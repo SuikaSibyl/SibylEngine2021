@@ -59,6 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -73,6 +74,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,12 +85,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\Sibyl\Application.cpp" />
+    <ClCompile Include="source\Sibyl\Log.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\Sibyl\Application.h" />
     <ClInclude Include="source\Sibyl\Core.h" />
     <ClInclude Include="source\Sibyl\EntryPoint.h" />
+    <ClInclude Include="source\Sibyl\Log.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

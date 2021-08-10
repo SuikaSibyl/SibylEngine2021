@@ -1,0 +1,3 @@
+[submodule "SibylEngine/vendor/spdlog"]
+	path = SibylEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog
