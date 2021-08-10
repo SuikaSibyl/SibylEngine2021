@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylEngine", "SibylEngine\SibylEngine.vcxproj", "{BCC5C14C-384A-4B5B-A826-2A5456C7D33B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylExample", "SibylExample\SibylExample.vcxproj", "{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -15,6 +17,10 @@ Global
 		{BCC5C14C-384A-4B5B-A826-2A5456C7D33B}.Debug|x64.Build.0 = Release|x64
 		{BCC5C14C-384A-4B5B-A826-2A5456C7D33B}.Release|x64.ActiveCfg = Release|x64
 		{BCC5C14C-384A-4B5B-A826-2A5456C7D33B}.Release|x64.Build.0 = Release|x64
+		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Debug|x64.ActiveCfg = Debug|x64
+		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Debug|x64.Build.0 = Debug|x64
+		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Release|x64.ActiveCfg = Release|x64
+		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
