@@ -47,23 +47,28 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\spdlog\include;E:\SibylEngine\SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -74,25 +79,43 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\vendor\spdlog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\spdlog\include;E:\SibylEngine\SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\Sibyl\Application.cpp" />
-    <ClCompile Include="source\Sibyl\Log.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\GLFWWindow.cpp" />
+    <ClCompile Include="source\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="source\SIByLpch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Core\Application.cpp" />
+    <ClCompile Include="source\Sibyl\Core\Log.cpp" />
+    <ClCompile Include="source\Sibyl\Core\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\Platform\OpenGL\GLFWWindow.h" />
+    <ClInclude Include="source\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="source\SIByL.h" />
-    <ClInclude Include="source\Sibyl\Application.h" />
-    <ClInclude Include="source\Sibyl\Core.h" />
-    <ClInclude Include="source\Sibyl\EntryPoint.h" />
-    <ClInclude Include="source\Sibyl\Log.h" />
+    <ClInclude Include="source\SIByLpch.h" />
+    <ClInclude Include="source\Sibyl\Core\Application.h" />
+    <ClInclude Include="source\Sibyl\Core\Core.h" />
+    <ClInclude Include="source\Sibyl\Core\EntryPoint.h" />
+    <ClInclude Include="source\Sibyl\Core\Window.h" />
+    <ClInclude Include="source\Sibyl\Events\ApplicationEvent.h" />
+    <ClInclude Include="source\Sibyl\Events\Event.h" />
+    <ClInclude Include="source\Sibyl\Events\KeyEvent.h" />
+    <ClInclude Include="source\Sibyl\Events\MouseEvent.h" />
+    <ClInclude Include="source\Sibyl\Core\Log.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

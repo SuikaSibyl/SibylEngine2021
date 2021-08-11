@@ -19,6 +19,6 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	SIByL_CORE_TRACE("Create Application");
+	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();
 }

@@ -2,8 +2,7 @@
 
 #include "Core.h"
 #include "spdlog/spdlog.h"
-#include <iostream>
-#include <memory>
+#include "spdlog/fmt/ostr.h"
 
 namespace SIByL
 {
@@ -11,10 +10,6 @@ namespace SIByL
 	{
 	public:
 		static void Init();
-
-		static void Logg();
-
-		static int i;
 
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger();
 		static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }

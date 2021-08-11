@@ -1,11 +1,8 @@
 #pragma once
 
 // For Use By Application
-
-#include "Sibyl/Application.h"
-
-#include "Sibyl/Log.h"
-
+#include "SIByLpch.h"
+#include "Sibyl/Core/Application.h"
 
 // EnterPoint
-#include "Sibyl/EntryPoint.h"
+#include "Sibyl/Core/EntryPoint.h"
