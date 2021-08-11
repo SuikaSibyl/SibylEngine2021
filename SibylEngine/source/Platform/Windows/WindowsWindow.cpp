@@ -9,7 +9,7 @@ namespace SIByL
 {
 	WindowsWindow* mApp;
 
-#ifdef SIByL_DX12_CORE
+#ifdef RENDER_API_DX12
 	Window* Window::Create(const WindowProps& props)
 	{
 		return new WindowsWindow(props);
@@ -158,6 +158,10 @@ namespace SIByL
 		m_Data.Height = props.Height;
 
 		SIByL_CORE_INFO("Creating windows {0} ({1}, {2})", props.Title, props.Width, props.Height);
+
+		#if defined(DEBUG) | defined(_DEBUG)
+				_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+		#endif
 
 		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW;

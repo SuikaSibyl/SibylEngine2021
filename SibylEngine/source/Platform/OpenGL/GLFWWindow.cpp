@@ -1,4 +1,5 @@
 #include "SIByLpch.h"
+#include <glad/glad.h> 
 #include "GLFWWindow.h"
 
 #include "Sibyl/Events/ApplicationEvent.h"
@@ -14,7 +15,7 @@ namespace SIByL
 		SIByL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-#ifdef SIByL_OpenGL_CORE
+#ifdef RENDER_API_OpenGL
 	Window* Window::Create(const WindowProps& props)
 	{
 		return new GLFWWindow(props);
@@ -49,6 +50,12 @@ namespace SIByL
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		glfwMakeContextCurrent(m_Window);
+
+		// Init GLAD
+		// OpenGL environment is setted up here
+		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+		SIByL_CORE_ASSERT(status, "Failed to initialized Glad!");
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 

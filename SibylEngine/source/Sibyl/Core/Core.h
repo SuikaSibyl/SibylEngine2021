@@ -1,9 +1,7 @@
 #pragma once
 
 #include "SIByLpch.h"
-
-//#define SIByL_DX12_CORE
-#define SIByL_OpenGL_CORE
+#include "SIByLsettings.h"
 
 #ifdef SIBYL_PLATFORM_WINDOWS
 	#ifdef SIBYL_BUILD_DLL
