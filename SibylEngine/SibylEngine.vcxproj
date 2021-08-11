@@ -99,6 +99,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Core\Application.cpp" />
+    <ClCompile Include="source\Sibyl\Core\Layer.cpp" />
+    <ClCompile Include="source\Sibyl\Core\LayerStack.cpp" />
     <ClCompile Include="source\Sibyl\Core\Log.cpp" />
     <ClCompile Include="source\Sibyl\Core\Window.cpp" />
   </ItemGroup>
@@ -110,6 +112,8 @@
     <ClInclude Include="source\Sibyl\Core\Application.h" />
     <ClInclude Include="source\Sibyl\Core\Core.h" />
     <ClInclude Include="source\Sibyl\Core\EntryPoint.h" />
+    <ClInclude Include="source\Sibyl\Core\Layer.h" />
+    <ClInclude Include="source\Sibyl\Core\LayerStack.h" />
     <ClInclude Include="source\Sibyl\Core\Window.h" />
     <ClInclude Include="source\Sibyl\Events\ApplicationEvent.h" />
     <ClInclude Include="source\Sibyl\Events\Event.h" />

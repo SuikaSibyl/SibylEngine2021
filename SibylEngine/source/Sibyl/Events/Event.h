@@ -43,8 +43,8 @@ namespace SIByL
 		{
 			return GetCategoryFlags() & category;
 		}
-	protected:
-		bool m_Handled = false;
+
+		bool Handled = false;
 	};
 
 	class EventDispatcher
@@ -63,7 +63,7 @@ namespace SIByL
 		{
 			if (m_Event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.m_Handled = func(*(T*)&m_Event);
+				m_Event.Handled = func(*(T*)&m_Event);
 				return true;
 			}
 			return false;
