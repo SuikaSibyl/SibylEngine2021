@@ -70,6 +70,13 @@ namespace SIByL
 			m_Data.EventCallback(event);
 			return 0;
 		}
+		case WM_CHAR:
+		{
+			KeyTypedEvent event(wParam);
+			if (m_Data.EventCallback == nullptr) return 0;
+			m_Data.EventCallback(event);
+			return 0;
+		}
 		// The WM_MENUCHAR message is sent when a menu is active and the user presses 
 		// a key that does not correspond to any mnemonic or accelerator key. 
 		case WM_MENUCHAR:

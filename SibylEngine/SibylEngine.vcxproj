@@ -134,6 +134,7 @@
     <ClInclude Include="source\Sibyl\Core\Application.h" />
     <ClInclude Include="source\Sibyl\Core\Core.h" />
     <ClInclude Include="source\Sibyl\Core\EntryPoint.h" />
+    <ClInclude Include="source\Sibyl\Core\Input.h" />
     <ClInclude Include="source\Sibyl\Core\Layer.h" />
     <ClInclude Include="source\Sibyl\Core\LayerStack.h" />
     <ClInclude Include="source\Sibyl\Core\Window.h" />
