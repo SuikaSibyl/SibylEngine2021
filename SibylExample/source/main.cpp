@@ -2,6 +2,11 @@
 
 #include <SIByL.h>
 
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 class ExampleLayer :public SIByL::Layer
 {
 public:
@@ -13,12 +18,14 @@ public:
 
 	void OnUpdate() override
 	{
-		SIByL_APP_INFO("ExampleLayer::Update");
+		//SIByL_APP_INFO("ExampleLayer::Update");
+		if (SIByL::Input::IsKeyPressed(SIByL_KEY_TAB))
+			SIByL_APP_TRACE("Tab key is pressed!");
 	}
 
 	void OnEvent(SIByL::Event& event) override
 	{
-		SIByL_APP_TRACE("{0}", event);
+		//SIByL_APP_TRACE("{0}", event);
 	}
 };
 

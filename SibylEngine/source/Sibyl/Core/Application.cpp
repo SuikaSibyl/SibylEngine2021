@@ -1,6 +1,7 @@
 #include "SIByLpch.h"
 #include "Application.h"
 #include "Sibyl/Events/ApplicationEvent.h"
+#include "Sibyl/Core/Input.h"
 
 namespace SIByL
 {

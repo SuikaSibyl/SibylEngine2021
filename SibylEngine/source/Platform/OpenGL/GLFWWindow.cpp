@@ -5,6 +5,7 @@
 #include "Sibyl/Events/ApplicationEvent.h"
 #include "Sibyl/Events/MouseEvent.h"
 #include "Sibyl/Events/KeyEvent.h"
+#include "Sibyl/Core/Input.h"
 
 namespace SIByL
 {
@@ -172,6 +173,11 @@ namespace SIByL
 	bool GLFWWindow::IsVSync() const
 	{
 		return m_Data.VSync;
+	}
+
+	void* GLFWWindow::GetNativeWindow() const
+	{
+		return (void*)m_Window;
 	}
 
 }
