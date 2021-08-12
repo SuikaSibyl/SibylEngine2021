@@ -181,6 +181,9 @@ namespace SIByL
 			return;
 		}
 
+		int syswidth = GetSystemMetrics(SM_CXSCREEN);
+		int sysheight = GetSystemMetrics(SM_CYSCREEN);
+
 		// Compute window rectangle dimensions based on requested client area dimensions.
 		RECT R = { 0, 0, props.Width, props.Height };
 		AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
