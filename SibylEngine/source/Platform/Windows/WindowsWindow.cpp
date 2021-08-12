@@ -7,7 +7,7 @@
 
 namespace SIByL
 {
-	WindowsWindow* mApp;
+	WindowsWindow* WindowsWindow::Main;
 
 #ifdef RENDER_API_DX12
 	Window* Window::Create(const WindowProps& props)
@@ -18,7 +18,7 @@ namespace SIByL
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
-		if (mApp == nullptr) mApp = this;
+		if (Main == nullptr) Main = this;
 		Init(props);
 	}
 
@@ -32,7 +32,7 @@ namespace SIByL
 	{
 		// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 		// before CreateWindow returns, and thus before mhMainWnd is valid.
-		return mApp->MsgProc(hwnd, msg, wParam, lParam);
+		return WindowsWindow::Main->MsgProc(hwnd, msg, wParam, lParam);
 	}
 
 	LRESULT CALLBACK WindowsWindow::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -200,6 +200,10 @@ namespace SIByL
 			SIByL_CORE_ERROR("Windows Window CreateWindow Failed.");
 			return;
 		}
+
+		// Init DX12 Environment
+		m_DX12Env = std::make_unique<DX12Environment>();
+		m_DX12Env->Init();
 
 		ShowWindow(mhMainWnd, SW_SHOW);
 

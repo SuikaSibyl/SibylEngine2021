@@ -94,8 +94,12 @@
   <ItemGroup>
     <ClCompile Include="source\Platform\DirectX12\DX12Environment.cpp" />
     <ClCompile Include="source\Platform\DirectX12\DX12Utility.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\ImGuiDX12Renderer.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\ImGuiLayerDX12.cpp" />
     <ClCompile Include="source\Platform\OpenGL\GLFWWindow.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\ImGuiLayerOpenGL.cpp" />
     <ClCompile Include="source\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
+    <ClCompile Include="source\Platform\Windows\ImGuiWin32Renderer.cpp" />
     <ClCompile Include="source\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="source\SIByLpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -117,8 +121,12 @@
   <ItemGroup>
     <ClInclude Include="source\Platform\DirectX12\DX12Environment.h" />
     <ClInclude Include="source\Platform\DirectX12\DX12Utility.h" />
+    <ClInclude Include="source\Platform\DirectX12\ImGuiDX12Renderer.h" />
+    <ClInclude Include="source\Platform\DirectX12\ImGuiLayerDX12.h" />
     <ClInclude Include="source\Platform\OpenGL\GLFWWindow.h" />
+    <ClInclude Include="source\Platform\OpenGL\ImGuiLayerOpenGL.h" />
     <ClInclude Include="source\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
+    <ClInclude Include="source\Platform\Windows\ImGuiWin32Renderer.h" />
     <ClInclude Include="source\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />

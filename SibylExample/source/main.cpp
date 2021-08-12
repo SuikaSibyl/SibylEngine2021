@@ -28,7 +28,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		//PushOverlay(new SIByL::ImGuiLayer());
+		PushOverlay(SIByL::ImGuiLayer::Create());
 	}
 
 	~Sandbox()

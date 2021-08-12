@@ -1,11 +1,13 @@
 #pragma once
 #include "Sibyl/Core/Window.h"
+#include "Platform/DirectX12/DX12Environment.h"
 
 namespace SIByL
 {
 	class WindowsWindow :public Window
 	{
 	public:
+		static WindowsWindow* Main;
 		WindowsWindow(const WindowProps& props);
 		virtual ~WindowsWindow();
 
@@ -45,5 +47,8 @@ namespace SIByL
 		HWND      mhMainWnd = nullptr; // main window handle
 	public:
 		LRESULT CALLBACK MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		HWND* GetHWND() { return &mhMainWnd; }
+	private:
+		std::unique_ptr<DX12Environment> m_DX12Env;
 	};
 }
