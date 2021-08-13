@@ -87,6 +87,9 @@
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">

@@ -113,6 +113,7 @@
     <ClCompile Include="source\Sibyl\Core\LayerStack.cpp" />
     <ClCompile Include="source\Sibyl\Core\Log.cpp" />
     <ClCompile Include="source\Sibyl\Core\Window.cpp" />
+    <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="vendor\glad\src\glad.cpp" />
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp" />
