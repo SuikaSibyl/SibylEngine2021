@@ -72,7 +72,7 @@ namespace SIByL
 		}
 		case WM_CHAR:
 		{
-			KeyTypedEvent event(wParam);
+			KeyTypedEvent event((unsigned int)wParam);
 			if (m_Data.EventCallback == nullptr) return 0;
 			m_Data.EventCallback(event);
 			return 0;
@@ -128,14 +128,14 @@ namespace SIByL
 		}
 		case WM_MOUSEMOVE:
 		{
-			MouseMovedEvent event(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			MouseMovedEvent event((float)GET_X_LPARAM(lParam), (float)GET_Y_LPARAM(lParam));
 			if (m_Data.EventCallback == nullptr) return 0;
 			m_Data.EventCallback(event);
 			return 0;
 		}
 		case WM_MOUSEWHEEL:
 		{
-			MouseScrolledEvent event(0, GET_WHEEL_DELTA_WPARAM(wParam) / 120);
+			MouseScrolledEvent event(0, (float)GET_WHEEL_DELTA_WPARAM(wParam) / 120);
 			if (m_Data.EventCallback == nullptr) return 0;
 			m_Data.EventCallback(event);
 			return 0;
@@ -192,7 +192,7 @@ namespace SIByL
 		int sysheight = GetSystemMetrics(SM_CYSCREEN);
 
 		// Compute window rectangle dimensions based on requested client area dimensions.
-		RECT R = { 0, 0, props.Width, props.Height };
+		RECT R = { 0, 0, (LONG)props.Width, (LONG)props.Height };
 		AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 		int width = R.right - R.left;
 		int height = R.bottom - R.top;

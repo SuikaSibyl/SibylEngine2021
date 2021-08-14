@@ -3,11 +3,16 @@
 #include "SIByLpch.h"
 #include "SIByLsettings.h"
 
+//#define SIBYL_DYNAMIC_LINK
 #ifdef SIBYL_PLATFORM_WINDOWS
-	#ifdef SIBYL_BUILD_DLL
-		#define SIByL_API __declspec(dllexport)
+	#ifdef SIBYL_DYNAMIC_LINK
+		#ifdef SIBYL_BUILD_DLL
+			#define SIByL_API __declspec(dllexport)
+		#else
+			#define SIByL_API __declspec(dllimport)
+		#endif
 	#else
-		#define SIByL_API __declspec(dllimport)
+		#define SIByL_API
 	#endif
 #else
 	#error Sibyl Only Support Windows Now!
