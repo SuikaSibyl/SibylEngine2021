@@ -1,5 +1,6 @@
 #pragma once
 #include "Sibyl/Core/Window.h"
+#include "Sibyl/Renderer/GraphicContext.h"
 #include <GLFW/glfw3.h>
 
 namespace SIByL
@@ -43,5 +44,6 @@ namespace SIByL
 		};
 
 		WindowData m_Data;
+		GraphicContext* m_GraphicContext;
 	};
 }

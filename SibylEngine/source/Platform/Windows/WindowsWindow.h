@@ -1,6 +1,6 @@
 #pragma once
 #include "Sibyl/Core/Window.h"
-#include "Platform/DirectX12/DX12Environment.h"
+#include "Platform/DirectX12/Common/DX12Context.h"
 
 namespace SIByL
 {
@@ -24,6 +24,8 @@ namespace SIByL
 
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+
+		virtual void* GetNativeWindow() const override;
 
 	private:
 		virtual void Init(const WindowProps& props);
@@ -49,6 +51,6 @@ namespace SIByL
 		LRESULT CALLBACK MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		HWND* GetHWND() { return &mhMainWnd; }
 	private:
-		std::unique_ptr<DX12Environment> m_DX12Env;
+		std::unique_ptr<DX12Context> m_DX12Env;
 	};
 }

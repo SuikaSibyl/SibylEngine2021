@@ -7,6 +7,8 @@
 #include "Sibyl/Events/KeyEvent.h"
 #include "Sibyl/Core/Input.h"
 
+#include "Platform/OpenGL/OpenGLContext.h"
+
 namespace SIByL
 {
 	static bool s_GLFWInitialzied = false;
@@ -50,12 +52,9 @@ namespace SIByL
 		}
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-
-		// Init GLAD
-		// OpenGL environment is setted up here
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		SIByL_CORE_ASSERT(status, "Failed to initialized Glad!");
+		
+		m_GraphicContext = new OpenGLContext(m_Window);
+		m_GraphicContext->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
@@ -157,7 +156,7 @@ namespace SIByL
 	void GLFWWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_GraphicContext->SwipBuffers();
 	}
 
 	void GLFWWindow::SetVSync(bool enabled)

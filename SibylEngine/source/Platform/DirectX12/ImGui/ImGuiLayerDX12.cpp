@@ -3,7 +3,7 @@
 
 #include "Platform/Windows/WindowsWindow.h"
 #include "Platform/Windows/ImGuiWin32Renderer.h"
-#include "Platform/DirectX12/ImGuiDX12Renderer.h"
+#include "Platform/DirectX12/ImGui/ImGuiDX12Renderer.h"
 
 namespace SIByL
 {
@@ -17,9 +17,9 @@ namespace SIByL
 
 	void ImGuiLayerDX12::PlatformInit()
 	{
-		g_pd3dSrvDescHeap = DX12Environment::Main->CreateSRVHeap();
+		g_pd3dSrvDescHeap = DX12Context::Main->CreateSRVHeap();
 		ImGui_ImplWin32_Init(WindowsWindow::Main->GetHWND());
-		ImGui_ImplDX12_Init(DX12Environment::Main->GetDevice(), NUM_FRAMES_IN_FLIGHT,
+		ImGui_ImplDX12_Init(DX12Context::Main->GetDevice(), NUM_FRAMES_IN_FLIGHT,
 			DXGI_FORMAT_R8G8B8A8_UNORM, g_pd3dSrvDescHeap,
 			g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(),
 			g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
@@ -34,7 +34,7 @@ namespace SIByL
 
 	void ImGuiLayerDX12::NewFrameEnd()
 	{
-		ID3D12GraphicsCommandList* g_pd3dCommandList = DX12Environment::Main->GetGraphicCommandList();
+		ID3D12GraphicsCommandList* g_pd3dCommandList = DX12Context::Main->GetGraphicCommandList();
 		g_pd3dCommandList->SetDescriptorHeaps(1, &g_pd3dSrvDescHeap);
 		ImGui::Render();
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), g_pd3dCommandList);

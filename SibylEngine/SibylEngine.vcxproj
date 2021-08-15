@@ -60,7 +60,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
@@ -83,7 +83,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
@@ -102,15 +102,19 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\Platform\DirectX12\DX12Environment.cpp" />
-    <ClCompile Include="source\Platform\DirectX12\DX12Utility.cpp" />
-    <ClCompile Include="source\Platform\DirectX12\ImGuiDX12Renderer.cpp" />
-    <ClCompile Include="source\Platform\DirectX12\ImGuiLayerDX12.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Common\DX12Context.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Common\DX12Utility.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Common\UploadBuffer.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
     <ClCompile Include="source\Platform\OpenGL\GLFWInput.cpp" />
     <ClCompile Include="source\Platform\OpenGL\GLFWWindow.cpp" />
     <ClCompile Include="source\Platform\OpenGL\ImGuiLayerOpenGL.cpp" />
     <ClCompile Include="source\Platform\OpenGL\ImGuiOpenGLRenderer.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="source\Platform\Windows\ImGuiWin32Renderer.cpp" />
+    <ClCompile Include="source\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="source\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="source\Sibyl\Core\SIByLpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -132,15 +136,25 @@
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Platform\DirectX12\DX12Environment.h" />
-    <ClInclude Include="source\Platform\DirectX12\DX12Utility.h" />
-    <ClInclude Include="source\Platform\DirectX12\ImGuiDX12Renderer.h" />
-    <ClInclude Include="source\Platform\DirectX12\ImGuiLayerDX12.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\CommandList.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocation.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocator.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocatorPage.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\DX12Context.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\DX12Utility.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\DynamicDescriptorHeap.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\ResourceStateTracker.h" />
+    <ClInclude Include="source\Platform\DirectX12\Common\UploadBuffer.h" />
+    <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.h" />
+    <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.h" />
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h" />
     <ClInclude Include="source\Platform\OpenGL\GLFWInput.h" />
     <ClInclude Include="source\Platform\OpenGL\GLFWWindow.h" />
     <ClInclude Include="source\Platform\OpenGL\ImGuiLayerOpenGL.h" />
     <ClInclude Include="source\Platform\OpenGL\ImGuiOpenGLRenderer.h" />
+    <ClInclude Include="source\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="source\Platform\Windows\ImGuiWin32Renderer.h" />
+    <ClInclude Include="source\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="source\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />
@@ -160,6 +174,16 @@
     <ClInclude Include="source\Sibyl\Events\MouseEvent.h" />
     <ClInclude Include="source\Sibyl\Core\Log.h" />
     <ClInclude Include="source\Sibyl\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="source\Sibyl\Renderer\FrameBuffer.h" />
+    <ClInclude Include="source\Sibyl\Renderer\GraphicContext.h" />
+    <ClInclude Include="source\Sibyl\Renderer\IndexBuffer.h" />
+    <ClInclude Include="source\Sibyl\Renderer\Pipelines.h" />
+    <ClInclude Include="source\Sibyl\Renderer\RenderPass.h" />
+    <ClInclude Include="source\Sibyl\Renderer\Shader.h" />
+    <ClInclude Include="source\Sibyl\Renderer\State.h" />
+    <ClInclude Include="source\Sibyl\Renderer\SwapChain.h" />
+    <ClInclude Include="source\Sibyl\Renderer\Texture.h" />
+    <ClInclude Include="source\Sibyl\Renderer\VertexBuffer.h" />
     <ClInclude Include="vendor\glad\include\glad\glad.h" />
     <ClInclude Include="vendor\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />

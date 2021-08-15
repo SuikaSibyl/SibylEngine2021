@@ -209,7 +209,7 @@ namespace SIByL
 		}
 
 		// Init DX12 Environment
-		m_DX12Env = std::make_unique<DX12Environment>();
+		m_DX12Env = std::make_unique<DX12Context>();
 		m_DX12Env->Init();
 
 		ShowWindow(mhMainWnd, SW_SHOW);
@@ -222,6 +222,11 @@ namespace SIByL
 	void WindowsWindow::Shutdown()
 	{
 		DestroyWindow(mhMainWnd);
+	}
+
+	void* WindowsWindow::GetNativeWindow() const
+	{
+		return (void*)mhMainWnd;
 	}
 
 	void WindowsWindow::OnUpdate()

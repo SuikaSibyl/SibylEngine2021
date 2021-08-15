@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "Sibyl/Events/ApplicationEvent.h"
 #include "Sibyl/Core/Input.h"
+#include "glad/glad.h"
 
 namespace SIByL
 {
@@ -25,6 +26,8 @@ namespace SIByL
 	{
 		while (m_Running)
 		{
+			//glClearColor(1, 0, 1, 1);
+			//glClear(GL_COLOR_BUFFER_BIT);
 
 			for (Layer* layer : m_LayerStack)
 			{
@@ -40,7 +43,7 @@ namespace SIByL
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
 
-		SIByL_CORE_TRACE("{0}", e);
+		//SIByL_CORE_TRACE("{0}", e);
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
