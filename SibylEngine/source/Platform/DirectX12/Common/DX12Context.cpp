@@ -11,10 +11,26 @@ namespace SIByL
 	{
 		SIByL_CORE_ASSERT(!Main, "DX12 Environment already exists!");
 		Main = this;
+		EnableDebugLayer();
 		CreateDevice();
 		CreateCommandQueue();
 		CreateGraphicCommandList();
+
+		m_SwapChain = std::make_unique<DX12SwapChain>();
+
+
 		SIByL_CORE_INFO("DirectX 12 Init finished");
+	}
+
+	void DX12Context::EnableDebugLayer()
+	{
+#if defined(_DEBUG)
+		// Always enable the debug layer before doing anything DX12 related
+		// so all possible errors generated while creating DX12 objects
+		// are caught by the debug layer.
+		DXCall(D3D12GetDebugInterface(IID_PPV_ARGS(&m_DebugInterface)));
+		m_DebugInterface->EnableDebugLayer();
+#endif
 	}
 
 	void DX12Context::CreateDevice()

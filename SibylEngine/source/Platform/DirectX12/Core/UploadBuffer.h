@@ -46,6 +46,7 @@ namespace SIByL
 		struct Page
 		{
 			Page(size_t sizeInBytes);
+			~Page();
 			// Check to see if the page has room to satisfy the requested
 			// allocation.
 			bool HasSpace(size_t sizeInBytes, size_t alignment) const;

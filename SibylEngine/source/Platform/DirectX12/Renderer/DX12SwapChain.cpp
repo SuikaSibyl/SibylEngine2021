@@ -5,6 +5,12 @@
 
 namespace SIByL
 {
+    DX12SwapChain::DX12SwapChain()
+        :SwapChain(WindowsWindow::Main->GetWidth(), WindowsWindow::Main->GetHeight())
+    {
+        CreateSwapChain(WindowsWindow::Main->GetWidth(), WindowsWindow::Main->GetHeight());
+    }
+
     DX12SwapChain::DX12SwapChain(int width, int height)
         :SwapChain(width, height)
     {

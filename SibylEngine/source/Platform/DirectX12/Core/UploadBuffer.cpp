@@ -90,7 +90,54 @@ namespace SIByL
             IID_PPV_ARGS(&(m_d3d12Resource))
         ));
 
-        //m_GPUPtr = m_d3d12Resource->GetGPUVirtualAddress();
-        //m_d3d12Resource->Map(0, nullptr, &m_CPUPtr);
+        m_GPUPtr = m_d3d12Resource->GetGPUVirtualAddress();
+        m_d3d12Resource->Map(0, nullptr, &m_CPUPtr);
+    }
+
+    UploadBuffer::Page::~Page()
+    {
+        m_d3d12Resource->Unmap(0, nullptr);
+        m_CPUPtr = nullptr;
+        m_GPUPtr = D3D12_GPU_VIRTUAL_ADDRESS(0);
+    }
+
+    bool UploadBuffer::Page::HasSpace(size_t sizeInBytes, size_t alignment) const
+    {
+        size_t alignedSize = Math::AlignUp(sizeInBytes, alignment);
+        size_t alignedOffset = Math::AlignUp(m_Offset, alignment);
+
+        return alignedOffset + alignedSize <= m_PageSize;
+    }
+
+    // UPLOADBUFFER::PAGE::ALLOCATE
+    // The Page::Allocate method is where the actual allocation occurs.
+    // This method returns an Allocation structure that can be used to 
+    // directly copy(using memcpy for example) CPU data to the GPUand bind that GPU address to the pipeline.
+    UploadBuffer::Allocation UploadBuffer::Page::Allocate(size_t sizeInBytes, size_t alignment)
+    {
+        if (!HasSpace(sizeInBytes, alignment))
+        {
+            // Can't allocate space from page.
+            throw std::bad_alloc();
+        }
+
+        size_t alignedSize = Math::AlignUp(sizeInBytes, alignment);
+        m_Offset = Math::AlignUp(m_Offset, alignment);
+
+        Allocation allocation;
+        allocation.CPU = static_cast<uint8_t*>(m_CPUPtr) + m_Offset;
+        allocation.GPU = m_GPUPtr + m_Offset;
+
+        m_Offset += alignedSize;
+
+        return allocation;
+    }
+
+    // UPLOADBUFFER::PAGE::RESET
+    // The Page::Reset method simply resets the page¡¯s pointer offset to 0
+    // so that it can be used to make new allocations.
+    void UploadBuffer::Page::Reset()
+    {
+        m_Offset = 0;
     }
 }

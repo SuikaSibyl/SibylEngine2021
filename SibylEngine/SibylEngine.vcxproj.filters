@@ -99,7 +99,19 @@
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Common\UploadBuffer.cpp">
+    <ClCompile Include="source\Platform\DirectX12\Core\UploadBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocation.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1109,25 +1121,25 @@
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\UploadBuffer.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\UploadBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocator.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocatorPage.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocation.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocation.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\DynamicDescriptorHeap.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\ResourceStateTracker.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\ResourceStateTracker.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Common\CommandList.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\CommandList.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

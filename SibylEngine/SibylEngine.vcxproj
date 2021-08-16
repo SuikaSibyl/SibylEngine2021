@@ -104,7 +104,11 @@
   <ItemGroup>
     <ClCompile Include="source\Platform\DirectX12\Common\DX12Context.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Common\DX12Utility.cpp" />
-    <ClCompile Include="source\Platform\DirectX12\Common\UploadBuffer.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocation.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocator.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\UploadBuffer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
@@ -136,15 +140,15 @@
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Platform\DirectX12\Common\CommandList.h" />
-    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocation.h" />
-    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocator.h" />
-    <ClInclude Include="source\Platform\DirectX12\Common\DescriptorAllocatorPage.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\CommandList.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocation.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocator.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Context.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Utility.h" />
-    <ClInclude Include="source\Platform\DirectX12\Common\DynamicDescriptorHeap.h" />
-    <ClInclude Include="source\Platform\DirectX12\Common\ResourceStateTracker.h" />
-    <ClInclude Include="source\Platform\DirectX12\Common\UploadBuffer.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\ResourceStateTracker.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\UploadBuffer.h" />
     <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.h" />
     <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h" />

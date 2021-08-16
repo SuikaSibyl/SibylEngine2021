@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <cstdint>
+#include <mutex>
 #include <utility>
 #include <algorithm>
 #include <functional>
@@ -15,8 +16,11 @@
 #include <codecvt>
 #include <comdef.h>
 
+#include <map>
+#include <set>
 #include <vector>
 #include <deque>
+#include <queue>
 #include <stdexcept>
 #include <unordered_map>
 #include <unordered_set>

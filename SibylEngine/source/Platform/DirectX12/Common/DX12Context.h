@@ -11,6 +11,8 @@ namespace SIByL
 		static DX12Context* Main;
 		void Init();
 
+		inline static uint64_t GetFrameCount() { return Main->m_FrameCount; };
+
 	public:
 		inline static ID3D12Device* GetDevice() { return Main->m_D3dDevice.Get(); }
 		inline static ID3D12GraphicsCommandList* GetGraphicCommandList() { return Main->m_GraphicCmdList.Get(); }
@@ -18,6 +20,7 @@ namespace SIByL
 		inline static ID3D12CommandQueue* GetCommandQueue() { return Main->m_CommandQueue.Get(); }
 
 	private:
+		void EnableDebugLayer();
 		void CreateDevice();
 		void GetDescriptorSize();
 		void CreateCommandQueue();
@@ -28,6 +31,7 @@ namespace SIByL
 		ID3D12DescriptorHeap* CreateSRVHeap();
 
 	private:
+		ComPtr<ID3D12Debug>			m_DebugInterface;
 		ComPtr<IDXGIFactory4>		m_DxgiFactory;
 		ComPtr<ID3D12Device>		m_D3dDevice;
 		ComPtr<ID3D12CommandQueue>	m_CommandQueue;
@@ -35,5 +39,7 @@ namespace SIByL
 		ComPtr<ID3D12GraphicsCommandList> m_GraphicCmdList;
 
 		std::unique_ptr<SwapChain> m_SwapChain;
+
+		uint64_t m_FrameCount;
 	};
 }

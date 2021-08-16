@@ -8,6 +8,7 @@ namespace SIByL
 	class DX12SwapChain :public SwapChain
 	{
 	public:
+		DX12SwapChain();
 		DX12SwapChain(int width, int height);
 		void CreateSwapChain(int width, int height);
 
