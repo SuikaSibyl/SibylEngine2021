@@ -26,6 +26,7 @@ namespace SIByL
 		bool IsVSync() const override;
 
 		virtual void* GetNativeWindow() const override;
+		static inline GLFWWindow* Get() { return Main; }
 
 	private:
 		virtual void Init(const WindowProps& props);
@@ -33,6 +34,7 @@ namespace SIByL
 
 	private:
 		GLFWwindow* m_Window;
+		static GLFWWindow* Main;
 
 		struct WindowData
 		{

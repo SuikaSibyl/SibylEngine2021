@@ -5,6 +5,8 @@
 #include "Sibyl/Events/MouseEvent.h"
 #include "Sibyl/Events/KeyEvent.h"
 
+#include "Platform/DirectX12/Core/DX12RenderPipeline.h"
+
 namespace SIByL
 {
 	WindowsWindow* WindowsWindow::Main;
@@ -233,20 +235,14 @@ namespace SIByL
 	{
 		MSG msg = { 0 };
 
-		while (msg.message != WM_QUIT)
+		// If there are Window messages then process them.
+		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
-			// If there are Window messages then process them.
-			if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			// Otherwise, do animation/game stuff.
-			else
-			{
-
-			}
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
+		// Otherwise, do animation/game stuff.
+		DX12RenderPipeline::DrawFrame();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)

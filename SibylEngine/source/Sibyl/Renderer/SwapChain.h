@@ -1,11 +1,19 @@
 #pragma once
 
-class SwapChain
+namespace SIByL
 {
-public:
-	SwapChain(int width, int height)
-		:m_Width(width), m_Height(height) {}
+	class SwapChain
+	{
+	public:
+		SwapChain(int width, int height)
+			:m_Width(width), m_Height(height) {}
 
-private:
-	int m_Width, m_Height;
-};
+		virtual void BindRenderTarget() {}
+		virtual void SetRenderTarget() {}
+		virtual void PreparePresent() {}
+		virtual void Present() {}
+
+	private:
+		int m_Width, m_Height;
+	};
+}

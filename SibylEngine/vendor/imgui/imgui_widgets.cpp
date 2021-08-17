@@ -1,5 +1,4 @@
 #include "SIByLpch.h"
-
 // dear imgui, v1.84 WIP
 // (widgets code)
 
@@ -838,7 +837,7 @@ bool ImGui::CollapseButton(ImGuiID id, const ImVec2& pos)
         window->DrawList->AddCircleFilled(center/*+ ImVec2(0.0f, -0.5f)*/, g.FontSize * 0.5f + 1.0f, bg_col, 12);
     RenderArrow(window->DrawList, bb.Min + g.Style.FramePadding, text_col, window->Collapsed ? ImGuiDir_Right : ImGuiDir_Down, 1.0f);
 
-    // Switch to moving the window after mouse is moved beyond the initial drag threshold
+    // SetRenderTarget to moving the window after mouse is moved beyond the initial drag threshold
     if (IsItemActive() && IsMouseDragging(0))
         StartMouseMovingWindow(window);
 

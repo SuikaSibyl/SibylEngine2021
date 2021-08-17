@@ -17,9 +17,11 @@ namespace SIByL
 
 		void Run();
 		void OnEvent(Event& e);
+		void OnDraw();
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
+		LayerStack& GetLayerStack() { return m_LayerStack; }
 
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }

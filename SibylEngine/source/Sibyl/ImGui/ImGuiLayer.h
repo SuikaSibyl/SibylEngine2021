@@ -15,7 +15,7 @@ namespace SIByL
 
 		void OnAttach();
 		void OnDetach();
-
+		void OnDraw() override;
 		void OnUpdate();
 		void OnEvent(Event& event);
 

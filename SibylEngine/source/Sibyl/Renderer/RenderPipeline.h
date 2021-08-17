@@ -2,11 +2,11 @@
 
 namespace SIByL
 {
-	class ResourceStateTracker
+	class RenderPipeline
 	{
 	public:
+		static void Draw();
 
-	private:
 
 	};
 }

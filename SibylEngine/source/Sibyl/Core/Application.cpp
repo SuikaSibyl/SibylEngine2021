@@ -26,14 +26,13 @@ namespace SIByL
 	{
 		while (m_Running)
 		{
-			//glClearColor(1, 0, 1, 1);
-			//glClear(GL_COLOR_BUFFER_BIT);
-
+			// Update
 			for (Layer* layer : m_LayerStack)
 			{
 				layer->OnUpdate();
 			}
 
+			// Draw
 			m_Window->OnUpdate();
 		}
 	}
@@ -50,6 +49,14 @@ namespace SIByL
 			(*--it)->OnEvent(e);
 			if (e.Handled)
 				break;
+		}
+	}
+
+	void Application::OnDraw()
+	{
+		for (auto layer : m_LayerStack)
+		{
+			layer->OnDraw();
 		}
 	}
 

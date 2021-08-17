@@ -1,5 +1,4 @@
 #include "SIByLpch.h"
-
 // dear imgui, v1.84 WIP
 // (main code and documentation)
 
@@ -335,7 +334,7 @@ CODE
  USING GAMEPAD/KEYBOARD NAVIGATION CONTROLS
  ------------------------------------------
  - The gamepad/keyboard navigation is fairly functional and keeps being improved.
- - Gamepad support is particularly useful to use Dear ImGui on a console system (e.g. PS4, Switch, XB1) without a mouse!
+ - Gamepad support is particularly useful to use Dear ImGui on a console system (e.g. PS4, SetRenderTarget, XB1) without a mouse!
  - You can ask questions and report issues at https://github.com/ocornut/imgui/issues/787
  - The initial focus was to support game controllers, but keyboard is becoming increasingly and decently usable.
  - Keyboard:

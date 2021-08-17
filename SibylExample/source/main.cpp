@@ -27,6 +27,11 @@ public:
 	{
 		//SIByL_APP_TRACE("{0}", event);
 	}
+
+	void OnDraw() override
+	{
+		SIByL_APP_TRACE("Example Draw");
+	}
 };
 
 class Sandbox :public SIByL::Application

@@ -12,10 +12,12 @@
 namespace SIByL
 {
 	static bool s_GLFWInitialzied = false;
+	GLFWWindow* GLFWWindow::Main;
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
 		SIByL_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+
 	}
 
 #ifdef RENDER_API_OpenGL
@@ -27,6 +29,8 @@ namespace SIByL
 
 	GLFWWindow::GLFWWindow(const WindowProps& props)
 	{
+		SIByL_CORE_ASSERT(!Main, "GLFW Window Already Exists!");
+		Main = this;
 		Init(props);
 	}
 
@@ -156,7 +160,7 @@ namespace SIByL
 	void GLFWWindow::OnUpdate()
 	{
 		glfwPollEvents();
-		m_GraphicContext->SwipBuffers();
+		OpenGLRenderPipeline::DrawFrame();
 	}
 
 	void GLFWWindow::SetVSync(bool enabled)

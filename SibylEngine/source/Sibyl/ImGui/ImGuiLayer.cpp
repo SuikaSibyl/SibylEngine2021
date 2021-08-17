@@ -55,6 +55,11 @@ namespace SIByL
 		static bool show = true;
 		ImGui::ShowDemoWindow(&show);
 
+		ImGui::Render();
+	}
+
+	void ImGuiLayer::OnDraw()
+	{
 		NewFrameEnd();
 	}
 

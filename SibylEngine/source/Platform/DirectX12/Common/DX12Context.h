@@ -2,6 +2,10 @@
 
 #include "SIByLpch.h"
 #include "Sibyl/Renderer/SwapChain.h"
+#include "Platform/DirectX12/Core/DescriptorAllocator.h"
+#include "Platform/DirectX12/Core/DX12CommandList.h"
+#include "Platform/DirectX12/Core/DX12RenderPipeline.h"
+#include "Platform/DirectX12/Core/DX12Synchronizer.h"
 
 namespace SIByL
 {
@@ -15,7 +19,10 @@ namespace SIByL
 
 	public:
 		inline static ID3D12Device* GetDevice() { return Main->m_D3dDevice.Get(); }
-		inline static ID3D12GraphicsCommandList* GetGraphicCommandList() { return Main->m_GraphicCmdList.Get(); }
+		inline static DX12GraphicCommandList* GetGraphicCommandList() { return Main->m_GraphicCommandList.get(); }
+		inline static SwapChain* GetSwapChain() { return Main->m_SwapChain.get(); }
+		inline static DX12Synchronizer* GetSynchronizer() { return Main->m_Synchronizer.get(); }
+		inline static ID3D12GraphicsCommandList* GetDXGraphicCommandList() { return Main->m_GraphicCommandList->Get(); }
 		inline static IDXGIFactory4* GetDxgiFactory() { return Main->m_DxgiFactory.Get(); }
 		inline static ID3D12CommandQueue* GetCommandQueue() { return Main->m_CommandQueue.Get(); }
 
@@ -25,7 +32,10 @@ namespace SIByL
 		void GetDescriptorSize();
 		void CreateCommandQueue();
 		void CreateGraphicCommandList();
-		void CreateSwapChain(int width, int height);
+		void CreateDescriptorAllocator();
+		void CreateSwapChain();
+		void CreateRenderPipeline();
+		void CreateSynchronizer();
 
 	public:
 		ID3D12DescriptorHeap* CreateSRVHeap();
@@ -35,10 +45,35 @@ namespace SIByL
 		ComPtr<IDXGIFactory4>		m_DxgiFactory;
 		ComPtr<ID3D12Device>		m_D3dDevice;
 		ComPtr<ID3D12CommandQueue>	m_CommandQueue;
-		ComPtr<ID3D12CommandAllocator> m_CommandAllocator;
-		ComPtr<ID3D12GraphicsCommandList> m_GraphicCmdList;
 
 		std::unique_ptr<SwapChain> m_SwapChain;
+		std::unique_ptr<DX12GraphicCommandList> m_GraphicCommandList;
+		std::unique_ptr<DX12RenderPipeline> m_RenderPipeline;
+		std::unique_ptr<DX12Synchronizer> m_Synchronizer;
+
+		// Descriptor Sizes
+		// ====================================================================
+	public:
+		inline static UINT GetRtvDescriptorSize() { return Main->m_RtvDescriptorSize; }
+		inline static UINT GetDsvDescriptorSize() { return Main->m_DsvDescriptorSize; }
+		inline static UINT GetCbvSrvUavDescriptorSize() { return Main->m_Cbv_Srv_UavDescriptorSize; }
+
+	private:
+		UINT m_RtvDescriptorSize;
+		UINT m_DsvDescriptorSize;
+		UINT m_Cbv_Srv_UavDescriptorSize;
+
+		// Descriptor Allocators
+		// ====================================================================
+	public:
+		inline static DescriptorAllocator* GetRtvDescriptorAllocator() { return Main->m_RtvDescriptorAllocator.get(); }
+		inline static DescriptorAllocator* GetDsvDescriptorAllocator() { return Main->m_DsvDescriptorAllocator.get(); }
+		inline static DescriptorAllocator* GetSrvDescriptorAllocator() { return Main->m_SrvDescriptorAllocator.get(); }
+
+	private:
+		std::unique_ptr<DescriptorAllocator> m_RtvDescriptorAllocator;
+		std::unique_ptr<DescriptorAllocator> m_DsvDescriptorAllocator;
+		std::unique_ptr<DescriptorAllocator> m_SrvDescriptorAllocator;
 
 		uint64_t m_FrameCount;
 	};

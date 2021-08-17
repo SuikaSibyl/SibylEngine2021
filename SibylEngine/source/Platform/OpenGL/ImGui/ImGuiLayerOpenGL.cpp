@@ -1,6 +1,6 @@
 #include "SIByLpch.h"
 #include "ImGuiLayerOpenGL.h"
-#include "Platform/OpenGL/ImGuiOpenGLRenderer.h"
+#include "Platform/OpenGL/ImGui/ImGuiOpenGLRenderer.h"
 
 namespace SIByL
 {
@@ -23,7 +23,6 @@ namespace SIByL
 
 	void ImGuiLayerOpenGL::NewFrameEnd()
 	{
-		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 }

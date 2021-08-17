@@ -13,11 +13,14 @@ namespace SIByL
 		Main = this;
 		EnableDebugLayer();
 		CreateDevice();
+		GetDescriptorSize();
 		CreateCommandQueue();
 		CreateGraphicCommandList();
+		CreateDescriptorAllocator();
+		CreateSwapChain();
 
-		m_SwapChain = std::make_unique<DX12SwapChain>();
-
+		CreateRenderPipeline();
+		CreateSynchronizer();
 
 		SIByL_CORE_INFO("DirectX 12 Init finished");
 	}
@@ -43,9 +46,9 @@ namespace SIByL
 
 	void DX12Context::GetDescriptorSize()
 	{
-		UINT rtvDescriptorSize = m_D3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		UINT dsvDescriptorSize = m_D3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-		UINT cbv_srv_uavDescriptorSize = m_D3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_RtvDescriptorSize = m_D3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		m_DsvDescriptorSize = m_D3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		m_Cbv_Srv_UavDescriptorSize = m_D3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	void DX12Context::CreateCommandQueue()
@@ -58,18 +61,30 @@ namespace SIByL
 
 	void DX12Context::CreateGraphicCommandList()
 	{
-		DXCall(m_D3dDevice->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_CommandAllocator)));
-		DXCall(m_D3dDevice->CreateCommandList(0,
-			D3D12_COMMAND_LIST_TYPE_DIRECT,
-			m_CommandAllocator.Get(),
-			nullptr,
-			IID_PPV_ARGS(&m_GraphicCmdList)));
-		m_GraphicCmdList->Close();
+		m_GraphicCommandList = std::make_unique<DX12GraphicCommandList>();
 	}
 
-	void DX12Context::CreateSwapChain(int width, int height)
+	void DX12Context::CreateDescriptorAllocator()
 	{
-		m_SwapChain = std::make_unique<DX12SwapChain>(width, height);
+		m_RtvDescriptorAllocator = std::make_unique<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		m_DsvDescriptorAllocator = std::make_unique<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		m_SrvDescriptorAllocator = std::make_unique<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	void DX12Context::CreateSwapChain()
+	{
+		m_SwapChain = std::make_unique<DX12SwapChain>();
+		m_SwapChain->BindRenderTarget();
+	}
+
+	void DX12Context::CreateRenderPipeline()
+	{
+		m_RenderPipeline = std::make_unique<DX12RenderPipeline>();
+	}
+
+	void DX12Context::CreateSynchronizer()
+	{
+		m_Synchronizer = std::make_unique<DX12Synchronizer>();
 	}
 
 	ID3D12DescriptorHeap* DX12Context::CreateSRVHeap()

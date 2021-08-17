@@ -45,7 +45,7 @@
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\ImGuiOpenGLRenderer.cpp">
+    <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiOpenGLRenderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="vendor\imgui\imgui.cpp">
@@ -75,7 +75,7 @@
     <ClCompile Include="source\Platform\Windows\ImGuiWin32Renderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\ImGuiLayerOpenGL.cpp">
+    <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiLayerOpenGL.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp">
@@ -112,6 +112,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DX12CommandList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DX12Synchronizer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\Core\DX12RenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\OpenGL\Core\OpenGLRenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,7 +185,7 @@
     <ClInclude Include="source\Sibyl\ImGui\ImGuiLayer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\ImGuiOpenGLRenderer.h">
+    <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiOpenGLRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="vendor\imgui\imconfig.h">
@@ -206,7 +221,7 @@
     <ClInclude Include="source\Platform\Windows\ImGuiWin32Renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\ImGuiLayerOpenGL.h">
+    <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiLayerOpenGL.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.h">
@@ -1139,7 +1154,25 @@
     <ClInclude Include="source\Platform\DirectX12\Core\ResourceStateTracker.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\CommandList.h">
+    <ClInclude Include="source\Platform\DirectX12\Core\DX12CommandList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\Core\DX12Synchronizer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\Core\DX12RenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Renderer\RenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\OpenGL\Core\OpenGLRenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\include\d3dx12.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
