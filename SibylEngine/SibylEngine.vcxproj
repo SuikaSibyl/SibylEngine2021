@@ -116,6 +116,7 @@
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLVertexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Window\GLFWInput.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Window\GLFWWindow.cpp" />
     <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.cpp" />

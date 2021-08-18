@@ -1,5 +1,8 @@
 #pragma once
 
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 #include "Sibyl/Renderer/GraphicContext.h"
 #include "Platform/OpenGL/Renderer/OpenGLRenderPipeline.h"
 #include "Platform/OpenGL/Renderer/OpenGLSwapChain.h"
