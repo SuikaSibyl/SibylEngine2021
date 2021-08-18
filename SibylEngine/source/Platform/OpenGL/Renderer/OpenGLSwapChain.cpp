@@ -3,7 +3,7 @@
 
 #include "SIByLpch.h"
 #include "glad/glad.h"
-#include "Platform/OpenGL/GLFWWindow.h"
+#include "Platform/OpenGL/Window/GLFWWindow.h"
 
 namespace SIByL
 {
