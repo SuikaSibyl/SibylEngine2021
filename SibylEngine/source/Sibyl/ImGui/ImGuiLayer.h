@@ -15,7 +15,8 @@ namespace SIByL
 
 		void OnAttach();
 		void OnDetach();
-		void OnDraw() override;
+		virtual void OnDraw() override;
+		virtual void OnDrawImGui() override;
 		static void OnDrawAdditionalWindows();
 		void OnUpdate();
 		void OnEvent(Event& event);

@@ -15,6 +15,7 @@ namespace SIByL
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
 		virtual void OnDraw() {}
+		virtual void OnDrawImGui() {}
 		virtual void OnEvent(Event& event) {}
 
 		inline const std::string& GetName() const { return m_DebugName; }

@@ -20,6 +20,7 @@ namespace SIByL
 		void Run();
 		void OnEvent(Event& e);
 		void OnDraw();
+		void DrawImGui();
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);

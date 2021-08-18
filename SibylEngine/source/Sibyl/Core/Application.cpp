@@ -62,6 +62,14 @@ namespace SIByL
 		}
 	}
 
+	void Application::DrawImGui()
+	{
+		for (auto layer : m_LayerStack)
+		{
+			layer->OnDrawImGui();
+		}
+	}
+
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);

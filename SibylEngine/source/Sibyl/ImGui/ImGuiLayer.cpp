@@ -55,8 +55,7 @@ namespace SIByL
 		NewFrameBegin();
 		ImGui::NewFrame();
 
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
+		app.DrawImGui();
 
 		ImGui::Render();
 	}
@@ -64,6 +63,12 @@ namespace SIByL
 	void ImGuiLayer::OnDraw()
 	{
 		NewFrameEnd();
+	}
+
+	void ImGuiLayer::OnDrawImGui()
+	{
+		static bool show = true;
+		ImGui::ShowDemoWindow(&show);
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)
