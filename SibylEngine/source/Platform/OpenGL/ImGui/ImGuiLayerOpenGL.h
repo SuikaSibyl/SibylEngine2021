@@ -7,8 +7,10 @@ namespace SIByL
 	class ImGuiLayerOpenGL :public ImGuiLayer
 	{
 	protected:
-		void PlatformInit() override;
-		void NewFrameBegin() override;
-		void NewFrameEnd() override;
+		virtual void PlatformInit() override;
+		virtual void NewFrameBegin() override;
+		virtual void NewFrameEnd() override;
+		virtual void PlatformDestroy() override;
+
 	};
 }

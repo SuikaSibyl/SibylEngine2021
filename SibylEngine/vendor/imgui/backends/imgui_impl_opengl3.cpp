@@ -5,6 +5,7 @@
 
 // Implemented features:
 //  [X] Renderer: User texture binding. Use 'GLuint' OpenGL texture identifier as void*/ImTextureID. Read the FAQ about ImTextureID!
+//  [X] Renderer: Multi-viewport support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
 //  [x] Renderer: Desktop GL only: Support for large meshes (64k+ vertices) with 16-bit indices.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
@@ -14,6 +15,7 @@
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
+//  2021-XX-XX: Platform: Added support for multiple windows via the ImGuiPlatformIO interface.
 //  2021-06-29: Reorganized backend to pull data from a single structure to facilitate usage with multiple-contexts (all g_XXXX access changed to bd->XXXX).
 //  2021-06-25: OpenGL: Use OES_vertex_array extension on Emscripten + backup/restore current state.
 //  2021-06-21: OpenGL: Destroy individual vertex/fragment shader objects right after they are linked into the main shader.
@@ -196,6 +198,10 @@ static ImGui_ImplOpenGL3_Data* ImGui_ImplOpenGL3_GetBackendData()
     return ImGui::GetCurrentContext() ? (ImGui_ImplOpenGL3_Data*)ImGui::GetIO().BackendRendererUserData : NULL;
 }
 
+// Forward Declarations
+static void ImGui_ImplOpenGL3_InitPlatformInterface();
+static void ImGui_ImplOpenGL3_ShutdownPlatformInterface();
+
 // Functions
 bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
 {
@@ -228,6 +234,7 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
     if (bd->GlVersion >= 320)
         io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 #endif
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;  // We can create multi-viewports on the Renderer side (optional)
 
     // Store GLSL version string so we can refer to it later in case we recreate shaders.
     // Note: GLSL version is NOT the same as GL version. Leave this to NULL if unsure.
@@ -291,6 +298,9 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
     }
 #endif
 
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        ImGui_ImplOpenGL3_InitPlatformInterface();
+
     return true;
 }
 
@@ -299,6 +309,7 @@ void    ImGui_ImplOpenGL3_Shutdown()
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplOpenGL3_Data* bd = ImGui_ImplOpenGL3_GetBackendData();
 
+    ImGui_ImplOpenGL3_ShutdownPlatformInterface();
     ImGui_ImplOpenGL3_DestroyDeviceObjects();
     io.BackendRendererName = NULL;
     io.BackendRendererUserData = NULL;
@@ -804,4 +815,32 @@ void    ImGui_ImplOpenGL3_DestroyDeviceObjects()
     if (bd->ElementsHandle) { glDeleteBuffers(1, &bd->ElementsHandle); bd->ElementsHandle = 0; }
     if (bd->ShaderHandle)   { glDeleteProgram(bd->ShaderHandle); bd->ShaderHandle = 0; }
     ImGui_ImplOpenGL3_DestroyFontsTexture();
+}
+
+//--------------------------------------------------------------------------------------------------------
+// MULTI-VIEWPORT / PLATFORM INTERFACE SUPPORT
+// This is an _advanced_ and _optional_ feature, allowing the backend to create and handle multiple viewports simultaneously.
+// If you are new to dear imgui or creating a new binding for dear imgui, it is recommended that you completely ignore this section first..
+//--------------------------------------------------------------------------------------------------------
+
+static void ImGui_ImplOpenGL3_RenderWindow(ImGuiViewport* viewport, void*)
+{
+    if (!(viewport->Flags & ImGuiViewportFlags_NoRendererClear))
+    {
+        ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    ImGui_ImplOpenGL3_RenderDrawData(viewport->DrawData);
+}
+
+static void ImGui_ImplOpenGL3_InitPlatformInterface()
+{
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+    platform_io.Renderer_RenderWindow = ImGui_ImplOpenGL3_RenderWindow;
+}
+
+static void ImGui_ImplOpenGL3_ShutdownPlatformInterface()
+{
+    ImGui::DestroyPlatformWindows();
 }

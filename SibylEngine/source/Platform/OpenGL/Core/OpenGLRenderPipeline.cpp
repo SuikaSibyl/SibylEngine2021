@@ -3,6 +3,7 @@
 
 #include "Platform/OpenGL/OpenGLContext.h"
 #include "Sibyl/Core/Application.h"
+#include "Sibyl/ImGui/ImGuiLayer.h"
 
 namespace SIByL
 {
@@ -18,7 +19,13 @@ namespace SIByL
 	{
 		SwapChain* swapChain = OpenGLContext::Get()->GetSwapChain();
 		swapChain->SetRenderTarget();
+
 		Application::Get().OnDraw();
-		OpenGLContext::Get()->SwipBuffers();
+
+		swapChain->PreparePresent();
+		
+		ImGuiLayer::OnDrawAdditionalWindows();
+
+		swapChain->Present();
 	}
 }

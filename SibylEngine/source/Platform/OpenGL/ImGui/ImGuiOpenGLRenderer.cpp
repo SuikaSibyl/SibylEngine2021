@@ -5,6 +5,7 @@
 
 // Implemented features:
 //  [X] Renderer: User texture binding. Use 'GLuint' OpenGL texture identifier as void*/ImTextureID. Read the FAQ about ImTextureID!
+//  [X] Renderer: Multi-viewport support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
 //  [x] Renderer: Desktop GL only: Support for large meshes (64k+ vertices) with 16-bit indices.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
@@ -14,6 +15,7 @@
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
+//  2021-XX-XX: Platform: Added support for multiple windows via the ImGuiPlatformIO interface.
 //  2021-06-29: Reorganized backend to pull data from a single structure to facilitate usage with multiple-contexts (all g_XXXX access changed to bd->XXXX).
 //  2021-06-25: OpenGL: Use OES_vertex_array extension on Emscripten + backup/restore current state.
 //  2021-06-21: OpenGL: Destroy individual vertex/fragment shader objects right after they are linked into the main shader.
@@ -62,6 +64,7 @@
 //  2016-09-05: OpenGL: Fixed save and restore of current scissor rectangle.
 //  2016-07-29: OpenGL: Explicitly setting GL_UNPACK_ROW_LENGTH to reduce issues because SDL changes it. (#752)
 
+#include "SIByLpch.h"
 //----------------------------------------
 // OpenGL    GLSL      GLSL
 // version   version   string
@@ -80,13 +83,12 @@
 //  ES 3.0    300       "#version 300 es"   = WebGL 2.0
 //----------------------------------------
 
-#pragma warning(disable:4996)
-#pragma warning(disable:6031)
+#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 
-#include "SIByLpch.h"
 #include "imgui.h"
 #include "ImGuiOpenGLRenderer.h"
-#include "glad/glad.h"
 #include <stdio.h>
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
 #include <stddef.h>     // intptr_t
@@ -197,6 +199,10 @@ static ImGui_ImplOpenGL3_Data* ImGui_ImplOpenGL3_GetBackendData()
     return ImGui::GetCurrentContext() ? (ImGui_ImplOpenGL3_Data*)ImGui::GetIO().BackendRendererUserData : NULL;
 }
 
+// Forward Declarations
+static void ImGui_ImplOpenGL3_InitPlatformInterface();
+static void ImGui_ImplOpenGL3_ShutdownPlatformInterface();
+
 // Functions
 bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
 {
@@ -229,6 +235,7 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
     if (bd->GlVersion >= 320)
         io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 #endif
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;  // We can create multi-viewports on the Renderer side (optional)
 
     // Store GLSL version string so we can refer to it later in case we recreate shaders.
     // Note: GLSL version is NOT the same as GL version. Leave this to NULL if unsure.
@@ -292,6 +299,9 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
     }
 #endif
 
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        ImGui_ImplOpenGL3_InitPlatformInterface();
+
     return true;
 }
 
@@ -300,6 +310,7 @@ void    ImGui_ImplOpenGL3_Shutdown()
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplOpenGL3_Data* bd = ImGui_ImplOpenGL3_GetBackendData();
 
+    ImGui_ImplOpenGL3_ShutdownPlatformInterface();
     ImGui_ImplOpenGL3_DestroyDeviceObjects();
     io.BackendRendererName = NULL;
     io.BackendRendererUserData = NULL;
@@ -358,10 +369,10 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
 #endif
     const float ortho_projection[4][4] =
     {
-        { 2.0f/(R-L),   0.0f,         0.0f,   0.0f },
-        { 0.0f,         2.0f/(T-B),   0.0f,   0.0f },
+        { 2.0f / (R - L),   0.0f,         0.0f,   0.0f },
+        { 0.0f,         2.0f / (T - B),   0.0f,   0.0f },
         { 0.0f,         0.0f,        -1.0f,   0.0f },
-        { (R+L)/(L-R),  (T+B)/(B-T),  0.0f,   1.0f },
+        { (R + L) / (L - R),  (T + B) / (B - T),  0.0f,   1.0f },
     };
     glUseProgram(bd->ShaderHandle);
     glUniform1i(bd->AttribLocationTex, 0);
@@ -383,9 +394,9 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, int fb_wid
     glEnableVertexAttribArray(bd->AttribLocationVtxPos);
     glEnableVertexAttribArray(bd->AttribLocationVtxUV);
     glEnableVertexAttribArray(bd->AttribLocationVtxColor);
-    glVertexAttribPointer(bd->AttribLocationVtxPos,   2, GL_FLOAT,         GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
-    glVertexAttribPointer(bd->AttribLocationVtxUV,    2, GL_FLOAT,         GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
-    glVertexAttribPointer(bd->AttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, GL_TRUE,  sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
+    glVertexAttribPointer(bd->AttribLocationVtxPos, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
+    glVertexAttribPointer(bd->AttribLocationVtxUV, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
+    glVertexAttribPointer(bd->AttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
 }
 
 // OpenGL3 Render function.
@@ -407,7 +418,8 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     GLuint last_program; glGetIntegerv(GL_CURRENT_PROGRAM, (GLint*)&last_program);
     GLuint last_texture; glGetIntegerv(GL_TEXTURE_BINDING_2D, (GLint*)&last_texture);
 #ifdef IMGUI_IMPL_OPENGL_MAY_HAVE_BIND_SAMPLER
-    GLuint last_sampler; if (bd->GlVersion >= 330) { glGetIntegerv(GL_SAMPLER_BINDING, (GLint*)&last_sampler); } else { last_sampler = 0; }
+    GLuint last_sampler; if (bd->GlVersion >= 330) { glGetIntegerv(GL_SAMPLER_BINDING, (GLint*)&last_sampler); }
+    else { last_sampler = 0; }
 #endif
     GLuint last_array_buffer; glGetIntegerv(GL_ARRAY_BUFFER_BINDING, (GLint*)&last_array_buffer);
 #ifdef IMGUI_IMPL_OPENGL_USE_VERTEX_ARRAY
@@ -488,7 +500,7 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                         glDrawElementsBaseVertex(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)), (GLint)pcmd->VtxOffset);
                     else
 #endif
-                    glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
+                        glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)));
                 }
             }
         }
@@ -801,8 +813,36 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
 void    ImGui_ImplOpenGL3_DestroyDeviceObjects()
 {
     ImGui_ImplOpenGL3_Data* bd = ImGui_ImplOpenGL3_GetBackendData();
-    if (bd->VboHandle)      { glDeleteBuffers(1, &bd->VboHandle); bd->VboHandle = 0; }
+    if (bd->VboHandle) { glDeleteBuffers(1, &bd->VboHandle); bd->VboHandle = 0; }
     if (bd->ElementsHandle) { glDeleteBuffers(1, &bd->ElementsHandle); bd->ElementsHandle = 0; }
-    if (bd->ShaderHandle)   { glDeleteProgram(bd->ShaderHandle); bd->ShaderHandle = 0; }
+    if (bd->ShaderHandle) { glDeleteProgram(bd->ShaderHandle); bd->ShaderHandle = 0; }
     ImGui_ImplOpenGL3_DestroyFontsTexture();
+}
+
+//--------------------------------------------------------------------------------------------------------
+// MULTI-VIEWPORT / PLATFORM INTERFACE SUPPORT
+// This is an _advanced_ and _optional_ feature, allowing the backend to create and handle multiple viewports simultaneously.
+// If you are new to dear imgui or creating a new binding for dear imgui, it is recommended that you completely ignore this section first..
+//--------------------------------------------------------------------------------------------------------
+
+static void ImGui_ImplOpenGL3_RenderWindow(ImGuiViewport* viewport, void*)
+{
+    if (!(viewport->Flags & ImGuiViewportFlags_NoRendererClear))
+    {
+        ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    ImGui_ImplOpenGL3_RenderDrawData(viewport->DrawData);
+}
+
+static void ImGui_ImplOpenGL3_InitPlatformInterface()
+{
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+    platform_io.Renderer_RenderWindow = ImGui_ImplOpenGL3_RenderWindow;
+}
+
+static void ImGui_ImplOpenGL3_ShutdownPlatformInterface()
+{
+    ImGui::DestroyPlatformWindows();
 }

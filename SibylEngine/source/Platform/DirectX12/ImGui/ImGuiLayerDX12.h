@@ -7,10 +7,10 @@ namespace SIByL
 	class ImGuiLayerDX12 :public ImGuiLayer
 	{
 	protected:
-		void PlatformInit() override;
-		void NewFrameBegin() override;
-		void NewFrameEnd() override;
-		void PlatformDestroy() override;
+		virtual void PlatformInit() override;
+		virtual void NewFrameBegin() override;
+		virtual void NewFrameEnd() override;
+		virtual void PlatformDestroy() override;
 
 	private:
 		ID3D12DescriptorHeap* g_pd3dSrvDescHeap = NULL;

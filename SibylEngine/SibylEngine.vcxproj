@@ -118,6 +118,7 @@
     <ClCompile Include="source\Platform\OpenGL\Core\OpenGLRenderPipeline.cpp" />
     <ClCompile Include="source\Platform\OpenGL\GLFWInput.cpp" />
     <ClCompile Include="source\Platform\OpenGL\GLFWWindow.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiLayerOpenGL.cpp" />
     <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiOpenGLRenderer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\OpenGLContext.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="source\Platform\OpenGL\Core\OpenGLRenderPipeline.h" />
     <ClInclude Include="source\Platform\OpenGL\GLFWInput.h" />
     <ClInclude Include="source\Platform\OpenGL\GLFWWindow.h" />
+    <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.h" />
     <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiLayerOpenGL.h" />
     <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiOpenGLRenderer.h" />
     <ClInclude Include="source\Platform\OpenGL\OpenGLContext.h" />

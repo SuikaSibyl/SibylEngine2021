@@ -3,6 +3,7 @@
 
 // Implemented features:
 //  [X] Renderer: User texture binding. Use 'GLuint' OpenGL texture identifier as void*/ImTextureID. Read the FAQ about ImTextureID!
+//  [X] Renderer: Multi-viewport support. Enable with 'io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable'.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
@@ -19,6 +20,7 @@
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
+//  2021-XX-XX: Platform: Added support for multiple windows via the ImGuiPlatformIO interface.
 //  2021-06-29: Reorganized backend to pull data from a single structure to facilitate usage with multiple-contexts (all g_XXXX access changed to bd->XXXX).
 //  2021-05-19: OpenGL: Replaced direct access to ImDrawCmd::TextureId with a call to ImDrawCmd::GetTexID(). (will become a requirement)
 //  2021-01-03: OpenGL: Backup, setup and restore GL_SHADE_MODEL state, disable GL_STENCIL_TEST and disable GL_NORMAL_ARRAY client state to increase compatibility with legacy OpenGL applications.
@@ -70,6 +72,10 @@ static ImGui_ImplOpenGL2_Data* ImGui_ImplOpenGL2_GetBackendData()
     return ImGui::GetCurrentContext() ? (ImGui_ImplOpenGL2_Data*)ImGui::GetIO().BackendRendererUserData : NULL;
 }
 
+// Forward Declarations
+static void ImGui_ImplOpenGL2_InitPlatformInterface();
+static void ImGui_ImplOpenGL2_ShutdownPlatformInterface();
+
 // Functions
 bool    ImGui_ImplOpenGL2_Init()
 {
@@ -80,6 +86,10 @@ bool    ImGui_ImplOpenGL2_Init()
     ImGui_ImplOpenGL2_Data* bd = IM_NEW(ImGui_ImplOpenGL2_Data)();
     io.BackendRendererUserData = (void*)bd;
     io.BackendRendererName = "imgui_impl_opengl2";
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasViewports;    // We can create multi-viewports on the Renderer side (optional)
+
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        ImGui_ImplOpenGL2_InitPlatformInterface();
 
     return true;
 }
@@ -89,6 +99,7 @@ void    ImGui_ImplOpenGL2_Shutdown()
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplOpenGL2_Data* bd = ImGui_ImplOpenGL2_GetBackendData();
 
+    ImGui_ImplOpenGL2_ShutdownPlatformInterface();
     ImGui_ImplOpenGL2_DestroyDeviceObjects();
     io.BackendRendererName = NULL;
     io.BackendRendererUserData = NULL;
@@ -285,4 +296,32 @@ bool    ImGui_ImplOpenGL2_CreateDeviceObjects()
 void    ImGui_ImplOpenGL2_DestroyDeviceObjects()
 {
     ImGui_ImplOpenGL2_DestroyFontsTexture();
+}
+
+//--------------------------------------------------------------------------------------------------------
+// MULTI-VIEWPORT / PLATFORM INTERFACE SUPPORT
+// This is an _advanced_ and _optional_ feature, allowing the backend to create and handle multiple viewports simultaneously.
+// If you are new to dear imgui or creating a new binding for dear imgui, it is recommended that you completely ignore this section first..
+//--------------------------------------------------------------------------------------------------------
+
+static void ImGui_ImplOpenGL2_RenderWindow(ImGuiViewport* viewport, void*)
+{
+    if (!(viewport->Flags & ImGuiViewportFlags_NoRendererClear))
+    {
+        ImVec4 clear_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    ImGui_ImplOpenGL2_RenderDrawData(viewport->DrawData);
+}
+
+static void ImGui_ImplOpenGL2_InitPlatformInterface()
+{
+    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
+    platform_io.Renderer_RenderWindow = ImGui_ImplOpenGL2_RenderWindow;
+}
+
+static void ImGui_ImplOpenGL2_ShutdownPlatformInterface()
+{
+    ImGui::DestroyPlatformWindows();
 }

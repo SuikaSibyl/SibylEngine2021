@@ -12,6 +12,18 @@ namespace SIByL
 	{
 		return new ImGuiLayerDX12();
 	}
+
+	void ImGuiLayer::OnDrawAdditionalWindows()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		ID3D12GraphicsCommandList* g_pd3dCommandList = DX12Context::Main->GetDXGraphicCommandList();
+		// Update and Render additional Platform Windows
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault(NULL, (void*)g_pd3dCommandList);
+		}
+	}
 #endif
 	static int const NUM_FRAMES_IN_FLIGHT = 3;
 
@@ -27,7 +39,6 @@ namespace SIByL
 
 	void ImGuiLayerDX12::NewFrameBegin()
 	{
-		SIByL_CORE_TRACE("IMGUI DX12 FRAME BEGIN");
 		// Start the Dear ImGui frame
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();

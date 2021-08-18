@@ -6,6 +6,8 @@
 #include "Sibyl/Events/KeyEvent.h"
 
 #include "Platform/DirectX12/Core/DX12RenderPipeline.h"
+#include "Platform/Windows/ImGuiWin32Renderer.h"
+#include "Platform/Windows/ImGuiWin32Renderer.cpp"
 
 namespace SIByL
 {
@@ -37,8 +39,13 @@ namespace SIByL
 		return WindowsWindow::Main->MsgProc(hwnd, msg, wParam, lParam);
 	}
 
+	//extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	LRESULT CALLBACK WindowsWindow::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
+			return true;
+
 		switch (msg)
 		{
 		// WM_ACTIVATE is sent when the window is activated or deactivated.  
@@ -255,5 +262,4 @@ namespace SIByL
 	{
 		return m_Data.VSync;
 	}
-
 }

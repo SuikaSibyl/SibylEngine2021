@@ -129,6 +129,9 @@
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1173,6 +1176,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -18,7 +18,7 @@ namespace SIByL
 		static inline OpenGLContext* Get() { return Main; }
 
 		SwapChain* GetSwapChain() { return m_SwapChain.get(); }
-
+		
 	private:
 		GLFWwindow* m_WindowHandle;
 		std::unique_ptr<OpenGLRenderPipeline> m_RenderPipeline;

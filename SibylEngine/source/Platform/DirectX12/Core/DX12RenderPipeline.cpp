@@ -10,6 +10,8 @@
 #include "Platform/DirectX12/Core/DX12CommandList.h"
 #include "Platform/DirectX12/Renderer/DX12SwapChain.h"
 
+#include "Sibyl/ImGui/ImGuiLayer.h"
+
 namespace SIByL
 {
 	DX12RenderPipeline* DX12RenderPipeline::Main;
@@ -33,6 +35,9 @@ namespace SIByL
 
 		swapChain->PreparePresent();
 		cmdList->Execute();
+
+		ImGuiLayer::OnDrawAdditionalWindows();
+
 		swapChain->Present();
 		synchronizer->ForceSynchronize();
 	}

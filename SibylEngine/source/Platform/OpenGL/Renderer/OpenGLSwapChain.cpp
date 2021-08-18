@@ -37,6 +37,6 @@ namespace SIByL
 
     void OpenGLSwapChain::Present()
     {
-
+        glfwSwapBuffers((GLFWwindow*)GLFWWindow::Get()->GetNativeWindow());
     }
 }

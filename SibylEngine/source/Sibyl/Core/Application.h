@@ -7,6 +7,8 @@
 #include "Sibyl/Events/MouseEvent.h"
 #include "Sibyl/Core/LayerStack.h"
 
+#include "Sibyl/ImGui/ImGuiLayer.h"
+
 namespace SIByL
 {
 	class SIByL_API Application
@@ -31,6 +33,8 @@ namespace SIByL
 
 	private:
 		std::unique_ptr<Window> m_Window;
+		std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
+
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 

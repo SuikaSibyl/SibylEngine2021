@@ -16,6 +16,7 @@ namespace SIByL
 		void OnAttach();
 		void OnDetach();
 		void OnDraw() override;
+		static void OnDrawAdditionalWindows();
 		void OnUpdate();
 		void OnEvent(Event& event);
 
@@ -26,17 +27,6 @@ namespace SIByL
 		virtual void NewFrameBegin() {};
 		virtual void NewFrameEnd() {};
 		virtual void PlatformDestroy() {};
-
-	private:
-		bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& e);
-		bool OnMouseMovedEvent(MouseMovedEvent& e);
-		bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& e);
-		bool OnMouseScrolledEvent(MouseScrolledEvent& e);
-		bool OnKeyPressedEvent(KeyPressedEvent& e);
-		bool OnKeyReleasedEvent(KeyReleasedEvent& e);
-		bool OnKeyTypedEvent(KeyTypedEvent& e);
-		bool OnWindowResizeEvent(WindowResizeEvent& e);
-				
 
 	private:
 		float m_Time = 0.0f;

@@ -7,6 +7,7 @@
 //  [X] Platform: OSX clipboard is supported within core Dear ImGui (no specific code in this backend).
 // Issues:
 //  [ ] Platform: Keys are all generally very broken. Best using [event keycode] and not [event characters]..
+//  [ ] Platform: Multi-viewport / platform windows.
 
 // You can use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
 // Prefer including the entire imgui/ repository into your project (either as a copy or as a submodule), and only build the backends you need.
