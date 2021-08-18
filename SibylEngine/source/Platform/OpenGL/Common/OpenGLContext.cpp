@@ -29,10 +29,4 @@ namespace SIByL
 		m_RenderPipeline = std::make_unique<OpenGLRenderPipeline>();
 		m_SwapChain = std::make_unique<OpenGLSwapChain>();
 	}
-
-	void OpenGLContext::SwipBuffers()
-	{
-		glfwSwapBuffers(m_WindowHandle);
-	}
-
 }

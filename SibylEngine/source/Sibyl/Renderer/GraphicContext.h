@@ -8,9 +8,11 @@ namespace SIByL
 	{
 	public:
 		virtual void Init() = 0;
-		virtual void SwipBuffers() = 0;
+
+	public:
+		SwapChain* GetSwapChain() { return m_SwapChain.get(); }
 
 	protected:
-		SwapChain* m_SwapChain;
+		std::unique_ptr<SwapChain> m_SwapChain;
 	};
 }

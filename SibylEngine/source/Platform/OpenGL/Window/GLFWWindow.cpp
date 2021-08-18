@@ -7,7 +7,7 @@
 #include "Sibyl/Events/KeyEvent.h"
 #include "Sibyl/Core/Input.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/Common/OpenGLContext.h"
 
 namespace SIByL
 {

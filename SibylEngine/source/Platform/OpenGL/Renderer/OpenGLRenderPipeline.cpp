@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "OpenGLRenderPipeline.h"
 
-#include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Sibyl/Core/Application.h"
 #include "Sibyl/ImGui/ImGuiLayer.h"
 

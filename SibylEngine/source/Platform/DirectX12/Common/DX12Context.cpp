@@ -1,6 +1,7 @@
 #include "SIByLpch.h"
 #include "DX12Context.h"
 #include "DX12Utility.h"
+#include "Sibyl/Renderer/GraphicContext.h"
 #include "Platform/DirectX12/Renderer/DX12SwapChain.h"
 
 namespace SIByL

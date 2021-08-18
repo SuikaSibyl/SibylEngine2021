@@ -1,12 +1,16 @@
 #pragma once
 
+#include "Primitive.h"
+
 namespace SIByL
 {
-	class Shader
+	class Vertex :public Primitive
 	{
 	public:
 
+
 	private:
+
 
 	};
 }

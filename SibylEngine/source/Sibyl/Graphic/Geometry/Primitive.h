@@ -2,9 +2,11 @@
 
 namespace SIByL
 {
-	class Shader
+	class Primitive
 	{
 	public:
+		Primitive();
+		~Primitive();
 
 	private:
 

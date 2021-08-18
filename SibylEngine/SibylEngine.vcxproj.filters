@@ -27,7 +27,7 @@
     <ClCompile Include="source\Sibyl\Core\Window.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\GLFWWindow.cpp">
+    <ClCompile Include="source\Platform\OpenGL\Window\GLFWWindow.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\Windows\WindowsWindow.cpp">
@@ -81,7 +81,7 @@
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\GLFWInput.cpp">
+    <ClCompile Include="source\Platform\OpenGL\Window\GLFWInput.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp">
@@ -90,7 +90,7 @@
     <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\OpenGLContext.cpp">
+    <ClCompile Include="source\Platform\OpenGL\Common\OpenGLContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\Windows\WindowsInput.cpp">
@@ -120,10 +120,10 @@
     <ClCompile Include="source\Platform\DirectX12\Core\DX12Synchronizer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DX12RenderPipeline.cpp">
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Core\OpenGLRenderPipeline.cpp">
+    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.cpp">
@@ -167,7 +167,7 @@
     <ClInclude Include="source\Sibyl\Core\Window.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\GLFWWindow.h">
+    <ClInclude Include="source\Platform\OpenGL\Window\GLFWWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\Windows\WindowsWindow.h">
@@ -233,7 +233,7 @@
     <ClInclude Include="source\Sibyl\Core\Input.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\GLFWInput.h">
+    <ClInclude Include="source\Platform\OpenGL\Window\GLFWInput.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Core\KeyCodes.h">
@@ -1103,7 +1103,7 @@
     <ClInclude Include="source\Sibyl\Renderer\GraphicContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\OpenGLContext.h">
+    <ClInclude Include="source\Platform\OpenGL\Common\OpenGLContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Renderer\SwapChain.h">
@@ -1163,13 +1163,13 @@
     <ClInclude Include="source\Platform\DirectX12\Core\DX12Synchronizer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DX12RenderPipeline.h">
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Renderer\RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Core\OpenGLRenderPipeline.h">
+    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\include\d3dx12.h">
@@ -1179,6 +1179,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLVertexBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Geometry\TriangleList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Geometry\Vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

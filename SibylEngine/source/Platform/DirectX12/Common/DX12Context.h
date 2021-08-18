@@ -1,19 +1,20 @@
 #pragma once
 
 #include "SIByLpch.h"
-#include "Sibyl/Renderer/SwapChain.h"
+#include "Sibyl/Renderer/GraphicContext.h"
+#include "Platform/OpenGL/Renderer/OpenGLSwapChain.h"
 #include "Platform/DirectX12/Core/DescriptorAllocator.h"
 #include "Platform/DirectX12/Core/DX12CommandList.h"
-#include "Platform/DirectX12/Core/DX12RenderPipeline.h"
 #include "Platform/DirectX12/Core/DX12Synchronizer.h"
+#include "Platform/DirectX12/Renderer/DX12RenderPipeline.h"
 
 namespace SIByL
 {
-	class DX12Context
+	class DX12Context :public GraphicContext
 	{
 	public:
 		static DX12Context* Main;
-		void Init();
+		virtual void Init() override;
 
 		inline static uint64_t GetFrameCount() { return Main->m_FrameCount; };
 
@@ -46,7 +47,6 @@ namespace SIByL
 		ComPtr<ID3D12Device>		m_D3dDevice;
 		ComPtr<ID3D12CommandQueue>	m_CommandQueue;
 
-		std::unique_ptr<SwapChain> m_SwapChain;
 		std::unique_ptr<DX12GraphicCommandList> m_GraphicCommandList;
 		std::unique_ptr<DX12RenderPipeline> m_RenderPipeline;
 		std::unique_ptr<DX12Synchronizer> m_Synchronizer;

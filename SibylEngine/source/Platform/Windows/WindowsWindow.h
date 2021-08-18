@@ -1,6 +1,9 @@
 #pragma once
 #include "Sibyl/Core/Window.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
+#include "Platform/Windows/ImGuiWin32Renderer.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace SIByL
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sibyl/Renderer/GraphicContext.h"
-#include "Platform/OpenGL/Core/OpenGLRenderPipeline.h"
+#include "Platform/OpenGL/Renderer/OpenGLRenderPipeline.h"
 #include "Platform/OpenGL/Renderer/OpenGLSwapChain.h"
 
 struct GLFWwindow;
@@ -13,16 +13,17 @@ namespace SIByL
 	public:
 		OpenGLContext(GLFWwindow* windowHandle);
 
+	public:
 		virtual void Init() override;
-		virtual void SwipBuffers() override;
-		static inline OpenGLContext* Get() { return Main; }
-
-		SwapChain* GetSwapChain() { return m_SwapChain.get(); }
 		
 	private:
 		GLFWwindow* m_WindowHandle;
 		std::unique_ptr<OpenGLRenderPipeline> m_RenderPipeline;
-		std::unique_ptr<OpenGLSwapChain> m_SwapChain;
+
+		// Get Context
+	public:
+		static inline OpenGLContext* Get() { return Main; }
+	private:
 		static OpenGLContext* Main;
 	};
 }
