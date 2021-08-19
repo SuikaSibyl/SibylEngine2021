@@ -162,6 +162,9 @@
     <ClCompile Include="source\Sibyl\Renderer\Shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\Core\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1233,6 +1236,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\Graphic\Geometry\OpenGLTriangleMesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Core\Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

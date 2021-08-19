@@ -140,6 +140,7 @@
     <ClCompile Include="source\Sibyl\Core\LayerStack.cpp" />
     <ClCompile Include="source\Sibyl\Core\Log.cpp" />
     <ClCompile Include="source\Sibyl\Core\Window.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Core\Camera.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Geometry\TriangleMesh.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="source\Sibyl\Events\KeyEvent.h" />
     <ClInclude Include="source\Sibyl\Events\MouseEvent.h" />
     <ClInclude Include="source\Sibyl\Core\Log.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Core\Camera.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\TriangleMesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Vertex.h" />
