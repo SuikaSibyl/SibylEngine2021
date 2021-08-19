@@ -208,6 +208,8 @@
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\TriangleMesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Vertex.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Texture\Image.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Texture\Texture.h" />
     <ClInclude Include="source\Sibyl\ImGui\ImGuiLayer.h" />
     <ClInclude Include="source\Sibyl\Renderer\FrameBuffer.h" />
     <ClInclude Include="source\Sibyl\Renderer\GraphicContext.h" />

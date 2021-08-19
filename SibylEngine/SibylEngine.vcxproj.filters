@@ -1241,6 +1241,12 @@
     <ClInclude Include="source\Sibyl\Graphic\Core\Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Texture\Image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Texture\Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\glm\glm\detail\func_common.inl">
