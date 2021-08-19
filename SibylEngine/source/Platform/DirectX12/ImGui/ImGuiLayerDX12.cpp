@@ -1,19 +1,13 @@
 #include "SIByLpch.h"
 #include "ImGuiLayerDX12.h"
 
-#include "Platform/Windows/WindowsWindow.h"
-#include "Platform/Windows/ImGuiWin32Renderer.h"
+#include "Platform/Windows/Window/WindowsWindow.h"
+#include "Platform/Windows/ImGui/ImGuiWin32Renderer.h"
 #include "Platform/DirectX12/ImGui/ImGuiDX12Renderer.h"
 
 namespace SIByL
 {
-#ifdef RENDER_API_DX12
-	ImGuiLayer* ImGuiLayer::Create()
-	{
-		return new ImGuiLayerDX12();
-	}
-
-	void ImGuiLayer::OnDrawAdditionalWindows()
+	void ImGuiLayerDX12::OnDrawAdditionalWindowsImpl()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		ID3D12GraphicsCommandList* g_pd3dCommandList = DX12Context::Main->GetDXGraphicCommandList();
@@ -24,7 +18,7 @@ namespace SIByL
 			ImGui::RenderPlatformWindowsDefault(NULL, (void*)g_pd3dCommandList);
 		}
 	}
-#endif
+
 	static int const NUM_FRAMES_IN_FLIGHT = 3;
 
 	void ImGuiLayerDX12::PlatformInit()

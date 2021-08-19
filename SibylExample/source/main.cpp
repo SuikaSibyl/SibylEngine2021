@@ -2,10 +2,7 @@
 
 #include <SIByL.h>
 
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <Sibyl/Renderer/Renderer.h>
 
 class ExampleLayer :public SIByL::Layer
 {
@@ -50,6 +47,8 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
+	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
+	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();
 }

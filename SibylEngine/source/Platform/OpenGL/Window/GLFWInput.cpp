@@ -6,10 +6,6 @@
 
 namespace SIByL
 {
-#ifdef RENDER_API_OpenGL
-	Input* Input::s_Instance = new GLFWInput();
-#endif // RENDER_API_OpenGL
-
 	bool GLFWInput::IsKeyPressedImpl(int keycode)
 	{
 		auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

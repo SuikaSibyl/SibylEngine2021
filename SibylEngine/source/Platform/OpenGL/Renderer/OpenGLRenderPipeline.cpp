@@ -20,6 +20,7 @@ namespace SIByL
 		SwapChain* swapChain = OpenGLContext::Get()->GetSwapChain();
 		swapChain->SetRenderTarget();
 
+		Application::Get().triangle->RasterDraw();
 		Application::Get().OnDraw();
 
 		swapChain->PreparePresent();

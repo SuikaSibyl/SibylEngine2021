@@ -8,13 +8,7 @@
 
 namespace SIByL
 {
-#ifdef RENDER_API_OpenGL
-	ImGuiLayer* ImGuiLayer::Create()
-	{
-		return new ImGuiLayerOpenGL();
-	}
-
-	void ImGuiLayer::OnDrawAdditionalWindows()
+	void ImGuiLayerOpenGL::OnDrawAdditionalWindowsImpl()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		// Update and Render additional Platform Windows
@@ -26,7 +20,6 @@ namespace SIByL
 			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
-#endif
 
 	void ImGuiLayerOpenGL::PlatformInit()
 	{

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <iostream>
+
 namespace SIByL
 {
 	class IndexBuffer
 	{
 	public:
-
-	private:
-
+		static IndexBuffer* Create(unsigned int* indices, uint32_t iCount);
+		virtual uint32_t Count() = 0;
 	};
 }

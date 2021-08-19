@@ -5,8 +5,10 @@ namespace SIByL
 	class Primitive
 	{
 	public:
-		Primitive();
-		~Primitive();
+		Primitive() {};
+		~Primitive() {};
+
+		virtual void RasterDraw() = 0;
 
 	private:
 

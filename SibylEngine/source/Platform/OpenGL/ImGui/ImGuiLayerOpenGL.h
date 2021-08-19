@@ -11,6 +11,6 @@ namespace SIByL
 		virtual void NewFrameBegin() override;
 		virtual void NewFrameEnd() override;
 		virtual void PlatformDestroy() override;
-
+		virtual void OnDrawAdditionalWindowsImpl() override;
 	};
 }

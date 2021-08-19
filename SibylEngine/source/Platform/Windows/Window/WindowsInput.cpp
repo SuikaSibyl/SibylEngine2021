@@ -5,10 +5,6 @@
 
 namespace SIByL
 {
-#ifdef RENDER_API_DX12
-	Input* Input::s_Instance = new WindowsInput();
-#endif // RENDER_API_OpenGL
-
 	bool WindowsInput::IsKeyPressedImpl(int keycode)
 	{
 		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());

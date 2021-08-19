@@ -17,12 +17,13 @@ namespace SIByL
 		void OnDetach();
 		virtual void OnDraw() override;
 		virtual void OnDrawImGui() override;
-		static void OnDrawAdditionalWindows();
+		virtual void OnDrawAdditionalWindowsImpl() = 0;
+		static inline void OnDrawAdditionalWindows() { Main->OnDrawAdditionalWindowsImpl(); }
 		void OnUpdate();
 		void OnEvent(Event& event);
 
 		static ImGuiLayer* Create();
-
+		static inline ImGuiLayer* Get() { return Main; }
 	protected:
 		virtual void PlatformInit() {};
 		virtual void NewFrameBegin() {};
@@ -31,6 +32,6 @@ namespace SIByL
 
 	private:
 		float m_Time = 0.0f;
-
+		static ImGuiLayer* Main;
 	};
 }

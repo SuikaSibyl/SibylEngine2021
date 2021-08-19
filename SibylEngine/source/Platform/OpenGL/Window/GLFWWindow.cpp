@@ -20,13 +20,6 @@ namespace SIByL
 
 	}
 
-#ifdef RENDER_API_OpenGL
-	Window* Window::Create(const WindowProps& props)
-	{
-		return new GLFWWindow(props);
-	}
-#endif // SIByL_OpenGL_CORE
-
 	GLFWWindow::GLFWWindow(const WindowProps& props)
 	{
 		SIByL_CORE_ASSERT(!Main, "GLFW Window Already Exists!");

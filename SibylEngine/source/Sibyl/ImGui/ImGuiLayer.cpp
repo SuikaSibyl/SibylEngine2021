@@ -7,17 +7,36 @@
 #include "GLFW/glfw3.h"
 #include "Sibyl/Core/Application.h"
 
+#include "Sibyl/Renderer/Renderer.h"
+#include "Platform/OpenGL/ImGui/ImGuiLayerOpenGL.h"
+#include "Platform/DirectX12/ImGui/ImGuiLayerDX12.h"
+
 namespace SIByL
 {
+	ImGuiLayer* ImGuiLayer::Main = nullptr;
+
 	ImGuiLayer::ImGuiLayer()
 		:Layer("ImGuiLayer")
 	{
-
+		SIByL_CORE_ASSERT(!Main, "ImGuiLayer Already Exists!");
+		Main = this;
 	}
 
 	ImGuiLayer::~ImGuiLayer()
 	{
 		PlatformDestroy();
+	}
+
+	ImGuiLayer* ImGuiLayer::Create()
+	{
+		switch (Renderer::GetRaster())
+		{
+		case RasterRenderer::OpenGL: return new ImGuiLayerOpenGL(); break;
+		case RasterRenderer::DirectX12: return new ImGuiLayerDX12(); break;
+		case RasterRenderer::CpuSoftware: return nullptr; break;
+		case RasterRenderer::GpuSoftware: return nullptr; break;
+		default: return nullptr; break;
+		}
 	}
 
 	void ImGuiLayer::OnAttach()

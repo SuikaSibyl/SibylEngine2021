@@ -11,13 +11,6 @@ namespace SIByL
 {
 	WindowsWindow* WindowsWindow::Main;
 
-#ifdef RENDER_API_DX12
-	Window* Window::Create(const WindowProps& props)
-	{
-		return new WindowsWindow(props);
-	}
-#endif // SIByL_DX12_CORE
-
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
 		if (Main == nullptr) Main = this;

@@ -8,6 +8,7 @@
 #include "Sibyl/Core/LayerStack.h"
 
 #include "Sibyl/ImGui/ImGuiLayer.h"
+#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
 
 namespace SIByL
 {
@@ -28,6 +29,8 @@ namespace SIByL
 
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }
+
+		TriangleMesh* triangle;
 
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);

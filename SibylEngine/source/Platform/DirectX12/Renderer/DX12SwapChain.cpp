@@ -2,7 +2,7 @@
 #include "DX12SwapChain.h"
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
-#include "Platform/Windows/WindowsWindow.h"
+#include "Platform/Windows/Window/WindowsWindow.h"
 #include "Platform/DirectX12/Core/DescriptorAllocator.h"
 
 namespace SIByL
