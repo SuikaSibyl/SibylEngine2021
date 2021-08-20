@@ -5,14 +5,14 @@
 
 namespace SIByL
 {
-	UploadBuffer::UploadBuffer(size_t pageSize)
+	DX12UploadBuffer::DX12UploadBuffer(size_t pageSize)
 		: m_PageSize(pageSize)
 	{}
 
     // UPLOADBUFFER::ALLOCATE
     // The Allocate method is used to allocate a chunk(or block) of memory from a memory page.
-    // This method returns an UploadBuffer::Allocation struct that was defined in the header file.
-    UploadBuffer::Allocation UploadBuffer::Allocate(size_t sizeInBytes, size_t alignment)
+    // This method returns an DX12UploadBuffer::Allocation struct that was defined in the header file.
+    DX12UploadBuffer::Allocation DX12UploadBuffer::Allocate(size_t sizeInBytes, size_t alignment)
     {
         if (sizeInBytes > m_PageSize)
         {
@@ -35,7 +35,7 @@ namespace SIByL
     // a new page must be retrieved from the list of available pages or a new page must be created.
     // The RequestPage method will return a memory page that can be used to 
     // satisfy allocation requests.
-    std::shared_ptr<UploadBuffer::Page> UploadBuffer::RequestPage()
+    std::shared_ptr<DX12UploadBuffer::Page> DX12UploadBuffer::RequestPage()
     {
         std::shared_ptr<Page> page;
 
@@ -58,7 +58,7 @@ namespace SIByL
     // The Reset method is used to reset all of the memory allocations 
     // so that they can be reused for the next frame
     // (or more specifically, the next command list recording).
-    void UploadBuffer::Reset()
+    void DX12UploadBuffer::Reset()
     {
         m_CurrentPage = nullptr;
         // Reset all available pages.
@@ -73,7 +73,7 @@ namespace SIByL
 
     // UPLOADBUFFER::PAGE::PAGE
     // The constructor for a Page takes the size of the page as its only argument.
-    UploadBuffer::Page::Page(size_t sizeInBytes)
+    DX12UploadBuffer::Page::Page(size_t sizeInBytes)
         : m_PageSize(sizeInBytes)
         , m_Offset(0)
         , m_CPUPtr(nullptr)
@@ -94,14 +94,14 @@ namespace SIByL
         m_d3d12Resource->Map(0, nullptr, &m_CPUPtr);
     }
 
-    UploadBuffer::Page::~Page()
+    DX12UploadBuffer::Page::~Page()
     {
         m_d3d12Resource->Unmap(0, nullptr);
         m_CPUPtr = nullptr;
         m_GPUPtr = D3D12_GPU_VIRTUAL_ADDRESS(0);
     }
 
-    bool UploadBuffer::Page::HasSpace(size_t sizeInBytes, size_t alignment) const
+    bool DX12UploadBuffer::Page::HasSpace(size_t sizeInBytes, size_t alignment) const
     {
         size_t alignedSize = Math::AlignUp(sizeInBytes, alignment);
         size_t alignedOffset = Math::AlignUp(m_Offset, alignment);
@@ -113,7 +113,7 @@ namespace SIByL
     // The Page::Allocate method is where the actual allocation occurs.
     // This method returns an Allocation structure that can be used to 
     // directly copy(using memcpy for example) CPU data to the GPUand bind that GPU address to the pipeline.
-    UploadBuffer::Allocation UploadBuffer::Page::Allocate(size_t sizeInBytes, size_t alignment)
+    DX12UploadBuffer::Allocation DX12UploadBuffer::Page::Allocate(size_t sizeInBytes, size_t alignment)
     {
         if (!HasSpace(sizeInBytes, alignment))
         {
@@ -127,6 +127,8 @@ namespace SIByL
         Allocation allocation;
         allocation.CPU = static_cast<uint8_t*>(m_CPUPtr) + m_Offset;
         allocation.GPU = m_GPUPtr + m_Offset;
+        allocation.Offset = m_Offset;
+        allocation.Page = m_d3d12Resource.Get();
 
         m_Offset += alignedSize;
 
@@ -136,7 +138,7 @@ namespace SIByL
     // UPLOADBUFFER::PAGE::RESET
     // The Page::Reset method simply resets the page¡¯s pointer offset to 0
     // so that it can be used to make new allocations.
-    void UploadBuffer::Page::Reset()
+    void DX12UploadBuffer::Page::Reset()
     {
         m_Offset = 0;
     }

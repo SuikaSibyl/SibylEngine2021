@@ -22,6 +22,7 @@ namespace SIByL
 
 		CreateRenderPipeline();
 		CreateSynchronizer();
+		CreateUploadBuffer();
 
 		SIByL_CORE_INFO("DirectX 12 Init finished");
 	}
@@ -86,6 +87,11 @@ namespace SIByL
 	void DX12Context::CreateSynchronizer()
 	{
 		m_Synchronizer = std::make_unique<DX12Synchronizer>();
+	}
+
+	void DX12Context::CreateUploadBuffer()
+	{
+		m_UploadBuffer = std::make_unique<DX12UploadBuffer>();
 	}
 
 	ID3D12DescriptorHeap* DX12Context::CreateSRVHeap()

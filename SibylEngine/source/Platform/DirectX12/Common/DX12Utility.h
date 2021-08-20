@@ -34,6 +34,11 @@ public:
 #define DXCall(x) ThrowIfFailed(x)
 #endif
 
+namespace SIByL
+{
+    ComPtr<ID3D12Resource> CreateDefaultBuffer(UINT64 byteSize, const void* initData);
+}
+
 #pragma once
 
 /*

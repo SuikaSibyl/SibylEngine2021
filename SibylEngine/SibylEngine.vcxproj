@@ -108,13 +108,17 @@
     <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocator.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12CommandList.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12Synchronizer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\UploadBuffer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12Shader.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLShader.cpp" />
@@ -157,12 +161,15 @@
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="source\Platform\Cuda\Common\CudaContext.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocation.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocator.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Context.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Utility.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DX12CommandList.h" />
+    <ClInclude Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.h" />
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DX12Synchronizer.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.h" />
@@ -171,7 +178,10 @@
     <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.h" />
     <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.h" />
     <ClInclude Include="source\Platform\DirectX12\include\d3dx12.h" />
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12Shader.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h" />
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.h" />
+    <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLShader.h" />

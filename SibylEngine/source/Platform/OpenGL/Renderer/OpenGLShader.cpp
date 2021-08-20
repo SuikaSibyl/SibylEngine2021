@@ -23,12 +23,57 @@ namespace SIByL
 
 	OpenGLShader::OpenGLShader()
 	{
+		CompileFromString(vertexShaderSource, fragShaderSource);
+	}
+
+	OpenGLShader::OpenGLShader(std::string vFile, std::string pFile)
+	{
+		CompileFromFile(vFile, pFile);
+	}
+
+	void OpenGLShader::CompileFromFile(std::string vertexPath, std::string fragmentPath)
+	{
+		// 1. Get VERTEX/FRAGMENT From File Path
+		std::string vertexCode;
+		std::string fragmentCode;
+		std::ifstream vShaderFile;
+		std::ifstream fShaderFile;
+		// Make sure exceptions could work properly
+		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			// Open the file
+			vShaderFile.open(vertexPath);
+			fShaderFile.open(fragmentPath);
+			std::stringstream vShaderStream, fShaderStream;
+			// Load the content from the File
+			vShaderStream << vShaderFile.rdbuf();
+			fShaderStream << fShaderFile.rdbuf();
+			// Close File dealers
+			vShaderFile.close();
+			fShaderFile.close();
+			// Change datastream to string
+			vertexCode = vShaderStream.str();
+			fragmentCode = fShaderStream.str();
+		}
+		catch (std::ifstream::failure e)
+		{
+			SIByL_CORE_ERROR("Shader File Failed to Load");
+		}
+		const char* vShaderCode = vertexCode.c_str();
+		const char* fShaderCode = fragmentCode.c_str();
+		CompileFromString(vShaderCode, fShaderCode);
+	}
+
+	void OpenGLShader::CompileFromString(const char* vertex, const char* fragment)
+	{
 		// ----------------------------
 		// Create Vertex Shader
 		// ----------------------------
 		unsigned int vertexShader;
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+		glShaderSource(vertexShader, 1, &vertex, NULL);
 		glCompileShader(vertexShader);
 
 		// Check Compiling Results
@@ -46,7 +91,7 @@ namespace SIByL
 		// ----------------------------
 		unsigned int fragmentShader;
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragShaderSource, NULL);
+		glShaderSource(fragmentShader, 1, &fragment, NULL);
 		glCompileShader(fragmentShader);
 
 		// Check Compiling Results

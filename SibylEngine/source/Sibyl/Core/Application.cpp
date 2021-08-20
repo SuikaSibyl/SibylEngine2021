@@ -41,9 +41,9 @@ namespace SIByL
 			1, 2, 3  // 第二个三角形
 		};
 
-		Shader* shader = Shader::Create();
-		triangle = TriangleMesh::Create((float*)vertices, 4 * 3, indices, 6, layout);
+		Shader* shader = Shader::Create("Test/basic.hlsl", "Test/basic.hlsl");
 		shader->Use();
+		triangle = TriangleMesh::Create((float*)vertices, 4 * 3, indices, 6, layout);
 	}
 
 	Application::~Application()

@@ -24,13 +24,18 @@ namespace SIByL
 
 	void DX12RenderPipeline::DrawFrameImpl()
 	{
-		SIByL_CORE_TRACE("Draw Frame Dx1222!");
 		DX12GraphicCommandList* cmdList = DX12Context::GetGraphicCommandList();
 		SwapChain* swapChain = DX12Context::GetSwapChain();
 		DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
 		cmdList->Restart();
+
+
+		// Use Swap Chain as Render Target
+		// -------------------------------------
 		swapChain->SetRenderTarget();
 
+		// Drawcalls
+		Application::Get().triangle->RasterDraw();
 		Application::Get().OnDraw();
 
 		swapChain->PreparePresent();

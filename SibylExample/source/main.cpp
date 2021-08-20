@@ -27,7 +27,7 @@ public:
 
 	void OnDraw() override
 	{
-		SIByL_APP_TRACE("Example Draw");
+
 	}
 };
 
@@ -47,7 +47,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
+	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();

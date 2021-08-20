@@ -5,6 +5,7 @@
 #include "Platform/OpenGL/Renderer/OpenGLSwapChain.h"
 #include "Platform/DirectX12/Core/DescriptorAllocator.h"
 #include "Platform/DirectX12/Core/DX12CommandList.h"
+#include "Platform/DirectX12/Core/UploadBuffer.h"
 #include "Platform/DirectX12/Core/DX12Synchronizer.h"
 #include "Platform/DirectX12/Renderer/DX12RenderPipeline.h"
 
@@ -26,6 +27,7 @@ namespace SIByL
 		inline static ID3D12GraphicsCommandList* GetDXGraphicCommandList() { return Main->m_GraphicCommandList->Get(); }
 		inline static IDXGIFactory4* GetDxgiFactory() { return Main->m_DxgiFactory.Get(); }
 		inline static ID3D12CommandQueue* GetCommandQueue() { return Main->m_CommandQueue.Get(); }
+		inline static DX12UploadBuffer* GetUploadBuffer() { return Main->m_UploadBuffer.get(); }
 
 	private:
 		void EnableDebugLayer();
@@ -37,6 +39,7 @@ namespace SIByL
 		void CreateSwapChain();
 		void CreateRenderPipeline();
 		void CreateSynchronizer();
+		void CreateUploadBuffer();
 
 	public:
 		ID3D12DescriptorHeap* CreateSRVHeap();
@@ -50,6 +53,7 @@ namespace SIByL
 		std::unique_ptr<DX12GraphicCommandList> m_GraphicCommandList;
 		std::unique_ptr<DX12RenderPipeline> m_RenderPipeline;
 		std::unique_ptr<DX12Synchronizer> m_Synchronizer;
+		std::unique_ptr<DX12UploadBuffer> m_UploadBuffer;
 
 		// Descriptor Sizes
 		// ====================================================================

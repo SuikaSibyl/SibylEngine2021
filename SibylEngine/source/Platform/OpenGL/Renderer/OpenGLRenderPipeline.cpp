@@ -18,8 +18,12 @@ namespace SIByL
 	void OpenGLRenderPipeline::DrawFrameImpl()
 	{
 		SwapChain* swapChain = OpenGLContext::Get()->GetSwapChain();
+
+		// Use Swap Chain as Render Target
+		// -------------------------------------
 		swapChain->SetRenderTarget();
 
+		// Drawcalls
 		Application::Get().triangle->RasterDraw();
 		Application::Get().OnDraw();
 

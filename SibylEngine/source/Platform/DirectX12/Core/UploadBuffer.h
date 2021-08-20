@@ -21,7 +21,7 @@
 
 namespace SIByL
 {
-	class UploadBuffer
+	class DX12UploadBuffer
 	{
 	public:
 		// Use to upload data to the GPU
@@ -29,11 +29,13 @@ namespace SIByL
 		{
 			void* CPU;
 			D3D12_GPU_VIRTUAL_ADDRESS GPU;
+			ID3D12Resource* Page;
+			size_t Offset;
 		};
 		/**
 		 * @param pageSize The size to use to allocate new pages in GPU memory.
 		 */
-		explicit UploadBuffer(size_t pageSize = _2MB);
+		explicit DX12UploadBuffer(size_t pageSize = _2MB);
 		size_t GetPageSize() const { return m_PageSize; }
 		Allocation Allocate(size_t sizeInBytes, size_t alignment);
 		/**
