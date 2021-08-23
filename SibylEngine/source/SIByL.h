@@ -1,6 +1,6 @@
 #pragma once
 
-// For Use By Application
+// For Bind By Application
 #include "SIByLpch.h"
 #include "Sibyl/Core/Application.h"
 #include "Sibyl/Core/Layer.h"

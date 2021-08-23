@@ -26,8 +26,7 @@ namespace SIByL
 		cmdList->IASetVertexBuffers(0, 1, &(dxVertexBuffer->GetVertexBufferView()));
 		DX12IndexBuffer* dxIndexBuffer = dynamic_cast<DX12IndexBuffer*>(m_IndexBuffer.get());
 		cmdList->IASetIndexBuffer(&(dxIndexBuffer->GetIndexBufferView()));
-		cmdList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		cmdList->DrawIndexedInstanced(
-			0, 1, 0, 0, 0);
+		cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		cmdList->DrawIndexedInstanced(m_IndexBuffer->Count(), 1, 0, 0, 0);
 	}
 }

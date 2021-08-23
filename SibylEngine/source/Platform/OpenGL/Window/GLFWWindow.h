@@ -46,6 +46,6 @@ namespace SIByL
 		};
 
 		WindowData m_Data;
-		GraphicContext* m_GraphicContext;
+		std::unique_ptr<GraphicContext> m_OpenGLContext;
 	};
 }

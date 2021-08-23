@@ -4,6 +4,7 @@
 #include "Sibyl/Events/ApplicationEvent.h"
 #include "Sibyl/Core/Input.h"
 #include "glad/glad.h"
+#include "Sibyl/Renderer/GraphicContext.h"
 
 #include "Sibyl/Graphic/Geometry/Vertex.h"
 
@@ -13,14 +14,28 @@ namespace SIByL
 
 	Application::Application()
 	{
+		// Init Application
+		// --------------------------------
 		SIByL_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		Input::Init();
+		// Init: Window
+		// --------------------------------
 		m_Window = std::unique_ptr<Window>(Window::Create());
+
+		// Init: Input System
+		// --------------------------------
+		Input::Init();
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 
+		// Init: ImGui
+		// --------------------------------
 		PushOverlay(SIByL::ImGuiLayer::Create());
+
+		// Init: Frame Timer
+		// --------------------------------
+		m_FrameTimer.reset(FrameTimer::Create());
+		m_FrameTimer->Reset();
 	}
 
 	Application::~Application()
@@ -28,10 +43,24 @@ namespace SIByL
 
 	}
 
+	void Application::OnAwake()
+	{
+		// Awake: Render Objects
+		// --------------------------------
+		CommandList* cmdList = m_Window->GetGraphicContext()->GetCommandList();
+		cmdList->Restart();
+		for (Layer* layer : m_LayerStack)
+			layer->OnInitRenderer();
+		cmdList->Execute();
+		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
+	}
+
 	void Application::Run()
 	{
 		while (m_Running)
 		{
+			m_FrameTimer->Tick();
+
 			// Update
 			for (Layer* layer : m_LayerStack)
 			{

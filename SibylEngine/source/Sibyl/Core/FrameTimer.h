@@ -17,6 +17,16 @@ namespace SIByL
 		virtual void Stop() = 0;
 		virtual void Tick() = 0;
 
+		inline const float& GetFPS() const { return m_FPS; }
+		inline const float& GetMsPF() const { return m_MsPF; }
+
+	protected:
+		void	RefreshFPS();
+		__int64 m_FrameCount = 0;
+		int		m_FramePerSecond = 0;
+		float	m_FPS = 0;
+		float	m_MsPF = 0;
+
 	protected:
 		double m_SencondsPerCount;
 		double m_DeltaTime;

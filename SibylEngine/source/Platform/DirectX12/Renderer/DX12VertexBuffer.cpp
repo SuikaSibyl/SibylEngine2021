@@ -10,7 +10,7 @@ namespace SIByL
 {
 	DX12VertexBuffer::DX12VertexBuffer(float* vertices, uint32_t vCount, Type type)
 	{
-		m_Count = vCount;
+		m_FloatCount = vCount;
 		SetData(vertices, vCount, type);
 	}
 
@@ -23,7 +23,7 @@ namespace SIByL
 	{
 		m_Layout = layout;
 		m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
-		m_VertexBufferView.SizeInBytes = sizeof(float) * m_Count;
+		m_VertexBufferView.SizeInBytes = sizeof(float) * m_FloatCount;
 		m_VertexBufferView.StrideInBytes = layout.GetStide();
 	}
 

@@ -24,7 +24,7 @@ namespace SIByL
 	class DX12UploadBuffer
 	{
 	public:
-		// Use to upload data to the GPU
+		// Bind to upload data to the GPU
 		struct Allocation
 		{
 			void* CPU;

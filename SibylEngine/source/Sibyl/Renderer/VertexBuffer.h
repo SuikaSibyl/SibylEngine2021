@@ -20,7 +20,7 @@ namespace SIByL
 		virtual const VertexBufferLayout& GetLayout() = 0;
 
 	protected:
-		uint32_t m_Count;
+		uint32_t m_FloatCount;
 		uint32_t m_Size;
 	};
 }

@@ -10,10 +10,12 @@ int main(int argc, char** argv)
 {
 	SIByL::Log::Init();
 	std::shared_ptr<spdlog::logger>&  logger = SIByL::Log::GetCoreLogger();
-	SIByL_CORE_WARN("Log System starts running!");
+	SIByL_CORE_WARN("Log System is Working!");
 
 	auto app = SIByL::CreateApplication();
-	SIByL_CORE_WARN("Application starts running!");
+	SIByL_CORE_WARN("Application Awake!");
+	app->OnAwake();
+	SIByL_CORE_WARN("Application Run!");
 	app->Run();
 	delete app;
 }

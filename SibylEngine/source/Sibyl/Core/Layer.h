@@ -12,6 +12,7 @@ namespace SIByL
 		virtual ~Layer();
 
 		virtual void OnAttach() {}
+		virtual void OnInitRenderer() {}
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
 		virtual void OnDraw() {}

@@ -9,7 +9,10 @@ namespace SIByL
 	public:
 		OpenGLShader();
 		OpenGLShader(std::string vFile, std::string pFile);
+
 		virtual void Use() override;
+		virtual void CreateBinder(const VertexBufferLayout& vertexBufferLayout) override;
+		virtual void SetVertexBufferLayout(const VertexBufferLayout& vertexBufferLayout) override;
 
 	private:
 		void CompileFromFile(std::string vertexPath, std::string fragmentPath);
@@ -17,6 +20,6 @@ namespace SIByL
 
 	private:
 		unsigned int m_ShaderProgram;
-
+		VertexBufferLayout m_VertexBufferLayout;
 	};
 }

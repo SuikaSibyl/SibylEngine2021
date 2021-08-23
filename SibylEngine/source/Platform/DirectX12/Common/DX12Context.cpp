@@ -18,11 +18,14 @@ namespace SIByL
 		CreateCommandQueue();
 		CreateGraphicCommandList();
 		CreateDescriptorAllocator();
-		CreateSwapChain();
-
 		CreateRenderPipeline();
 		CreateSynchronizer();
 		CreateUploadBuffer();
+
+		m_CommandList->Restart();
+		CreateSwapChain();
+		m_CommandList->Execute();
+
 
 		SIByL_CORE_INFO("DirectX 12 Init finished");
 	}
@@ -64,6 +67,7 @@ namespace SIByL
 	void DX12Context::CreateGraphicCommandList()
 	{
 		m_GraphicCommandList = std::make_unique<DX12GraphicCommandList>();
+		m_CommandList = m_GraphicCommandList.get();
 	}
 
 	void DX12Context::CreateDescriptorAllocator()

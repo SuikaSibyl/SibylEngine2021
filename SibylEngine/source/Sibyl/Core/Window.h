@@ -2,6 +2,7 @@
 
 #include "Core.h"
 #include "Sibyl/Events/Event.h"
+#include "Sibyl/Renderer/GraphicContext.h"
 
 namespace SIByL
 {
@@ -39,5 +40,9 @@ namespace SIByL
 		virtual void* GetNativeWindow() const = 0;
 
 		static Window* Create(const WindowProps& props = WindowProps());
+		GraphicContext* GetGraphicContext() { return m_GraphicContext; }
+
+	protected:
+		GraphicContext* m_GraphicContext;
 	};
 }

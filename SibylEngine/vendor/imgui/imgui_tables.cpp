@@ -2016,7 +2016,7 @@ void ImGui::TableEndCell(ImGuiTable* table)
 // - TableUpdateColumnsWeightFromWidth() [Internal]
 //-------------------------------------------------------------------------
 
-// Maximum column content width given current layout. Use column->MinX so this value on a per-column basis.
+// Maximum column content width given current layout. Bind column->MinX so this value on a per-column basis.
 float ImGui::TableGetMaxColumnWidth(const ImGuiTable* table, int column_n)
 {
     const ImGuiTableColumn* column = &table->Columns[column_n];
@@ -2413,7 +2413,7 @@ void ImGui::TableMergeDrawChannels(ImGuiTable* table)
     {
         // We skip channel 0 (Bg0/Bg1) and 1 (Bg2 frozen) from the shuffling since they won't move - see channels allocation in TableSetupDrawChannels().
         const int LEADING_DRAW_CHANNELS = 2;
-        g.DrawChannelsTempMergeBuffer.resize(splitter->_Count - LEADING_DRAW_CHANNELS); // Use shared temporary storage so the allocation gets amortized
+        g.DrawChannelsTempMergeBuffer.resize(splitter->_Count - LEADING_DRAW_CHANNELS); // Bind shared temporary storage so the allocation gets amortized
         ImDrawChannel* dst_tmp = g.DrawChannelsTempMergeBuffer.Data;
         ImBitArray<IMGUI_TABLE_MAX_DRAW_CHANNELS> remaining_mask;                       // We need 132-bit of storage
         remaining_mask.SetBitRange(LEADING_DRAW_CHANNELS, splitter->_Count);
@@ -2998,7 +2998,7 @@ void ImGui::TableHeader(const char* label)
 // - TableDrawContextMenu() [Internal]
 //-------------------------------------------------------------------------
 
-// Use -1 to open menu not specific to a given column.
+// Bind -1 to open menu not specific to a given column.
 void ImGui::TableOpenContextMenu(int column_n)
 {
     ImGuiContext& g = *GImGui;

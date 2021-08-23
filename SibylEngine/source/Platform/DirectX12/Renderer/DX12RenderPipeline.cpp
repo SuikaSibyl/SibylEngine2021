@@ -30,7 +30,7 @@ namespace SIByL
 		cmdList->Restart();
 
 
-		// Use Swap Chain as Render Target
+		// Bind Swap Chain as Render Target
 		// -------------------------------------
 		swapChain->SetRenderTarget();
 

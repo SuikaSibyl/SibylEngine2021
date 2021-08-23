@@ -10,23 +10,65 @@
 
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
+#include "Platform/DirectX12/Renderer/DX12ShaderBinder.h"
 
 namespace SIByL
 {
+	static DXGI_FORMAT ShaderDataTypeToDXGIFormat(ShaderDataType type)
+	{
+		switch (type)
+		{
+		case SIByL::ShaderDataType::None:	return DXGI_FORMAT_R8_TYPELESS;
+		case SIByL::ShaderDataType::Float:	return DXGI_FORMAT_R32_FLOAT;
+		case SIByL::ShaderDataType::Float2:	return DXGI_FORMAT_R32G32_FLOAT;
+		case SIByL::ShaderDataType::Float3:	return DXGI_FORMAT_R32G32B32_FLOAT;
+		case SIByL::ShaderDataType::Float4:	return DXGI_FORMAT_R32G32B32A32_FLOAT;
+		case SIByL::ShaderDataType::Mat3:	return DXGI_FORMAT_R8_TYPELESS;
+		case SIByL::ShaderDataType::Mat4:	return DXGI_FORMAT_R8_TYPELESS;
+		case SIByL::ShaderDataType::Int:	return DXGI_FORMAT_R16_SINT;
+		case SIByL::ShaderDataType::Int2:	return DXGI_FORMAT_R8G8_SINT;
+		case SIByL::ShaderDataType::Int3:	return DXGI_FORMAT_R32G32B32_SINT;
+		case SIByL::ShaderDataType::Int4:	return DXGI_FORMAT_R8G8B8A8_SINT;
+		case SIByL::ShaderDataType::Bool:	return DXGI_FORMAT_R8_TYPELESS;
+		default:return DXGI_FORMAT_R8_TYPELESS;
+		}
+	}
+
 	DX12Shader::DX12Shader()
 	{
-
 	}
 
 	DX12Shader::DX12Shader(std::string vFile, std::string pFile)
 	{
 		m_VsBytecode = CompileFromFile(AnsiToWString(vFile), nullptr, "VS", "vs_5_1");
 		m_PsBytecode = CompileFromFile(AnsiToWString(pFile), nullptr, "PS", "ps_5_1");
+
 	}
 
 	void DX12Shader::Use()
 	{
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		cmdList->SetPipelineState(m_PipelineStateObject.Get());
+		m_ShaderBinder->Bind();
+	}
 
+	void DX12Shader::CreateBinder(const VertexBufferLayout& vertexBufferLayout)
+	{
+		m_ShaderBinder.reset(ShaderBinder::Create());
+		SetVertexBufferLayout(vertexBufferLayout);
+		CreatePSO();
+	}
+
+	void DX12Shader::SetVertexBufferLayout(const VertexBufferLayout& vertexBufferLayout)
+	{
+		m_VertexBufferLayout = vertexBufferLayout;
+		for (const auto& element : m_VertexBufferLayout)
+		{
+			m_InputLayoutDesc.push_back(
+				{ element.Name.c_str(), 0, 
+				ShaderDataTypeToDXGIFormat(element.Type) , 0,
+				0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+		}
 	}
 
 	ComPtr<ID3DBlob> DX12Shader::CompileFromFile(
@@ -62,5 +104,28 @@ namespace SIByL
 		DXCall(hr);
 
 		return byteCode;
+	}
+
+	void DX12Shader::CreatePSO()
+	{
+		DX12ShaderBinder* dxShaderBinder = dynamic_cast<DX12ShaderBinder*>(m_ShaderBinder.get());
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+		ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+		psoDesc.InputLayout = { m_InputLayoutDesc.data(), (UINT)m_InputLayoutDesc.size() };
+		psoDesc.pRootSignature = dxShaderBinder->GetRootSignature();
+		psoDesc.VS = { reinterpret_cast<BYTE*>(m_VsBytecode->GetBufferPointer()), m_VsBytecode->GetBufferSize() };
+		psoDesc.PS = { reinterpret_cast<BYTE*>(m_PsBytecode->GetBufferPointer()), m_PsBytecode->GetBufferSize() };
+		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+		psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+		psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		psoDesc.SampleMask = UINT_MAX;	//0xffffffff, No Sampling Mask
+		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		psoDesc.NumRenderTargets = 1;
+		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;	// Normalized Unsigned Int
+		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		psoDesc.SampleDesc.Count = 1;	// No 4XMSAA
+		psoDesc.SampleDesc.Quality = 0;	////No 4XMSAA
+
+		DXCall(DX12Context::GetDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_PipelineStateObject)));
 	}
 }

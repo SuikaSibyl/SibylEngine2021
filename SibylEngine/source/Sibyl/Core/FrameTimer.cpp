@@ -27,4 +27,18 @@ namespace SIByL
 			return (float)((m_CurrentTime - m_PauseTime - m_BaseTime) * m_SencondsPerCount);
 		}
 	}
+
+	void FrameTimer::RefreshFPS()
+	{
+		static float timeElapsed = 0.0f;
+		m_FramePerSecond++;
+
+		if (TotalTime() - timeElapsed >= 1.0f)
+		{
+			m_FPS = (float)m_FramePerSecond;
+			m_MsPF = 1000.0f / m_FPS;
+			m_FramePerSecond = 0;
+			timeElapsed += 1.0f;
+		}
+	}
 }

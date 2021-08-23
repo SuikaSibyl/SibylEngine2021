@@ -4,6 +4,9 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#include "Platform/OpenGL/Renderer/OpenGLCommandList.h"
+#include "Platform/OpenGL/Renderer/OpenGLSynchronizer.h"
+
 namespace SIByL
 {
 	OpenGLContext* OpenGLContext::Main;
@@ -14,6 +17,10 @@ namespace SIByL
 		SIByL_CORE_ASSERT(windowHandle, "WindowHandle is NULL!");
 		SIByL_CORE_ASSERT(!Main, "OpenGL Context Already Exists!");
 		Main = this;
+
+		// Create Command List
+		m_CommandList = new OpenGLCommandList();
+		m_Synchronizer.reset(new OpenGLSynchronizer());
 	}
 
 	void OpenGLContext::Init()

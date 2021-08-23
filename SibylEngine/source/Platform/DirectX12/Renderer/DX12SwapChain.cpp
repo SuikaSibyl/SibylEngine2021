@@ -11,12 +11,15 @@ namespace SIByL
         :SwapChain(WindowsWindow::Main->GetWidth(), WindowsWindow::Main->GetHeight())
     {
         CreateSwapChain(WindowsWindow::Main->GetWidth(), WindowsWindow::Main->GetHeight());
+        CreateDepthStencil(WindowsWindow::Main->GetWidth(), WindowsWindow::Main->GetHeight());
+        SetViewportRect(WindowsWindow::Main->GetWidth(), WindowsWindow::Main->GetHeight());
     }
 
     DX12SwapChain::DX12SwapChain(int width, int height)
         :SwapChain(width, height)
     {
         CreateSwapChain(width, height);
+        CreateDepthStencil(width, height);
         SetViewportRect(width, height);
     }
 
@@ -43,6 +46,46 @@ namespace SIByL
 
         DXCall(DX12Context::GetDxgiFactory()->CreateSwapChain(DX12Context::GetCommandQueue(), 
             &swapChainDesc, m_SwapChain.GetAddressOf()));
+    }
+
+    void DX12SwapChain::CreateDepthStencil(int width, int height)
+    {
+        D3D12_RESOURCE_DESC dsvResourceDesc;
+        dsvResourceDesc.Alignment = 0;
+        dsvResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+        dsvResourceDesc.DepthOrArraySize = 1;
+        dsvResourceDesc.Width = width;
+        dsvResourceDesc.Height = height;
+        dsvResourceDesc.MipLevels = 1;
+        dsvResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+        dsvResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+        dsvResourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        dsvResourceDesc.SampleDesc.Count = 1;
+        dsvResourceDesc.SampleDesc.Quality = 0;
+
+        CD3DX12_CLEAR_VALUE optClear;
+        optClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        optClear.DepthStencil.Depth = 1;
+        optClear.DepthStencil.Stencil = 0;
+
+        DXCall(DX12Context::GetDevice()->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+            D3D12_HEAP_FLAG_NONE,
+            &dsvResourceDesc,
+            D3D12_RESOURCE_STATE_COMMON,
+            &optClear,
+            IID_PPV_ARGS(&m_SwapChainDepthStencil)));
+
+        DescriptorAllocator* dsvDespAllocator = DX12Context::GetDsvDescriptorAllocator();
+        m_DSVDespAllocation = dsvDespAllocator->Allocate(1);
+        DX12Context::GetDevice()->CreateDepthStencilView(m_SwapChainDepthStencil.Get(),
+            nullptr,
+            m_DSVDespAllocation.GetDescriptorHandle());
+
+        ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+        cmdList->ResourceBarrier(1,	//Barrier屏障个数
+            &CD3DX12_RESOURCE_BARRIER::Transition(m_SwapChainDepthStencil.Get(),
+                D3D12_RESOURCE_STATE_COMMON,	//转换前状态（创建时的状态，即CreateCommittedResource函数中定义的状态）
+                D3D12_RESOURCE_STATE_DEPTH_WRITE));	//转换后状态为可写入的深度图，还有一个D3D12_RESOURCE_STATE_DEPTH_READ是只可读的深度图
     }
 
     void DX12SwapChain::BindRenderTarget()
@@ -77,18 +120,19 @@ namespace SIByL
         // Clear Render Targets
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_DescriptorAllocation.GetDescriptorHandle(m_CurrentBackBuffer);
         cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::Black, 0, nullptr);
-        //D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
-        //cmdList->ClearDepthStencilView(dsvHandle,	//DSV描述符句柄
-        //    D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,	//FLAG
-        //    1.0f,	//默认深度值
-        //    0,	//默认模板值
-        //    0,	//裁剪矩形数量
-        //    nullptr);	//裁剪矩形指针
+
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_DSVDespAllocation.GetDescriptorHandle();
+        cmdList->ClearDepthStencilView(dsvHandle,	//DSV描述符句柄
+            D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,	//FLAG
+            1.0f,	//默认深度值
+            0,	//默认模板值
+            0,	//裁剪矩形数量
+            nullptr);	//裁剪矩形指针
 
         cmdList->OMSetRenderTargets(1,//待绑定的RTV数量
             &rtvHandle,	//指向RTV数组的指针
             true,	//RTV对象在堆内存中是连续存放的
-            nullptr);	//指向DSV的指针
+            &dsvHandle);	//指向DSV的指针
     }
 
     void DX12SwapChain::PreparePresent()

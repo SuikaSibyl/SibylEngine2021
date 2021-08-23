@@ -12,6 +12,7 @@ namespace SIByL
 		DX12SwapChain();
 		DX12SwapChain(int width, int height);
 		void CreateSwapChain(int width, int height);
+		void CreateDepthStencil(int width, int height);
 
 		virtual void BindRenderTarget() override;
 		virtual void SetRenderTarget() override;
@@ -24,7 +25,9 @@ namespace SIByL
 	private:
 		ComPtr<IDXGISwapChain> m_SwapChain;
 		ComPtr<ID3D12Resource> m_SwapChainBuffer[2];
+		ComPtr<ID3D12Resource> m_SwapChainDepthStencil;
 		DescriptorAllocation m_DescriptorAllocation;
+		DescriptorAllocation m_DSVDespAllocation;
 		UINT m_CurrentBackBuffer = 0;
 
 	private:

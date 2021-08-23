@@ -209,6 +209,7 @@ namespace SIByL
 		// Init DX12 Environment
 		m_DX12Env = std::make_unique<DX12Context>();
 		m_DX12Env->Init();
+		m_GraphicContext = m_DX12Env.get();
 
 		ShowWindow(mhMainWnd, SW_SHOW);
 

@@ -1,15 +1,16 @@
 #pragma once
 #include "SIByLpch.h"
+#include "Sibyl/Renderer/CommandList.h"
 
 namespace SIByL
 {
-	class DX12GraphicCommandList
+	class DX12GraphicCommandList : public CommandList
 	{
 	public:
 		DX12GraphicCommandList();
 
-		void Restart();
-		void Execute();
+		virtual void Restart() override;
+		virtual void Execute() override;
 
 		inline ID3D12GraphicsCommandList* Get() { return m_GraphicCmdList.Get(); }
 

@@ -124,4 +124,14 @@ namespace SIByL
 	{
 		glUseProgram(m_ShaderProgram);
 	}
+
+	void OpenGLShader::CreateBinder(const VertexBufferLayout& vertexBufferLayout)
+	{
+		//m_ShaderBinder = 
+	}
+
+	void OpenGLShader::SetVertexBufferLayout(const VertexBufferLayout& vertexBufferLayout)
+	{
+		m_VertexBufferLayout = vertexBufferLayout;
+	}
 }

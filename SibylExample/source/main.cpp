@@ -14,9 +14,14 @@ public:
 	ExampleLayer()
 		:Layer("Example")
 	{
+
+	}
+
+	void OnInitRenderer() override
+	{
 		VertexBufferLayout layout =
 		{
-			{ShaderDataType::Float3, "a_Position"},
+			{ShaderDataType::Float3, "POSITION"},
 		};
 
 		VertexData vertices[] = {
@@ -31,7 +36,8 @@ public:
 			1, 2, 3  // 第二个三角形
 		};
 
-		shader = Shader::Create("Test/basic.vert", "Test/basic.frag");
+		shader = Shader::Create("Test/basic", "Test/basic");
+		shader->CreateBinder(layout);
 		triangle = TriangleMesh::Create((float*)vertices, 4 * 3, indices, 6, layout);
 	}
 
@@ -40,6 +46,11 @@ public:
 		//SIByL_APP_INFO("ExampleLayer::Update");
 		if (SIByL::Input::IsKeyPressed(SIByL_KEY_TAB))
 			SIByL_APP_TRACE("Tab key is pressed!");
+
+		SIByL_CORE_INFO("FPS: {0}, {1} ms", 
+			Application::Get().GetFrameTimer()->GetFPS(),
+			Application::Get().GetFrameTimer()->GetMsPF());
+
 	}
 
 	void OnEvent(SIByL::Event& event) override
@@ -73,7 +84,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
+	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();

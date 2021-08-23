@@ -17,7 +17,7 @@ namespace SIByL
 	{
 		m_IndexBuffer = CreateDefaultBuffer(sizeof(unsigned int) * number, indices);
 		m_IndexBufferView.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress();
-		m_IndexBufferView.Format = DXGI_FORMAT_R16_UINT;
+		m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
 		m_IndexBufferView.SizeInBytes = sizeof(unsigned int) * number;
 	}
 

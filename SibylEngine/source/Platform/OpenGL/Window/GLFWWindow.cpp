@@ -50,11 +50,12 @@ namespace SIByL
 
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		
-		m_GraphicContext = new OpenGLContext(m_Window);
-		m_GraphicContext->Init();
+		m_OpenGLContext = std::make_unique<OpenGLContext>(m_Window);
+		m_OpenGLContext->Init();
+		m_GraphicContext = m_OpenGLContext.get();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
+		SetVSync(false);
 
 		// Set GLFW Callbacks
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)

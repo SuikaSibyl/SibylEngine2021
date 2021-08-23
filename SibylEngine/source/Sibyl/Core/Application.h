@@ -6,7 +6,8 @@
 #include "Sibyl/Events/KeyEvent.h"
 #include "Sibyl/Events/MouseEvent.h"
 #include "Sibyl/Core/LayerStack.h"
-
+#include "Sibyl/Core/FrameTimer.h"
+#include "Sibyl/Renderer/GraphicContext.h"
 #include "Sibyl/ImGui/ImGuiLayer.h"
 #include "Sibyl/Graphic/Geometry/TriangleMesh.h"
 
@@ -20,6 +21,7 @@ namespace SIByL
 
 		void Run();
 		void OnEvent(Event& e);
+		void OnAwake();
 		void OnDraw();
 		void DrawImGui();
 
@@ -29,6 +31,7 @@ namespace SIByL
 
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }
+		inline FrameTimer* GetFrameTimer() { return m_FrameTimer.get(); }
 
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
@@ -36,6 +39,7 @@ namespace SIByL
 	private:
 		std::unique_ptr<Window> m_Window;
 		std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
+		std::unique_ptr<FrameTimer> m_FrameTimer;
 
 		bool m_Running = true;
 		LayerStack m_LayerStack;

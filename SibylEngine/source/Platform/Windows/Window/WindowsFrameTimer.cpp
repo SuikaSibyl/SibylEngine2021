@@ -65,5 +65,8 @@ namespace SIByL
 		{
 			m_DeltaTime = 0;
 		}
+
+		// Recalculate FPS
+		RefreshFPS();
 	}
 }

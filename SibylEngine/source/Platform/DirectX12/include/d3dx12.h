@@ -546,7 +546,7 @@ struct CD3DX12_CLEAR_VALUE : public D3D12_CLEAR_VALUE
     {
         Format = format;
         memset(&Color, 0, sizeof(Color));
-        /* Use memcpy to preserve NAN values */
+        /* Bind memcpy to preserve NAN values */
         memcpy(&DepthStencil.Depth, &depth, sizeof(depth));
         DepthStencil.Stencil = stencil;
     }
@@ -2404,7 +2404,7 @@ struct ID3DX12PipelineParserCallbacks
 };
 
 // CD3DX12_PIPELINE_STATE_STREAM1 Works on RS3+ (where there is a new view instancing
-// subobject). Use CD3DX12_PIPELINE_STATE_STREAM for RS2+ support.
+// subobject). Bind CD3DX12_PIPELINE_STATE_STREAM for RS2+ support.
 struct CD3DX12_PIPELINE_STATE_STREAM1
 {
     CD3DX12_PIPELINE_STATE_STREAM1() = default;

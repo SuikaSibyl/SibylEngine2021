@@ -117,6 +117,7 @@
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiDX12Renderer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12Shader.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12ShaderBinder.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="source\Sibyl\Renderer\IndexBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Renderer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Shader.cpp" />
+    <ClCompile Include="source\Sibyl\Renderer\ShaderBinder.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\VertexBuffer.cpp" />
     <ClCompile Include="vendor\glad\src\glad.cpp" />
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp" />
@@ -181,13 +183,16 @@
     <ClInclude Include="source\Platform\DirectX12\ImGui\ImGuiLayerDX12.h" />
     <ClInclude Include="source\Platform\DirectX12\include\d3dx12.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12Shader.h" />
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12ShaderBinder.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.h" />
     <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h" />
+    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLCommandList.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLShader.h" />
     <ClInclude Include="source\Platform\OpenGL\Graphic\Geometry\OpenGLTriangleMesh.h" />
+    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLSynchronizer.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLVertexBuffer.h" />
     <ClInclude Include="source\Platform\OpenGL\Window\GLFWInput.h" />
     <ClInclude Include="source\Platform\OpenGL\Window\GLFWWindow.h" />
@@ -203,6 +208,7 @@
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />
     <ClInclude Include="source\SIByLsettings.h" />
+    <ClInclude Include="source\Sibyl\Components\Transform.h" />
     <ClInclude Include="source\Sibyl\Core\Application.h" />
     <ClInclude Include="source\Sibyl\Core\Core.h" />
     <ClInclude Include="source\Sibyl\Core\EntryPoint.h" />
@@ -222,9 +228,11 @@
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\TriangleMesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Vertex.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Material\Material.h" />
     <ClInclude Include="source\Sibyl\Graphic\Texture\Image.h" />
     <ClInclude Include="source\Sibyl\Graphic\Texture\Texture.h" />
     <ClInclude Include="source\Sibyl\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="source\Sibyl\Renderer\CommandList.h" />
     <ClInclude Include="source\Sibyl\Renderer\FrameBuffer.h" />
     <ClInclude Include="source\Sibyl\Renderer\GraphicContext.h" />
     <ClInclude Include="source\Sibyl\Renderer\IndexBuffer.h" />
@@ -233,8 +241,10 @@
     <ClInclude Include="source\Sibyl\Renderer\RenderPass.h" />
     <ClInclude Include="source\Sibyl\Renderer\RenderPipeline.h" />
     <ClInclude Include="source\Sibyl\Renderer\Shader.h" />
+    <ClInclude Include="source\Sibyl\Renderer\ShaderBinder.h" />
     <ClInclude Include="source\Sibyl\Renderer\State.h" />
     <ClInclude Include="source\Sibyl\Renderer\SwapChain.h" />
+    <ClInclude Include="source\Sibyl\Renderer\Synchronizer.h" />
     <ClInclude Include="source\Sibyl\Renderer\Texture.h" />
     <ClInclude Include="source\Sibyl\Renderer\VertexBuffer.h" />
     <ClInclude Include="vendor\glad\include\glad\glad.h" />

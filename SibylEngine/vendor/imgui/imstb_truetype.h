@@ -218,7 +218,7 @@
 //
 //   Quality:
 //
-//    - Use the functions with Subpixel at the end to allow your characters
+//    - Bind the functions with Subpixel at the end to allow your characters
 //      to have subpixel positioning. Since the font is anti-aliased, not
 //      hinted, this is very import for quality. (This is not possible with
 //      baked fonts.)

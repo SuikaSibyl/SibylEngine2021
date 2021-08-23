@@ -9,6 +9,21 @@ inline std::wstring AnsiToWString(const std::string& str)
 	return std::wstring(buffer);
 }
 
+//wstring=>string
+inline std::string WString2String(const std::wstring& ws)
+{
+    std::string strLocale = setlocale(LC_ALL, "");
+    const wchar_t* wchSrc = ws.c_str();
+    size_t nDestSize = wcstombs(NULL, wchSrc, 0) + 1;
+    char* chDest = new char[nDestSize];
+    memset(chDest, 0, nDestSize);
+    wcstombs(chDest, wchSrc, nDestSize);
+    std::string strResult = chDest;
+    delete[]chDest;
+    setlocale(LC_ALL, strLocale.c_str());
+    return strResult;
+}
+
 class DxException
 {
 public:
@@ -29,7 +44,9 @@ public:
 {                                                                     \
     HRESULT hr__ = (x);                                               \
     std::wstring wfn = AnsiToWString(__FILE__);                       \
-    if(FAILED(hr__)) { throw DxException(hr__, L#x, wfn, __LINE__); } \
+    if(FAILED(hr__)) {                                                \
+        SIByL_CORE_ERROR("DXCall Failed: {0}, {1}", WString2String(wfn), __LINE__);  \
+        throw DxException(hr__, L#x, wfn, __LINE__); }                \
 }
 #define DXCall(x) ThrowIfFailed(x)
 #endif

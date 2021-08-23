@@ -797,7 +797,7 @@ namespace detail
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////
-// Use SIMD instruction sets
+// Bind SIMD instruction sets
 
 #if GLM_HAS_ALIGNOF && (GLM_LANG & GLM_LANG_CXXMS_FLAG) && (GLM_ARCH & GLM_ARCH_SIMD_BIT)
 #	define GLM_CONFIG_SIMD GLM_ENABLE
