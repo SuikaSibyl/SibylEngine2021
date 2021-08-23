@@ -30,8 +30,6 @@ namespace SIByL
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }
 
-		TriangleMesh* triangle;
-
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
 

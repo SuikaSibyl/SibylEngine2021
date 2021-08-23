@@ -24,7 +24,6 @@ namespace SIByL
 		swapChain->SetRenderTarget();
 
 		// Drawcalls
-		Application::Get().triangle->RasterDraw();
 		Application::Get().OnDraw();
 
 		swapChain->PreparePresent();

@@ -3,6 +3,10 @@
 #include <SIByL.h>
 
 #include <Sibyl/Renderer/Renderer.h>
+#include "Sibyl/Renderer/Shader.h"
+#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
+
+using namespace SIByL;
 
 class ExampleLayer :public SIByL::Layer
 {
@@ -10,7 +14,25 @@ public:
 	ExampleLayer()
 		:Layer("Example")
 	{
+		VertexBufferLayout layout =
+		{
+			{ShaderDataType::Float3, "a_Position"},
+		};
 
+		VertexData vertices[] = {
+			0.5f, 0.5f, 0.0f,   // 右上角
+			0.5f, -0.5f, 0.0f,  // 右下角
+			-0.5f, -0.5f, 0.0f, // 左下角
+			-0.5f, 0.5f, 0.0f   // 左上角
+		};
+
+		uint32_t indices[] = { // 注意索引从0开始! 
+			0, 1, 3, // 第一个三角形
+			1, 2, 3  // 第二个三角形
+		};
+
+		shader = Shader::Create("Test/basic.vert", "Test/basic.frag");
+		triangle = TriangleMesh::Create((float*)vertices, 4 * 3, indices, 6, layout);
 	}
 
 	void OnUpdate() override
@@ -27,8 +49,12 @@ public:
 
 	void OnDraw() override
 	{
-
+		shader->Use();
+		triangle->RasterDraw();
 	}
+
+	Shader* shader;
+	TriangleMesh* triangle;
 };
 
 class Sandbox :public SIByL::Application
@@ -47,7 +73,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
+	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();
