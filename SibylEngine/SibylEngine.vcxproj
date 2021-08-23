@@ -133,7 +133,7 @@
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.cpp" />
     <ClCompile Include="source\Platform\Windows\ImGui\ImGuiWin32Renderer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp" />
-    <ClCompile Include="source\Platform\Windows\Window\WindowsTimer.cpp" />
+    <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
     <ClCompile Include="source\Sibyl\Core\Input.cpp" />
     <ClCompile Include="source\Sibyl\Core\SIByLpch.cpp">
@@ -144,7 +144,7 @@
     <ClCompile Include="source\Sibyl\Core\Layer.cpp" />
     <ClCompile Include="source\Sibyl\Core\LayerStack.cpp" />
     <ClCompile Include="source\Sibyl\Core\Log.cpp" />
-    <ClCompile Include="source\Sibyl\Core\Timer.cpp" />
+    <ClCompile Include="source\Sibyl\Core\FrameTimer.cpp" />
     <ClCompile Include="source\Sibyl\Core\Window.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Camera.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Geometry\TriangleMesh.cpp" />
@@ -198,7 +198,7 @@
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.h" />
     <ClInclude Include="source\Platform\Windows\ImGui\ImGuiWin32Renderer.h" />
     <ClInclude Include="source\Platform\Windows\Window\WindowsInput.h" />
-    <ClInclude Include="source\Platform\Windows\Window\WindowsTimer.h" />
+    <ClInclude Include="source\Platform\Windows\Window\WindowsFrameTimer.h" />
     <ClInclude Include="source\Platform\Windows\Window\WindowsWindow.h" />
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />
@@ -211,7 +211,7 @@
     <ClInclude Include="source\Sibyl\Core\Layer.h" />
     <ClInclude Include="source\Sibyl\Core\LayerStack.h" />
     <ClInclude Include="source\Sibyl\Core\MouseButtonCodes.h" />
-    <ClInclude Include="source\Sibyl\Core\Timer.h" />
+    <ClInclude Include="source\Sibyl\Core\FrameTimer.h" />
     <ClInclude Include="source\Sibyl\Core\Window.h" />
     <ClInclude Include="source\Sibyl\Events\ApplicationEvent.h" />
     <ClInclude Include="source\Sibyl\Events\Event.h" />

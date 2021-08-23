@@ -177,10 +177,10 @@
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Core\Timer.cpp">
+    <ClCompile Include="source\Sibyl\Core\FrameTimer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\Windows\Window\WindowsTimer.cpp">
+    <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1283,10 +1283,10 @@
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Core\Timer.h">
+    <ClInclude Include="source\Sibyl\Core\FrameTimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\Windows\Window\WindowsTimer.h">
+    <ClInclude Include="source\Platform\Windows\Window\WindowsFrameTimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
