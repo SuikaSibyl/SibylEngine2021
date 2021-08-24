@@ -14,8 +14,18 @@ namespace SIByL
 
 	void DX12ShaderBinder::Bind()
 	{
+		// Bind Root Signature
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
 		cmdList->SetGraphicsRootSignature(m_RootSignature.Get());
+
+		//// Bind Descriptor Table
+		//int objCbvIndex = 0;
+		//auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
+		//handle.Offset(objCbvIndex, cbv_srv_uavDescriptorSize);
+		//cmdList->SetGraphicsRootDescriptorTable(0, //根参数的起始索引
+		//	handle);
+
+
 	}
 
 	void DX12ShaderBinder::BuildRootSignature()
@@ -30,7 +40,9 @@ namespace SIByL
 		cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, // Descriptor Type
 			1, // Descriptor Number
 			0);// Slot Number where Descriptor binded
-		slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+		slotRootParameter[0].InitAsConstantBufferView(0);
+
+		//slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
 		// Root Signature is consisted of a set of root parameters
 		CD3DX12_ROOT_SIGNATURE_DESC rootSig(1, // Number of root parameters
 			slotRootParameter, // Pointer to Root Parameter

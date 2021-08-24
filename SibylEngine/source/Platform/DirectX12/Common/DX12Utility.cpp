@@ -16,7 +16,7 @@ namespace SIByL
 	{
 		// Allocate upload buffer
 		DX12UploadBuffer* uploadBuffer = DX12Context::GetUploadBuffer();
-		DX12UploadBuffer::Allocation allocation = uploadBuffer->Allocate(byteSize, 4);
+		DX12UploadBuffer::Allocation allocation = uploadBuffer->Allocate(byteSize, true);
 
 		//Create Default Buffer as the target
 		ComPtr<ID3D12Resource> defaultBuffer;

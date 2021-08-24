@@ -8,10 +8,10 @@
 
 namespace SIByL
 {
-	DX12VertexBuffer::DX12VertexBuffer(float* vertices, uint32_t vCount, Type type)
+	DX12VertexBuffer::DX12VertexBuffer(float* vertices, uint32_t floatCount, Type type)
 	{
-		m_FloatCount = vCount;
-		SetData(vertices, vCount, type);
+		m_FloatCount = floatCount;
+		SetData(vertices, floatCount, type);
 	}
 
 	void DX12VertexBuffer::SetData(float* vertices, UINT32 number, Type type)

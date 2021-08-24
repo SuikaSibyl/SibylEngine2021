@@ -61,7 +61,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp14</LanguageStandard>
@@ -108,7 +108,9 @@
     <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocator.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12CommandList.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\DX12FrameResources.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12Synchronizer.cpp" />
@@ -120,6 +122,7 @@
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12ShaderBinder.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\Graphic\Texture\OpenGLTexture.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLShader.cpp" />
@@ -149,6 +152,9 @@
     <ClCompile Include="source\Sibyl\Core\Window.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Camera.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Geometry\TriangleMesh.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Material\Material.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Texture\Image.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Texture\Texture.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\IndexBuffer.cpp" />
@@ -163,6 +169,7 @@
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
     <ClCompile Include="vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Platform\Cuda\Common\CudaContext.h" />
@@ -172,6 +179,8 @@
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Context.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Utility.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DX12CommandList.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\DX12FrameResources.h" />
+    <ClInclude Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.h" />
     <ClInclude Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.h" />
@@ -187,6 +196,7 @@
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.h" />
     <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h" />
+    <ClInclude Include="source\Platform\OpenGL\Graphic\Texture\OpenGLTexture.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLCommandList.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.h" />
@@ -242,10 +252,10 @@
     <ClInclude Include="source\Sibyl\Renderer\RenderPipeline.h" />
     <ClInclude Include="source\Sibyl\Renderer\Shader.h" />
     <ClInclude Include="source\Sibyl\Renderer\ShaderBinder.h" />
+    <ClInclude Include="source\Sibyl\Renderer\ShaderData.h" />
     <ClInclude Include="source\Sibyl\Renderer\State.h" />
     <ClInclude Include="source\Sibyl\Renderer\SwapChain.h" />
     <ClInclude Include="source\Sibyl\Renderer\Synchronizer.h" />
-    <ClInclude Include="source\Sibyl\Renderer\Texture.h" />
     <ClInclude Include="source\Sibyl\Renderer\VertexBuffer.h" />
     <ClInclude Include="vendor\glad\include\glad\glad.h" />
     <ClInclude Include="vendor\glad\include\KHR\khrplatform.h" />
@@ -541,6 +551,7 @@
     <ClInclude Include="vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\glm\glm\detail\func_common.inl" />

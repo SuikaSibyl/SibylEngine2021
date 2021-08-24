@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Sibyl/Renderer/Shader.h>
+
 namespace SIByL
 {
 	class Material
@@ -7,6 +9,8 @@ namespace SIByL
 	public:
 
 	private:
+		Ref<Shader> m_Shader;
+
 
 	};
 }

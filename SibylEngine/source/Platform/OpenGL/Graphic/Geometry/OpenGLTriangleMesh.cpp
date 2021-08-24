@@ -6,7 +6,7 @@
 namespace SIByL
 {
 	OpenGLTriangleMesh::OpenGLTriangleMesh(
-		float* vertices, uint32_t vCount,
+		float* vertices, uint32_t floatCount,
 		unsigned int* indices, uint32_t iCount,
 		VertexBufferLayout layout)
 	{
@@ -15,7 +15,7 @@ namespace SIByL
 		glBindVertexArray(m_VertexArrayObject);
 
 		// Bind Vertex Buffer & IndexBuffer
-		m_VertexBuffer.reset(VertexBuffer::Create(vertices, vCount));
+		m_VertexBuffer.reset(VertexBuffer::Create(vertices, floatCount));
 		m_VertexBuffer->SetLayout(layout);
 		m_IndexBuffer.reset(IndexBuffer::Create(indices, iCount));
 	}

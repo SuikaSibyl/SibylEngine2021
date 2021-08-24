@@ -38,6 +38,8 @@ namespace SIByL
 		explicit DX12UploadBuffer(size_t pageSize = _2MB);
 		size_t GetPageSize() const { return m_PageSize; }
 		Allocation Allocate(size_t sizeInBytes, size_t alignment);
+		Allocation Allocate(size_t sizeInBytes, bool isConstantBuffer);
+
 		/**
 		 * Release all allocated pages. This should only be done when the command list
 		 * is finished executing on the Command Queue.

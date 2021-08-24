@@ -7,12 +7,12 @@
 
 namespace SIByL
 {
-	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t vCount, Type type)
+	VertexBuffer* VertexBuffer::Create(float* vertices, uint32_t floatCount, Type type)
 	{
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: return new OpenGLVertexBuffer(vertices, vCount, type); break;
-		case RasterRenderer::DirectX12: return new DX12VertexBuffer(vertices, vCount, type); break;
+		case RasterRenderer::OpenGL: return new OpenGLVertexBuffer(vertices, floatCount, type); break;
+		case RasterRenderer::DirectX12: return new DX12VertexBuffer(vertices, floatCount, type); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

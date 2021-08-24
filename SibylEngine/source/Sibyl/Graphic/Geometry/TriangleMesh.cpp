@@ -12,12 +12,14 @@ namespace SIByL
 		unsigned int* indices, uint32_t iCount,
 		VertexBufferLayout layout)
 	{
+		uint32_t floatCount = layout.GetStide() * vCount * 0.25;
+
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: 
-			return new OpenGLTriangleMesh(vertices, vCount, indices, iCount, layout);
+			return new OpenGLTriangleMesh(vertices, floatCount, indices, iCount, layout);
 		case RasterRenderer::DirectX12:
-			return new DX12TriangleMesh(vertices, vCount, indices, iCount, layout);
+			return new DX12TriangleMesh(vertices, floatCount, indices, iCount, layout);
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

@@ -21,6 +21,7 @@ namespace SIByL
 		CreateRenderPipeline();
 		CreateSynchronizer();
 		CreateUploadBuffer();
+		CreateFrameResourcesManager();
 
 		m_CommandList->Restart();
 		CreateSwapChain();
@@ -96,6 +97,11 @@ namespace SIByL
 	void DX12Context::CreateUploadBuffer()
 	{
 		m_UploadBuffer = std::make_unique<DX12UploadBuffer>();
+	}
+
+	void DX12Context::CreateFrameResourcesManager()
+	{
+		m_FrameResourcesManager = std::make_unique<DX12FrameResourcesManager>();
 	}
 
 	ID3D12DescriptorHeap* DX12Context::CreateSRVHeap()

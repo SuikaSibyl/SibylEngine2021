@@ -1,7 +1,6 @@
 #include "SIByLpch.h"
 #include "ShaderBinder.h"
 
-#include "SIByLsettings.h"
 #include "Sibyl/Renderer/Renderer.h"
 
 #include "Platform/DirectX12/Renderer/DX12ShaderBinder.h"

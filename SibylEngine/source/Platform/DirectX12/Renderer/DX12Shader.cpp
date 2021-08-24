@@ -100,6 +100,7 @@ namespace SIByL
 		if (errors != nullptr)
 		{
 			SIByL_CORE_ERROR("DX12 Shader Compile From File Failed!");
+			OutputDebugStringA((char*)errors->GetBufferPointer());
 		}
 		DXCall(hr);
 

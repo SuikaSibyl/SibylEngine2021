@@ -29,6 +29,14 @@ namespace SIByL
         return m_CurrentPage->Allocate(sizeInBytes, alignment);
     }
 
+    DX12UploadBuffer::Allocation DX12UploadBuffer::Allocate(size_t sizeInBytes, bool isConstantBuffer)
+    {
+        if (isConstantBuffer)
+            return Allocate(sizeInBytes, (size_t)256);
+        else
+            return Allocate(sizeInBytes, (size_t)0);
+    }
+
     // UPLOADBUFFER::REQUESTPAGE
     // If either the allocator does not have a page to make an allocation from, 
     // or the current page does not have the available space to satisfy the allocation request, 

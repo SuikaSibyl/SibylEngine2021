@@ -38,7 +38,7 @@ namespace SIByL
 		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferObject);
 		int dataType = (type == Type::Static) ? (GL_STATIC_DRAW) : (
 			(type == Type::Dynamic) ? (GL_DYNAMIC_DRAW) : (GL_STREAM_DRAW));
-		glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData) * number, vertices, dataType);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * number, vertices, dataType);
 
 	}
 

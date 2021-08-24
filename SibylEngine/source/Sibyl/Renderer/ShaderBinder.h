@@ -1,10 +1,13 @@
 #pragma once
 
+#include "ShaderData.h"
+
 namespace SIByL
 {
-	class ShaderUniformData
+	struct ShaderUniformItem
 	{
-
+		std::string Name;
+		ShaderDataType Type;
 	};
 
 	class ShaderBinder
@@ -14,7 +17,11 @@ namespace SIByL
 		virtual void BindFloat3() = 0;
 		virtual void Bind() = 0;
 
+
+
 	private:
+		//Ref<ShaderUniformData> m_MaterialConstantBuffer;
+		//Ref<ShaderUniformData> m_ObjectConstantBuffer;
 
 	};
 }

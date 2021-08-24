@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SIByLpch.h"
-#include "SIByLsettings.h"
 
 //#define SIBYL_DYNAMIC_LINK
 #ifdef SIBYL_PLATFORM_WINDOWS

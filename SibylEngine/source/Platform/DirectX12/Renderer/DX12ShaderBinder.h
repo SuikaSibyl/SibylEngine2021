@@ -11,6 +11,8 @@ namespace SIByL
 		ID3D12RootSignature* GetRootSignature() { return m_RootSignature.Get(); }
 		virtual void Bind() override;
 
+		
+
 	private:
 		void BuildRootSignature();
 		virtual void BindFloat3() override {}

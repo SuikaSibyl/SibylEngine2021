@@ -8,6 +8,7 @@
 #include "Platform/DirectX12/Core/UploadBuffer.h"
 #include "Platform/DirectX12/Core/DX12Synchronizer.h"
 #include "Platform/DirectX12/Renderer/DX12RenderPipeline.h"
+#include "Platform/DirectX12/Core/DX12FrameResources.h"
 
 namespace SIByL
 {
@@ -41,6 +42,7 @@ namespace SIByL
 		void CreateRenderPipeline();
 		void CreateSynchronizer();
 		void CreateUploadBuffer();
+		void CreateFrameResourcesManager();
 
 	public:
 		ID3D12DescriptorHeap* CreateSRVHeap();
@@ -54,6 +56,7 @@ namespace SIByL
 		std::unique_ptr<DX12GraphicCommandList> m_GraphicCommandList;
 		std::unique_ptr<DX12RenderPipeline>		m_RenderPipeline;
 		std::unique_ptr<DX12UploadBuffer>		m_UploadBuffer;
+		std::unique_ptr<DX12FrameResourcesManager> m_FrameResourcesManager;
 
 		// Descriptor Sizes
 		// ====================================================================
