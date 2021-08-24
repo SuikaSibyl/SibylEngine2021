@@ -15,8 +15,6 @@ namespace SIByL
 		m_Height = image.GetHeight();
 		m_Channel = image.GetChannel();
 
-		image.SetPixel(2, 2, RGBPixel(1, 0, 0));
-
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_TexID);
 		if (image.GetChannel() == 3)
 		{

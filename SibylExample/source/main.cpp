@@ -56,7 +56,7 @@ public:
 		shader = Shader::Create("Test/basic", "Test/basic");
 		shader->CreateBinder(layout);
 		triangle = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
-		texture = Texture2D::Create("TEST.png");
+		texture = Texture2D::Create("haruka.jpg");
 	}
 
 	void OnUpdate() override

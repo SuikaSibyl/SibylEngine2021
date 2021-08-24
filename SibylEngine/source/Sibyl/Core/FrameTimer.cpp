@@ -15,7 +15,9 @@ namespace SIByL
 		m_SencondsPerCount(0.0), m_DeltaTime(-1.0), m_BaseTime(0),
 		m_PauseTime(0), m_StopTime(0), m_PrevTime(0), m_CurrentTime(0), m_IsStoped(false)
 	{
+
 	}
+
 	float FrameTimer::TotalTime() const
 	{
 		if (m_IsStoped)
