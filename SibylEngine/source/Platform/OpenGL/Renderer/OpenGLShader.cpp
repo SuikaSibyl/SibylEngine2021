@@ -26,8 +26,15 @@ namespace SIByL
 		CompileFromString(vertexShaderSource, fragShaderSource);
 	}
 
-	OpenGLShader::OpenGLShader(std::string vFile, std::string pFile)
+	OpenGLShader::OpenGLShader(std::string file, const ShaderDesc& desc)
 	{
+		m_Descriptor = desc;
+		CompileFromSingleFile(file);
+	}
+
+	OpenGLShader::OpenGLShader(std::string vFile, std::string pFile, const ShaderDesc& desc)
+	{
+		m_Descriptor = desc;
 		CompileFromFile(vFile, pFile);
 	}
 
@@ -122,6 +129,11 @@ namespace SIByL
 
 	void OpenGLShader::Use()
 	{
+		if (m_Descriptor.useAlphaBlending == true)
+		{
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
 		glUseProgram(m_ShaderProgram);
 	}
 
@@ -133,5 +145,58 @@ namespace SIByL
 	void OpenGLShader::SetVertexBufferLayout(const VertexBufferLayout& vertexBufferLayout)
 	{
 		m_VertexBufferLayout = vertexBufferLayout;
+	}
+
+	void OpenGLShader::CompileFromSingleFile(std::string glslPath)
+	{
+		// 1. Get VERTEX/FRAGMENT From File Path
+		std::string glslCode;
+		std::ifstream shaderFile;
+		// Make sure exceptions could work properly
+		shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			// Open the file
+			shaderFile.open(glslPath);
+			std::stringstream shaderStream, fShaderStream;
+			// Load the content from the File
+			shaderStream << shaderFile.rdbuf();
+			// Close File dealers
+			shaderFile.close();
+			// Change datastream to string
+			glslCode = shaderStream.str();
+		}
+		catch (std::ifstream::failure e)
+		{
+			SIByL_CORE_ERROR("Shader File Failed to Load");
+		}
+
+		// Split to Vertex/Fragment Codes
+		std::string vertexCode;
+		std::string fragmentCode;
+
+		const char* typeToken = "#type";
+		size_t typeTokenLength = strlen(typeToken);
+		size_t pos = glslCode.find(typeToken, 0);
+		while (pos != std::string::npos)
+		{
+			size_t eol = glslCode.find_first_of("\r\n", pos);
+			SIByL_CORE_ASSERT(eol != std::string::npos, "Shader File Structure Syntax Error");
+			size_t begin = pos + typeTokenLength + 1;
+			std::string type = glslCode.substr(begin, eol - begin);
+			SIByL_CORE_ASSERT(type == "VS" || type == "FS" || type == "PS", "Invalid Shader Type Specified");
+
+			size_t nextLinePos = glslCode.find_first_not_of("\r\n", eol);
+			pos = glslCode.find(typeToken, nextLinePos);
+			if (type == "VS") 
+				vertexCode = (pos == std::string::npos) ? glslCode.substr(nextLinePos) : glslCode.substr(nextLinePos, pos - nextLinePos);
+			else if (type == "FS" || type == "PS") 
+				fragmentCode = (pos == std::string::npos) ? glslCode.substr(nextLinePos) : glslCode.substr(nextLinePos, pos - nextLinePos);
+		}
+
+		const char* vShaderCode = vertexCode.c_str();
+		const char* fShaderCode = fragmentCode.c_str();
+		CompileFromString(vShaderCode, fShaderCode);
+
 	}
 }

@@ -53,10 +53,10 @@ public:
 			1, 2, 3  // 第二个三角形
 		};
 
-		shader = Shader::Create("Test/basic", "Test/basic");
+		shader = Shader::Create("Test/basic", ShaderDesc({ true }));
 		shader->CreateBinder(layout);
 		triangle = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
-		texture = Texture2D::Create("haruka.jpg");
+		texture = Texture2D::Create("blue.png");
 	}
 
 	void OnUpdate() override
@@ -115,7 +115,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
+	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();

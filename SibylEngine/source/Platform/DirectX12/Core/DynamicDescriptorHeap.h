@@ -31,6 +31,12 @@ public:
      * Stages a contiguous range of CPU visible descriptors.
      * Descriptors are not copied to the GPU visible descriptor heap until
      * the CommitStagedDescriptors function is called.
+     * 
+     * Only the handles are copied to the Dyanamic Descriptor Heap
+     * but not the contents of the descriptor.
+     * 
+     * So the CPU Visible descriptor could not be overwritten
+     * until Commit Staged Descriptors method is invoked
      */
     void StageDescriptors(uint32_t rootParameterIndex, uint32_t offset, uint32_t numDescriptors, const D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptors);
 
@@ -151,7 +157,7 @@ private:
     // descriptors were copied.
     uint32_t m_StaleDescriptorTableBitMask;
 
-    using DescriptorHeapPool = std::queue< Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> >;
+    using DescriptorHeapPool = std::queue< ComPtr<ID3D12DescriptorHeap> >;
 
     DescriptorHeapPool m_DescriptorHeapPool;
     DescriptorHeapPool m_AvailableDescriptorHeaps;

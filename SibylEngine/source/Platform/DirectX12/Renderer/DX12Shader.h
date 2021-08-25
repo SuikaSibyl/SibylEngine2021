@@ -8,7 +8,8 @@ namespace SIByL
 	{
 	public:
 		DX12Shader();
-		DX12Shader(std::string vFile, std::string pFile);
+		DX12Shader(std::string file, const ShaderDesc& desc);
+		DX12Shader(std::string vFile, std::string pFile, const ShaderDesc& desc);
 
 		virtual void Use() override;
 		virtual void CreateBinder(const VertexBufferLayout& vertexBufferLayout) override;

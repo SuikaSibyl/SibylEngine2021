@@ -38,11 +38,18 @@ namespace SIByL
 	{
 	}
 
-	DX12Shader::DX12Shader(std::string vFile, std::string pFile)
+	DX12Shader::DX12Shader(std::string file, const ShaderDesc& desc)
 	{
+		m_Descriptor = desc;
+		m_VsBytecode = CompileFromFile(AnsiToWString(file), nullptr, "VS", "vs_5_1");
+		m_PsBytecode = CompileFromFile(AnsiToWString(file), nullptr, "PS", "ps_5_1");
+	}	
+	
+	DX12Shader::DX12Shader(std::string vFile, std::string pFile, const ShaderDesc& desc)
+	{
+		m_Descriptor = desc;
 		m_VsBytecode = CompileFromFile(AnsiToWString(vFile), nullptr, "VS", "vs_5_1");
 		m_PsBytecode = CompileFromFile(AnsiToWString(pFile), nullptr, "PS", "ps_5_1");
-
 	}
 
 	void DX12Shader::Use()

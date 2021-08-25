@@ -248,6 +248,7 @@
     <ClInclude Include="source\Sibyl\Renderer\IndexBuffer.h" />
     <ClInclude Include="source\Sibyl\Renderer\Pipelines.h" />
     <ClInclude Include="source\Sibyl\Renderer\Renderer.h" />
+    <ClInclude Include="source\Sibyl\Renderer\Renderer2D.h" />
     <ClInclude Include="source\Sibyl\Renderer\RenderPass.h" />
     <ClInclude Include="source\Sibyl\Renderer\RenderPipeline.h" />
     <ClInclude Include="source\Sibyl\Renderer\Shader.h" />
