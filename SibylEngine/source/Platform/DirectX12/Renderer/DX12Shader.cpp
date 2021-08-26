@@ -72,9 +72,9 @@ namespace SIByL
 		for (const auto& element : m_VertexBufferLayout)
 		{
 			m_InputLayoutDesc.push_back(
-				{ element.Name.c_str(), 0, 
-				ShaderDataTypeToDXGIFormat(element.Type) , 0,
-				0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
+				{ element.Name.c_str(), 0,
+				ShaderDataTypeToDXGIFormat(element.Type) , 0, element.Offset,
+				D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		}
 	}
 

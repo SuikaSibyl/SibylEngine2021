@@ -29,6 +29,7 @@ namespace SIByL
 		inline static ID3D12CommandQueue* GetCommandQueue() { return Main->m_CommandQueue.Get(); }
 		inline static DX12UploadBuffer* GetUploadBuffer() { return Main->m_UploadBuffer.get(); }
 		inline static DX12Synchronizer* GetSynchronizer() { return dynamic_cast<DX12Synchronizer*>(Main->m_Synchronizer.get()); }
+		static std::array<CD3DX12_STATIC_SAMPLER_DESC, 6> GetStaticSamplers();
 
 
 	private:
@@ -73,14 +74,14 @@ namespace SIByL
 		// Descriptor Allocators
 		// ====================================================================
 	public:
-		inline static DescriptorAllocator* GetRtvDescriptorAllocator() { return Main->m_RtvDescriptorAllocator.get(); }
-		inline static DescriptorAllocator* GetDsvDescriptorAllocator() { return Main->m_DsvDescriptorAllocator.get(); }
-		inline static DescriptorAllocator* GetSrvDescriptorAllocator() { return Main->m_SrvDescriptorAllocator.get(); }
+		inline static Ref<DescriptorAllocator> GetRtvDescriptorAllocator() { return Main->m_RtvDescriptorAllocator; }
+		inline static Ref<DescriptorAllocator> GetDsvDescriptorAllocator() { return Main->m_DsvDescriptorAllocator; }
+		inline static Ref<DescriptorAllocator> GetSrvDescriptorAllocator() { return Main->m_SrvDescriptorAllocator; }
 
 	private:
-		std::unique_ptr<DescriptorAllocator> m_RtvDescriptorAllocator;
-		std::unique_ptr<DescriptorAllocator> m_DsvDescriptorAllocator;
-		std::unique_ptr<DescriptorAllocator> m_SrvDescriptorAllocator;
+		Ref<DescriptorAllocator> m_RtvDescriptorAllocator;
+		Ref<DescriptorAllocator> m_DsvDescriptorAllocator;
+		Ref<DescriptorAllocator> m_SrvDescriptorAllocator;
 
 		uint64_t m_FrameCount;
 	};

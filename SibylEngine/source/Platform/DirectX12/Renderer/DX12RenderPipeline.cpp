@@ -27,8 +27,9 @@ namespace SIByL
 		DX12GraphicCommandList* cmdList = DX12Context::GetGraphicCommandList();
 		SwapChain* swapChain = DX12Context::GetSwapChain();
 		DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
-		cmdList->Restart();
 
+		synchronizer->StartFrame();
+		cmdList->Restart();
 
 		// Bind Swap Chain as Render Target
 		// -------------------------------------
@@ -43,6 +44,7 @@ namespace SIByL
 		ImGuiLayer::OnDrawAdditionalWindows();
 
 		swapChain->Present();
-		synchronizer->ForceSynchronize();
+		synchronizer->EndFrame();
+		//synchronizer->ForceSynchronize();
 	}
 }

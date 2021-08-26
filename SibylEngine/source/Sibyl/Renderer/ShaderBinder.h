@@ -20,8 +20,6 @@ namespace SIByL
 
 
 	private:
-		//Ref<ShaderUniformData> m_MaterialConstantBuffer;
-		//Ref<ShaderUniformData> m_ObjectConstantBuffer;
 
 	};
 }

@@ -75,17 +75,17 @@ namespace SIByL
             &optClear,
             IID_PPV_ARGS(&m_SwapChainDepthStencil)));
 
-        DescriptorAllocator* dsvDespAllocator = DX12Context::GetDsvDescriptorAllocator();
+        Ref<DescriptorAllocator> dsvDespAllocator = DX12Context::GetDsvDescriptorAllocator();
         m_DSVDespAllocation = dsvDespAllocator->Allocate(1);
         DX12Context::GetDevice()->CreateDepthStencilView(m_SwapChainDepthStencil.Get(),
             nullptr,
             m_DSVDespAllocation.GetDescriptorHandle());
 
         ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
-        cmdList->ResourceBarrier(1,	//Barrier屏障个数
+        cmdList->ResourceBarrier(1,	//Barrier Count
             &CD3DX12_RESOURCE_BARRIER::Transition(m_SwapChainDepthStencil.Get(),
-                D3D12_RESOURCE_STATE_COMMON,	//转换前状态（创建时的状态，即CreateCommittedResource函数中定义的状态）
-                D3D12_RESOURCE_STATE_DEPTH_WRITE));	//转换后状态为可写入的深度图，还有一个D3D12_RESOURCE_STATE_DEPTH_READ是只可读的深度图
+                D3D12_RESOURCE_STATE_COMMON,	// Before Transition
+                D3D12_RESOURCE_STATE_DEPTH_WRITE));	// Writable Depth Map
     }
 
     void DX12SwapChain::BindRenderTarget()

@@ -9,6 +9,7 @@
 #include "Platform/DirectX12/Common/DX12Context.h"
 #include "Platform/DirectX12/Renderer/DX12ShaderBinder.h"
 #include "Platform/DirectX12/Core/DX12FrameResources.h"
+#include "Platform/DirectX12/Graphic/Texture/DX12Texture.h"
 #include "Sibyl/Graphic/Texture/Texture.h"
 using namespace SIByL;
 
@@ -38,14 +39,14 @@ public:
 		VertexBufferLayout layout =
 		{
 			{ShaderDataType::Float3, "POSITION"},
-			{ShaderDataType::Float2, "UV"},
+			{ShaderDataType::Float2, "TEXCOORD"},
 		};
 
 		VertexData vertices[] = {
-			0.5f, 0.5f, 0.0f,     1,1,
-			0.5f, -0.5f, 0.0f,    1,0,
-			-0.5f, -0.5f, 0.0f,   0,0,
-			-0.5f, 0.5f, 0.0f,	  0,1,
+			0.5f, 0.5f, 0.0f,     1.0f,1.0f,  
+			0.5f, -0.5f, 0.0f,    1.0f,0.0f,  
+			-0.5f, -0.5f, 0.0f,   0.0f ,0.0f, 
+			-0.5f, 0.5f, 0.0f,	  0.0f,1.0f,  
 		};
 
 		uint32_t indices[] = { // 注意索引从0开始! 
@@ -56,7 +57,8 @@ public:
 		shader = Shader::Create("Test/basic", ShaderDesc({ true }));
 		shader->CreateBinder(layout);
 		triangle = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
-		texture = Texture2D::Create("blue.png");
+		texture = Texture2D::Create("fen4.png");
+		//litUni = new DX12FrameResource<LitUniforms>();
 	}
 
 	void OnUpdate() override
@@ -89,6 +91,13 @@ public:
 
 		//ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
 		//cmdList->SetGraphicsRootConstantBufferView(0, gpuAddr);
+
+		//DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
+		//DX12ShaderBinder* dxBinder = dynamic_cast<DX12ShaderBinder*>(shader->GetShaderBinder().get());
+		//Ref<DynamicDescriptorHeap> dxSDH = dxBinder->GetSrvDynamicDescriptorHeap();
+		//dxSDH->StageDescriptors(1, 0, 1, dxTexture->GetSRVHandle());
+		//dxSDH->CommitStagedDescriptorsForDraw();
+
 		texture->Bind(0);
 		triangle->RasterDraw();
 	}
@@ -115,7 +124,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
+	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new Sandbox();

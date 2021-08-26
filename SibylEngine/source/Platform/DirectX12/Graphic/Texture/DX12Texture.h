@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sibyl/Graphic/Texture/Texture.h"
+#include "Platform/DirectX12/Core/DescriptorAllocation.h"
 
 namespace SIByL
 {
@@ -15,10 +16,18 @@ namespace SIByL
 
 		virtual void Bind(uint32_t slot) const override;
 
+		D3D12_CPU_DESCRIPTOR_HANDLE GetSRVHandle();
+
 	private:
 		uint32_t m_Width;
 		uint32_t m_Height;
+		uint32_t m_Channel;
+
 		uint32_t m_ID;
 		std::string m_Path;
+
+		ComPtr<ID3D12Resource> m_Resource;
+		ComPtr<ID3D12Resource> m_Uploader;
+		DescriptorAllocation m_DescriptorAllocation;
 	};
 }

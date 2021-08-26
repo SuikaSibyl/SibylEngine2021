@@ -109,6 +109,7 @@
     <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12CommandList.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12FrameResources.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Core\RootSignature.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.cpp" />
@@ -180,6 +181,7 @@
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Utility.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DX12CommandList.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DX12FrameResources.h" />
+    <ClInclude Include="source\Platform\DirectX12\Core\RootSignature.h" />
     <ClInclude Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.h" />
     <ClInclude Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.h" />

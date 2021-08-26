@@ -8,6 +8,9 @@ namespace SIByL
 	{
 	public:
 		virtual void ForceSynchronize() override {}
+		virtual void StartFrame() override {}
+		virtual bool CheckFinish(UINT64 fence) override { return true; }
+		virtual void EndFrame() override {}
 
 	private:
 

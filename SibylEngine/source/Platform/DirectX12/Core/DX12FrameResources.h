@@ -43,7 +43,11 @@ namespace SIByL
 		DX12FrameResourcesManager(int frameResourcesCount = 3);
 		~DX12FrameResourcesManager();
 		static DX12FrameResourcesManager* Get();
+		static void UseNextFrameResource() { m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % m_FrameResourcesCount; }
 		static int GetCurrentIndex() { return m_CurrentFrameIndex; }
+		static UINT64 GetCurrentFence() { return m_Fence[m_CurrentFrameIndex]; }
+		static void SetCurrentFence(UINT64 cpuFence);
+		static ComPtr<ID3D12CommandAllocator> GetCurrentAllocator() { return m_CommandAllocators[m_CurrentFrameIndex]; }
 
 		template<typename T>
 		void RegistFrameResource(DX12FrameResource<T>* frameResource)
@@ -65,5 +69,7 @@ namespace SIByL
 		static int m_FrameResourcesCount;
 		static int m_CurrentFrameIndex;
 		static DX12FrameResourcesManager* m_Instance;
+		static UINT64* m_Fence;
+		static ComPtr<ID3D12CommandAllocator>* m_CommandAllocators;
 	};
 }

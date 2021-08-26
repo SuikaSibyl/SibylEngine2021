@@ -20,8 +20,9 @@ namespace SIByL
 		virtual void CreateBinder(const VertexBufferLayout& vertexBufferLayout) = 0;
 		virtual void SetVertexBufferLayout(const VertexBufferLayout& vertexBufferLayout) = 0;
 
+		Ref<ShaderBinder> GetShaderBinder() { return m_ShaderBinder; }
 	protected:
-		std::unique_ptr<ShaderBinder> m_ShaderBinder;
+		Ref<ShaderBinder> m_ShaderBinder;
 		ShaderDesc m_Descriptor;
 	};
 }

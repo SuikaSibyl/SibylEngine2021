@@ -70,6 +70,7 @@ public:
 namespace SIByL
 {
     ComPtr<ID3D12Resource> CreateDefaultBuffer(UINT64 byteSize, const void* initData);
+    void UploadDefaultBuffer(ComPtr<ID3D12Resource> defaultBuffer, UINT64 byteSize, const void* initData);
 }
 
 #pragma once

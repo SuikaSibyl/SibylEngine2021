@@ -7,6 +7,5 @@ namespace SIByL
 	public:
 		virtual void Restart() = 0;
 		virtual void Execute() = 0;
-
 	};
 }
