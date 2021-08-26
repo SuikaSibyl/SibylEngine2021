@@ -10,6 +10,16 @@ namespace SIByL
 		ShaderDataType Type;
 	};
 
+	struct ShaderConstants
+	{
+
+	};
+
+	struct ShaderResourceTable
+	{
+
+	};
+
 	class ShaderBinder
 	{
 	public:
