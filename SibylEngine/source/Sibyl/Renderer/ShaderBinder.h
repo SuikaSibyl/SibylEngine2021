@@ -21,7 +21,7 @@ namespace SIByL
 		std::vector<ShaderResourceLayout> m_TextureBufferLayouts;
 	};
 
-	struct ShaderUniformItem
+	struct ShaderConstantItem
 	{
 		std::string Name;
 		ShaderDataType Type;
@@ -37,16 +37,23 @@ namespace SIByL
 
 	};
 
+	class ConstantsMapper
+	{
+
+	private:
+		std::unordered_map<std::string, ShaderConstantItem> m_Mapper;
+	};
+
 	class ShaderBinder
 	{
 	public:
-		static ShaderBinder* Create(const ShaderBinderDesc& desc);
+		static Ref<ShaderBinder> Create(const ShaderBinderDesc& desc);
+		virtual ~ShaderBinder() {}
 		virtual void BindFloat3() = 0;
 		virtual void Bind() = 0;
 
-
-
-	private:
-
+	protected:
+		void InitMappers(const ShaderBinderDesc& desc);
+		ConstantsMapper m_ConstantsMapper;
 	};
 }

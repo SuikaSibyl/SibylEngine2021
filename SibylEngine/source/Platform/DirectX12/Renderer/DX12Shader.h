@@ -25,9 +25,12 @@ namespace SIByL
 		void CreatePSO();
 
 	private:
+		// Resources
 		ComPtr<ID3DBlob> m_VsBytecode = nullptr;
 		ComPtr<ID3DBlob> m_PsBytecode = nullptr;
 		ComPtr<ID3D12PipelineState> m_PipelineStateObject;
+
+		// Layout descriptors
 		std::vector<D3D12_INPUT_ELEMENT_DESC> m_InputLayoutDesc;
 		VertexBufferLayout m_VertexBufferLayout;
 	};

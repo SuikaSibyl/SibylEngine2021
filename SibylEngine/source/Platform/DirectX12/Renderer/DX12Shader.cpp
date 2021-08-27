@@ -48,7 +48,7 @@ namespace SIByL
 		m_PsBytecode = CompileFromFile(AnsiToWString(file), nullptr, "PS", "ps_5_1");
 
 		CreateBinder();
-	}	
+	}
 	
 	DX12Shader::DX12Shader(std::string vFile, std::string pFile, const ShaderDesc& desc)
 	{
@@ -68,7 +68,7 @@ namespace SIByL
 
 	void DX12Shader::CreateBinder()
 	{
-		m_ShaderBinder.reset(ShaderBinder::Create(m_BinderDescriptor));
+		m_ShaderBinder = ShaderBinder::Create(m_BinderDescriptor);
 		SetVertexBufferLayout();
 		CreatePSO();
 	}

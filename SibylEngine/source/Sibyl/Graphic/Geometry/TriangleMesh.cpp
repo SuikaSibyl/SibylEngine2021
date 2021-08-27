@@ -7,7 +7,7 @@
 
 namespace SIByL
 {
-	TriangleMesh* TriangleMesh::Create(
+	Ref<TriangleMesh> TriangleMesh::Create(
 		float* vertices, uint32_t vCount,
 		unsigned int* indices, uint32_t iCount,
 		VertexBufferLayout layout)
@@ -17,9 +17,9 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: 
-			return new OpenGLTriangleMesh(vertices, floatCount, indices, iCount, layout);
+			return std::make_shared<OpenGLTriangleMesh>(vertices, floatCount, indices, iCount, layout);
 		case RasterRenderer::DirectX12:
-			return new DX12TriangleMesh(vertices, floatCount, indices, iCount, layout);
+			return std::make_shared<DX12TriangleMesh>(vertices, floatCount, indices, iCount, layout);
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

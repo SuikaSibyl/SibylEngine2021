@@ -9,6 +9,7 @@ namespace SIByL
 {
 	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
 	{
+		InitMappers(desc);
 		m_Desc = desc;
 		BuildRootSignature();
 		m_SrvDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
