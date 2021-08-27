@@ -9,13 +9,51 @@ namespace SIByL
 {
 	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
 	{
-		InitMappers(desc);
 		m_Desc = desc;
+		InitMappers(desc);
 		BuildRootSignature();
 		m_SrvDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		m_SamplerDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
 		m_SrvDynamicDescriptorHeap->ParseRootSignature(*m_RootSignature);
+
+		m_ConstantsTableBuffer = new Ref<DX12FrameResourceBuffer>[desc.ConstantBufferCount()];
+		for (int i = 0; i < desc.ConstantBufferCount(); i++)
+		{
+			ConstantBufferLayout& cbLayout = m_Desc.m_ConstantBufferLayouts[i];
+			m_ConstantsTableBuffer[i] = std::make_shared<DX12FrameResourceBuffer>(cbLayout.GetStide());
+		}
+	}
+
+	DX12ShaderBinder::~DX12ShaderBinder()
+	{
+		for (int i = 0; i < m_Desc.ConstantBufferCount(); i++)
+		{
+			m_ConstantsTableBuffer[i] = nullptr;
+		}
+		delete[] m_ConstantsTableBuffer;
+	}
+
+	void DX12ShaderBinder::CopyMemoryToConstantsBuffer
+		(void* data, int index, uint32_t offset, uint32_t length)
+	{
+		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
+		buffer->CopyMemoryToConstantsBuffer(data, offset, length);
+	}
+
+	void DX12ShaderBinder::UpdateConstantsBuffer(int index)
+	{
+		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
+		buffer->UploadCurrentBuffer();
+	}
+	
+	void DX12ShaderBinder::BindConstantsBuffer(int index)
+	{
+		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
+		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = buffer->GetCurrentGPUAddress();
+
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		cmdList->SetGraphicsRootConstantBufferView(index, gpuAddr);
 	}
 
 	void DX12ShaderBinder::Bind()
@@ -90,4 +128,11 @@ namespace SIByL
 		m_RootSignature = std::make_shared<RootSignature>(rootSig);
 	}
 
+	void DX12ShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+		ShaderConstantItem item;
+		m_ConstantsMapper.FetchConstant(name, item);
+		float data[3]{ value.r,value.g,value.b };
+		CopyMemoryToConstantsBuffer(&data, item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+	}
 }

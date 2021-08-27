@@ -40,6 +40,7 @@ namespace SIByL
 
 	Application::~Application()
 	{
+		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
 		Input::Destroy();
 	}
 

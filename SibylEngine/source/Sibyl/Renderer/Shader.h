@@ -23,7 +23,7 @@ namespace SIByL
 		virtual void CreateBinder() = 0;
 		virtual void SetVertexBufferLayout() = 0;
 
-		Ref<ShaderBinder> GetShaderBinder() { return m_ShaderBinder; }
+		Ref<ShaderBinder> GetBinder() { return m_ShaderBinder; }
 	protected:
 		Ref<ShaderBinder> m_ShaderBinder;
 		ShaderDesc m_Descriptor;

@@ -18,6 +18,13 @@ namespace SIByL
 		{
 			DX12FrameResourcesManager::Get()->RegistFrameResource(this);
 		}
+		~DX12FrameResource()
+		{
+			for (int i = 0; i < m_FrameResourcesCount; i++)
+				m_CpuBuffers[i] = nullptr;
+			delete m_CpuBuffers;
+
+		}
 
 		Ref<T> GetCurrentBuffer() { return m_CpuBuffers[DX12FrameResourcesManager::GetCurrentIndex()]; }
 		void UploadCurrentBuffer() { return UploadBufferToGpu(DX12FrameResourcesManager::GetCurrentIndex()); }
@@ -34,6 +41,44 @@ namespace SIByL
 			memcpy(m_GpuBuffers.get()[index].CPU
 				, m_CpuBuffers[index].get()
 				, sizeof(T));
+		}
+	};
+
+	class DX12FrameResourceBuffer
+	{
+	public:
+		friend class DX12FrameResourcesManager;
+		DX12FrameResourceBuffer(uint32_t size);
+		~DX12FrameResourceBuffer()
+		{
+			delete m_CpuBuffer;
+		}
+
+		void CopyMemoryToConstantsBuffer
+			(void* data, uint32_t offset, uint32_t length)
+		{
+			void* target = (void*)((char*)m_CpuBuffer + offset);
+			memcpy((target)
+				, data
+				, length);
+		}
+
+		void* GetCurrentBuffer();
+		void UploadCurrentBuffer();
+		D3D12_GPU_VIRTUAL_ADDRESS GetCurrentGPUAddress();
+
+		uint32_t GetSizeInByte() { return m_SizeByte; }
+	private:
+		Ref<DX12UploadBuffer::Allocation> m_GpuBuffers;
+		void* m_CpuBuffer;
+		uint32_t m_SizeByte;
+
+	private:
+		void UploadBufferToGpu(int index)
+		{
+			memcpy(m_GpuBuffers.get()[index].CPU
+				, (m_CpuBuffer)
+				, m_SizeByte);
 		}
 	};
 
@@ -61,6 +106,18 @@ namespace SIByL
 				// Allocate Upload Buffer for resource
 				frameResource->m_GpuBuffers.get()[i] =
 					m_UploadBuffers[i]->Allocate(sizeof(T), true);
+			}
+		}
+
+		void RegistFrameResource(DX12FrameResourceBuffer* frameResource)
+		{
+			frameResource->m_CpuBuffer = new byte[frameResource->GetSizeInByte()];
+			frameResource->m_GpuBuffers.reset(new DX12UploadBuffer::Allocation[m_FrameResourcesCount]);
+			for (int i = 0; i < m_FrameResourcesCount; i++)
+			{
+				// Allocate Upload Buffer for resource
+				frameResource->m_GpuBuffers.get()[i] =
+					m_UploadBuffers[i]->Allocate(frameResource->GetSizeInByte(), true);
 			}
 		}
 

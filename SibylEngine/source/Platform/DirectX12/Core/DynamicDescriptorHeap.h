@@ -24,7 +24,7 @@ namespace SIByL
     public:
         DynamicDescriptorHeap(
             D3D12_DESCRIPTOR_HEAP_TYPE heapType,
-            uint32_t numDescriptorsPerHeap = 1024);
+            uint32_t numDescriptorsPerHeap = 128);
 
         virtual ~DynamicDescriptorHeap();
 

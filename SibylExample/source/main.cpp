@@ -103,21 +103,12 @@ public:
 
 	void OnDraw() override
 	{
-		//shader->Use();
-
-		////D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = litUni->GetCurrentGPUAddress();
-
-		//ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
-		////cmdList->SetGraphicsRootConstantBufferView(0, gpuAddr);
-
-		//DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
-		//DX12ShaderBinder* dxBinder = dynamic_cast<DX12ShaderBinder*>(shader->GetShaderBinder().get());
-		//Ref<DynamicDescriptorHeap> dxSDH = dxBinder->GetSrvDynamicDescriptorHeap();
-		//dxSDH->StageDescriptors(1, 0, 1, dxTexture->GetSRVHandle());
-		//dxSDH->CommitStagedDescriptorsForDraw();
+		shader->Use();
+		shader->GetBinder()->SetFloat3("Color", { 1,1,0 });
+		shader->GetBinder()->TEMPUpdateAllConstants();
 
 		//texture->Bind(0);
-		//triangle->RasterDraw();
+		triangle->RasterDraw();
 	}
 
 	Ref<Shader> shader;
@@ -142,7 +133,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	//_CrtSetBreakAlloc(1342);
+	//_CrtSetBreakAlloc(1330);
 	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");

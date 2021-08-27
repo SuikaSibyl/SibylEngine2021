@@ -52,4 +52,25 @@ namespace SIByL
 		delete[] m_Fence;
 		delete[] m_CommandAllocators;
 	}
+
+	DX12FrameResourceBuffer::DX12FrameResourceBuffer(uint32_t size)
+		:m_SizeByte(size)
+	{
+		DX12FrameResourcesManager::Get()->RegistFrameResource(this);
+	}
+
+	void* DX12FrameResourceBuffer::GetCurrentBuffer() 
+	{ 
+		return m_CpuBuffer; 
+	}
+
+	void DX12FrameResourceBuffer::UploadCurrentBuffer() 
+	{
+		return UploadBufferToGpu(DX12FrameResourcesManager::GetCurrentIndex()); 
+	}
+
+	D3D12_GPU_VIRTUAL_ADDRESS DX12FrameResourceBuffer::GetCurrentGPUAddress()
+	{
+		return m_GpuBuffers.get()[DX12FrameResourcesManager::GetCurrentIndex()].GPU;
+	}
 }
