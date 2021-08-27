@@ -10,5 +10,6 @@ namespace SIByL
 
 	Layer::~Layer()
 	{
+		
 	}
 }

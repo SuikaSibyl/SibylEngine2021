@@ -16,15 +16,16 @@ namespace SIByL
 	{
 	public:
 		static DX12Context* Main;
+		~DX12Context();
 		virtual void Init() override;
 
 		inline static uint64_t GetFrameCount() { return Main->m_FrameCount; };
 
 	public:
 		inline static ID3D12Device* GetDevice() { return Main->m_D3dDevice.Get(); }
-		inline static DX12GraphicCommandList* GetGraphicCommandList() { return Main->m_GraphicCommandList.get(); }
+		inline static DX12GraphicCommandList* GetGraphicCommandList() { return dynamic_cast<DX12GraphicCommandList*>(Main->m_CommandList.get()); }
 		inline static SwapChain* GetSwapChain() { return Main->m_SwapChain.get(); }
-		inline static ID3D12GraphicsCommandList* GetDXGraphicCommandList() { return Main->m_GraphicCommandList->Get(); }
+		inline static ID3D12GraphicsCommandList* GetDXGraphicCommandList() { return Main->GetGraphicCommandList()->Get(); }
 		inline static IDXGIFactory4* GetDxgiFactory() { return Main->m_DxgiFactory.Get(); }
 		inline static ID3D12CommandQueue* GetCommandQueue() { return Main->m_CommandQueue.Get(); }
 		inline static DX12UploadBuffer* GetUploadBuffer() { return Main->m_UploadBuffer.get(); }
@@ -46,18 +47,18 @@ namespace SIByL
 		void CreateFrameResourcesManager();
 
 	public:
-		ID3D12DescriptorHeap* CreateSRVHeap();
+		ComPtr<ID3D12DescriptorHeap> CreateSRVHeap();
 
 	private:
 		ComPtr<ID3D12Debug>			m_DebugInterface;
 		ComPtr<IDXGIFactory4>		m_DxgiFactory;
 		ComPtr<ID3D12Device>		m_D3dDevice;
 		ComPtr<ID3D12CommandQueue>	m_CommandQueue;
+		ComPtr<IDXGIDebug1>			m_DxgiDebug;
 
-		std::unique_ptr<DX12GraphicCommandList> m_GraphicCommandList;
-		std::unique_ptr<DX12RenderPipeline>		m_RenderPipeline;
-		std::unique_ptr<DX12UploadBuffer>		m_UploadBuffer;
-		std::unique_ptr<DX12FrameResourcesManager> m_FrameResourcesManager;
+		std::unique_ptr<DX12RenderPipeline>			m_RenderPipeline;
+		Ref<DX12UploadBuffer>			m_UploadBuffer;
+		Ref<DX12FrameResourcesManager>	m_FrameResourcesManager;
 
 		// Descriptor Sizes
 		// ====================================================================

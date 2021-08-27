@@ -38,11 +38,16 @@ namespace SIByL
 	{
 	}
 
-	DX12Shader::DX12Shader(std::string file, const ShaderDesc& desc)
+	DX12Shader::DX12Shader(std::string file, const ShaderBinderDesc& binderDesc, const ShaderDesc& desc)
 	{
 		m_Descriptor = desc;
+		m_BinderDescriptor = binderDesc;
+		m_VertexBufferLayout = desc.inputLayout;
+
 		m_VsBytecode = CompileFromFile(AnsiToWString(file), nullptr, "VS", "vs_5_1");
 		m_PsBytecode = CompileFromFile(AnsiToWString(file), nullptr, "PS", "ps_5_1");
+
+		CreateBinder();
 	}	
 	
 	DX12Shader::DX12Shader(std::string vFile, std::string pFile, const ShaderDesc& desc)
@@ -54,21 +59,22 @@ namespace SIByL
 
 	void DX12Shader::Use()
 	{
+		// Set PSO
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
 		cmdList->SetPipelineState(m_PipelineStateObject.Get());
+		// Bind Stuff
 		m_ShaderBinder->Bind();
 	}
 
-	void DX12Shader::CreateBinder(const VertexBufferLayout& vertexBufferLayout)
+	void DX12Shader::CreateBinder()
 	{
-		m_ShaderBinder.reset(ShaderBinder::Create());
-		SetVertexBufferLayout(vertexBufferLayout);
+		m_ShaderBinder.reset(ShaderBinder::Create(m_BinderDescriptor));
+		SetVertexBufferLayout();
 		CreatePSO();
 	}
 
-	void DX12Shader::SetVertexBufferLayout(const VertexBufferLayout& vertexBufferLayout)
+	void DX12Shader::SetVertexBufferLayout()
 	{
-		m_VertexBufferLayout = vertexBufferLayout;
 		for (const auto& element : m_VertexBufferLayout)
 		{
 			m_InputLayoutDesc.push_back(

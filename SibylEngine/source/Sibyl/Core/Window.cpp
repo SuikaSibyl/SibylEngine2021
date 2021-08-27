@@ -7,12 +7,12 @@
 
 namespace SIByL
 {
-	Window* Window::Create(const WindowProps& props)
+	Ref<Window> Window::Create(const WindowProps& props)
 	{
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: return new GLFWWindow(props); break;
-		case RasterRenderer::DirectX12: return new WindowsWindow(props); break;
+		case RasterRenderer::OpenGL: return std::make_shared<GLFWWindow>(props); break;
+		case RasterRenderer::DirectX12: return std::make_shared<WindowsWindow>(props); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

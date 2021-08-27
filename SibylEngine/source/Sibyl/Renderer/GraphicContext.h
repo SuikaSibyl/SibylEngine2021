@@ -12,14 +12,14 @@ namespace SIByL
 		virtual void Init() = 0;
 
 	public:
-		SwapChain* GetSwapChain() { return m_SwapChain.get(); }
-		CommandList* GetCommandList() { return m_CommandList; }
+		Ref<SwapChain> GetSwapChain() { return m_SwapChain; }
+		Ref<CommandList> GetCommandList() { return m_CommandList; }
 		inline Synchronizer* GetSynchronizer() { return m_Synchronizer.get(); }
-		void SetCommandList(CommandList* cmdList) { m_CommandList = cmdList; }
+		void SetCommandList(Ref<CommandList> cmdList) { m_CommandList.reset(cmdList.get()); }
 
 	protected:
-		std::unique_ptr<SwapChain> m_SwapChain;
-		CommandList* m_CommandList;
-		std::unique_ptr<Synchronizer> m_Synchronizer;
+		Ref<SwapChain> m_SwapChain;
+		Ref<CommandList> m_CommandList;
+		Ref<Synchronizer> m_Synchronizer;
 	};
 }

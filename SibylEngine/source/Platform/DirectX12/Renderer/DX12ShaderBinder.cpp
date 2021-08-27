@@ -7,8 +7,9 @@
 
 namespace SIByL
 {
-	DX12ShaderBinder::DX12ShaderBinder()
+	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
 	{
+		m_Desc = desc;
 		BuildRootSignature();
 		m_SrvDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		m_SamplerDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
@@ -32,27 +33,44 @@ namespace SIByL
 
 	void DX12ShaderBinder::BuildRootSignature()
 	{
-		CD3DX12_DESCRIPTOR_RANGE srvTableCube;
-		srvTableCube.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,	//描述符类型
-			1,	//表中的描述符数量（纹理数量）
-			0);	//描述符所绑定的寄存器槽号
-
 		// Perfomance TIP: Order from most frequent to least frequent.
 		// ----------------------------------------------------------------------
-		
+		int parameterCount = m_Desc.m_ConstantBufferLayouts.size()
+			+ m_Desc.m_TextureBufferLayouts.size();
+
 		// RootSignature could be descriptor table \ Root Descriptor \ Root Constant
-		CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+		Ref<CD3DX12_ROOT_PARAMETER> slotRootParameter;
+		slotRootParameter.reset(new CD3DX12_ROOT_PARAMETER[parameterCount]);
+		int indexPara = 0;
+
 		// Create a descriptor table of one sigle CBV
-		slotRootParameter[0].InitAsConstantBufferView(0);
-		slotRootParameter[1].InitAsDescriptorTable(1,//Range数量
-			&srvTableCube,	//Range指针
-			D3D12_SHADER_VISIBILITY_PIXEL);	//该资源只能在像素着色器可读
+		for (ConstantBufferLayout& buffer : m_Desc.m_ConstantBufferLayouts)
+		{
+			slotRootParameter.get()[indexPara].InitAsConstantBufferView(indexPara);
+			indexPara++;
+		}
+
+		// Create srv tables for srv...
+		int indexSrvTable = 0;
+		for (ShaderResourceLayout& srLayout : m_Desc.m_TextureBufferLayouts)
+		{
+			CD3DX12_DESCRIPTOR_RANGE srvTable;
+			srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+				srLayout.SrvCount(),
+				indexSrvTable);
+
+			slotRootParameter.get()[indexPara].InitAsDescriptorTable(1,
+				&srvTable,
+				D3D12_SHADER_VISIBILITY_PIXEL);	// Only Readable in pixel shader
+
+			indexPara++; indexSrvTable;
+		}
 
 		auto staticSamplers = DX12Context::GetStaticSamplers();	//获得静态采样器集合
 		//slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
 		// Root Signature is consisted of a set of root parameters
-		CD3DX12_ROOT_SIGNATURE_DESC rootSig(2, // Number of root parameters
-			slotRootParameter, // Pointer to Root Parameter
+		CD3DX12_ROOT_SIGNATURE_DESC rootSig(parameterCount, // Number of root parameters
+			slotRootParameter.get(), // Pointer to Root Parameter
 			staticSamplers.size(),
 			staticSamplers.data(),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);

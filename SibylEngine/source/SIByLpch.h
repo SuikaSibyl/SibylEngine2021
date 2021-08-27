@@ -32,6 +32,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
 
 #include <Windows.h>
 #include <wincodec.h>
@@ -42,6 +43,7 @@
 #include <d3d12.h>
 
 #include <d3dcompiler.h>
+#include <dxgidebug.h>
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 #include <DirectXColors.h>

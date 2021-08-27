@@ -11,12 +11,13 @@ namespace SIByL
 	{
 	public:
 		ImGuiLayer();
-		~ImGuiLayer();
+		virtual ~ImGuiLayer();
 
 		void OnAttach();
 		void OnDetach();
 		virtual void OnDraw() override;
 		virtual void OnDrawImGui() override;
+		virtual void OnReleaseResource() override;
 		virtual void OnDrawAdditionalWindowsImpl() = 0;
 		static inline void OnDrawAdditionalWindows() { Main->OnDrawAdditionalWindowsImpl(); }
 		void OnUpdate();

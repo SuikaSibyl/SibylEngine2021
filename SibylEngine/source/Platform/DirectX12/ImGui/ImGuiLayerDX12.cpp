@@ -26,7 +26,7 @@ namespace SIByL
 		g_pd3dSrvDescHeap = DX12Context::Main->CreateSRVHeap();
 		ImGui_ImplWin32_Init(*(WindowsWindow::Main->GetHWND()));
 		ImGui_ImplDX12_Init(DX12Context::Main->GetDevice(), NUM_FRAMES_IN_FLIGHT,
-			DXGI_FORMAT_R8G8B8A8_UNORM, g_pd3dSrvDescHeap,
+			DXGI_FORMAT_R8G8B8A8_UNORM, g_pd3dSrvDescHeap.Get(),
 			g_pd3dSrvDescHeap->GetCPUDescriptorHandleForHeapStart(),
 			g_pd3dSrvDescHeap->GetGPUDescriptorHandleForHeapStart());
 	}
@@ -41,12 +41,20 @@ namespace SIByL
 	void ImGuiLayerDX12::NewFrameEnd()
 	{
 		ID3D12GraphicsCommandList* g_pd3dCommandList = DX12Context::Main->GetDXGraphicCommandList();
-		g_pd3dCommandList->SetDescriptorHeaps(1, &g_pd3dSrvDescHeap);
+		ID3D12DescriptorHeap* heap = g_pd3dSrvDescHeap.Get();
+		g_pd3dCommandList->SetDescriptorHeaps(1, &heap);
 		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), g_pd3dCommandList);
+	}
+
+	ImGuiLayerDX12::~ImGuiLayerDX12()
+	{
+		PlatformDestroy();
 	}
 
 	void ImGuiLayerDX12::PlatformDestroy()
 	{
+		DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
+		synchronizer->ForceSynchronize();
 		ImGui_ImplDX12_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();

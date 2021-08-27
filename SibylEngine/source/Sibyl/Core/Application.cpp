@@ -21,7 +21,7 @@ namespace SIByL
 
 		// Init: Window
 		// --------------------------------
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window = Window::Create();
 
 		// Init: Input System
 		// --------------------------------
@@ -40,17 +40,17 @@ namespace SIByL
 
 	Application::~Application()
 	{
-
+		Input::Destroy();
 	}
 
 	void Application::OnAwake()
 	{
 		// Awake: Render Objects
 		// --------------------------------
-		CommandList* cmdList = m_Window->GetGraphicContext()->GetCommandList();
+		Ref<CommandList> cmdList = m_Window->GetGraphicContext()->GetCommandList();
 		cmdList->Restart();
 		for (Layer* layer : m_LayerStack)
-			layer->OnInitRenderer();
+			layer->OnInitResource();
 		cmdList->Execute();
 		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
 	}
@@ -95,6 +95,13 @@ namespace SIByL
 		}
 	}
 
+	void Application::OnResourceDestroy()
+	{
+		for (auto layer : m_LayerStack)
+		{
+			layer->OnReleaseResource();
+		}
+	}
 	void Application::DrawImGui()
 	{
 		for (auto layer : m_LayerStack)

@@ -20,4 +20,9 @@ namespace SIByL
 		default: return; break;
 		}
 	}
+
+	void Input::Destroy()
+	{
+		delete s_Instance;
+	}
 }

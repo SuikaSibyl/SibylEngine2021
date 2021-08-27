@@ -5,41 +5,6 @@
 
 namespace SIByL
 {
-	struct BufferElement
-	{
-		std::string Name;
-		ShaderDataType Type;
-		uint32_t Offset;
-		uint32_t Size;
-		bool Normalized;
-
-		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
-			:Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
-		{
-
-		}
-
-		uint32_t GetComponentCount() const
-		{
-			switch (Type)
-			{
-			case SIByL::ShaderDataType::None:	return 0;
-			case SIByL::ShaderDataType::Float:	return 1;
-			case SIByL::ShaderDataType::Float2:	return 2;
-			case SIByL::ShaderDataType::Float3:	return 3;
-			case SIByL::ShaderDataType::Float4:	return 4;
-			case SIByL::ShaderDataType::Mat3:	return 3 * 3;
-			case SIByL::ShaderDataType::Mat4:	return 4 * 4;
-			case SIByL::ShaderDataType::Int:	return 1;
-			case SIByL::ShaderDataType::Int2:	return 2;
-			case SIByL::ShaderDataType::Int3:	return 3;
-			case SIByL::ShaderDataType::Int4:	return 4;
-			case SIByL::ShaderDataType::Bool:	return 1;
-			default:return 0;
-			}
-		}
-	};
-
 	class VertexBufferLayout
 	{
 	public:

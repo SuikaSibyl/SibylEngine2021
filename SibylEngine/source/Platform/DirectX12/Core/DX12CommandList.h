@@ -8,6 +8,11 @@ namespace SIByL
 	{
 	public:
 		DX12GraphicCommandList();
+		~DX12GraphicCommandList()
+		{
+			m_GraphicCmdList = nullptr;
+			m_CommandAllocator = nullptr;
+		}
 
 		virtual void Restart() override;
 		virtual void Execute() override;
@@ -23,11 +28,11 @@ namespace SIByL
 		//                             Descriptor Binding                             //
 		////////////////////////////////////////////////////////////////////////////////
 	public:
-		void SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ID3D12DescriptorHeap* heap);
+		void SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ComPtr<ID3D12DescriptorHeap> heap);
 	private:
 		// Keep track of the currently bound descriptor heaps. Only change descriptor 
 		// heaps if they are different than the currently bound descriptor heaps.
-		ID3D12DescriptorHeap* m_DescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+		ComPtr<ID3D12DescriptorHeap> m_DescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 		// Binds the current descriptor heaps to the command list.
 		void BindDescriptorHeaps();
 	};

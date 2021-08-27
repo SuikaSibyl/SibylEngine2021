@@ -11,6 +11,7 @@ namespace SIByL
 	public:
 		DX12SwapChain();
 		DX12SwapChain(int width, int height);
+		~DX12SwapChain() { }
 		void CreateSwapChain(int width, int height);
 		void CreateDepthStencil(int width, int height);
 

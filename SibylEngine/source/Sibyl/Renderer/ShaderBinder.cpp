@@ -7,12 +7,12 @@
 
 namespace SIByL
 {
-	ShaderBinder* ShaderBinder::Create()
+	ShaderBinder* ShaderBinder::Create(const ShaderBinderDesc& desc)
 	{
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: return nullptr; break;
-		case RasterRenderer::DirectX12: return new DX12ShaderBinder(); break;
+		case RasterRenderer::DirectX12: return new DX12ShaderBinder(desc); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

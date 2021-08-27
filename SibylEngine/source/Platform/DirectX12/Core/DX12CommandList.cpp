@@ -17,6 +17,11 @@ namespace SIByL
 			nullptr,
 			IID_PPV_ARGS(&m_GraphicCmdList)));
 		m_GraphicCmdList->Close();
+
+		for (uint32_t i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
+		{
+			m_DescriptorHeaps[i] = nullptr;
+		}
 	}
 
 	void DX12GraphicCommandList::Restart()
@@ -39,7 +44,7 @@ namespace SIByL
 	////////////////////////////////////////////////////////////////////////////////
 	//                             Descriptor Binding                             //
 	////////////////////////////////////////////////////////////////////////////////
-	void DX12GraphicCommandList::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ID3D12DescriptorHeap* heap)
+	void DX12GraphicCommandList::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ComPtr<ID3D12DescriptorHeap> heap)
 	{
 		if (m_DescriptorHeaps[heapType] != heap)
 		{
@@ -55,7 +60,7 @@ namespace SIByL
 
 		for (uint32_t i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
 		{
-			ID3D12DescriptorHeap* descriptorHeap = m_DescriptorHeaps[i];
+			ID3D12DescriptorHeap* descriptorHeap = m_DescriptorHeaps[i].Get();
 			if (descriptorHeap)
 			{
 				descriptorHeaps[numDescriptorHeaps++] = descriptorHeap;

@@ -4,6 +4,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#include "Sibyl/Core/Application.h"
 #include "Platform/OpenGL/Renderer/OpenGLCommandList.h"
 #include "Platform/OpenGL/Renderer/OpenGLSynchronizer.h"
 
@@ -19,8 +20,13 @@ namespace SIByL
 		Main = this;
 
 		// Create Command List
-		m_CommandList = new OpenGLCommandList();
+		m_CommandList = std::make_shared<OpenGLCommandList>();
 		m_Synchronizer.reset(new OpenGLSynchronizer());
+	}
+
+	OpenGLContext::~OpenGLContext()
+	{
+		Application::Get().OnResourceDestroy();
 	}
 
 	void OpenGLContext::Init()

@@ -15,6 +15,7 @@ namespace SIByL
 	{
 	public:
 		OpenGLContext(GLFWwindow* windowHandle);
+		~OpenGLContext();
 
 	public:
 		virtual void Init() override;

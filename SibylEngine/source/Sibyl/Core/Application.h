@@ -23,6 +23,7 @@ namespace SIByL
 		void OnEvent(Event& e);
 		void OnAwake();
 		void OnDraw();
+		void OnResourceDestroy();
 		void DrawImGui();
 
 		void PushLayer(Layer* layer);
@@ -37,8 +38,8 @@ namespace SIByL
 		bool OnWindowClosed(WindowCloseEvent& e);
 
 	private:
-		std::unique_ptr<Window> m_Window;
-		std::unique_ptr<ImGuiLayer> m_ImGuiLayer;
+		Ref<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		std::unique_ptr<FrameTimer> m_FrameTimer;
 
 		bool m_Running = true;

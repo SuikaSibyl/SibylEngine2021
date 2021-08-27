@@ -1,6 +1,8 @@
 #include "SIByLpch.h"
 #include "DX12Context.h"
 #include "DX12Utility.h"
+
+#include "Sibyl/Core/Application.h"
 #include "Sibyl/Renderer/GraphicContext.h"
 #include "Platform/DirectX12/Renderer/DX12SwapChain.h"
 
@@ -29,6 +31,34 @@ namespace SIByL
 
 
 		SIByL_CORE_INFO("DirectX 12 Init finished");
+	}
+
+	DX12Context::~DX12Context()
+	{
+		//Application::Get().OnResourceDestroy();
+		m_Synchronizer->ForceSynchronize();
+
+		m_SwapChain = nullptr;
+		m_CommandQueue = nullptr;
+
+		// Release Main Descriptor Allocators
+		m_RtvDescriptorAllocator = nullptr;
+		m_DsvDescriptorAllocator = nullptr;
+		m_SrvDescriptorAllocator = nullptr;
+
+		m_CommandList = nullptr;
+		m_Synchronizer = nullptr;
+		m_FrameResourcesManager = nullptr;
+		m_UploadBuffer = nullptr;
+
+		m_D3dDevice = nullptr;
+
+#if defined(_DEBUG)
+		if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&m_DxgiDebug))))
+		{
+			m_DxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+		}
+#endif
 	}
 
 	void DX12Context::EnableDebugLayer()
@@ -67,8 +97,8 @@ namespace SIByL
 
 	void DX12Context::CreateGraphicCommandList()
 	{
-		m_GraphicCommandList = std::make_unique<DX12GraphicCommandList>();
-		m_CommandList = m_GraphicCommandList.get();
+		//m_GraphicCommandList = std::make_shared<DX12GraphicCommandList>();
+		m_CommandList = std::make_shared<DX12GraphicCommandList>();
 	}
 
 	void DX12Context::CreateDescriptorAllocator()
@@ -80,7 +110,7 @@ namespace SIByL
 
 	void DX12Context::CreateSwapChain()
 	{
-		m_SwapChain = std::make_unique<DX12SwapChain>();
+		m_SwapChain = std::make_shared<DX12SwapChain>();
 		m_SwapChain->BindRenderTarget();
 	}
 
@@ -96,23 +126,22 @@ namespace SIByL
 
 	void DX12Context::CreateUploadBuffer()
 	{
-		m_UploadBuffer = std::make_unique<DX12UploadBuffer>();
+		m_UploadBuffer = std::make_shared<DX12UploadBuffer>();
 	}
 
 	void DX12Context::CreateFrameResourcesManager()
 	{
-		m_FrameResourcesManager = std::make_unique<DX12FrameResourcesManager>();
+		m_FrameResourcesManager = std::make_shared<DX12FrameResourcesManager>();
 	}
 
-	ID3D12DescriptorHeap* DX12Context::CreateSRVHeap()
+	ComPtr<ID3D12DescriptorHeap> DX12Context::CreateSRVHeap()
 	{
-		ID3D12DescriptorHeap* g_pd3dSrvDescHeap;
+		ComPtr<ID3D12DescriptorHeap> g_pd3dSrvDescHeap;
 		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		desc.NumDescriptors = 1;
 		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		DXCall(m_D3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_pd3dSrvDescHeap)));
-
 		return g_pd3dSrvDescHeap;
 	}
 

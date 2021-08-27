@@ -9,7 +9,7 @@ namespace SIByL
 	class DX12ShaderBinder :public ShaderBinder
 	{
 	public:
-		DX12ShaderBinder();
+		DX12ShaderBinder(const ShaderBinderDesc& desc);
 		ID3D12RootSignature* GetRootSignature() { return m_RootSignature->GetRootSignature().Get(); }
 		virtual void Bind() override;
 
@@ -24,5 +24,6 @@ namespace SIByL
 		Ref<RootSignature> m_RootSignature;
 		Ref<DynamicDescriptorHeap> m_SrvDynamicDescriptorHeap;
 		Ref<DynamicDescriptorHeap> m_SamplerDynamicDescriptorHeap;
+		ShaderBinderDesc m_Desc;
 	};
 }

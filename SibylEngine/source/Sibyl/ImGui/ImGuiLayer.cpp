@@ -21,10 +21,15 @@ namespace SIByL
 		SIByL_CORE_ASSERT(!Main, "ImGuiLayer Already Exists!");
 		Main = this;
 	}
+	
+	void ImGuiLayer::OnReleaseResource()
+	{
+		//PlatformDestroy();
+	}
 
 	ImGuiLayer::~ImGuiLayer()
 	{
-		PlatformDestroy();
+		
 	}
 
 	ImGuiLayer* ImGuiLayer::Create()
@@ -92,6 +97,6 @@ namespace SIByL
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-
+		
 	}
 }

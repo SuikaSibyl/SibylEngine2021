@@ -22,12 +22,12 @@ namespace SIByL
 		return nullptr;
 	}
 
-	Shader* Shader::Create(std::string file, const ShaderDesc& desc)
+	Shader* Shader::Create(std::string file, const ShaderDesc& desc, const ShaderBinderDesc& binderDesc)
 	{
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: return new OpenGLShader(ShaderPath + file + ".glsl", desc); break;
-		case RasterRenderer::DirectX12: return new DX12Shader(ShaderPath + file + ".hlsl", desc); break;
+		case RasterRenderer::DirectX12: return new DX12Shader(ShaderPath + file + ".hlsl", binderDesc, desc); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

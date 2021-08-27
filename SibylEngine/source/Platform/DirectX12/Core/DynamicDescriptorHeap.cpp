@@ -154,7 +154,7 @@ namespace SIByL
                 m_CurrentGPUDescriptorHandle = m_CurrentDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
                 m_NumFreeHandles = m_NumDescriptorsPerHeap;
     
-                dx12GraphicsCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap.Get());
+                dx12GraphicsCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap);
                 // When updating the descriptor heap on the command list, all descriptor
                 // tables must be (re)recopied to the new descriptor heap (not just
                 // the stale descriptor tables).

@@ -25,7 +25,9 @@ namespace SIByL
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 
-		virtual ~Window() {}
+		virtual ~Window() {
+		
+		}
 
 		virtual void OnUpdate() = 0;
 
@@ -39,7 +41,7 @@ namespace SIByL
 
 		virtual void* GetNativeWindow() const = 0;
 
-		static Window* Create(const WindowProps& props = WindowProps());
+		static Ref<Window> Create(const WindowProps& props = WindowProps());
 		GraphicContext* GetGraphicContext() { return m_GraphicContext; }
 
 	protected:

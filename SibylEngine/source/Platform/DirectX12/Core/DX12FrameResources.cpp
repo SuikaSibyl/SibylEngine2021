@@ -42,6 +42,14 @@ namespace SIByL
 
 	DX12FrameResourcesManager::~DX12FrameResourcesManager()
 	{
-		m_UploadBuffers = nullptr;
+		for (int i = 0; i < m_FrameResourcesCount; i++)
+		{
+			m_UploadBuffers[i] = nullptr;
+			m_CommandAllocators[i] = nullptr;
+			m_Fence[i] = 0;
+		}
+		delete[] m_UploadBuffers;
+		delete[] m_Fence;
+		delete[] m_CommandAllocators;
 	}
 }

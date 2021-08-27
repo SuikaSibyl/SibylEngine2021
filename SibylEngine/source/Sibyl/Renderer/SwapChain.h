@@ -8,6 +8,8 @@ namespace SIByL
 		SwapChain(int width, int height)
 			:m_Width(width), m_Height(height) {}
 
+		virtual ~SwapChain() { }
+
 		virtual void BindRenderTarget() {}
 		virtual void SetRenderTarget() {}
 		virtual void PreparePresent() {}
