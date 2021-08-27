@@ -4,6 +4,7 @@
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
 #include "Platform/DirectX12/Core/UploadBuffer.h"
+#include "Platform/DirectX12/Graphic/Texture/DX12Texture.h"
 
 namespace SIByL
 {
@@ -12,11 +13,13 @@ namespace SIByL
 		m_Desc = desc;
 		InitMappers(desc);
 		BuildRootSignature();
+
+		// Init Shader Resource Buffer
 		m_SrvDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		m_SamplerDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-
 		m_SrvDynamicDescriptorHeap->ParseRootSignature(*m_RootSignature);
 
+		// Init Constant Buffer
 		m_ConstantsTableBuffer = new Ref<DX12FrameResourceBuffer>[desc.ConstantBufferCount()];
 		for (int i = 0; i < desc.ConstantBufferCount(); i++)
 		{
@@ -91,18 +94,18 @@ namespace SIByL
 
 		// Create srv tables for srv...
 		int indexSrvTable = 0;
+		CD3DX12_DESCRIPTOR_RANGE* srvTable = new CD3DX12_DESCRIPTOR_RANGE[m_Desc.TextureBufferCount()]{};
 		for (ShaderResourceLayout& srLayout : m_Desc.m_TextureBufferLayouts)
 		{
-			CD3DX12_DESCRIPTOR_RANGE srvTable;
-			srvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+			srvTable[indexSrvTable].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 				srLayout.SrvCount(),
 				indexSrvTable);
 
 			slotRootParameter.get()[indexPara].InitAsDescriptorTable(1,
-				&srvTable,
+				&srvTable[indexSrvTable],
 				D3D12_SHADER_VISIBILITY_PIXEL);	// Only Readable in pixel shader
 
-			indexPara++; indexSrvTable;
+			indexPara++; indexSrvTable++;
 		}
 
 		auto staticSamplers = DX12Context::GetStaticSamplers();	//获得静态采样器集合
@@ -126,13 +129,28 @@ namespace SIByL
 		DXCall(hr);
 
 		m_RootSignature = std::make_shared<RootSignature>(rootSig);
+		delete[] srvTable;
+	}
+
+	void DX12ShaderBinder::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
+	{
+		ShaderResourceItem item;
+		if (m_ResourcesMapper.FetchResource(name, item))
+		{
+			Ref<DynamicDescriptorHeap> sddh = GetSrvDynamicDescriptorHeap();
+			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
+			sddh->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
+		}
 	}
 
 	void DX12ShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		ShaderConstantItem item;
-		m_ConstantsMapper.FetchConstant(name, item);
-		float data[3]{ value.r,value.g,value.b };
-		CopyMemoryToConstantsBuffer(&data, item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+		if (m_ConstantsMapper.FetchConstant(name, item))
+		{
+			float data[3]{ value.r,value.g,value.b };
+			CopyMemoryToConstantsBuffer(&data, item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+
+		}
 	}
 }

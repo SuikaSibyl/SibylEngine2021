@@ -1,16 +1,4 @@
-#include <iostream>
-
 #include <SIByL.h>
-
-#include <Sibyl/Renderer/Renderer.h>
-#include "Sibyl/Renderer/Shader.h"
-#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
-#include "Sibyl/Graphic/Texture/Texture.h"
-
-//#include "Platform/DirectX12/Common/DX12Context.h"
-//#include "Platform/DirectX12/Renderer/DX12ShaderBinder.h"
-//#include "Platform/DirectX12/Core/DX12FrameResources.h"
-//#include "Platform/DirectX12/Graphic/Texture/DX12Texture.h"
 
 using namespace SIByL;
 
@@ -22,12 +10,6 @@ public:
 	{
 
 	}
-
-	struct LitUniforms
-	{
-		float color[3];
-	};
-
 
 	struct VertexData
 	{
@@ -77,7 +59,7 @@ public:
 
 		triangle = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
 		texture = Texture2D::Create("fen4.png");
-		//litUni = new DX12FrameResource<LitUniforms>();
+		texture1 = Texture2D::Create("amagami4.png");
 	}
 
 	void OnUpdate() override
@@ -88,12 +70,6 @@ public:
 		SIByL_CORE_INFO("FPS: {0}, {1} ms", 
 			Application::Get().GetFrameTimer()->GetFPS(),
 			Application::Get().GetFrameTimer()->GetMsPF());
-
-		//Ref<LitUniforms> lu = litUni->GetCurrentBuffer();
-		//lu->color[0] = sin(Application::Get().GetFrameTimer()->TotalTime());
-		//lu->color[1] = 0.5;
-		//lu->color[2] = 0.8;
-		//litUni->UploadCurrentBuffer();
 	}
 
 	void OnEvent(SIByL::Event& event) override
@@ -103,18 +79,23 @@ public:
 
 	void OnDraw() override
 	{
+		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
 		shader->Use();
-		shader->GetBinder()->SetFloat3("Color", { 1,1,0 });
+		shader->GetBinder()->SetFloat3("Color", { sin(totalTime),1,0 });
 		shader->GetBinder()->TEMPUpdateAllConstants();
+		if (((int)(totalTime) % 2) == 0)
+			shader->GetBinder()->SetTexture2D("Main", texture);
+		else
+			shader->GetBinder()->SetTexture2D("Main", texture1);
+		shader->GetBinder()->TEMPUpdateAllResources();
 
-		//texture->Bind(0);
 		triangle->RasterDraw();
 	}
 
 	Ref<Shader> shader;
 	Ref<TriangleMesh> triangle;
 	Ref<Texture2D> texture;
-	//DX12FrameResource<LitUniforms>* litUni;
+	Ref<Texture2D> texture1;
 };
 
 class Sandbox :public SIByL::Application

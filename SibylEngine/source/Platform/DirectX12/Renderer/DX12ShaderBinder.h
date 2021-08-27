@@ -25,6 +25,12 @@ namespace SIByL
 			UpdateConstantsBuffer(0);
 			BindConstantsBuffer(0);
 		}
+		void TEMPUpdateAllResources()
+		{
+			GetSrvDynamicDescriptorHeap()->CommitStagedDescriptorsForDraw();
+		}
+
+		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
 
 	private:
 		void BuildRootSignature();

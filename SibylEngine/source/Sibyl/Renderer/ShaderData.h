@@ -129,12 +129,7 @@ namespace SIByL
 
 		int SrvCount()
 		{
-			int count = 0;
-			for (TextureTableElement& e : m_Elements)
-			{
-				count += 1;
-			}
-			return count;
+			return m_Elements.size();
 		}
 
 		inline const std::vector<TextureTableElement>& GetElements() const { return m_Elements; }

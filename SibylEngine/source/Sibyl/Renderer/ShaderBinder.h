@@ -2,6 +2,7 @@
 
 #include "ShaderData.h"
 #include "glm/glm.hpp"
+#include "Sibyl/Graphic/Texture/Texture.h"
 
 namespace SIByL
 {
@@ -18,10 +19,14 @@ namespace SIByL
 
 		~ShaderBinderDesc() {};
 		int ConstantBufferCount()const { return m_ConstantBufferLayouts.size(); }
+		int TextureBufferCount()const { return m_TextureBufferLayouts.size(); }
 		std::vector<ConstantBufferLayout> m_ConstantBufferLayouts;
 		std::vector<ShaderResourceLayout> m_TextureBufferLayouts;
 	};
 
+	/// <summary>
+	/// Shader Constant Mapper
+	/// </summary>
 	struct ShaderConstantItem
 	{
 		std::string Name;
@@ -29,7 +34,6 @@ namespace SIByL
 		int CBIndex;
 		uint32_t Offset;
 	};
-
 	class ConstantsMapper
 	{
 	public:
@@ -40,16 +44,22 @@ namespace SIByL
 		std::unordered_map<std::string, ShaderConstantItem> m_Mapper;
 	};
 
+	/// <summary>
+	/// Shader Resource Mapper
+	/// </summary>
 	struct ShaderResourceItem
 	{
 		std::string Name;
 		ShaderResourceType Type;
+		int SRTIndex;
+		int Offset;
 	};
-
 	class ResourcesMapper
 	{
 	public:
-		//void InsertR
+		void InsertResource(const ShaderResourceItem& element);
+		bool FetchResource(std::string name, ShaderResourceItem& buffer);
+
 	private:
 		std::unordered_map<std::string, ShaderResourceItem> m_Mapper;
 	};
@@ -63,7 +73,11 @@ namespace SIByL
 		virtual void Bind() = 0;
 
 		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
+
+		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
+
 		virtual void TEMPUpdateAllConstants() = 0;
+		virtual void TEMPUpdateAllResources() = 0;
 	protected:
 		void InitMappers(const ShaderBinderDesc& desc);
 		ConstantsMapper m_ConstantsMapper;

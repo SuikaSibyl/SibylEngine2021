@@ -9,5 +9,12 @@
 #include "Sibyl/Core/KeyCodes.h"
 #include "Sibyl/Core/MouseButtonCodes.h"
 #include "Sibyl/ImGui/ImGuiLayer.h"
+
 // EnterPoint
 #include "Sibyl/Core/EntryPoint.h"
+
+// Render Basic
+#include "Sibyl/Renderer/Renderer.h"
+#include "Sibyl/Renderer/Shader.h"
+#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Texture/Texture.h"
