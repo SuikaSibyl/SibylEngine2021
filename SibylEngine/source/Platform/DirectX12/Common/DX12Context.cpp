@@ -97,7 +97,6 @@ namespace SIByL
 
 	void DX12Context::CreateGraphicCommandList()
 	{
-		//m_GraphicCommandList = std::make_shared<DX12GraphicCommandList>();
 		m_CommandList = std::make_shared<DX12GraphicCommandList>();
 	}
 

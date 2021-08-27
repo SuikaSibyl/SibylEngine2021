@@ -48,11 +48,16 @@ namespace SIByL
 		// Awake: Render Objects
 		// --------------------------------
 		Ref<CommandList> cmdList = m_Window->GetGraphicContext()->GetCommandList();
+		Ref<Synchronizer> synchronizer = m_Window->GetGraphicContext()->GetSynchronizer();
+
+		synchronizer->StartFrame();
 		cmdList->Restart();
 		for (Layer* layer : m_LayerStack)
 			layer->OnInitResource();
 		cmdList->Execute();
+		synchronizer->EndFrame();
 		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
+
 	}
 
 	void Application::Run()

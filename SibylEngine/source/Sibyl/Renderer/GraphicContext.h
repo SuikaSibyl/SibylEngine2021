@@ -14,7 +14,7 @@ namespace SIByL
 	public:
 		Ref<SwapChain> GetSwapChain() { return m_SwapChain; }
 		Ref<CommandList> GetCommandList() { return m_CommandList; }
-		inline Synchronizer* GetSynchronizer() { return m_Synchronizer.get(); }
+		inline Ref<Synchronizer> GetSynchronizer() { return m_Synchronizer; }
 		void SetCommandList(Ref<CommandList> cmdList) { m_CommandList.reset(cmdList.get()); }
 
 	protected:

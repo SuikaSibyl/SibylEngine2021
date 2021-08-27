@@ -16,6 +16,7 @@ namespace SIByL
 			m_CommandAllocator.Get(),
 			nullptr,
 			IID_PPV_ARGS(&m_GraphicCmdList)));
+
 		m_GraphicCmdList->Close();
 
 		for (uint32_t i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
