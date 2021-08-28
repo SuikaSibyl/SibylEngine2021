@@ -26,7 +26,7 @@ namespace SIByL
 	{
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: return std::make_shared<OpenGLShader>(ShaderPath + file + ".glsl", desc); break;
+		case RasterRenderer::OpenGL: return std::make_shared<OpenGLShader>(ShaderPath + file + ".glsl", desc, binderDesc); break;
 		case RasterRenderer::DirectX12: return std::make_shared<DX12Shader>(ShaderPath + file + ".hlsl", binderDesc, desc); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;

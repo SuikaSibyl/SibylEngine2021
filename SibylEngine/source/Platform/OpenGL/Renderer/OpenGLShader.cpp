@@ -2,6 +2,7 @@
 
 #include "SIByLpch.h"
 #include "OpenGLShader.h"
+#include "OpenGLShaderBinder.h"
 
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 
@@ -26,10 +27,12 @@ namespace SIByL
 		CompileFromString(vertexShaderSource, fragShaderSource);
 	}
 
-	OpenGLShader::OpenGLShader(std::string file, const ShaderDesc& desc)
+	OpenGLShader::OpenGLShader(std::string file, const ShaderDesc& shaderDesc, const ShaderBinderDesc& binderDesc)
 	{
-		m_Descriptor = desc;
+		m_Descriptor = shaderDesc;
+		m_BinderDescriptor = binderDesc;
 		CompileFromSingleFile(file);
+		CreateBinder();
 	}
 
 	OpenGLShader::OpenGLShader(std::string vFile, std::string pFile, const ShaderDesc& desc)
@@ -139,7 +142,9 @@ namespace SIByL
 
 	void OpenGLShader::CreateBinder()
 	{
-		//m_ShaderBinder = 
+		m_ShaderBinder = ShaderBinder::Create(m_BinderDescriptor);
+		OpenGLShaderBinder* shaderBinder = dynamic_cast<OpenGLShaderBinder*>(m_ShaderBinder.get());
+		shaderBinder->SetOpenGLShaderId(m_ShaderProgram);
 	}
 
 	void OpenGLShader::SetVertexBufferLayout()

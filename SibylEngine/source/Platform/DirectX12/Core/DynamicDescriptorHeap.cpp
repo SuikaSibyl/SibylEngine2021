@@ -160,7 +160,11 @@ namespace SIByL
                 // the stale descriptor tables).
                 m_StaleDescriptorTableBitMask = m_DescriptorTableBitMask;
             }
-    
+
+            m_CurrentCPUDescriptorHandle = m_CurrentDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+            m_CurrentGPUDescriptorHandle = m_CurrentDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+            m_NumFreeHandles = m_NumDescriptorsPerHeap;
+
             DWORD rootIndex;
             // Scan from LSB to MSB for a bit set in staleDescriptorsBitMask
             while (_BitScanForward(&rootIndex, m_StaleDescriptorTableBitMask))

@@ -4,6 +4,7 @@
 #include "Sibyl/Renderer/Renderer.h"
 
 #include "Platform/DirectX12/Renderer/DX12ShaderBinder.h"
+#include "Platform/OpenGL/Renderer/OpenGLShaderBinder.h"
 
 namespace SIByL
 {
@@ -11,7 +12,7 @@ namespace SIByL
 	{
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: return nullptr; break;
+		case RasterRenderer::OpenGL: return std::make_shared<OpenGLShaderBinder>(desc);; break;
 		case RasterRenderer::DirectX12: return std::make_shared<DX12ShaderBinder>(desc); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;

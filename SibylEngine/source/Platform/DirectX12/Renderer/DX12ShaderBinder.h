@@ -34,7 +34,6 @@ namespace SIByL
 
 	private:
 		void BuildRootSignature();
-		virtual void BindFloat3() override {}
 
 	private:
 		Ref<RootSignature> m_RootSignature;

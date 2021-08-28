@@ -69,7 +69,6 @@ namespace SIByL
 	public:
 		static Ref<ShaderBinder> Create(const ShaderBinderDesc& desc);
 		virtual ~ShaderBinder() {}
-		virtual void BindFloat3() = 0;
 		virtual void Bind() = 0;
 
 		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
