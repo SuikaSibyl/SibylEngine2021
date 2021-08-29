@@ -1,5 +1,7 @@
 #include <SIByL.h>
 
+#include <Sibyl/Graphic/Core/Camera.h>
+
 using namespace SIByL;
 
 class ExampleLayer :public SIByL::Layer
@@ -29,7 +31,10 @@ public:
 		{
 			// ConstantBuffer1
 			{
-				{ShaderDataType::Float3, "Color"}
+				{ShaderDataType::Mat4, "Model"},
+				{ShaderDataType::Mat4, "View"},
+				{ShaderDataType::Mat4, "Projection"},
+				{ShaderDataType::Float3, "Color"},
 			},
 		};
 
@@ -37,7 +42,7 @@ public:
 		{
 			// ShaderResourceTable 1
 			{
-				{ShaderResourceType::Texture2D, "Main"}
+				{ShaderResourceType::Texture2D, "Main"},
 			},
 		};
 
@@ -60,11 +65,15 @@ public:
 		triangle = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
 		texture = Texture2D::Create("fen4.png");
 		texture1 = Texture2D::Create("amagami4.png");
+
+		camera = std::make_shared<PerspectiveCamera>(45, 
+			Application::Get().GetWindow().GetWidth(), 
+			Application::Get().GetWindow().GetHeight());
 	}
 
 	void OnUpdate() override
 	{
-		if (SIByL::Input::IsKeyPressed(SIByL_KEY_TAB))
+		if (SIByL::Input::IsKeyPressed(SIByL_KEY_A))
 			SIByL_APP_TRACE("Tab key is pressed!");
 
 		SIByL_CORE_INFO("FPS: {0}, {1} ms", 
@@ -79,9 +88,19 @@ public:
 
 	void OnDraw() override
 	{
+		glm::mat4 model = glm::mat4(1.0f);
+		//model = glm::scale(model, { 2,2,2 });
+
+		float x = Input::GetMouseX();
+		std::cout << x << std::endl;
+
 		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
 		shader->Use();
 		shader->GetBinder()->SetFloat3("Color", { sin(totalTime),1,0 });
+		shader->GetBinder()->SetMatrix4x4("Model", model);
+		shader->GetBinder()->SetMatrix4x4("View", glm::transpose(camera->GetViewMatrix()));
+		shader->GetBinder()->SetMatrix4x4("Projection", (camera->GetProjectionMatrix()));
+		
 		shader->GetBinder()->TEMPUpdateAllConstants();
 		if (((int)(totalTime) % 2) == 0)
 			shader->GetBinder()->SetTexture2D("Main", texture);
@@ -96,6 +115,7 @@ public:
 	Ref<TriangleMesh> triangle;
 	Ref<Texture2D> texture;
 	Ref<Texture2D> texture1;
+	Ref<Camera> camera;
 };
 
 class Sandbox :public SIByL::Application

@@ -7,9 +7,10 @@ namespace SIByL
 {
 	bool WindowsInput::IsKeyPressedImpl(int keycode)
 	{
-		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		//auto state = glfwGetKey(window, keycode);
-		//return state == GLFW_PRESS || state == GLFW_REPEAT;
+		if (GetKeyState(keycode) & 0x8000)
+		{
+			return true;
+		}
 
 		return false;
 	}

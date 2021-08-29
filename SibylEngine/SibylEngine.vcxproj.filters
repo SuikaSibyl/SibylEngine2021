@@ -216,6 +216,9 @@
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLShaderBinder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Components\ViewCameraController.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1365,6 +1368,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLShaderBinder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Components\ViewCameraController.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

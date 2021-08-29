@@ -154,8 +154,8 @@ namespace SIByL
         // Set Viewport
         viewPort.TopLeftX = 0;
         viewPort.TopLeftY = 0;
-        viewPort.Width = width;
-        viewPort.Height = height;
+        viewPort.Width =(float)width;
+        viewPort.Height = (float)height;
         viewPort.MaxDepth = 1.0f;
         viewPort.MinDepth = 0.0f;
 

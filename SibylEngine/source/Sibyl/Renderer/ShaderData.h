@@ -127,7 +127,7 @@ namespace SIByL
 		{
 		}
 
-		int SrvCount()
+		size_t SrvCount()
 		{
 			return m_Elements.size();
 		}

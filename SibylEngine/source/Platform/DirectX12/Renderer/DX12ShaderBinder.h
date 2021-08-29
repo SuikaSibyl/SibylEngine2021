@@ -10,14 +10,17 @@ namespace SIByL
 	class DX12ShaderBinder :public ShaderBinder
 	{
 	public:
+		virtual void SetFloat(const std::string& name, const float& value) override;
+		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override;
+		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
+		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) override;
+		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
+
 		~DX12ShaderBinder();
 
 		DX12ShaderBinder(const ShaderBinderDesc& desc);
 		ID3D12RootSignature* GetRootSignature() { return m_RootSignature->GetRootSignature().Get(); }
 		virtual void Bind() override;
-
-		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override;
-
 		Ref<DynamicDescriptorHeap> GetSrvDynamicDescriptorHeap() { return m_SrvDynamicDescriptorHeap; }
 
 		void TEMPUpdateAllConstants()
@@ -29,8 +32,6 @@ namespace SIByL
 		{
 			GetSrvDynamicDescriptorHeap()->CommitStagedDescriptorsForDraw();
 		}
-
-		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
 
 	private:
 		void BuildRootSignature();

@@ -141,6 +141,7 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
+    <ClCompile Include="source\Sibyl\Components\ViewCameraController.cpp" />
     <ClCompile Include="source\Sibyl\Core\Input.cpp" />
     <ClCompile Include="source\Sibyl\Core\SIByLpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -223,6 +224,7 @@
     <ClInclude Include="source\SIByLpch.h" />
     <ClInclude Include="source\SIByLsettings.h" />
     <ClInclude Include="source\Sibyl\Components\Transform.h" />
+    <ClInclude Include="source\Sibyl\Components\ViewCameraController.h" />
     <ClInclude Include="source\Sibyl\Core\Application.h" />
     <ClInclude Include="source\Sibyl\Core\Core.h" />
     <ClInclude Include="source\Sibyl\Core\EntryPoint.h" />

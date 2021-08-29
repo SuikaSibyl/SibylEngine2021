@@ -8,6 +8,53 @@
 
 namespace SIByL
 {
+	void DX12ShaderBinder::SetFloat(const std::string& name, const float& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper.FetchConstant(name, item))
+		{
+			CopyMemoryToConstantsBuffer((void*)&value, item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper.FetchConstant(name, item))
+		{
+			CopyMemoryToConstantsBuffer((void*)&value[0], item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderBinder::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper.FetchConstant(name, item))
+		{
+			CopyMemoryToConstantsBuffer((void*)&value[0], item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderBinder::SetMatrix4x4(const std::string& name, const glm::mat4& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper.FetchConstant(name, item))
+		{
+			CopyMemoryToConstantsBuffer((void*)&value[0][0], item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderBinder::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
+	{
+		ShaderResourceItem item;
+		if (m_ResourcesMapper.FetchResource(name, item))
+		{
+			Ref<DynamicDescriptorHeap> sddh = GetSrvDynamicDescriptorHeap();
+			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
+			sddh->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
+		}
+	}
+
 	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
 	{
 		m_Desc = desc;
@@ -77,7 +124,7 @@ namespace SIByL
 	{
 		// Perfomance TIP: Order from most frequent to least frequent.
 		// ----------------------------------------------------------------------
-		int parameterCount = m_Desc.m_ConstantBufferLayouts.size()
+		size_t parameterCount = m_Desc.m_ConstantBufferLayouts.size()
 			+ m_Desc.m_TextureBufferLayouts.size();
 
 		// RootSignature could be descriptor table \ Root Descriptor \ Root Constant
@@ -98,7 +145,7 @@ namespace SIByL
 		for (ShaderResourceLayout& srLayout : m_Desc.m_TextureBufferLayouts)
 		{
 			srvTable[indexSrvTable].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-				srLayout.SrvCount(),
+				(UINT)srLayout.SrvCount(),
 				indexSrvTable);
 
 			slotRootParameter.get()[indexPara].InitAsDescriptorTable(1,
@@ -111,7 +158,7 @@ namespace SIByL
 		auto staticSamplers = DX12Context::GetStaticSamplers();	//获得静态采样器集合
 		//slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
 		// Root Signature is consisted of a set of root parameters
-		CD3DX12_ROOT_SIGNATURE_DESC rootSig(parameterCount, // Number of root parameters
+		CD3DX12_ROOT_SIGNATURE_DESC rootSig((UINT)parameterCount, // Number of root parameters
 			slotRootParameter.get(), // Pointer to Root Parameter
 			staticSamplers.size(),
 			staticSamplers.data(),
@@ -130,27 +177,5 @@ namespace SIByL
 
 		m_RootSignature = std::make_shared<RootSignature>(rootSig);
 		delete[] srvTable;
-	}
-
-	void DX12ShaderBinder::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
-	{
-		ShaderResourceItem item;
-		if (m_ResourcesMapper.FetchResource(name, item))
-		{
-			Ref<DynamicDescriptorHeap> sddh = GetSrvDynamicDescriptorHeap();
-			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
-			sddh->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
-		}
-	}
-
-	void DX12ShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
-	{
-		ShaderConstantItem item;
-		if (m_ConstantsMapper.FetchConstant(name, item))
-		{
-			float data[3]{ value.r,value.g,value.b };
-			CopyMemoryToConstantsBuffer(&data, item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
-
-		}
 	}
 }

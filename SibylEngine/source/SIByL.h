@@ -13,6 +13,11 @@
 // EnterPoint
 #include "Sibyl/Core/EntryPoint.h"
 
+// GLM
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 // Render Basic
 #include "Sibyl/Renderer/Renderer.h"
 #include "Sibyl/Renderer/Shader.h"
