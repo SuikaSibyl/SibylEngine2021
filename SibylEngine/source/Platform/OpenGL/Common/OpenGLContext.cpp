@@ -42,4 +42,9 @@ namespace SIByL
 		m_RenderPipeline = std::make_unique<OpenGLRenderPipeline>();
 		m_SwapChain = std::make_unique<OpenGLSwapChain>();
 	}
+
+	void OpenGLContext::OnWindowResize(uint32_t width, uint32_t height)
+	{
+		m_SwapChain->Reisze(width, height);
+	}
 }

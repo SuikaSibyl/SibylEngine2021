@@ -2,6 +2,7 @@
 #include "WindowsInput.h"
 
 #include "Sibyl/Core/Application.h"
+#include "Platform/Windows/Window/WindowsWindow.h"
 
 namespace SIByL
 {
@@ -16,36 +17,54 @@ namespace SIByL
 	}
 	bool WindowsInput::IsMouseButtonPressedImpl(int button)
 	{
-		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		//auto state = glfwGetMouseButton(window, button);
-		//return state == GLFW_PRESS;
+		if (GetKeyState(button) & 0x8000)
+		{
+			return true;
+		}
 
 		return false;
 	}
 
 	std::pair<float, float> WindowsInput::GetMousePositionImpl()
 	{
-		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		//double xpos, ypos;
-		//glfwGetCursorPos(window, &xpos, &ypos);
-
+		POINT pt;
+		BOOL bReturn = GetCursorPos(&pt);
+		if (bReturn != 0)
+		{
+			if (ScreenToClient((HWND)WindowsWindow::Main->GetNativeWindow(), &pt))
+			{
+				return { pt.x ,pt.y };
+			}
+		}
 		return { 0.0f, 0.0f };
 	}
 
 	float WindowsInput::GetMouseXImpl()
 	{
-		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		//double xpos, ypos;
-		//glfwGetCursorPos(window, &xpos, &ypos);
+		POINT pt;
+		BOOL bReturn = GetCursorPos(&pt);
+		if (bReturn != 0)
+		{
+			if (ScreenToClient((HWND)WindowsWindow::Main->GetNativeWindow(), &pt))
+			{
+				return pt.x;
+			}
+		}
 
 		return 0.0f;
 	}
 
 	float WindowsInput::GetMouseYImpl()
 	{
-		//auto window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		//double xpos, ypos;
-		//glfwGetCursorPos(window, &xpos, &ypos);
+		POINT pt;
+		BOOL bReturn = GetCursorPos(&pt);
+		if (bReturn != 0)
+		{
+			if (ScreenToClient((HWND)WindowsWindow::Main->GetNativeWindow(), &pt))
+			{
+				return pt.y;
+			}
+		}
 
 		return 0.0f;
 	}

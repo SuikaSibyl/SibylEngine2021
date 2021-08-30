@@ -36,16 +36,17 @@ VertexOut VS(VertexIn vin)
 	float4x4 VP = mul(Projection, View);
 	// float4x4 MVP = mul(Model, VP);
 	// vout.PosH = mul(View, float4(vin.PosL, 1.0f));
-	vout.PosH = mul(float4(vin.PosL, 1.0f), View);
+	vout.PosH = mul(View, float4(vin.PosL, 1.0f));
+	vout.PosH = mul(Projection, vout.PosH);
 
 	// Just pass vertex color into the pixel shader.
-    vout.Color = float4(-View[0][0],-View[0][0],-View[0][0], 1.0);
+    vout.Color = float4(color, 1.0);
     vout.UV = vin.UV;
     return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-	// float4 color = gDiffuseMap.Sample(gSamLinearWarp, pin.UV);
-    return float4(1,1,1,1);
+	float4 color = gDiffuseMap.Sample(gSamLinearWarp, pin.UV);
+    return color*pin.Color;
 }

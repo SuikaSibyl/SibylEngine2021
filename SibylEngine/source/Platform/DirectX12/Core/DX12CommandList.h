@@ -17,12 +17,15 @@ namespace SIByL
 		virtual void Restart() override;
 		virtual void Execute() override;
 
-		inline ID3D12GraphicsCommandList* Get() { return m_GraphicCmdList.Get(); }
+		inline ComPtr<ID3D12GraphicsCommandList> Get() { return m_GraphicCmdList.Get(); }
+		inline ComPtr<ID3D12CommandAllocator> GetAllocator() { return m_CommandAllocator.Get(); }
 
 	private:
 		ComPtr<ID3D12GraphicsCommandList>	m_GraphicCmdList;
 		ComPtr<ID3D12CommandAllocator>		m_CommandAllocator;
 
+	private:
+		bool m_IsClosed = false;
 
 		////////////////////////////////////////////////////////////////////////////////
 		//                             Descriptor Binding                             //

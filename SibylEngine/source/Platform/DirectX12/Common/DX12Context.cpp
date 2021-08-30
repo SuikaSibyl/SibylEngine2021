@@ -33,6 +33,11 @@ namespace SIByL
 		SIByL_CORE_INFO("DirectX 12 Init finished");
 	}
 
+	void DX12Context::OnWindowResize(uint32_t width, uint32_t height)
+	{
+		m_SwapChain->Reisze(width, height);
+	}
+
 	DX12Context::~DX12Context()
 	{
 		//Application::Get().OnResourceDestroy();

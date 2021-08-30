@@ -17,7 +17,9 @@ namespace SIByL
 	public:
 		static DX12Context* Main;
 		~DX12Context();
+
 		virtual void Init() override;
+		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 
 		inline static uint64_t GetFrameCount() { return Main->m_FrameCount; };
 
@@ -25,7 +27,7 @@ namespace SIByL
 		inline static ID3D12Device* GetDevice() { return Main->m_D3dDevice.Get(); }
 		inline static DX12GraphicCommandList* GetGraphicCommandList() { return dynamic_cast<DX12GraphicCommandList*>(Main->m_CommandList.get()); }
 		inline static SwapChain* GetSwapChain() { return Main->m_SwapChain.get(); }
-		inline static ID3D12GraphicsCommandList* GetDXGraphicCommandList() { return Main->GetGraphicCommandList()->Get(); }
+		inline static ID3D12GraphicsCommandList* GetDXGraphicCommandList() { return Main->GetGraphicCommandList()->Get().Get(); }
 		inline static IDXGIFactory4* GetDxgiFactory() { return Main->m_DxgiFactory.Get(); }
 		inline static ID3D12CommandQueue* GetCommandQueue() { return Main->m_CommandQueue.Get(); }
 		inline static DX12UploadBuffer* GetUploadBuffer() { return Main->m_UploadBuffer.get(); }

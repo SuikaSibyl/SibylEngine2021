@@ -50,6 +50,13 @@ namespace SIByL
 
     void DX12SwapChain::CreateDepthStencil(int width, int height)
     {
+        Ref<DescriptorAllocator> dsvDespAllocator = DX12Context::GetDsvDescriptorAllocator();
+        m_DSVDespAllocation = dsvDespAllocator->Allocate(1);
+        RecreateDepthStencil(width, height);
+    }
+
+    void DX12SwapChain::RecreateDepthStencil(int width, int height)
+    {
         D3D12_RESOURCE_DESC dsvResourceDesc;
         dsvResourceDesc.Alignment = 0;
         dsvResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -75,8 +82,6 @@ namespace SIByL
             &optClear,
             IID_PPV_ARGS(&m_SwapChainDepthStencil)));
 
-        Ref<DescriptorAllocator> dsvDespAllocator = DX12Context::GetDsvDescriptorAllocator();
-        m_DSVDespAllocation = dsvDespAllocator->Allocate(1);
         DX12Context::GetDevice()->CreateDepthStencilView(m_SwapChainDepthStencil.Get(),
             nullptr,
             m_DSVDespAllocation.GetDescriptorHandle());
@@ -92,6 +97,11 @@ namespace SIByL
     {
         // Allocate descriptors from Heap
         m_DescriptorAllocation = DX12Context::GetRtvDescriptorAllocator()->Allocate(2u);
+        RecreateRenderTarget();
+    }
+
+    void DX12SwapChain::RecreateRenderTarget()
+    {
         CD3DX12_CPU_DESCRIPTOR_HANDLE  handle(m_DescriptorAllocation.GetDescriptorHandle());
         for (int i = 0; i < 2; i++)
         {
@@ -147,6 +157,33 @@ namespace SIByL
     {
         DXCall(m_SwapChain->Present(0, 0));
         m_CurrentBackBuffer = (m_CurrentBackBuffer + 1) % 2;
+    }
+
+    void DX12SwapChain::Reisze(uint32_t width, uint32_t height)
+    {
+        DX12GraphicCommandList* cmdList = DX12Context::GetGraphicCommandList();
+
+        DX12Context::GetSynchronizer()->ForceSynchronize();
+
+        cmdList->Restart();
+        
+        for (UINT i = 0; i < 2; i++)
+            m_SwapChainBuffer[i].Reset();
+        m_SwapChainDepthStencil.Reset();
+        
+        m_SwapChain->ResizeBuffers(
+            2, // Swap chain number
+            width, height, 
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+        RecreateRenderTarget();
+        RecreateDepthStencil(width, height);
+        SetViewportRect(width, height);
+        m_CurrentBackBuffer = 0;
+        cmdList->Execute();
+
+        DX12Context::GetSynchronizer()->ForceSynchronize();
+
     }
 
     void DX12SwapChain::SetViewportRect(int width, int height)

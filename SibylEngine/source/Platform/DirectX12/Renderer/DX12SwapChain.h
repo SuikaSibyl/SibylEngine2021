@@ -13,12 +13,15 @@ namespace SIByL
 		DX12SwapChain(int width, int height);
 		~DX12SwapChain() { }
 		void CreateSwapChain(int width, int height);
+		void RecreateRenderTarget();
 		void CreateDepthStencil(int width, int height);
+		void RecreateDepthStencil(int width, int height);
 
 		virtual void BindRenderTarget() override;
 		virtual void SetRenderTarget() override;
 		virtual void PreparePresent() override;
 		virtual void Present() override;
+		virtual void Reisze(uint32_t width, uint32_t height) override;
 
 	private:
 		void SetViewportRect(int width, int height);

@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <functional>
 #include <new>
+#include <cmath>
 
 #include <string>
 #include <sstream>

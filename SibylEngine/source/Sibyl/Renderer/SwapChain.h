@@ -14,6 +14,7 @@ namespace SIByL
 		virtual void SetRenderTarget() {}
 		virtual void PreparePresent() {}
 		virtual void Present() {}
+		virtual void Reisze(uint32_t width, uint32_t height) {}
 
 	private:
 		int m_Width, m_Height;

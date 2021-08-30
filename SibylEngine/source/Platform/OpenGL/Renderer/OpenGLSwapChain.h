@@ -15,6 +15,7 @@ namespace SIByL
 		virtual void SetRenderTarget() override;
 		virtual void PreparePresent() override;
 		virtual void Present() override;
+		virtual void Reisze(uint32_t width, uint32_t height) override;
 
 	private:
 		UINT m_CurrentBackBuffer = 0;

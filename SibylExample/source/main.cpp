@@ -1,6 +1,7 @@
 #include <SIByL.h>
 
 #include <Sibyl/Graphic/Core/Camera.h>
+#include <Sibyl/Components/ViewCameraController.h>
 
 using namespace SIByL;
 
@@ -69,37 +70,37 @@ public:
 		camera = std::make_shared<PerspectiveCamera>(45, 
 			Application::Get().GetWindow().GetWidth(), 
 			Application::Get().GetWindow().GetHeight());
+
+		viewCameraController = std::make_shared<ViewCameraController>(camera);
 	}
 
 	void OnUpdate() override
 	{
-		if (SIByL::Input::IsKeyPressed(SIByL_KEY_A))
-			SIByL_APP_TRACE("Tab key is pressed!");
+		//if (SIByL::Input::IsKeyPressed(SIByL_KEY_A))
+		//	SIByL_APP_TRACE("Tab key is pressed!");
 
 		SIByL_CORE_INFO("FPS: {0}, {1} ms", 
 			Application::Get().GetFrameTimer()->GetFPS(),
 			Application::Get().GetFrameTimer()->GetMsPF());
+
+		viewCameraController->OnUpdate();
 	}
 
 	void OnEvent(SIByL::Event& event) override
 	{
-		//SIByL_APP_TRACE("{0}", event);
+		viewCameraController->OnEvent(event);
 	}
 
 	void OnDraw() override
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::scale(model, { 2,2,2 });
-
-		float x = Input::GetMouseX();
-		std::cout << x << std::endl;
 
 		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
 		shader->Use();
 		shader->GetBinder()->SetFloat3("Color", { sin(totalTime),1,0 });
 		shader->GetBinder()->SetMatrix4x4("Model", model);
-		shader->GetBinder()->SetMatrix4x4("View", glm::transpose(camera->GetViewMatrix()));
-		shader->GetBinder()->SetMatrix4x4("Projection", (camera->GetProjectionMatrix()));
+		shader->GetBinder()->SetMatrix4x4("View", camera->GetViewMatrix());
+		shader->GetBinder()->SetMatrix4x4("Projection", camera->GetProjectionMatrix());
 		
 		shader->GetBinder()->TEMPUpdateAllConstants();
 		if (((int)(totalTime) % 2) == 0)
@@ -112,6 +113,7 @@ public:
 	}
 
 	Ref<Shader> shader;
+	Ref<ViewCameraController> viewCameraController;
 	Ref<TriangleMesh> triangle;
 	Ref<Texture2D> texture;
 	Ref<Texture2D> texture1;

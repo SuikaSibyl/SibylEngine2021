@@ -36,6 +36,7 @@ namespace SIByL
 
 	private:
 		bool OnWindowClosed(WindowCloseEvent& e);
+		bool OnWindowResized(WindowResizeEvent& e);
 
 	private:
 		Ref<Window> m_Window;
@@ -46,6 +47,8 @@ namespace SIByL
 		LayerStack m_LayerStack;
 
 		static Application* s_Instance;
+
+		bool m_IsMinimized = false;
 	};
 
 	// Defined in client

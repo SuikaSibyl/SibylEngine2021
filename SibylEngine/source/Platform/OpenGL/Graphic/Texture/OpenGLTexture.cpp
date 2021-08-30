@@ -32,8 +32,8 @@ namespace SIByL
 			m_Type = Texture2D::Type::R8G8B8A8;
 		}
 
-		glTextureParameteri(m_TexID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTextureParameteri(m_TexID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTextureParameteri(m_TexID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTextureParameteri(m_TexID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}

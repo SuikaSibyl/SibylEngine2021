@@ -240,6 +240,8 @@
     <ClInclude Include="source\Sibyl\Events\KeyEvent.h" />
     <ClInclude Include="source\Sibyl\Events\MouseEvent.h" />
     <ClInclude Include="source\Sibyl\Core\Log.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Animation\Core\AnimationCurve.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Animation\Core\KeyFrame.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Camera.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h" />
     <ClInclude Include="source\Sibyl\Graphic\Geometry\TriangleMesh.h" />

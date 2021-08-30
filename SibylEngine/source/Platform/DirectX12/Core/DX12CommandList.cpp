@@ -31,6 +31,8 @@ namespace SIByL
 		DXCall(commandAllocator->Reset());
 		DXCall(m_GraphicCmdList->Reset(commandAllocator.Get(), nullptr));
 
+		m_IsClosed = false;
+
 		// INIT
 		BindDescriptorHeaps();
 	}
@@ -40,6 +42,7 @@ namespace SIByL
 		DXCall(m_GraphicCmdList->Close());
 		ID3D12CommandList* cmdLists[] = { m_GraphicCmdList.Get() };
 		DX12Context::GetCommandQueue()->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+		m_IsClosed = true;
 	}
 
 	////////////////////////////////////////////////////////////////////////////////

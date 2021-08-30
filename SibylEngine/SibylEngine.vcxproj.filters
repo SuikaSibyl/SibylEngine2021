@@ -1373,6 +1373,12 @@
     <ClInclude Include="source\Sibyl\Components\ViewCameraController.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Animation\Core\KeyFrame.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Animation\Core\AnimationCurve.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\glm\glm\detail\func_common.inl">

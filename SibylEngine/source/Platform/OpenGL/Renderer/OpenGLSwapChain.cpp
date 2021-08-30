@@ -39,4 +39,9 @@ namespace SIByL
     {
         glfwSwapBuffers((GLFWwindow*)GLFWWindow::Get()->GetNativeWindow());
     }
+
+    void OpenGLSwapChain::Reisze(uint32_t width, uint32_t height)
+    {
+        glViewport(0, 0, width, height);
+    }
 }

@@ -82,6 +82,7 @@ namespace SIByL
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResized));
 
 		//SIByL_CORE_TRACE("{0}", e);
 
@@ -132,5 +133,19 @@ namespace SIByL
 	{
 		m_Running = false;
 		return true;
+	}
+
+	bool Application::OnWindowResized(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			m_IsMinimized = true;
+			return false;
+		}
+		
+		m_IsMinimized = false;
+		m_Window->GetGraphicContext()->OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 }

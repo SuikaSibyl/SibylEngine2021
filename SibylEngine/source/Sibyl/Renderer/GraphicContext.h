@@ -10,6 +10,7 @@ namespace SIByL
 	{
 	public:
 		virtual void Init() = 0;
+		virtual void OnWindowResize(uint32_t width, uint32_t height) = 0;
 
 	public:
 		Ref<SwapChain> GetSwapChain() { return m_SwapChain; }
