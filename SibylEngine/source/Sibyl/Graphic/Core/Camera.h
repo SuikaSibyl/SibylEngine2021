@@ -97,9 +97,18 @@ namespace SIByL
 
 	class OrthographicCamera :public Camera
 	{
+	public:
+		OrthographicCamera(float width, float height)
+		{
+			m_Width = width;
+			m_Height = height;
+			RecalculateProjectionMatrix();
+		}
+
+	protected:
 		virtual void RecalculateProjectionMatrix() override
 		{
-
+			m_Projection = glm::orthoLH_NO(-1.0f, 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
 		}
 	};
 

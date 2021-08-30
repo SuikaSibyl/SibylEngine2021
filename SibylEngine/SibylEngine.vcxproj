@@ -162,6 +162,7 @@
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\IndexBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Renderer.cpp" />
+    <ClCompile Include="source\Sibyl\Renderer\Renderer2D.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Shader.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\ShaderBinder.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\VertexBuffer.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="source\Sibyl\Core\LayerStack.h" />
     <ClInclude Include="source\Sibyl\Core\MouseButtonCodes.h" />
     <ClInclude Include="source\Sibyl\Core\FrameTimer.h" />
+    <ClInclude Include="source\Sibyl\Core\Timer.h" />
     <ClInclude Include="source\Sibyl\Core\Window.h" />
     <ClInclude Include="source\Sibyl\Events\ApplicationEvent.h" />
     <ClInclude Include="source\Sibyl\Events\Event.h" />

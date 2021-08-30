@@ -219,6 +219,9 @@
     <ClCompile Include="source\Sibyl\Components\ViewCameraController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Renderer\Renderer2D.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1377,6 +1380,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\Animation\Core\AnimationCurve.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Core\Timer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

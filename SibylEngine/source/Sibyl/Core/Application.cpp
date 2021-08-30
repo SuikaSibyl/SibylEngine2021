@@ -5,7 +5,7 @@
 #include "Sibyl/Core/Input.h"
 #include "glad/glad.h"
 #include "Sibyl/Renderer/GraphicContext.h"
-
+#include "Sibyl/Renderer/Renderer2D.h"
 #include "Sibyl/Graphic/Geometry/Vertex.h"
 
 namespace SIByL
@@ -42,6 +42,7 @@ namespace SIByL
 	{
 		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
 		Input::Destroy();
+		Renderer2D::Shutdown();
 	}
 
 	void Application::OnAwake()
@@ -53,12 +54,21 @@ namespace SIByL
 
 		synchronizer->StartFrame();
 		cmdList->Restart();
+
+		// ---------------------------------------
+
+		// Init::Renderer2D
+		// --------------------------------
+		Renderer2D::Init();
+		// Init::All Layers
+		// --------------------------------
 		for (Layer* layer : m_LayerStack)
 			layer->OnInitResource();
+
+		// ---------------------------------------
 		cmdList->Execute();
 		synchronizer->EndFrame();
 		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
-
 	}
 
 	void Application::Run()
