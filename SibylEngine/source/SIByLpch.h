@@ -27,6 +27,8 @@
 #include <unordered_set>
 
 #include "Sibyl/Core/Log.h"
+#include "Sibyl/Core/Instrumental.h"
+#include "entt.hpp"
 
 #ifdef SIBYL_PLATFORM_WINDOWS
 

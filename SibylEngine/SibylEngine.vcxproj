@@ -61,10 +61,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -84,10 +84,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glfw\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +112,7 @@
     <ClCompile Include="source\Platform\DirectX12\Core\RootSignature.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12FrameBuffer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Core\DX12Synchronizer.cpp" />
@@ -124,6 +125,7 @@
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Graphic\Texture\OpenGLTexture.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLFrameBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.cpp" />
     <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLShader.cpp" />
@@ -160,12 +162,14 @@
     <ClCompile Include="source\Sibyl\Graphic\Texture\Texture.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp" />
+    <ClCompile Include="source\Sibyl\Renderer\FrameBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\IndexBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Renderer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Renderer2D.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Shader.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\ShaderBinder.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\VertexBuffer.cpp" />
+    <ClCompile Include="source\Sibyl\Scene\scene.cpp" />
     <ClCompile Include="vendor\glad\src\glad.cpp" />
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
@@ -187,6 +191,7 @@
     <ClInclude Include="source\Platform\DirectX12\Core\RootSignature.h" />
     <ClInclude Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.h" />
     <ClInclude Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.h" />
+    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12FrameBuffer.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.h" />
     <ClInclude Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.h" />
     <ClInclude Include="source\Platform\DirectX12\Core\DX12Synchronizer.h" />
@@ -203,6 +208,7 @@
     <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h" />
     <ClInclude Include="source\Platform\OpenGL\Graphic\Texture\OpenGLTexture.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLCommandList.h" />
+    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLFrameBuffer.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.h" />
     <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLShader.h" />
@@ -224,18 +230,21 @@
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />
     <ClInclude Include="source\SIByLsettings.h" />
-    <ClInclude Include="source\Sibyl\Components\Transform.h" />
+    <ClInclude Include="source\Sibyl\Components\Components.h" />
+    <ClInclude Include="source\Sibyl\Components\Render\MeshRenderer.h" />
+    <ClInclude Include="source\Sibyl\Components\Render\SpriteRenderer.h" />
+    <ClInclude Include="source\Sibyl\Components\Common\Transform.h" />
     <ClInclude Include="source\Sibyl\Components\ViewCameraController.h" />
     <ClInclude Include="source\Sibyl\Core\Application.h" />
     <ClInclude Include="source\Sibyl\Core\Core.h" />
     <ClInclude Include="source\Sibyl\Core\EntryPoint.h" />
     <ClInclude Include="source\Sibyl\Core\Input.h" />
+    <ClInclude Include="source\Sibyl\Core\Instrumental.h" />
     <ClInclude Include="source\Sibyl\Core\KeyCodes.h" />
     <ClInclude Include="source\Sibyl\Core\Layer.h" />
     <ClInclude Include="source\Sibyl\Core\LayerStack.h" />
     <ClInclude Include="source\Sibyl\Core\MouseButtonCodes.h" />
     <ClInclude Include="source\Sibyl\Core\FrameTimer.h" />
-    <ClInclude Include="source\Sibyl\Core\Timer.h" />
     <ClInclude Include="source\Sibyl\Core\Window.h" />
     <ClInclude Include="source\Sibyl\Events\ApplicationEvent.h" />
     <ClInclude Include="source\Sibyl\Events\Event.h" />
@@ -268,6 +277,8 @@
     <ClInclude Include="source\Sibyl\Renderer\SwapChain.h" />
     <ClInclude Include="source\Sibyl\Renderer\Synchronizer.h" />
     <ClInclude Include="source\Sibyl\Renderer\VertexBuffer.h" />
+    <ClInclude Include="source\Sibyl\Scene\Scene.h" />
+    <ClInclude Include="vendor\entt\entt.hpp" />
     <ClInclude Include="vendor\glad\include\glad\glad.h" />
     <ClInclude Include="vendor\glad\include\KHR\khrplatform.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />

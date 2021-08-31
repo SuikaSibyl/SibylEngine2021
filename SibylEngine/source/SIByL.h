@@ -11,7 +11,14 @@
 #include "Sibyl/ImGui/ImGuiLayer.h"
 
 // EnterPoint
-#include "Sibyl/Core/EntryPoint.h"
+#include "Sibyl/Core/Instrumental.h"
+
+// ImGui
+#include "imgui.h"
+
+// Scene
+#include "Sibyl/Scene/Scene.h"
+#include "Sibyl/Components/Components.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -23,3 +30,9 @@
 #include "Sibyl/Renderer/Shader.h"
 #include "Sibyl/Graphic/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/Texture/Texture.h"
+#include "Sibyl/Renderer/Renderer2D.h"
+#include "Sibyl/Renderer/FrameBuffer.h"
+
+// Components
+#include <Sibyl/Graphic/Core/Camera.h>
+#include <Sibyl/Components/ViewCameraController.h>

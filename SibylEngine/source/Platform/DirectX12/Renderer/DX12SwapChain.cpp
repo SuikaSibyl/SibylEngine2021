@@ -161,6 +161,11 @@ namespace SIByL
 
     void DX12SwapChain::Reisze(uint32_t width, uint32_t height)
     {
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
         DX12GraphicCommandList* cmdList = DX12Context::GetGraphicCommandList();
 
         DX12Context::GetSynchronizer()->ForceSynchronize();

@@ -47,9 +47,9 @@ namespace SIByL
 
 		//s_Data->TexCheckboard = Texture2D::Create("checkboard.png");
 
-		//s_Data->TextureShader = Shader::Create("SIByL/Texture",
-		//	ShaderDesc({ true,layout }),
-		//	ShaderBinderDesc(CBlayouts, SRlayouts));
+		s_Data->TextureShader = Shader::Create("SIByL/Texture",
+			ShaderDesc({ true,layout }),
+			ShaderBinderDesc(CBlayouts, SRlayouts));
 
 		struct VertexData
 		{
@@ -77,9 +77,11 @@ namespace SIByL
 		delete s_Data;
 	}
 
-	void Renderer2D::BeginScene(const OrthographicCamera& camera)
+	void Renderer2D::BeginScene(Ref<Camera> camera)
 	{
-
+		s_Data->TextureShader->Use();
+		s_Data->TextureShader->GetBinder()->SetMatrix4x4("View", camera->GetViewMatrix());
+		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Projection", camera->GetProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
@@ -99,11 +101,25 @@ namespace SIByL
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, Ref<Texture2D> texture)
 	{
+		glm::mat4 model = glm::mat4(1.0f);
 
+		model = glm::translate(model, { position,0 });
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, Ref<Texture2D> texture)
 	{
+		glm::mat4 model = glm::mat4(1.0f);
 
+		model = glm::scale(model, { size, 1 });
+		model = glm::translate(model, { position });
+
+		s_Data->TextureShader->Use();
+		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", model);
+		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+
+		s_Data->TextureShader->GetBinder()->SetTexture2D("Main", texture);
+		s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
+
+		s_Data->QuadMesh->RasterDraw();
 	}
 }

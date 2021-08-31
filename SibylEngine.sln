@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylEngine", "SibylEngine\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylExample", "SibylExample\SibylExample.vcxproj", "{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylEditor", "SibylEditor\SibylEditor.vcxproj", "{901A25EC-013A-49C3-87A6-5D8D4CCFDD22}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BCC5C14C-384A-4B5B-A826-2A5456C7D33B} = {BCC5C14C-384A-4B5B-A826-2A5456C7D33B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +26,10 @@ Global
 		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Debug|x64.Build.0 = Debug|x64
 		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Release|x64.ActiveCfg = Release|x64
 		{44A31B46-129E-4B6B-9E9C-9C69D7619D2F}.Release|x64.Build.0 = Release|x64
+		{901A25EC-013A-49C3-87A6-5D8D4CCFDD22}.Debug|x64.ActiveCfg = Debug|x64
+		{901A25EC-013A-49C3-87A6-5D8D4CCFDD22}.Debug|x64.Build.0 = Debug|x64
+		{901A25EC-013A-49C3-87A6-5D8D4CCFDD22}.Release|x64.ActiveCfg = Release|x64
+		{901A25EC-013A-49C3-87A6-5D8D4CCFDD22}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

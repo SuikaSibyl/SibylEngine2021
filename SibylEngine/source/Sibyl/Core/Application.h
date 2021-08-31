@@ -16,7 +16,7 @@ namespace SIByL
 	class SIByL_API Application
 	{
 	public:
-		Application();
+		Application(const std::string& name = "SIByL Enigne");
 		virtual ~Application();
 
 		void Run();
@@ -29,6 +29,7 @@ namespace SIByL
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 		LayerStack& GetLayerStack() { return m_LayerStack; }
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }

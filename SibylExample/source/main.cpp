@@ -5,10 +5,10 @@
 
 using namespace SIByL;
 
-class ExampleLayer :public SIByL::Layer
+class EditorLayer :public SIByL::Layer
 {
 public:
-	ExampleLayer()
+	EditorLayer()
 		:Layer("Example")
 	{
 
@@ -22,48 +22,6 @@ public:
 
 	void OnInitResource() override
 	{
-		VertexBufferLayout layout =
-		{
-			{ShaderDataType::Float3, "POSITION"},
-			{ShaderDataType::Float2, "TEXCOORD"},
-		};
-
-		std::vector<ConstantBufferLayout> CBlayouts =
-		{
-			// ConstantBuffer1
-			{
-				{ShaderDataType::Mat4, "Model"},
-				{ShaderDataType::Mat4, "View"},
-				{ShaderDataType::Mat4, "Projection"},
-				{ShaderDataType::Float3, "Color"},
-			},
-		};
-
-		std::vector<ShaderResourceLayout> SRlayouts =
-		{
-			// ShaderResourceTable 1
-			{
-				{ShaderResourceType::Texture2D, "Main"},
-			},
-		};
-
-		VertexData vertices[] = {
-			0.5f, 0.5f, 0.0f,     1.0f,1.0f,  
-			0.5f, -0.5f, 0.0f,    1.0f,0.0f,  
-			-0.5f, -0.5f, 0.0f,   0.0f ,0.0f, 
-			-0.5f, 0.5f, 0.0f,	  0.0f,1.0f,  
-		};
-
-		uint32_t indices[] = { // 注意索引从0开始! 
-			0, 1, 3, // 第一个三角形
-			1, 2, 3  // 第二个三角形
-		};
-
-		shader = Shader::Create("Test/basic", 
-			ShaderDesc({ true,layout }), 
-			ShaderBinderDesc(CBlayouts, SRlayouts));
-
-		triangle = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
 		texture = Texture2D::Create("fen4.png");
 		texture1 = Texture2D::Create("amagami4.png");
 
@@ -71,19 +29,37 @@ public:
 			Application::Get().GetWindow().GetWidth(), 
 			Application::Get().GetWindow().GetHeight());
 
+		orthoCamera = std::make_shared<OrthographicCamera>(
+			Application::Get().GetWindow().GetWidth(),
+			Application::Get().GetWindow().GetHeight());
+
 		viewCameraController = std::make_shared<ViewCameraController>(camera);
+
+		FrameBufferDesc desc;
+		desc.Width = 1280;
+		desc.Height = 720;
+		m_FrameBuffer = FrameBuffer::Create(desc);
 	}
 
 	void OnUpdate() override
 	{
-		//if (SIByL::Input::IsKeyPressed(SIByL_KEY_A))
-		//	SIByL_APP_TRACE("Tab key is pressed!");
+		PROFILE_SCOPE_FUNCTION();
 
 		SIByL_CORE_INFO("FPS: {0}, {1} ms", 
 			Application::Get().GetFrameTimer()->GetFPS(),
 			Application::Get().GetFrameTimer()->GetMsPF());
 
 		viewCameraController->OnUpdate();
+	}
+
+	virtual void OnDrawImGui() 
+	{
+		ImGui::Begin("Setting");
+		unsigned int textureID = m_FrameBuffer->GetColorAttachment();
+		ImGui::Image((void*)textureID, ImVec2{ 512,512 }, { 1,1 }, { 0,0 });
+		ImGui::End();
+		static bool show = true;
+		//ImGui::ShowDemoWindow(&show);
 	}
 
 	void OnEvent(SIByL::Event& event) override
@@ -93,23 +69,11 @@ public:
 
 	void OnDraw() override
 	{
-		glm::mat4 model = glm::mat4(1.0f);
-
-		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
-		shader->Use();
-		shader->GetBinder()->SetFloat3("Color", { sin(totalTime),1,0 });
-		shader->GetBinder()->SetMatrix4x4("Model", model);
-		shader->GetBinder()->SetMatrix4x4("View", camera->GetViewMatrix());
-		shader->GetBinder()->SetMatrix4x4("Projection", camera->GetProjectionMatrix());
-		
-		shader->GetBinder()->TEMPUpdateAllConstants();
-		if (((int)(totalTime) % 2) == 0)
-			shader->GetBinder()->SetTexture2D("Main", texture);
-		else
-			shader->GetBinder()->SetTexture2D("Main", texture1);
-		shader->GetBinder()->TEMPUpdateAllResources();
-
-		triangle->RasterDraw();
+		m_FrameBuffer->Bind();
+		Renderer2D::BeginScene(camera);
+		Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
+		Renderer2D::EndScene();
+		m_FrameBuffer->Unbind();
 	}
 
 	Ref<Shader> shader;
@@ -118,17 +82,19 @@ public:
 	Ref<Texture2D> texture;
 	Ref<Texture2D> texture1;
 	Ref<Camera> camera;
+	Ref<Camera> orthoCamera;
+	Ref<FrameBuffer> m_FrameBuffer;
 };
 
-class Sandbox :public SIByL::Application
+class SIByLEditor :public SIByL::Application
 {
 public:
-	Sandbox()
+	SIByLEditor()
 	{
-		PushLayer(new ExampleLayer());
+		PushLayer(new EditorLayer());
 	}
 
-	~Sandbox()
+	~SIByLEditor()
 	{
 
 	}
@@ -137,8 +103,8 @@ public:
 SIByL::Application* SIByL::CreateApplication()
 {
 	//_CrtSetBreakAlloc(1330);
-	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
+	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
-	return new Sandbox();
+	return new SIByLEditor();
 }

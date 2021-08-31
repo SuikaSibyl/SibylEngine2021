@@ -28,6 +28,8 @@ namespace SIByL
 
 	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t vCount, Type type)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// Create VBO
 		glGenBuffers(1, &m_VertexBufferObject);
 		SetData(vertices, vCount, type);

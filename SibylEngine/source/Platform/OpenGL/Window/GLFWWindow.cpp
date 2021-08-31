@@ -22,6 +22,8 @@ namespace SIByL
 
 	GLFWWindow::GLFWWindow(const WindowProps& props)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		SIByL_CORE_ASSERT(!Main, "GLFW Window Already Exists!");
 		Main = this;
 		Init(props);
@@ -148,17 +150,23 @@ namespace SIByL
 
 	void GLFWWindow::Shutdown()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void GLFWWindow::OnUpdate()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		glfwPollEvents();
 		OpenGLRenderPipeline::DrawFrame();
 	}
 
 	void GLFWWindow::SetVSync(bool enabled)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		if (enabled)
 			glfwSwapInterval(1);
 		else

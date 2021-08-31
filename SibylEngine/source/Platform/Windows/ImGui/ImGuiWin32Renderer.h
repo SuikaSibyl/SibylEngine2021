@@ -39,5 +39,5 @@ IMGUI_IMPL_API float    ImGui_ImplWin32_GetDpiScaleForMonitor(void* monitor); //
 
 // Transparency related helpers (optional) [experimental]
 // - Bind to enable alpha compositing transparency with the desktop.
-// - Bind together with e.g. clearing your framebuffer with zero-alpha.
+// - Bind together with e.g. clearing your m_FrameBuffer with zero-alpha.
 IMGUI_IMPL_API void     ImGui_ImplWin32_EnableAlphaCompositing(void* hwnd);   // HWND hwnd

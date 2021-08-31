@@ -13,6 +13,8 @@ namespace SIByL
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		if (Main == nullptr) Main = this;
 		Init(props);
 	}
@@ -156,6 +158,30 @@ namespace SIByL
 		return DefWindowProc(hwnd, msg, wParam, lParam);
 	}
 
+	std::wstring string2wstring(std::string str)
+	{
+		std::wstring result;
+		int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
+		TCHAR* buffer = new TCHAR[len + 1];
+		MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), buffer, len);
+		buffer[len] = '\0';
+		result.append(buffer);
+		delete[] buffer;
+		return result;
+	}
+
+	std::string wstring2string(std::wstring wstr)
+	{
+		std::string result;
+		int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
+		char* buffer = new char[len + 1];
+		WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
+		buffer[len] = '\0';
+		result.append(buffer);
+		delete[] buffer;
+		return result;
+	}
+
 	void WindowsWindow::Init(const WindowProps& props)
 	{
 		m_Data.Title = props.Title;
@@ -196,8 +222,7 @@ namespace SIByL
 		int height = R.bottom - R.top;
 		SIByL_CORE_INFO("WindowsWindow Init finished");
 
-		std::wstring_convert<std::codecvt<wchar_t, char, mbstate_t>> converter(new std::codecvt<wchar_t, char, mbstate_t>("CHS"));
-		std::wstring mMainWndCaption = converter.from_bytes(props.Title);
+		std::wstring mMainWndCaption = string2wstring(props.Title);
 		mhMainWnd = CreateWindow(L"MainWnd", mMainWndCaption.c_str(),
 			WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mhAppInst, 0);
 		if (!mhMainWnd)
@@ -220,6 +245,8 @@ namespace SIByL
 
 	void WindowsWindow::Shutdown()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		DestroyWindow(mhMainWnd);
 	}
 
@@ -230,6 +257,8 @@ namespace SIByL
 
 	void WindowsWindow::OnUpdate()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		MSG msg = { 0 };
 
 		// If there are Window messages then process them.
@@ -244,6 +273,7 @@ namespace SIByL
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
+		PROFILE_SCOPE_FUNCTION();
 
 		m_Data.VSync = enabled;
 	}

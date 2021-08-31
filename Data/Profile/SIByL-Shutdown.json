@@ -1,0 +1,1 @@
+{"otherData": {},"traceEvents":[{"cat":"function","dur":22,"name":"__cdecl SIByL::Application::~Application(void)","ph":"X","pid":0,"tid":2947566954,"ts":334383108904},{"cat":"function","dur":11236,"name":"void __cdecl SIByL::GLFWWindow::Shutdown(void)","ph":"X","pid":0,"tid":2947566954,"ts":334383108974}]}

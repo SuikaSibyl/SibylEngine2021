@@ -1842,7 +1842,7 @@ void ImDrawData::DeIndexAllBuffers()
 
 // Helper to scale the ClipRect field of each ImDrawCmd.
 // Bind if your final output buffer is at a different scale than draw_data->DisplaySize,
-// or if there is a difference between your window resolution and framebuffer resolution.
+// or if there is a difference between your window resolution and m_FrameBuffer resolution.
 void ImDrawData::ScaleClipRects(const ImVec2& fb_scale)
 {
     for (int i = 0; i < CmdListsCount; i++)

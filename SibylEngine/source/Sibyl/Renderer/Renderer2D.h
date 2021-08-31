@@ -11,7 +11,7 @@ namespace SIByL
 		static void Init();
 		static void Shutdown();
 
-		static void BeginScene(const OrthographicCamera& camera);
+		static void BeginScene(Ref<Camera> camera);
 		static void EndScene();
 
 		// Primitives

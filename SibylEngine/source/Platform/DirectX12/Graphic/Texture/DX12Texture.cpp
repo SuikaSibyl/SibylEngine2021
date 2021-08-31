@@ -11,6 +11,8 @@ namespace SIByL
 {
 	DX12Texture2D::DX12Texture2D(const std::string& path)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Image image(path);
 		m_Path = path;
 		m_Width = image.GetWidth();

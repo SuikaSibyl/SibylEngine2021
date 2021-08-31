@@ -24,11 +24,15 @@ namespace SIByL
 
 	OpenGLShader::OpenGLShader()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		CompileFromString(vertexShaderSource, fragShaderSource);
 	}
 
 	OpenGLShader::OpenGLShader(std::string file, const ShaderDesc& shaderDesc, const ShaderBinderDesc& binderDesc)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Descriptor = shaderDesc;
 		m_BinderDescriptor = binderDesc;
 		CompileFromSingleFile(file);
@@ -37,12 +41,16 @@ namespace SIByL
 
 	OpenGLShader::OpenGLShader(std::string vFile, std::string pFile, const ShaderDesc& desc)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Descriptor = desc;
 		CompileFromFile(vFile, pFile);
 	}
 
 	void OpenGLShader::CompileFromFile(std::string vertexPath, std::string fragmentPath)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// 1. Get VERTEX/FRAGMENT From File Path
 		std::string vertexCode;
 		std::string fragmentCode;
@@ -78,6 +86,8 @@ namespace SIByL
 
 	void OpenGLShader::CompileFromString(const char* vertex, const char* fragment)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// ----------------------------
 		// Create Vertex Shader
 		// ----------------------------
@@ -142,6 +152,8 @@ namespace SIByL
 
 	void OpenGLShader::CreateBinder()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_ShaderBinder = ShaderBinder::Create(m_BinderDescriptor);
 		OpenGLShaderBinder* shaderBinder = dynamic_cast<OpenGLShaderBinder*>(m_ShaderBinder.get());
 		shaderBinder->SetOpenGLShaderId(m_ShaderProgram);
@@ -154,6 +166,8 @@ namespace SIByL
 
 	void OpenGLShader::CompileFromSingleFile(std::string glslPath)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// 1. Get VERTEX/FRAGMENT From File Path
 		std::string glslCode;
 		std::ifstream shaderFile;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Components/Transform.h"
+#include "Sibyl/Components/Common/Transform.h"
 
 namespace SIByL
 {
@@ -58,6 +58,9 @@ namespace SIByL
 		virtual void RecalculateProjectionMatrix() = 0;
 		void Resize(float width, float height)
 		{
+			if (width <= 0 || height <= 0)
+				return;
+
 			m_Width = width;
 			m_Height = height;
 			RecalculateProjectionMatrix();

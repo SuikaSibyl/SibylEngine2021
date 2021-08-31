@@ -10,6 +10,8 @@ namespace SIByL
 		unsigned int* indices, uint32_t iCount,
 		VertexBufferLayout layout)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// Create VAO
 		glGenVertexArrays(1, &m_VertexArrayObject);
 		glBindVertexArray(m_VertexArrayObject);
@@ -22,6 +24,8 @@ namespace SIByL
 
 	void OpenGLTriangleMesh::RasterDraw()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		glBindVertexArray(m_VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, m_IndexBuffer->Count() , GL_UNSIGNED_INT, 0);
 	}

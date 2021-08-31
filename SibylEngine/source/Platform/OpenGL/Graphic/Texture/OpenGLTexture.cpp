@@ -10,6 +10,8 @@ namespace SIByL
 	OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		:m_Path(path)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Image image(m_Path);
 		m_Width = image.GetWidth();
 		m_Height = image.GetHeight();

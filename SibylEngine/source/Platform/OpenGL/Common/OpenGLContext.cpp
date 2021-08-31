@@ -15,6 +15,8 @@ namespace SIByL
 	OpenGLContext::OpenGLContext(GLFWwindow* windowHandle)
 		:m_WindowHandle(windowHandle)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		SIByL_CORE_ASSERT(windowHandle, "WindowHandle is NULL!");
 		SIByL_CORE_ASSERT(!Main, "OpenGL Context Already Exists!");
 		Main = this;
@@ -26,6 +28,8 @@ namespace SIByL
 
 	OpenGLContext::~OpenGLContext()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Application::Get().OnResourceDestroy();
 	}
 
@@ -45,6 +49,8 @@ namespace SIByL
 
 	void OpenGLContext::OnWindowResize(uint32_t width, uint32_t height)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_SwapChain->Reisze(width, height);
 	}
 }

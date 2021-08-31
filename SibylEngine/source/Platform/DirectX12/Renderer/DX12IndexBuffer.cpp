@@ -9,12 +9,16 @@ namespace SIByL
 {
 	DX12IndexBuffer::DX12IndexBuffer(unsigned int* indices, uint32_t iCount)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Count = iCount;
 		SetData(indices, iCount);
 	}
 
 	void DX12IndexBuffer::SetData(unsigned int* indices, UINT32 number)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_IndexBuffer = CreateDefaultBuffer(sizeof(unsigned int) * number, indices);
 		m_IndexBufferView.BufferLocation = m_IndexBuffer->GetGPUVirtualAddress();
 		m_IndexBufferView.Format = DXGI_FORMAT_R32_UINT;

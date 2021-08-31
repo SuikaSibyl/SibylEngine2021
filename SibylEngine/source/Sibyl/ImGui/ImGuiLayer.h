@@ -25,6 +25,9 @@ namespace SIByL
 
 		static ImGuiLayer* Create();
 		static inline ImGuiLayer* Get() { return Main; }
+
+		void SetBlockEvents(bool block) { m_BlockEvents = block; }
+
 	protected:
 		virtual void PlatformInit() {};
 		virtual void NewFrameBegin() {};
@@ -33,6 +36,7 @@ namespace SIByL
 
 	private:
 		float m_Time = 0.0f;
+		bool m_BlockEvents = false;
 		static ImGuiLayer* Main;
 	};
 }

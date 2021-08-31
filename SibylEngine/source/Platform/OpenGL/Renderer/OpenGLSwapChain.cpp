@@ -17,6 +17,7 @@ namespace SIByL
         : SwapChain(width, height)
     {
 
+
     }
 
     void OpenGLSwapChain::BindRenderTarget()
@@ -26,22 +27,34 @@ namespace SIByL
 
     void OpenGLSwapChain::SetRenderTarget()
     {
+        PROFILE_SCOPE_FUNCTION();
+
         glClearColor(0.0, 0.0, 0.0, 0.0);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
     void OpenGLSwapChain::PreparePresent()
     {
+        PROFILE_SCOPE_FUNCTION();
 
     }
 
     void OpenGLSwapChain::Present()
     {
+        PROFILE_SCOPE_FUNCTION();
+
         glfwSwapBuffers((GLFWwindow*)GLFWWindow::Get()->GetNativeWindow());
     }
 
     void OpenGLSwapChain::Reisze(uint32_t width, uint32_t height)
     {
+        PROFILE_SCOPE_FUNCTION();
+
+        if (width <= 0 || height <= 0)
+        {
+            return;
+        }
+
         glViewport(0, 0, width, height);
     }
 }

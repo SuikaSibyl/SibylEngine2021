@@ -12,6 +12,8 @@ namespace SIByL
 
 	void DX12Context::Init()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		SIByL_CORE_ASSERT(!Main, "DX12 Environment already exists!");
 		Main = this;
 		EnableDebugLayer();
@@ -35,11 +37,15 @@ namespace SIByL
 
 	void DX12Context::OnWindowResize(uint32_t width, uint32_t height)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_SwapChain->Reisze(width, height);
 	}
 
 	DX12Context::~DX12Context()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		//Application::Get().OnResourceDestroy();
 		m_Synchronizer->ForceSynchronize();
 

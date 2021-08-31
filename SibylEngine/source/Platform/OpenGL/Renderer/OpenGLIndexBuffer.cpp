@@ -7,6 +7,8 @@ namespace SIByL
 {
 	OpenGLIndexBuffer::OpenGLIndexBuffer(unsigned int* indices, uint32_t iCount)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Count = iCount;
 		glGenBuffers(1, &m_ElementBufferObject);
 		SetData(indices, iCount);

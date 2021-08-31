@@ -24,6 +24,8 @@ namespace SIByL
 
 	void DX12RenderPipeline::DrawFrameImpl()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		DX12GraphicCommandList* cmdList = DX12Context::GetGraphicCommandList();
 		SwapChain* swapChain = DX12Context::GetSwapChain();
 		DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
@@ -35,8 +37,12 @@ namespace SIByL
 		// -------------------------------------
 		swapChain->SetRenderTarget();
 
-		// Drawcalls
-		Application::Get().OnDraw();
+		{
+			PROFILE_SCOPE("Draw Layers");
+			// Drawcalls
+			Application::Get().OnDraw();
+			
+		}
 
 		swapChain->PreparePresent();
 		cmdList->Execute();

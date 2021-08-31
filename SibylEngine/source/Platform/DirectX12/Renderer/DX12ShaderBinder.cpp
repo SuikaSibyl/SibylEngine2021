@@ -10,6 +10,8 @@ namespace SIByL
 {
 	void DX12ShaderBinder::SetFloat(const std::string& name, const float& value)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		ShaderConstantItem item;
 		if (m_ConstantsMapper.FetchConstant(name, item))
 		{
@@ -19,6 +21,8 @@ namespace SIByL
 
 	void DX12ShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		ShaderConstantItem item;
 		if (m_ConstantsMapper.FetchConstant(name, item))
 		{
@@ -28,6 +32,8 @@ namespace SIByL
 
 	void DX12ShaderBinder::SetFloat4(const std::string& name, const glm::vec4& value)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		ShaderConstantItem item;
 		if (m_ConstantsMapper.FetchConstant(name, item))
 		{
@@ -37,6 +43,8 @@ namespace SIByL
 
 	void DX12ShaderBinder::SetMatrix4x4(const std::string& name, const glm::mat4& value)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		ShaderConstantItem item;
 		if (m_ConstantsMapper.FetchConstant(name, item))
 		{
@@ -46,6 +54,8 @@ namespace SIByL
 
 	void DX12ShaderBinder::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		ShaderResourceItem item;
 		if (m_ResourcesMapper.FetchResource(name, item))
 		{
@@ -57,6 +67,8 @@ namespace SIByL
 
 	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Desc = desc;
 		InitMappers(desc);
 		BuildRootSignature();
@@ -77,6 +89,8 @@ namespace SIByL
 
 	DX12ShaderBinder::~DX12ShaderBinder()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		for (int i = 0; i < m_Desc.ConstantBufferCount(); i++)
 		{
 			m_ConstantsTableBuffer[i] = nullptr;
@@ -87,18 +101,24 @@ namespace SIByL
 	void DX12ShaderBinder::CopyMemoryToConstantsBuffer
 		(void* data, int index, uint32_t offset, uint32_t length)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
 		buffer->CopyMemoryToConstantsBuffer(data, offset, length);
 	}
 
 	void DX12ShaderBinder::UpdateConstantsBuffer(int index)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
 		buffer->UploadCurrentBuffer();
 	}
 	
 	void DX12ShaderBinder::BindConstantsBuffer(int index)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
 		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = buffer->GetCurrentGPUAddress();
 
@@ -108,6 +128,8 @@ namespace SIByL
 
 	void DX12ShaderBinder::Bind()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// Bind Root Signature
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
 		cmdList->SetGraphicsRootSignature(GetRootSignature());
@@ -122,6 +144,8 @@ namespace SIByL
 
 	void DX12ShaderBinder::BuildRootSignature()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// Perfomance TIP: Order from most frequent to least frequent.
 		// ----------------------------------------------------------------------
 		size_t parameterCount = m_Desc.m_ConstantBufferLayouts.size()

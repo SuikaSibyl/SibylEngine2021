@@ -12,8 +12,9 @@ namespace SIByL
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
+		PROFILE_SCOPE_FUNCTION();
 		// Init Application
 		// --------------------------------
 		SIByL_CORE_ASSERT(!s_Instance, "Application already exists!");
@@ -21,7 +22,7 @@ namespace SIByL
 
 		// Init: Window
 		// --------------------------------
-		m_Window = Window::Create();
+		m_Window = Window::Create(WindowProps(name));
 
 		// Init: Input System
 		// --------------------------------
@@ -30,7 +31,7 @@ namespace SIByL
 
 		// Init: ImGui
 		// --------------------------------
-		PushOverlay(SIByL::ImGuiLayer::Create());
+		PushOverlay(m_ImGuiLayer = SIByL::ImGuiLayer::Create());
 
 		// Init: Frame Timer
 		// --------------------------------
@@ -40,6 +41,7 @@ namespace SIByL
 
 	Application::~Application()
 	{
+		PROFILE_SCOPE_FUNCTION();
 		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
 		Input::Destroy();
 		Renderer2D::Shutdown();
@@ -47,6 +49,7 @@ namespace SIByL
 
 	void Application::OnAwake()
 	{
+		PROFILE_SCOPE_FUNCTION();
 		// Awake: Render Objects
 		// --------------------------------
 		Ref<CommandList> cmdList = m_Window->GetGraphicContext()->GetCommandList();
@@ -73,6 +76,8 @@ namespace SIByL
 
 	void Application::Run()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		while (m_Running)
 		{
 			m_FrameTimer->Tick();
@@ -90,6 +95,8 @@ namespace SIByL
 
 	void Application::OnEvent(Event& e)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClosed));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResized));
@@ -106,6 +113,8 @@ namespace SIByL
 
 	void Application::OnDraw()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		for (auto layer : m_LayerStack)
 		{
 			layer->OnDraw();
@@ -114,6 +123,8 @@ namespace SIByL
 
 	void Application::OnResourceDestroy()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		for (auto layer : m_LayerStack)
 		{
 			layer->OnReleaseResource();
@@ -121,6 +132,7 @@ namespace SIByL
 	}
 	void Application::DrawImGui()
 	{
+		PROFILE_SCOPE_FUNCTION();
 		for (auto layer : m_LayerStack)
 		{
 			layer->OnDrawImGui();
@@ -141,12 +153,16 @@ namespace SIByL
 
 	bool Application::OnWindowClosed(WindowCloseEvent& e)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Running = false;
 		return true;
 	}
 
 	bool Application::OnWindowResized(WindowResizeEvent& e)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
 			m_IsMinimized = true;

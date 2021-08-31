@@ -10,17 +10,23 @@ namespace SIByL
 {
 	DX12VertexBuffer::DX12VertexBuffer(float* vertices, uint32_t floatCount, Type type)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_FloatCount = floatCount;
 		SetData(vertices, floatCount, type);
 	}
 
 	void DX12VertexBuffer::SetData(float* vertices, UINT32 number, Type type)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_VertexBuffer = CreateDefaultBuffer(sizeof(float) * number, vertices);
 	}
 
 	void DX12VertexBuffer::SetLayout(const VertexBufferLayout& layout)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Layout = layout;
 		m_VertexBufferView.BufferLocation = m_VertexBuffer->GetGPUVirtualAddress();
 		m_VertexBufferView.SizeInBytes = sizeof(float) * m_FloatCount;

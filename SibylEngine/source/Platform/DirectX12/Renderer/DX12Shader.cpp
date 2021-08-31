@@ -40,6 +40,8 @@ namespace SIByL
 
 	DX12Shader::DX12Shader(std::string file, const ShaderBinderDesc& binderDesc, const ShaderDesc& desc)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Descriptor = desc;
 		m_BinderDescriptor = binderDesc;
 		m_VertexBufferLayout = desc.inputLayout;
@@ -52,6 +54,8 @@ namespace SIByL
 	
 	DX12Shader::DX12Shader(std::string vFile, std::string pFile, const ShaderDesc& desc)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_Descriptor = desc;
 		m_VsBytecode = CompileFromFile(AnsiToWString(vFile), nullptr, "VS", "vs_5_1");
 		m_PsBytecode = CompileFromFile(AnsiToWString(pFile), nullptr, "PS", "ps_5_1");
@@ -59,6 +63,8 @@ namespace SIByL
 
 	void DX12Shader::Use()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// Set PSO
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
 		cmdList->SetPipelineState(m_PipelineStateObject.Get());
@@ -68,6 +74,8 @@ namespace SIByL
 
 	void DX12Shader::CreateBinder()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		m_ShaderBinder = ShaderBinder::Create(m_BinderDescriptor);
 		SetVertexBufferLayout();
 		CreatePSO();
@@ -75,6 +83,8 @@ namespace SIByL
 
 	void DX12Shader::SetVertexBufferLayout()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		for (const auto& element : m_VertexBufferLayout)
 		{
 			m_InputLayoutDesc.push_back(
@@ -90,6 +100,8 @@ namespace SIByL
 		const std::string& enteryPoint,
 		const std::string& target)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// If in debug mode, compile using DEBUG Mode
 		UINT compileFlags = 0;
 #if defined(DEBUG) || defined(_DEBUG)
@@ -122,6 +134,8 @@ namespace SIByL
 
 	void DX12Shader::CreatePSO()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		DX12ShaderBinder* dxShaderBinder = dynamic_cast<DX12ShaderBinder*>(m_ShaderBinder.get());
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 		ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));

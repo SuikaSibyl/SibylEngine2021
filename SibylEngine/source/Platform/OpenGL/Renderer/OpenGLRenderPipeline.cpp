@@ -17,6 +17,8 @@ namespace SIByL
 
 	void OpenGLRenderPipeline::DrawFrameImpl()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		Ref<SwapChain> swapChain = OpenGLContext::Get()->GetSwapChain();
 
 		// Bind Swap Chain as Render Target

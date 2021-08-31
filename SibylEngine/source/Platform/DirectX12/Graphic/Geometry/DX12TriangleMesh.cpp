@@ -13,6 +13,8 @@ namespace SIByL
 		unsigned int* indices, uint32_t iCount, 
 		VertexBufferLayout layout)
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		// Bind Vertex Buffer & IndexBuffer
 		m_VertexBuffer.reset(VertexBuffer::Create(vertices, vCount));
 		m_VertexBuffer->SetLayout(layout);
@@ -21,6 +23,8 @@ namespace SIByL
 
 	void DX12TriangleMesh::RasterDraw()
 	{
+		PROFILE_SCOPE_FUNCTION();
+
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
 		DX12VertexBuffer* dxVertexBuffer = dynamic_cast<DX12VertexBuffer*>(m_VertexBuffer.get());
 		cmdList->IASetVertexBuffers(0, 1, &(dxVertexBuffer->GetVertexBufferView()));
