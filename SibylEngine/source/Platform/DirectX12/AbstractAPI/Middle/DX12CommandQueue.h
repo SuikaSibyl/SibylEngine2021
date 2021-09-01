@@ -1,11 +1,12 @@
 #pragma once
 
 #include "SIByLpch.h"
-
-class DX12CommandList;
+#include "Sibyl/Basic/ThreadSafeQueue.h"
 
 namespace SIByL
 {
+    class DX12CommandList;
+
 	class DX12CommandQueue
 	{
 	public:
@@ -17,8 +18,8 @@ namespace SIByL
 
 		// Execute a command list.
 		// Returns the fence value to wait for for this command list.
-		uint64_t ExecuteCommandList(std::shared_ptr<DX12CommandList> commandList);
-		uint64_t ExecuteCommandLists(const std::vector<std::shared_ptr<DX12CommandList> >& commandLists);
+		uint64_t ExecuteCommandList(Ref<DX12CommandList> commandList);
+		uint64_t ExecuteCommandLists(const std::vector<Ref<DX12CommandList> >& commandLists);
 
 		uint64_t Signal();
 		bool IsFenceComplete(uint64_t fenceValue);
@@ -36,7 +37,7 @@ namespace SIByL
         // Keep track of command allocators that are "in-flight"
         // The first member is the fence value to wait for, the second is the 
         // a shared pointer to the "in-flight" command list.
-        using CommandListEntry = std::tuple<uint64_t, std::shared_ptr<DX12CommandQueue> >;
+        using CommandListEntry = std::tuple<uint64_t, Ref<DX12CommandList> >;
 
         D3D12_COMMAND_LIST_TYPE                         m_CommandListType;
         Microsoft::WRL::ComPtr<ID3D12CommandQueue>      m_d3d12CommandQueue;
@@ -44,7 +45,7 @@ namespace SIByL
         std::atomic_uint64_t                            m_FenceValue;
 
         ThreadSafeQueue<CommandListEntry>               m_InFlightCommandLists;
-        ThreadSafeQueue<std::shared_ptr<DX12CommandList> >  m_AvailableCommandLists;
+        ThreadSafeQueue<Ref<DX12CommandList>>           m_AvailableCommandLists;
 
         // A thread to process in-flight command lists.
         std::thread m_ProcessInFlightCommandListsThread;

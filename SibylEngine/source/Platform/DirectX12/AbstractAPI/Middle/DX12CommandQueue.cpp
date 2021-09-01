@@ -86,9 +86,9 @@ namespace SIByL
         WaitForFenceValue(m_FenceValue);
     }
 
-    std::shared_ptr<DX12CommandList> DX12CommandQueue::GetCommandList()
+    Ref<DX12CommandList> DX12CommandQueue::GetCommandList()
     {
-        std::shared_ptr<DX12CommandList> commandList;
+        Ref<DX12CommandList> commandList;
 
         // If there is a command list on the queue.
         if (!m_AvailableCommandLists.Empty())
@@ -98,7 +98,7 @@ namespace SIByL
         else
         {
             // Otherwise create a new command list.
-            commandList = std::make_shared<CommandList>(m_CommandListType);
+            commandList = CreateRef<DX12CommandList>(m_CommandListType);
         }
 
         return commandList;
@@ -106,12 +106,12 @@ namespace SIByL
 
     // Execute a command list.
     // Returns the fence value to wait for for this command list.
-    uint64_t DX12CommandQueue::ExecuteCommandList(std::shared_ptr<DX12CommandList> commandList)
+    uint64_t DX12CommandQueue::ExecuteCommandList(Ref<DX12CommandList> commandList)
     {
         return ExecuteCommandLists(std::vector<std::shared_ptr<DX12CommandList> >({ commandList }));
     }
 
-    uint64_t DX12CommandQueue::ExecuteCommandLists(const std::vector<std::shared_ptr<DX12CommandList> >& commandLists)
+    uint64_t DX12CommandQueue::ExecuteCommandLists(const std::vector<Ref<DX12CommandList> >& commandLists)
     {
         DX12ResourceStateTracker::Lock();
 
@@ -143,11 +143,11 @@ namespace SIByL
             toBeQueued.push_back(pendingCommandList);
             toBeQueued.push_back(commandList);
 
-            auto generateMipsCommandList = commandList->GetGenerateMipsCommandList();
-            if (generateMipsCommandList)
-            {
-                generateMipsCommandLists.push_back(generateMipsCommandList);
-            }
+            //auto generateMipsCommandList = commandList->GetGenerateMipsCommandList();
+            //if (generateMipsCommandList)
+            //{
+            //    generateMipsCommandLists.push_back(generateMipsCommandList);
+            //}
         }
 
         UINT numCommandLists = static_cast<UINT>(d3d12CommandLists.size());
@@ -162,14 +162,14 @@ namespace SIByL
             m_InFlightCommandLists.Push({ fenceValue, commandList });
         }
 
-        // If there are any command lists that generate mips then execute those
-        // after the initial resource command lists have finished.
-        if (generateMipsCommandLists.size() > 0)
-        {
-            auto computeQueue = Application::Get().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE);
-            computeQueue->Wait(*this);
-            computeQueue->ExecuteCommandLists(generateMipsCommandLists);
-        }
+        //// If there are any command lists that generate mips then execute those
+        //// after the initial resource command lists have finished.
+        //if (generateMipsCommandLists.size() > 0)
+        //{
+        //    auto computeQueue = Application::Get().GetCommandQueue(D3D12_COMMAND_LIST_TYPE_COMPUTE);
+        //    computeQueue->Wait(*this);
+        //    computeQueue->ExecuteCommandLists(generateMipsCommandLists);
+        //}
 
         return fenceValue;
     }

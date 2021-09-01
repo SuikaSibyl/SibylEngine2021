@@ -1,17 +1,17 @@
 #pragma once
 
 #include "SIByLpch.h"
-// The DynamicDescriptorHeap class handles copying of CPU visible descriptors to GPU visible descriptor heaps.
-// The purpose of the DynamicDescriptorHeap class is to allocate GPU visible descriptors that are used for
+// The DX12DynamicDescriptorHeap class handles copying of CPU visible descriptors to GPU visible descriptor heaps.
+// The purpose of the DX12DynamicDescriptorHeap class is to allocate GPU visible descriptors that are used for
 // binding CBV, SRV, UAV, and Samplers to the GPU pipeline for rendering or compute invocations.
 // This is necessary since the descriptors provided by the DescriptorAllocator class are CPU visible
 // and cannot be used to bind resources to the GPU rendering pipeline.
 
-// The DynamicDescriptorHeap class provides a staging area for CPU visible descriptors
+// The DX12DynamicDescriptorHeap class provides a staging area for CPU visible descriptors
 // that are committed to GPU visible descriptor heaps when a Draw or Dispatch method is invoked on the command list.
 
 // Since only a single CBV_SRV_UAV descriptor heap and a single SAMPLER descriptor heap can be bound to the command list at the same time,
-// the DynamicDescriptorHeap class also ensures that the currently bound descriptor heap has a sufficient number of descriptors
+// the DX12DynamicDescriptorHeap class also ensures that the currently bound descriptor heap has a sufficient number of descriptors
 // to commit all of the staged descriptors before a Draw or Dispatch command is executed.
 // If the currently bound descriptor heap runs out of descriptors, then a new descriptor heap is bound to the command list.
 namespace SIByL
@@ -19,14 +19,14 @@ namespace SIByL
     class CommandList;
     class RootSignature;
 
-    class DynamicDescriptorHeap
+    class DX12DynamicDescriptorHeap
     {
     public:
-        DynamicDescriptorHeap(
+        DX12DynamicDescriptorHeap(
             D3D12_DESCRIPTOR_HEAP_TYPE heapType,
             uint32_t numDescriptorsPerHeap = 128);
 
-        virtual ~DynamicDescriptorHeap();
+        virtual ~DX12DynamicDescriptorHeap();
 
         /**
          * Stages a contiguous range of CPU visible descriptors.
@@ -49,7 +49,7 @@ namespace SIByL
          *   * Before a draw    : ID3D12GraphicsCommandList::SetGraphicsRootDescriptorTable
          *   * Before a dispatch: ID3D12GraphicsCommandList::SetComputeRootDescriptorTable
          *
-         * Since the DynamicDescriptorHeap can't know which function will be used, it must
+         * Since the DX12DynamicDescriptorHeap can't know which function will be used, it must
          * be passed as an argument to the function.
          */
         void CommitStagedDescriptors(std::function<void(ID3D12GraphicsCommandList*, UINT, D3D12_GPU_DESCRIPTOR_HANDLE)> setFunc);

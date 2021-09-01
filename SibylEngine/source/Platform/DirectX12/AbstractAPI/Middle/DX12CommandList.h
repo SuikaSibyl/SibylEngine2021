@@ -5,14 +5,18 @@
 namespace SIByL
 {
 	class DX12Resource;
+	class DX12UploadBuffer;
 	class DX12ResourceStateTracker;
+	class DX12DynamicDescriptorHeap;
+
 
 	class DX12CommandList
 	{
 	public:
 		/////////////////////////////////////////////////////////
 		///				        Constructors     	          ///
-		DX12CommandList();
+		DX12CommandList(D3D12_COMMAND_LIST_TYPE type);
+		virtual ~DX12CommandList();
 
 		/////////////////////////////////////////////////////////
 		///				        Commands         	          ///
@@ -22,6 +26,10 @@ namespace SIByL
 		bool Close(DX12CommandList& pendingCommandList);
 		// Just close the command list. This is useful for pending command lists.
 		void Close();
+
+		void Reset();
+
+		void ReleaseTrackedObjects();
 
 		// Resource Barrier Series ------------------------------
 
@@ -52,7 +60,18 @@ namespace SIByL
 		void TrackResource(const DX12Resource& res);
 
 	private:
-		Scope<DX12ResourceStateTracker> m_ResourceStateTracker;
+		Scope<DX12ResourceStateTracker>		m_ResourceStateTracker;
+		ComPtr<ID3D12CommandAllocator>		m_d3d12CommandAllocator;
+		Scope<DX12UploadBuffer>				m_UploadBuffer;
+		Scope<DX12DynamicDescriptorHeap>	m_DynamicDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+		ID3D12DescriptorHeap*				m_DescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+		// For copy queues, it may be necessary to generate mips while loading textures.
+		// Mips can't be generated on copy queues but must be generated on compute or
+		// direct queues. In this case, a Compute command list is generated and executed 
+		// after the copy queue is finished uploading the first sub resource.
+		Ref<CommandList>					m_ComputeCommandList;
+		// Keep track of the currently bound root signatures to minimize root signature changes.
+		ID3D12RootSignature*				m_RootSignature;
 
 		// Objects that are being tracked by a command list that is "in-flight" on 
 		// the command-queue and cannot be deleted. To ensure objects are not deleted 

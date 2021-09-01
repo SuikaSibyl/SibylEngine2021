@@ -21,7 +21,7 @@ namespace SIByL
 		DX12ShaderBinder(const ShaderBinderDesc& desc);
 		ID3D12RootSignature* GetRootSignature() { return m_RootSignature->GetRootSignature().Get(); }
 		virtual void Bind() override;
-		Ref<DynamicDescriptorHeap> GetSrvDynamicDescriptorHeap() { return m_SrvDynamicDescriptorHeap; }
+		Ref<DX12DynamicDescriptorHeap> GetSrvDynamicDescriptorHeap() { return m_SrvDynamicDescriptorHeap; }
 
 		void TEMPUpdateAllConstants()
 		{
@@ -38,8 +38,8 @@ namespace SIByL
 
 	private:
 		Ref<RootSignature> m_RootSignature;
-		Ref<DynamicDescriptorHeap> m_SrvDynamicDescriptorHeap;
-		Ref<DynamicDescriptorHeap> m_SamplerDynamicDescriptorHeap;
+		Ref<DX12DynamicDescriptorHeap> m_SrvDynamicDescriptorHeap;
+		Ref<DX12DynamicDescriptorHeap> m_SamplerDynamicDescriptorHeap;
 		ShaderBinderDesc m_Desc;
 
 		Ref<DX12FrameResourceBuffer>* m_ConstantsTableBuffer;

@@ -59,7 +59,7 @@ namespace SIByL
 		ShaderResourceItem item;
 		if (m_ResourcesMapper.FetchResource(name, item))
 		{
-			Ref<DynamicDescriptorHeap> sddh = GetSrvDynamicDescriptorHeap();
+			Ref<DX12DynamicDescriptorHeap> sddh = GetSrvDynamicDescriptorHeap();
 			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
 			sddh->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
 		}
@@ -74,8 +74,8 @@ namespace SIByL
 		BuildRootSignature();
 
 		// Init Shader Resource Buffer
-		m_SrvDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		m_SamplerDynamicDescriptorHeap = std::make_shared<DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+		m_SrvDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_SamplerDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 		m_SrvDynamicDescriptorHeap->ParseRootSignature(*m_RootSignature);
 
 		// Init Constant Buffer

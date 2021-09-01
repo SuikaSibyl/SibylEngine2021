@@ -8,7 +8,7 @@
 
 namespace SIByL
 {
-    DynamicDescriptorHeap::DynamicDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptorsPerHeap)
+    DX12DynamicDescriptorHeap::DX12DynamicDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, uint32_t numDescriptorsPerHeap)
         : m_DescriptorHeapType(heapType)
         , m_NumDescriptorsPerHeap(numDescriptorsPerHeap)
         , m_DescriptorTableBitMask(0)
@@ -23,10 +23,10 @@ namespace SIByL
         m_DescriptorHandleCache = std::make_unique<D3D12_CPU_DESCRIPTOR_HANDLE[]>(m_NumDescriptorsPerHeap);
     }
 
-    DynamicDescriptorHeap::~DynamicDescriptorHeap()
+    DX12DynamicDescriptorHeap::~DX12DynamicDescriptorHeap()
     {}
     
-    void DynamicDescriptorHeap::ParseRootSignature(const RootSignature& rootSignature)
+    void DX12DynamicDescriptorHeap::ParseRootSignature(const RootSignature& rootSignature)
     {
         // If the root signature changes, all descriptors must be (re)bound to the
         // command list.
@@ -59,7 +59,7 @@ namespace SIByL
         assert(currentOffset <= m_NumDescriptorsPerHeap && "The root signature requires more than the maximum number of descriptors per descriptor heap. Consider increasing the maximum number of descriptors per descriptor heap.");
     }
     
-    void DynamicDescriptorHeap::StageDescriptors(uint32_t rootParameterIndex, uint32_t offset, uint32_t numDescriptors, const D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptor)
+    void DX12DynamicDescriptorHeap::StageDescriptors(uint32_t rootParameterIndex, uint32_t offset, uint32_t numDescriptors, const D3D12_CPU_DESCRIPTOR_HANDLE srcDescriptor)
     {
         // Cannot stage more than the maximum number of descriptors per heap.
         // Cannot stage more than MaxDescriptorTables root parameters.
@@ -88,7 +88,7 @@ namespace SIByL
         m_StaleDescriptorTableBitMask |= (1 << rootParameterIndex);
     }
     
-    uint32_t DynamicDescriptorHeap::ComputeStaleDescriptorCount() const
+    uint32_t DX12DynamicDescriptorHeap::ComputeStaleDescriptorCount() const
     {
         uint32_t numStaleDescriptors = 0;
         DWORD i;
@@ -103,7 +103,7 @@ namespace SIByL
         return numStaleDescriptors;
     }
     
-    ComPtr<ID3D12DescriptorHeap> DynamicDescriptorHeap::RequestDescriptorHeap()
+    ComPtr<ID3D12DescriptorHeap> DX12DynamicDescriptorHeap::RequestDescriptorHeap()
     {
         ComPtr<ID3D12DescriptorHeap> descriptorHeap;
         if (!m_AvailableDescriptorHeaps.empty())
@@ -120,7 +120,7 @@ namespace SIByL
         return descriptorHeap;
     }
     
-    ComPtr<ID3D12DescriptorHeap> DynamicDescriptorHeap::CreateDescriptorHeap()
+    ComPtr<ID3D12DescriptorHeap> DX12DynamicDescriptorHeap::CreateDescriptorHeap()
     {
         auto device = DX12Context::GetDevice();
     
@@ -135,7 +135,7 @@ namespace SIByL
         return descriptorHeap;
     }
     
-    void DynamicDescriptorHeap::CommitStagedDescriptors(std::function<void(ID3D12GraphicsCommandList*, UINT, D3D12_GPU_DESCRIPTOR_HANDLE)> setFunc)
+    void DX12DynamicDescriptorHeap::CommitStagedDescriptors(std::function<void(ID3D12GraphicsCommandList*, UINT, D3D12_GPU_DESCRIPTOR_HANDLE)> setFunc)
     {
         // Compute the number of descriptors that need to be copied 
         uint32_t numDescriptorsToCommit = ComputeStaleDescriptorCount();
@@ -199,17 +199,17 @@ namespace SIByL
         }
     }
     
-    void DynamicDescriptorHeap::CommitStagedDescriptorsForDraw()
+    void DX12DynamicDescriptorHeap::CommitStagedDescriptorsForDraw()
     {
         CommitStagedDescriptors(&ID3D12GraphicsCommandList::SetGraphicsRootDescriptorTable);
     }
     
-    void DynamicDescriptorHeap::CommitStagedDescriptorsForDispatch()
+    void DX12DynamicDescriptorHeap::CommitStagedDescriptorsForDispatch()
     {
         CommitStagedDescriptors(&ID3D12GraphicsCommandList::SetComputeRootDescriptorTable);
     }
     
-    D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorHeap::CopyDescriptor(CommandList& comandList, D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptor)
+    D3D12_GPU_DESCRIPTOR_HANDLE DX12DynamicDescriptorHeap::CopyDescriptor(CommandList& comandList, D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptor)
     {
         DX12GraphicCommandList* dx12GraphicsCommandList = DX12Context::GetGraphicCommandList();
 
@@ -240,7 +240,7 @@ namespace SIByL
         return hGPU;
     }
     
-    void DynamicDescriptorHeap::Reset()
+    void DX12DynamicDescriptorHeap::Reset()
     {
         m_AvailableDescriptorHeaps = m_DescriptorHeapPool;
         m_CurrentDescriptorHeap.Reset();

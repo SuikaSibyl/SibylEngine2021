@@ -4,17 +4,23 @@
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
 
-#include "Platform/DirectX12/AbstractAPI/Bottom/DX12FrameResources.h"
-
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12Resource.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12ResourceStateTracker.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12DynamicDescriptorHeap.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12UploadBuffer.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12FrameResources.h"
 
 namespace SIByL
 {
-	DX12CommandList::DX12CommandList()
+	DX12CommandList::DX12CommandList(D3D12_COMMAND_LIST_TYPE type)
 	{
 		m_ResourceStateTracker = CreateScope<DX12ResourceStateTracker>();
 
+
+	}
+
+	DX12CommandList::~DX12CommandList()
+	{
 
 	}
 
@@ -37,6 +43,31 @@ namespace SIByL
 	{
 		FlushResourceBarriers();
 		m_d3d12CommandList->Close();
+	}
+
+	void DX12CommandList::Reset()
+	{
+		DXCall(m_d3d12CommandAllocator->Reset());
+		ThrowIfFailed(m_d3d12CommandList->Reset(m_d3d12CommandAllocator.Get(), nullptr));
+
+		m_ResourceStateTracker->Reset();
+		m_UploadBuffer->Reset();
+
+		ReleaseTrackedObjects();
+
+		for (int i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
+		{
+			m_DynamicDescriptorHeap[i]->Reset();
+			m_DescriptorHeaps[i] = nullptr;
+		}
+
+		m_RootSignature = nullptr;
+		m_ComputeCommandList = nullptr;
+	}
+
+	void DX12CommandList::ReleaseTrackedObjects()
+	{
+		m_TrackedObjects.clear();
 	}
 
 	void DX12CommandList::TransitionBarrier(const DX12Resource& resource, 
