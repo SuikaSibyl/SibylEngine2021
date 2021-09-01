@@ -16,6 +16,7 @@
 #include <iostream>
 #include <codecvt>
 #include <comdef.h>
+#include <mutex>
 
 #include <map>
 #include <set>
@@ -29,6 +30,8 @@
 #include "Sibyl/Core/Log.h"
 #include "Sibyl/Core/Instrumental.h"
 #include "entt.hpp"
+
+#include "Sibyl/Basic/ThreadSafeQueue.h"
 
 #ifdef SIBYL_PLATFORM_WINDOWS
 

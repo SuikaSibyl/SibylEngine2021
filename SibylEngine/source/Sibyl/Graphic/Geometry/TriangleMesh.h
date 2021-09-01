@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Primitive.h"
-#include "Sibyl/Renderer/VertexBuffer.h"
-#include "Sibyl/Renderer/IndexBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/VertexBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/IndexBuffer.h"
 
 namespace SIByL
 {

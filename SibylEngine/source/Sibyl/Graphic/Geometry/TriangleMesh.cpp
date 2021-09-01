@@ -2,8 +2,8 @@
 #include "TriangleMesh.h"
 
 #include "Sibyl/Renderer/Renderer.h"
-#include "Platform/OpenGL/Graphic/Geometry/OpenGLTriangleMesh.h"
-#include "Platform/DirectX12/Graphic/Geometry/DX12TriangleMesh.h"
+#include "Platform/OpenGL/AbstractAPI/Top/OpenGLTriangleMesh.h"
+#include "Platform/DirectX12/AbstractAPI/Top/DX12TriangleMesh.h"
 
 namespace SIByL
 {

@@ -122,7 +122,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -135,8 +135,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -175,7 +175,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -233,8 +233,8 @@ struct std_sort {
      *
      * Sorts the elements in a range using the given binary comparison function.
      *
-     * @tparam It Type of random access iterator.
-     * @tparam Compare Type of comparison function object.
+     * @tparam It Format of random access iterator.
+     * @tparam Compare Format of comparison function object.
      * @tparam Args Types of arguments to forward to the sort function.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
@@ -255,8 +255,8 @@ struct insertion_sort {
      *
      * Sorts the elements in a range using the given binary comparison function.
      *
-     * @tparam It Type of random access iterator.
-     * @tparam Compare Type of comparison function object.
+     * @tparam It Format of random access iterator.
+     * @tparam Compare Format of comparison function object.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
      * @param compare A valid comparison function object.
@@ -297,8 +297,8 @@ struct radix_sort {
      * This implementation is inspired by the online book
      * [Physically Based Rendering](http://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies.html#RadixSort).
      *
-     * @tparam It Type of random access iterator.
-     * @tparam Getter Type of _getter_ function object.
+     * @tparam It Format of random access iterator.
+     * @tparam Getter Format of _getter_ function object.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
      * @param getter A valid _getter_ function object.
@@ -463,7 +463,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -476,8 +476,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -516,7 +516,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -980,8 +980,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -1000,8 +1000,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -1024,8 +1024,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -1085,24 +1085,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -1137,7 +1137,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -1205,7 +1205,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -1216,7 +1216,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -1224,7 +1224,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -1240,7 +1240,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -1249,7 +1249,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -1282,11 +1282,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -1301,7 +1301,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -1312,7 +1312,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -1325,7 +1325,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -1333,7 +1333,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -1356,7 +1356,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -1369,7 +1369,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -1380,7 +1380,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -1393,7 +1393,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -1417,7 +1417,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -1426,8 +1426,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -1435,8 +1435,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -1444,8 +1444,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -1458,7 +1458,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -1470,7 +1470,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -1630,7 +1630,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -1638,7 +1638,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -1708,7 +1708,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -1721,7 +1721,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -1730,7 +1730,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -1745,7 +1745,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -1754,7 +1754,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -1777,7 +1777,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -1987,7 +1987,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -2002,7 +2002,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -2015,7 +2015,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
@@ -2081,12 +2081,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Format &> or forward_as_any instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;
@@ -2094,7 +2094,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
@@ -2130,7 +2130,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -2209,7 +2209,7 @@ template<std::size_t Len, std::size_t Align>
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @tparam Type Type to which conversion is required.
+ * @tparam Format Format to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  * @param data Target any object.
@@ -2260,7 +2260,7 @@ Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Args Types of arguments to use to construct the new instance.
@@ -2277,7 +2277,7 @@ basic_any<Len, Align> make_any(Args &&... args) {
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -2739,7 +2739,7 @@ template<id_type>
 struct monostate {
     /**
      * @brief Assigns a value of a specific type to a given key.
-     * @tparam Type Type of the value to assign.
+     * @tparam Format Format of the value to assign.
      * @param val User data to assign to the given key.
      */
     template<typename Type>
@@ -2749,7 +2749,7 @@ struct monostate {
 
     /**
      * @brief Gets a value of a specific type for a given key.
-     * @tparam Type Type of the value to get.
+     * @tparam Format Format of the value to get.
      * @return Stored value, if any.
      */
     template<typename Type>
@@ -2867,8 +2867,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -2887,8 +2887,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -2911,8 +2911,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -2972,24 +2972,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -3024,7 +3024,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -3092,7 +3092,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -3103,7 +3103,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -3111,7 +3111,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -3127,7 +3127,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -3136,7 +3136,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -3169,11 +3169,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -3188,7 +3188,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -3199,7 +3199,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -3212,7 +3212,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -3220,7 +3220,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -3243,7 +3243,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -3256,7 +3256,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -3267,7 +3267,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -3280,7 +3280,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -3304,7 +3304,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -3313,8 +3313,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -3322,8 +3322,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -3331,8 +3331,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -3345,7 +3345,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -3357,7 +3357,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -3517,7 +3517,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -3525,7 +3525,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -3595,7 +3595,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -3608,7 +3608,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -3617,7 +3617,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -3632,7 +3632,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -3641,7 +3641,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -3664,7 +3664,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -3753,7 +3753,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -3766,8 +3766,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -3806,7 +3806,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -3954,7 +3954,7 @@ struct basic_component_traits {
 
 /**
  * @brief Common way to access various properties of components.
- * @tparam Type Type of component.
+ * @tparam Format Format of component.
  */
 template<typename Type, typename = void>
 struct component_traits: basic_component_traits {
@@ -4042,7 +4042,7 @@ struct entt_traits<std::uint64_t> {
 
 /**
  * @brief Entity traits.
- * @tparam Type Type of identifier.
+ * @tparam Format Format of identifier.
  */
 template<typename Type>
 class entt_traits: private internal::entt_traits<Type> {
@@ -4118,7 +4118,7 @@ template<typename Entity>
 struct null_t {
     /**
      * @brief Converts the null object to identifiers of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @return The null representation for the given type.
      */
     template<typename Entity>
@@ -4146,7 +4146,7 @@ struct null_t {
 
     /**
      * @brief Compares a null object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
@@ -4157,7 +4157,7 @@ struct null_t {
 
     /**
      * @brief Compares a null object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
@@ -4168,7 +4168,7 @@ struct null_t {
 
     /**
      * @brief Creates a null object from an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier to turn into a null object.
      * @return The null representation for the given identifier.
      */
@@ -4181,7 +4181,7 @@ struct null_t {
 
 /**
  * @brief Compares a null object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A null object yet to be converted.
  * @return False if the two elements differ, true otherwise.
@@ -4194,7 +4194,7 @@ template<typename Entity>
 
 /**
  * @brief Compares a null object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A null object yet to be converted.
  * @return True if the two elements differ, false otherwise.
@@ -4209,7 +4209,7 @@ template<typename Entity>
 struct tombstone_t {
     /**
      * @brief Converts the tombstone object to identifiers of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @return The tombstone representation for the given type.
      */
     template<typename Entity>
@@ -4237,7 +4237,7 @@ struct tombstone_t {
 
     /**
      * @brief Compares a tombstone object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
@@ -4248,7 +4248,7 @@ struct tombstone_t {
 
     /**
      * @brief Compares a tombstone object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
@@ -4259,7 +4259,7 @@ struct tombstone_t {
 
     /**
      * @brief Creates a tombstone object from an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier to turn into a tombstone object.
      * @return The tombstone representation for the given identifier.
      */
@@ -4272,7 +4272,7 @@ struct tombstone_t {
 
 /**
  * @brief Compares a tombstone object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A tombstone object yet to be converted.
  * @return False if the two elements differ, true otherwise.
@@ -4285,7 +4285,7 @@ template<typename Entity>
 
 /**
  * @brief Compares a tombstone object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A tombstone object yet to be converted.
  * @return True if the two elements differ, false otherwise.
@@ -4494,7 +4494,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -4505,7 +4505,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -4513,7 +4513,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -4529,7 +4529,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -4538,7 +4538,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -4571,11 +4571,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -4590,7 +4590,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -4601,7 +4601,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -4614,7 +4614,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -4622,7 +4622,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -4645,7 +4645,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -4658,7 +4658,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -4669,7 +4669,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -4682,7 +4682,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -4706,7 +4706,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -4715,8 +4715,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -4724,8 +4724,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -4733,8 +4733,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -4747,7 +4747,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -4759,7 +4759,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -4919,7 +4919,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -4927,7 +4927,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -4997,7 +4997,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -5010,7 +5010,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -5019,7 +5019,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -5034,7 +5034,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -5043,7 +5043,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -5066,7 +5066,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -5213,7 +5213,7 @@ struct entt_traits<std::uint64_t> {
 
 /**
  * @brief Entity traits.
- * @tparam Type Type of identifier.
+ * @tparam Format Format of identifier.
  */
 template<typename Type>
 class entt_traits: private internal::entt_traits<Type> {
@@ -5289,7 +5289,7 @@ template<typename Entity>
 struct null_t {
     /**
      * @brief Converts the null object to identifiers of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @return The null representation for the given type.
      */
     template<typename Entity>
@@ -5317,7 +5317,7 @@ struct null_t {
 
     /**
      * @brief Compares a null object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
@@ -5328,7 +5328,7 @@ struct null_t {
 
     /**
      * @brief Compares a null object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
@@ -5339,7 +5339,7 @@ struct null_t {
 
     /**
      * @brief Creates a null object from an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier to turn into a null object.
      * @return The null representation for the given identifier.
      */
@@ -5352,7 +5352,7 @@ struct null_t {
 
 /**
  * @brief Compares a null object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A null object yet to be converted.
  * @return False if the two elements differ, true otherwise.
@@ -5365,7 +5365,7 @@ template<typename Entity>
 
 /**
  * @brief Compares a null object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A null object yet to be converted.
  * @return True if the two elements differ, false otherwise.
@@ -5380,7 +5380,7 @@ template<typename Entity>
 struct tombstone_t {
     /**
      * @brief Converts the tombstone object to identifiers of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @return The tombstone representation for the given type.
      */
     template<typename Entity>
@@ -5408,7 +5408,7 @@ struct tombstone_t {
 
     /**
      * @brief Compares a tombstone object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return False if the two elements differ, true otherwise.
      */
@@ -5419,7 +5419,7 @@ struct tombstone_t {
 
     /**
      * @brief Compares a tombstone object and an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier with which to compare.
      * @return True if the two elements differ, false otherwise.
      */
@@ -5430,7 +5430,7 @@ struct tombstone_t {
 
     /**
      * @brief Creates a tombstone object from an entity identifier of any type.
-     * @tparam Entity Type of entity identifier.
+     * @tparam Entity Format of entity identifier.
      * @param entity Entity identifier to turn into a tombstone object.
      * @return The tombstone representation for the given identifier.
      */
@@ -5443,7 +5443,7 @@ struct tombstone_t {
 
 /**
  * @brief Compares a tombstone object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A tombstone object yet to be converted.
  * @return False if the two elements differ, true otherwise.
@@ -5456,7 +5456,7 @@ template<typename Entity>
 
 /**
  * @brief Compares a tombstone object and an entity identifier of any type.
- * @tparam Entity Type of entity identifier.
+ * @tparam Entity Format of entity identifier.
  * @param entity Entity identifier with which to compare.
  * @param other A tombstone object yet to be converted.
  * @return True if the two elements differ, false otherwise.
@@ -5709,7 +5709,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -5722,8 +5722,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -5762,7 +5762,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -5820,8 +5820,8 @@ struct std_sort {
      *
      * Sorts the elements in a range using the given binary comparison function.
      *
-     * @tparam It Type of random access iterator.
-     * @tparam Compare Type of comparison function object.
+     * @tparam It Format of random access iterator.
+     * @tparam Compare Format of comparison function object.
      * @tparam Args Types of arguments to forward to the sort function.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
@@ -5842,8 +5842,8 @@ struct insertion_sort {
      *
      * Sorts the elements in a range using the given binary comparison function.
      *
-     * @tparam It Type of random access iterator.
-     * @tparam Compare Type of comparison function object.
+     * @tparam It Format of random access iterator.
+     * @tparam Compare Format of comparison function object.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
      * @param compare A valid comparison function object.
@@ -5884,8 +5884,8 @@ struct radix_sort {
      * This implementation is inspired by the online book
      * [Physically Based Rendering](http://www.pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies.html#RadixSort).
      *
-     * @tparam It Type of random access iterator.
-     * @tparam Getter Type of _getter_ function object.
+     * @tparam It Format of random access iterator.
+     * @tparam Getter Format of _getter_ function object.
      * @param first An iterator to the first element of the range to sort.
      * @param last An iterator past the last element of the range to sort.
      * @param getter A valid _getter_ function object.
@@ -5977,7 +5977,7 @@ enum class deletion_policy: std::uint8_t {
  * a sparse set. Do not make assumption on the order in any case.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Allocator Format of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
@@ -6219,7 +6219,7 @@ public:
 
     /**
      * @brief Constructs an empty container with the given policy and allocator.
-     * @param pol Type of deletion policy.
+     * @param pol Format of deletion policy.
      * @param alloc Allocator to use (possibly default-constructed).
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &alloc = {})
@@ -6537,7 +6537,7 @@ public:
      * Attempting to assign an entity that already belongs to the sparse set
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -6573,7 +6573,7 @@ public:
      *
      * @sa erase
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param ud Optional user data that are forwarded as-is to derived classes.
@@ -6597,7 +6597,7 @@ public:
 
     /**
      * @brief Removes entities from a sparse set if they exist.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param ud Optional user data that are forwarded as-is to derived classes.
@@ -6685,8 +6685,8 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param length Number of elements to sort.
      * @param compare A valid comparison function object.
@@ -6721,8 +6721,8 @@ public:
      *
      * @sa sort_n
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -7089,7 +7089,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -7100,7 +7100,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -7108,7 +7108,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -7124,7 +7124,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -7133,7 +7133,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -7166,11 +7166,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -7185,7 +7185,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -7196,7 +7196,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -7209,7 +7209,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -7217,7 +7217,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -7240,7 +7240,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -7253,7 +7253,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -7264,7 +7264,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -7277,7 +7277,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -7301,7 +7301,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -7310,8 +7310,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -7319,8 +7319,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -7328,8 +7328,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -7342,7 +7342,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -7354,7 +7354,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -7514,7 +7514,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -7522,7 +7522,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -7592,7 +7592,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -7605,7 +7605,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -7614,7 +7614,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -7629,7 +7629,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -7638,7 +7638,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -7661,7 +7661,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -7875,7 +7875,7 @@ public:
      * @brief Constructs a delegate and connects a free function with payload or
      * a bound member.
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -7924,7 +7924,7 @@ public:
      * define the delegate itself.
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -7945,10 +7945,10 @@ public:
      * @brief Connects a free function with payload or a bound member to a
      * delegate.
      *
-     * @sa connect(Type &)
+     * @sa connect(Format &)
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -8068,7 +8068,7 @@ delegate(connect_arg_t<Candidate>)
 /**
  * @brief Deduction guide.
  * @tparam Candidate Function or member to connect to the delegate.
- * @tparam Type Type of class or type of payload.
+ * @tparam Format Format of class or type of payload.
  */
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&)
@@ -8185,7 +8185,7 @@ public:
 
     /**
      * @brief Instance type when it comes to connecting member functions.
-     * @tparam Class Type of class to which the member function belongs.
+     * @tparam Class Format of class to which the member function belongs.
      */
     template<typename Class>
     using instance_type = Class *;
@@ -8229,7 +8229,7 @@ public:
      * * The list of parameters is empty if `Ret` is `void`, otherwise it
      *   contains a single element such that `Ret` is convertible to it.
      *
-     * @tparam Func Type of collector to use, if any.
+     * @tparam Func Format of collector to use, if any.
      * @param func A valid function object.
      * @param args Arguments to use to invoke listeners.
      */
@@ -8438,7 +8438,7 @@ public:
      * @brief Returns a sink that connects before a free function with payload
      * or a bound member.
      * @tparam Candidate Member or free function to look for.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -8458,7 +8458,7 @@ public:
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -8470,7 +8470,7 @@ public:
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -8535,7 +8535,7 @@ public:
      * define the signal itself.
      *
      * @tparam Candidate Function or member to connect to the signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized connection object.
      */
@@ -8568,7 +8568,7 @@ public:
      * @brief Disconnects a free function with payload or a bound member from a
      * signal.
      * @tparam Candidate Function or member to disconnect from the signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -8582,7 +8582,7 @@ public:
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -8593,7 +8593,7 @@ public:
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -8660,7 +8660,7 @@ struct basic_component_traits {
 
 /**
  * @brief Common way to access various properties of components.
- * @tparam Type Type of component.
+ * @tparam Format Format of component.
  */
 template<typename Type, typename = void>
 struct component_traits: basic_component_traits {
@@ -8707,8 +8707,8 @@ namespace entt {
  * @sa sparse_set<Entity>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Format Format of objects assigned to the entities.
+ * @tparam Allocator Format of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Type, typename Allocator, typename = void>
 class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
@@ -8954,7 +8954,7 @@ protected:
 public:
     /*! @brief Allocator type. */
     using allocator_type = typename alloc_traits::allocator_type;
-    /*! @brief Type of the objects assigned to entities. */
+    /*! @brief Format of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -9236,7 +9236,7 @@ public:
      * Attempting to assign an entity that already belongs to the storage
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the object to construct.
@@ -9265,8 +9265,8 @@ public:
      *
      * @sa construct
      *
-     * @tparam EIt Type of input iterator.
-     * @tparam CIt Type of input iterator.
+     * @tparam EIt Format of input iterator.
+     * @tparam CIt Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of objects.
@@ -9298,7 +9298,7 @@ public:
      *
      * @code{.cpp}
      * bool(const Entity, const Entity);
-     * bool(const Type &, const Type &);
+     * bool(const Format &, const Format &);
      * @endcode
      *
      * Moreover, the comparison function object shall induce a
@@ -9316,8 +9316,8 @@ public:
      * objects that require to return entities rather than components are
      * accepted.
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param length Number of elements to sort.
      * @param compare A valid comparison function object.
@@ -9341,8 +9341,8 @@ public:
      *
      * @sa sort_n
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -9373,7 +9373,7 @@ class basic_storage_impl<Entity, Type, Allocator, std::enable_if_t<component_tra
 public:
     /*! @brief Allocator type. */
     using allocator_type = typename alloc_traits::allocator_type;
-    /*! @brief Type of the objects assigned to entities. */
+    /*! @brief Format of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -9437,7 +9437,7 @@ public:
      * Attempting to assign an entity that already belongs to the storage
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -9450,13 +9450,13 @@ public:
 
 /**
  * @brief Mixin type to use to wrap basic storage classes.
- * @tparam Type The type of the underlying storage.
+ * @tparam Format The type of the underlying storage.
  */
 template<typename Type>
 struct storage_adapter_mixin: Type {
     static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
 
-    /*! @brief Type of the objects assigned to entities. */
+    /*! @brief Format of the objects assigned to entities. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
@@ -9478,7 +9478,7 @@ struct storage_adapter_mixin: Type {
 
     /**
      * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
      * to the entities.
      * @param first An iterator to the first element of the range of entities.
@@ -9507,7 +9507,7 @@ struct storage_adapter_mixin: Type {
 
 /**
  * @brief Mixin type to use to add signal support to storage types.
- * @tparam Type The type of the underlying storage.
+ * @tparam Format The type of the underlying storage.
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
@@ -9616,7 +9616,7 @@ public:
 
     /**
      * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
      * to the entities.
      * @param owner The registry that issued the request.
@@ -9661,8 +9661,8 @@ private:
 /**
  * @brief Storage implementation dispatcher.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Format Format of objects assigned to the entities.
+ * @tparam Allocator Format of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Type, typename Allocator>
 struct basic_storage: basic_storage_impl<Entity, Type, Allocator> {
@@ -9673,7 +9673,7 @@ struct basic_storage: basic_storage_impl<Entity, Type, Allocator> {
 /**
  * @brief Provides a common way to access certain properties of storage types.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects managed by the storage class.
+ * @tparam Format Format of objects managed by the storage class.
  */
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
@@ -9684,7 +9684,7 @@ struct storage_traits {
 
 /**
  * @brief Gets the element assigned to an entity from a storage, if any.
- * @tparam Type Storage type.
+ * @tparam Format Storage type.
  * @param container A valid instance of a storage class.
  * @param entt A valid entity identifier.
  * @return A possibly empty tuple containing the requested element.
@@ -9720,7 +9720,7 @@ namespace entt {
 
 /**
  * @brief Alias for exclusion lists.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 struct exclude_t: type_list<Type...> {};
@@ -9728,7 +9728,7 @@ struct exclude_t: type_list<Type...> {};
 
 /**
  * @brief Variable template for exclusion lists.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 inline constexpr exclude_t<Type...> exclude{};
@@ -9736,7 +9736,7 @@ inline constexpr exclude_t<Type...> exclude{};
 
 /**
  * @brief Alias for lists of observed components.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 struct get_t: type_list<Type...>{};
@@ -9744,7 +9744,7 @@ struct get_t: type_list<Type...>{};
 
 /**
  * @brief Variable template for lists of observed components.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 inline constexpr get_t<Type...> get{};
@@ -9804,7 +9804,7 @@ class basic_group;
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Exclude Types of components used to filter the group.
- * @tparam Get Type of components observed by the group.
+ * @tparam Get Format of components observed by the group.
  */
 template<typename Entity, typename... Exclude, typename... Get>
 class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
@@ -10103,15 +10103,15 @@ public:
      * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
+     * void(const entity_type, Format &...);
+     * void(Format &...);
      * @endcode
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -10171,8 +10171,8 @@ public:
      * * A comparison function to use to compare the elements.
      *
      * @tparam Component Optional types of components to compare.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -10210,7 +10210,7 @@ public:
      * can quickly ruin the order imposed to the pool of entities shared between
      * the non-owning groups.
      *
-     * @tparam Component Type of component to use to impose the order.
+     * @tparam Component Format of component to use to impose the order.
      */
     template<typename Component>
     void sort() const {
@@ -10427,7 +10427,7 @@ public:
      * @warning
      * This function is only available for owned types.
      *
-     * @tparam Component Type of component in which one is interested.
+     * @tparam Component Format of component in which one is interested.
      * @return A pointer to the array of components.
      */
     template<typename Component>
@@ -10598,15 +10598,15 @@ public:
      * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
+     * void(const entity_type, Format &...);
+     * void(Format &...);
      * @endcode
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -10667,8 +10667,8 @@ public:
      * * A comparison function to use to compare the elements.
      *
      * @tparam Component Optional types of components to compare.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -10856,7 +10856,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -10869,8 +10869,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -10909,7 +10909,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -11345,8 +11345,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -11365,8 +11365,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -11389,8 +11389,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -11450,24 +11450,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -11502,7 +11502,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -11570,7 +11570,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -11581,7 +11581,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -11589,7 +11589,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -11605,7 +11605,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -11614,7 +11614,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -11647,11 +11647,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -11666,7 +11666,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -11677,7 +11677,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -11690,7 +11690,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -11698,7 +11698,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -11721,7 +11721,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -11734,7 +11734,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -11745,7 +11745,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -11758,7 +11758,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -11782,7 +11782,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -11791,8 +11791,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -11800,8 +11800,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -11809,8 +11809,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -11823,7 +11823,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -11835,7 +11835,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -11995,7 +11995,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -12003,7 +12003,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -12073,7 +12073,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -12086,7 +12086,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -12095,7 +12095,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -12110,7 +12110,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -12119,7 +12119,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -12142,7 +12142,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -12352,7 +12352,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -12367,7 +12367,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -12380,7 +12380,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
@@ -12446,12 +12446,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Format &> or forward_as_any instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;
@@ -12459,7 +12459,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
@@ -12495,7 +12495,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -12574,7 +12574,7 @@ template<std::size_t Len, std::size_t Align>
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @tparam Type Type to which conversion is required.
+ * @tparam Format Format to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  * @param data Target any object.
@@ -12625,7 +12625,7 @@ Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Args Types of arguments to use to construct the new instance.
@@ -12642,7 +12642,7 @@ basic_any<Len, Align> make_any(Args &&... args) {
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -12750,8 +12750,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -12770,8 +12770,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -12794,8 +12794,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -12855,24 +12855,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -12907,7 +12907,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -13004,7 +13004,7 @@ class basic_group;
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
  * @tparam Exclude Types of components used to filter the group.
- * @tparam Get Type of components observed by the group.
+ * @tparam Get Format of components observed by the group.
  */
 template<typename Entity, typename... Exclude, typename... Get>
 class basic_group<Entity, exclude_t<Exclude...>, get_t<Get...>> final {
@@ -13303,15 +13303,15 @@ public:
      * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
+     * void(const entity_type, Format &...);
+     * void(Format &...);
      * @endcode
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -13371,8 +13371,8 @@ public:
      * * A comparison function to use to compare the elements.
      *
      * @tparam Component Optional types of components to compare.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -13410,7 +13410,7 @@ public:
      * can quickly ruin the order imposed to the pool of entities shared between
      * the non-owning groups.
      *
-     * @tparam Component Type of component to use to impose the order.
+     * @tparam Component Format of component to use to impose the order.
      */
     template<typename Component>
     void sort() const {
@@ -13627,7 +13627,7 @@ public:
      * @warning
      * This function is only available for owned types.
      *
-     * @tparam Component Type of component in which one is interested.
+     * @tparam Component Format of component in which one is interested.
      * @return A pointer to the array of components.
      */
     template<typename Component>
@@ -13798,15 +13798,15 @@ public:
      * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
+     * void(const entity_type, Format &...);
+     * void(Format &...);
      * @endcode
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -13867,8 +13867,8 @@ public:
      * * A comparison function to use to compare the elements.
      *
      * @tparam Component Optional types of components to compare.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -14218,7 +14218,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -14231,8 +14231,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -14271,7 +14271,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -14735,8 +14735,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -14755,8 +14755,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -14779,8 +14779,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -14840,24 +14840,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -14892,7 +14892,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -14960,7 +14960,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -14971,7 +14971,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -14979,7 +14979,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -14995,7 +14995,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -15004,7 +15004,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -15037,11 +15037,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -15056,7 +15056,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -15067,7 +15067,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -15080,7 +15080,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -15088,7 +15088,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -15111,7 +15111,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -15124,7 +15124,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -15135,7 +15135,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -15148,7 +15148,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -15172,7 +15172,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -15181,8 +15181,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -15190,8 +15190,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -15199,8 +15199,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -15213,7 +15213,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -15225,7 +15225,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -15385,7 +15385,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -15393,7 +15393,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -15463,7 +15463,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -15476,7 +15476,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -15485,7 +15485,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -15500,7 +15500,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -15509,7 +15509,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -15532,7 +15532,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -15742,7 +15742,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -15757,7 +15757,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -15770,7 +15770,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
@@ -15836,12 +15836,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Format &> or forward_as_any instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;
@@ -15849,7 +15849,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
@@ -15885,7 +15885,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -15964,7 +15964,7 @@ template<std::size_t Len, std::size_t Align>
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @tparam Type Type to which conversion is required.
+ * @tparam Format Format to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  * @param data Target any object.
@@ -16015,7 +16015,7 @@ Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Args Types of arguments to use to construct the new instance.
@@ -16032,7 +16032,7 @@ basic_any<Len, Align> make_any(Args &&... args) {
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -16138,8 +16138,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -16158,8 +16158,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -16182,8 +16182,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -16243,24 +16243,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -16295,7 +16295,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -16363,7 +16363,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -16374,7 +16374,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -16382,7 +16382,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -16398,7 +16398,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -16407,7 +16407,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -16440,11 +16440,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -16459,7 +16459,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -16470,7 +16470,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -16483,7 +16483,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -16491,7 +16491,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -16514,7 +16514,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -16527,7 +16527,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -16538,7 +16538,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -16551,7 +16551,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -16575,7 +16575,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -16584,8 +16584,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -16593,8 +16593,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -16602,8 +16602,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -16616,7 +16616,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -16628,7 +16628,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -16788,7 +16788,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -16796,7 +16796,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -16866,7 +16866,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -16879,7 +16879,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -16888,7 +16888,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -16903,7 +16903,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -16912,7 +16912,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -16935,7 +16935,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -17044,7 +17044,7 @@ namespace entt {
 struct poly_inspector {
     /**
      * @brief Generic conversion operator (definition only).
-     * @tparam Type Type to which conversion is requested.
+     * @tparam Format Format to which conversion is requested.
      */
     template <class Type>
     operator Type &&() const;
@@ -17129,12 +17129,12 @@ public:
 
     /**
      * @brief Returns a static virtual table for a specific concept and type.
-     * @tparam Type The type for which to generate the virtual table.
+     * @tparam Format The type for which to generate the virtual table.
      * @return A static virtual table for the given concept and type.
      */
     template<typename Type>
     [[nodiscard]] static const auto * instance() {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Type differs from its decayed form");
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Format differs from its decayed form");
         static const auto vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
         return &vtable;
     }
@@ -17171,7 +17171,7 @@ struct poly_base {
 
 
 /**
- * @brief Shortcut for calling `poly_base<Type>::invoke`.
+ * @brief Shortcut for calling `poly_base<Format>::invoke`.
  * @tparam Member Index of the function to invoke.
  * @tparam Poly A fully defined poly object.
  * @tparam Args Types of arguments to pass to the function.
@@ -17219,7 +17219,7 @@ public:
 
     /**
      * @brief Constructs a poly by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the poly.
+     * @tparam Format Format of object to use to initialize the poly.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -17231,7 +17231,7 @@ public:
 
     /**
      * @brief Constructs a poly from a given value.
-     * @tparam Type Type of object to use to initialize the poly.
+     * @tparam Format Format of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, basic_poly>>>
@@ -17288,7 +17288,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the poly.
+     * @tparam Format Format of object to use to initialize the poly.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -17393,7 +17393,7 @@ struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
 
     /**
      * @brief Concept implementation.
-     * @tparam Type Type for which to generate an implementation.
+     * @tparam Format Format for which to generate an implementation.
      */
     template<typename Type>
     using impl = value_list<&type_id<typename Type::value_type>>;
@@ -17646,7 +17646,7 @@ public:
      * void(const entity_type);
      * @endcode
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -18054,7 +18054,7 @@ public:
 
     /**
      * @brief Forces the type to use to drive iterations.
-     * @tparam Comp Type of component to use to drive the iteration.
+     * @tparam Comp Format of component to use to drive the iteration.
      */
     template<typename Comp>
     void use() const ENTT_NOEXCEPT {
@@ -18208,15 +18208,15 @@ public:
      * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
+     * void(const entity_type, Format &...);
+     * void(Format &...);
      * @endcode
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -18234,8 +18234,8 @@ public:
      *
      * @sa each
      *
-     * @tparam Comp Type of component to use to drive the iteration.
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Comp Format of component to use to drive the iteration.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
@@ -18270,7 +18270,7 @@ public:
      *
      * @sa each
      *
-     * @tparam Comp Type of component to use to drive the iteration.
+     * @tparam Comp Format of component to use to drive the iteration.
      * @return An iterable object to use to _visit_ the view.
      */
     template<typename Comp>
@@ -18327,7 +18327,7 @@ private:
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Type of component iterated by the view.
+ * @tparam Component Format of component iterated by the view.
  */
 template<typename Entity, typename Component>
 class basic_view_impl<packed_storage_policy, Entity, exclude_t<>, Component> {
@@ -18627,7 +18627,7 @@ public:
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -18708,7 +18708,7 @@ struct basic_view<Entity, exclude_t<Exclude...>, Component...>
 
 /**
  * @brief Deduction guide.
- * @tparam Storage Type of storage classes used to create the view.
+ * @tparam Storage Format of storage classes used to create the view.
  * @param storage The storage for the types to iterate.
  */
 template<typename... Storage>
@@ -18899,7 +18899,7 @@ public:
 
     /**
      * @brief Prepares a pool for the given type if required.
-     * @tparam Component Type of component for which to prepare a pool.
+     * @tparam Component Format of component for which to prepare a pool.
      */
     template<typename Component>
     void prepare() {
@@ -18926,7 +18926,7 @@ public:
 
     /**
      * @brief Returns the number of existing components of the given type.
-     * @tparam Component Type of component of which to return the size.
+     * @tparam Component Format of component of which to return the size.
      * @return Number of existing components of the given type.
      */
     template<typename Component>
@@ -18990,7 +18990,7 @@ public:
 
     /**
      * @brief Returns the capacity of the pool for the given component.
-     * @tparam Component Type of component in which one is interested.
+     * @tparam Component Format of component in which one is interested.
      * @return Capacity of the pool of the given component.
      */
     template<typename Component>
@@ -19152,7 +19152,7 @@ public:
      *
      * @sa create
      *
-     * @tparam It Type of forward iterator.
+     * @tparam It Format of forward iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
@@ -19182,7 +19182,7 @@ public:
      * @warning
      * There must be no entities still alive for this to work properly.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param destroyed The head of the list of destroyed entities.
@@ -19231,7 +19231,7 @@ public:
      *
      * @sa release
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -19288,7 +19288,7 @@ public:
      *
      * @sa destroy
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -19318,7 +19318,7 @@ public:
      * Attempting to use an invalid entity or to assign a component to an entity
      * that already owns it results in undefined behavior.
      *
-     * @tparam Component Type of component to create.
+     * @tparam Component Format of component to create.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -19335,8 +19335,8 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
-     * @tparam It Type of input iterator.
+     * @tparam Component Format of component to create.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the component to assign.
@@ -19352,9 +19352,9 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
-     * @tparam EIt Type of input iterator.
-     * @tparam CIt Type of input iterator.
+     * @tparam Component Format of component to create.
+     * @tparam EIt Format of input iterator.
+     * @tparam CIt Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of components.
@@ -19380,7 +19380,7 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to assign or replace.
+     * @tparam Component Format of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -19414,7 +19414,7 @@ public:
      * Attempting to use an invalid entity or to patch a component of an entity
      * that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Type of component to patch.
+     * @tparam Component Format of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
@@ -19437,7 +19437,7 @@ public:
      * Attempting to use an invalid entity or to replace a component of an
      * entity that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Type of component to replace.
+     * @tparam Component Format of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -19471,7 +19471,7 @@ public:
      * @sa remove
      *
      * @tparam Component Types of components to remove.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return The number of components actually removed.
@@ -19514,7 +19514,7 @@ public:
      * @sa erase
      *
      * @tparam Component Types of components to erase.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -19661,7 +19661,7 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to get.
+     * @tparam Component Format of component to get.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -19742,7 +19742,7 @@ public:
      * it's useful for iterating all the entities still in use, regardless of
      * their components.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -19783,7 +19783,7 @@ public:
      *
      * This function can be very slow and should not be used frequently.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -19812,7 +19812,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Component Format of component of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Component>
@@ -19835,7 +19835,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Component Format of component of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Component>
@@ -19860,7 +19860,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Component Format of component of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Component>
@@ -19896,7 +19896,7 @@ public:
      * of the entities have all the given components.<br/>
      * To get a performance boost, consider using a group instead.
      *
-     * @tparam Component Type of components used to construct the view.
+     * @tparam Component Format of components used to construct the view.
      * @tparam Exclude Types of components used to filter the view.
      * @return A newly created view.
      */
@@ -19927,9 +19927,9 @@ public:
      * some external inputs and don't know at compile-time what are the required
      * components.
      *
-     * @tparam ItComp Type of input iterator for the components to use to
+     * @tparam ItComp Format of input iterator for the components to use to
      * construct the view.
-     * @tparam ItExcl Type of input iterator for the components to use to filter
+     * @tparam ItExcl Format of input iterator for the components to use to filter
      * the view.
      * @param first An iterator to the first element of the range of components
      * to use to construct the view.
@@ -20183,9 +20183,9 @@ public:
      * @warning
      * Pools of components owned by a group cannot be sorted.
      *
-     * @tparam Component Type of components to sort.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Component Format of components to sort.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -20227,8 +20227,8 @@ public:
      * @warning
      * Pools of components owned by a group cannot be sorted.
      *
-     * @tparam To Type of components to sort.
-     * @tparam From Type of components to use to sort.
+     * @tparam To Format of components to sort.
+     * @tparam From Format of components to use to sort.
      */
     template<typename To, typename From>
     void sort() {
@@ -20253,7 +20253,7 @@ public:
      * It's not specified whether a component attached to or removed from the
      * given entity during the visit is returned or not to the caller.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param entity A valid entity identifier.
      * @param func A valid function object.
      */
@@ -20283,7 +20283,7 @@ public:
      * It's not specified whether a component for which a pool is created during
      * the visit is returned or not to the caller.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -20301,7 +20301,7 @@ public:
      * If the value already exists it is overwritten, otherwise a new instance
      * of the given type is created and initialized with the arguments provided.
      *
-     * @tparam Type Type of object to set.
+     * @tparam Format Format of object to set.
      * @tparam Args Types of arguments to use to construct the object.
      * @param args Parameters to use to initialize the value.
      * @return A reference to the newly created object.
@@ -20315,7 +20315,7 @@ public:
 
     /**
      * @brief Unsets a context variable if it exists.
-     * @tparam Type Type of object to set.
+     * @tparam Format Format of object to set.
      */
     template<typename Type>
     void unset() {
@@ -20328,7 +20328,7 @@ public:
      * In case the context doesn't contain the given object, the parameters
      * provided are used to construct it.
      *
-     * @tparam Type Type of object to set.
+     * @tparam Format Format of object to set.
      * @tparam Args Types of arguments to use to construct the object.
      * @param args Parameters to use to initialize the object.
      * @return A reference to the object in the context of the registry.
@@ -20341,7 +20341,7 @@ public:
 
     /**
      * @brief Returns a pointer to an object in the context of the registry.
-     * @tparam Type Type of object to get.
+     * @tparam Format Format of object to get.
      * @return A pointer to the object if it exists in the context of the
      * registry, a null pointer otherwise.
      */
@@ -20365,7 +20365,7 @@ public:
      * Attempting to get a context variable that doesn't exist results in
      * undefined behavior.
      *
-     * @tparam Type Type of object to get.
+     * @tparam Format Format of object to get.
      * @return A valid reference to the object in the context of the registry.
      */
     template<typename Type>
@@ -20401,7 +20401,7 @@ public:
      * It's not specified whether a context variable created during the visit is
      * returned or not to the caller.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -20436,11 +20436,11 @@ namespace entt {
  * Tiny wrapper around a registry and an entity.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Types to which to restrict the scope of a handle.
+ * @tparam Format Types to which to restrict the scope of a handle.
  */
 template<typename Entity, typename... Type>
 struct basic_handle {
-    /*! @brief Type of registry accepted by the handle. */
+    /*! @brief Format of registry accepted by the handle. */
     using registry_type = constness_as_t<basic_registry<std::remove_const_t<Entity>>, Entity>;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename registry_type::entity_type;
@@ -20553,7 +20553,7 @@ struct basic_handle {
     /**
      * @brief Assigns the given component to a handle.
      * @sa basic_registry::emplace
-     * @tparam Component Type of component to create.
+     * @tparam Component Format of component to create.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
@@ -20567,7 +20567,7 @@ struct basic_handle {
     /**
      * @brief Assigns or replaces the given component for a handle.
      * @sa basic_registry::emplace_or_replace
-     * @tparam Component Type of component to assign or replace.
+     * @tparam Component Format of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the newly created component.
@@ -20581,7 +20581,7 @@ struct basic_handle {
     /**
      * @brief Patches the given component for a handle.
      * @sa basic_registry::patch
-     * @tparam Component Type of component to patch.
+     * @tparam Component Format of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param func Valid function objects.
      * @return A reference to the patched component.
@@ -20595,7 +20595,7 @@ struct basic_handle {
     /**
      * @brief Replaces the given component for a handle.
      * @sa basic_registry::replace
-     * @tparam Component Type of component to replace.
+     * @tparam Component Format of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
      * @return A reference to the component being replaced.
@@ -20684,7 +20684,7 @@ struct basic_handle {
     /**
      * @brief Returns a reference to the given component for a handle.
      * @sa basic_registry::get_or_emplace
-     * @tparam Component Type of component to get.
+     * @tparam Component Format of component to get.
      * @tparam Args Types of arguments to use to construct the component.
      * @param args Parameters to use to initialize the component.
      * @return Reference to the component owned by the handle.
@@ -20718,7 +20718,7 @@ struct basic_handle {
     /**
      * @brief Visits a handle and returns the types for its components.
      * @sa basic_registry::visit
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -20734,7 +20734,7 @@ private:
 
 /**
  * @brief Compares two handles.
- * @tparam Type A valid entity type (see entt_traits for more details).
+ * @tparam Format A valid entity type (see entt_traits for more details).
  * @tparam Other A valid entity type (see entt_traits for more details).
  * @param lhs A valid handle.
  * @param rhs A valid handle.
@@ -20936,7 +20936,7 @@ public:
      * @brief Constructs a delegate and connects a free function with payload or
      * a bound member.
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -20985,7 +20985,7 @@ public:
      * define the delegate itself.
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -21006,10 +21006,10 @@ public:
      * @brief Connects a free function with payload or a bound member to a
      * delegate.
      *
-     * @sa connect(Type &)
+     * @sa connect(Format &)
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -21129,7 +21129,7 @@ delegate(connect_arg_t<Candidate>)
 /**
  * @brief Deduction guide.
  * @tparam Candidate Function or member to connect to the delegate.
- * @tparam Type Type of class or type of payload.
+ * @tparam Format Format of class or type of payload.
  */
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&)
@@ -21168,7 +21168,7 @@ template<typename Entity>
 struct as_view {
     /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
-    /*! @brief Type of registry to convert. */
+    /*! @brief Format of registry to convert. */
     using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /**
@@ -21180,7 +21180,7 @@ struct as_view {
     /**
      * @brief Conversion function from a registry to a view.
      * @tparam Exclude Types of components used to filter the view.
-     * @tparam Component Type of components used to construct the view.
+     * @tparam Component Format of components used to construct the view.
      * @return A newly created view.
      */
     template<typename Exclude, typename... Component>
@@ -21217,7 +21217,7 @@ template<typename Entity>
 struct as_group {
     /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
-    /*! @brief Type of registry to convert. */
+    /*! @brief Format of registry to convert. */
     using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /**
@@ -21288,7 +21288,7 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  * makes assumptions about how the components are laid out.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Type of component.
+ * @tparam Component Format of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
  * @return The entity associated with the given component.
@@ -21382,7 +21382,7 @@ struct basic_collector<> {
 
     /**
      * @brief Adds an observing matcher to the collector.
-     * @tparam AnyOf Type of component for which changes should be detected.
+     * @tparam AnyOf Format of component for which changes should be detected.
      * @return The updated collector.
      */
     template<typename AnyOf>
@@ -21417,7 +21417,7 @@ struct basic_collector<matcher<type_list<Reject...>, type_list<Require...>, Rule
 
     /**
      * @brief Adds an observing matcher to the collector.
-     * @tparam AnyOf Type of component for which changes should be detected.
+     * @tparam AnyOf Format of component for which changes should be detected.
      * @return The updated collector.
      */
     template<typename AnyOf>
@@ -21733,7 +21733,7 @@ public:
      * void(const entity_type);
      * @endcode
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -21749,7 +21749,7 @@ public:
      *
      * @sa each
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -21817,7 +21817,7 @@ template<typename Entity>
 struct as_view {
     /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
-    /*! @brief Type of registry to convert. */
+    /*! @brief Format of registry to convert. */
     using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /**
@@ -21829,7 +21829,7 @@ struct as_view {
     /**
      * @brief Conversion function from a registry to a view.
      * @tparam Exclude Types of components used to filter the view.
-     * @tparam Component Type of components used to construct the view.
+     * @tparam Component Format of components used to construct the view.
      * @return A newly created view.
      */
     template<typename Exclude, typename... Component>
@@ -21866,7 +21866,7 @@ template<typename Entity>
 struct as_group {
     /*! @brief Underlying entity identifier. */
     using entity_type = std::remove_const_t<Entity>;
-    /*! @brief Type of registry to convert. */
+    /*! @brief Format of registry to convert. */
     using registry_type = constness_as_t<basic_registry<entity_type>, Entity>;
 
     /**
@@ -21937,7 +21937,7 @@ void invoke(basic_registry<Entity> &reg, const Entity entt) {
  * makes assumptions about how the components are laid out.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Type of component.
+ * @tparam Component Format of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
  * @return The entity associated with the given component.
@@ -22350,7 +22350,7 @@ public:
      * instance to the task list.
      * @tparam Candidate Function or member to add to the task list.
      * @tparam Req Additional requirements and/or override resource access mode.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @param name Optional name to associate with the task.
      */
@@ -22501,7 +22501,7 @@ struct Storage: type_list<type_info() const ENTT_NOEXCEPT> {
 
     /**
      * @brief Concept implementation.
-     * @tparam Type Type for which to generate an implementation.
+     * @tparam Format Format for which to generate an implementation.
      */
     template<typename Type>
     using impl = value_list<&type_id<typename Type::value_type>>;
@@ -22729,7 +22729,7 @@ public:
 
     /**
      * @brief Prepares a pool for the given type if required.
-     * @tparam Component Type of component for which to prepare a pool.
+     * @tparam Component Format of component for which to prepare a pool.
      */
     template<typename Component>
     void prepare() {
@@ -22756,7 +22756,7 @@ public:
 
     /**
      * @brief Returns the number of existing components of the given type.
-     * @tparam Component Type of component of which to return the size.
+     * @tparam Component Format of component of which to return the size.
      * @return Number of existing components of the given type.
      */
     template<typename Component>
@@ -22820,7 +22820,7 @@ public:
 
     /**
      * @brief Returns the capacity of the pool for the given component.
-     * @tparam Component Type of component in which one is interested.
+     * @tparam Component Format of component in which one is interested.
      * @return Capacity of the pool of the given component.
      */
     template<typename Component>
@@ -22982,7 +22982,7 @@ public:
      *
      * @sa create
      *
-     * @tparam It Type of forward iterator.
+     * @tparam It Format of forward iterator.
      * @param first An iterator to the first element of the range to generate.
      * @param last An iterator past the last element of the range to generate.
      */
@@ -23012,7 +23012,7 @@ public:
      * @warning
      * There must be no entities still alive for this to work properly.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param destroyed The head of the list of destroyed entities.
@@ -23061,7 +23061,7 @@ public:
      *
      * @sa release
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -23118,7 +23118,7 @@ public:
      *
      * @sa destroy
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -23148,7 +23148,7 @@ public:
      * Attempting to use an invalid entity or to assign a component to an entity
      * that already owns it results in undefined behavior.
      *
-     * @tparam Component Type of component to create.
+     * @tparam Component Format of component to create.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -23165,8 +23165,8 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
-     * @tparam It Type of input iterator.
+     * @tparam Component Format of component to create.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the component to assign.
@@ -23182,9 +23182,9 @@ public:
      *
      * @sa emplace
      *
-     * @tparam Component Type of component to create.
-     * @tparam EIt Type of input iterator.
-     * @tparam CIt Type of input iterator.
+     * @tparam Component Format of component to create.
+     * @tparam EIt Format of input iterator.
+     * @tparam CIt Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of components.
@@ -23210,7 +23210,7 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to assign or replace.
+     * @tparam Component Format of component to assign or replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -23244,7 +23244,7 @@ public:
      * Attempting to use an invalid entity or to patch a component of an entity
      * that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Type of component to patch.
+     * @tparam Component Format of component to patch.
      * @tparam Func Types of the function objects to invoke.
      * @param entity A valid entity identifier.
      * @param func Valid function objects.
@@ -23267,7 +23267,7 @@ public:
      * Attempting to use an invalid entity or to replace a component of an
      * entity that doesn't own it results in undefined behavior.
      *
-     * @tparam Component Type of component to replace.
+     * @tparam Component Format of component to replace.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -23301,7 +23301,7 @@ public:
      * @sa remove
      *
      * @tparam Component Types of components to remove.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @return The number of components actually removed.
@@ -23344,7 +23344,7 @@ public:
      * @sa erase
      *
      * @tparam Component Types of components to erase.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -23491,7 +23491,7 @@ public:
      * @warning
      * Attempting to use an invalid entity results in undefined behavior.
      *
-     * @tparam Component Type of component to get.
+     * @tparam Component Format of component to get.
      * @tparam Args Types of arguments to use to construct the component.
      * @param entity A valid entity identifier.
      * @param args Parameters to use to initialize the component.
@@ -23572,7 +23572,7 @@ public:
      * it's useful for iterating all the entities still in use, regardless of
      * their components.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -23613,7 +23613,7 @@ public:
      *
      * This function can be very slow and should not be used frequently.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -23642,7 +23642,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Component Format of component of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Component>
@@ -23665,7 +23665,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Component Format of component of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Component>
@@ -23690,7 +23690,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Component Type of component of which to get the sink.
+     * @tparam Component Format of component of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Component>
@@ -23726,7 +23726,7 @@ public:
      * of the entities have all the given components.<br/>
      * To get a performance boost, consider using a group instead.
      *
-     * @tparam Component Type of components used to construct the view.
+     * @tparam Component Format of components used to construct the view.
      * @tparam Exclude Types of components used to filter the view.
      * @return A newly created view.
      */
@@ -23757,9 +23757,9 @@ public:
      * some external inputs and don't know at compile-time what are the required
      * components.
      *
-     * @tparam ItComp Type of input iterator for the components to use to
+     * @tparam ItComp Format of input iterator for the components to use to
      * construct the view.
-     * @tparam ItExcl Type of input iterator for the components to use to filter
+     * @tparam ItExcl Format of input iterator for the components to use to filter
      * the view.
      * @param first An iterator to the first element of the range of components
      * to use to construct the view.
@@ -24013,9 +24013,9 @@ public:
      * @warning
      * Pools of components owned by a group cannot be sorted.
      *
-     * @tparam Component Type of components to sort.
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Component Format of components to sort.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -24057,8 +24057,8 @@ public:
      * @warning
      * Pools of components owned by a group cannot be sorted.
      *
-     * @tparam To Type of components to sort.
-     * @tparam From Type of components to use to sort.
+     * @tparam To Format of components to sort.
+     * @tparam From Format of components to use to sort.
      */
     template<typename To, typename From>
     void sort() {
@@ -24083,7 +24083,7 @@ public:
      * It's not specified whether a component attached to or removed from the
      * given entity during the visit is returned or not to the caller.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param entity A valid entity identifier.
      * @param func A valid function object.
      */
@@ -24113,7 +24113,7 @@ public:
      * It's not specified whether a component for which a pool is created during
      * the visit is returned or not to the caller.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -24131,7 +24131,7 @@ public:
      * If the value already exists it is overwritten, otherwise a new instance
      * of the given type is created and initialized with the arguments provided.
      *
-     * @tparam Type Type of object to set.
+     * @tparam Format Format of object to set.
      * @tparam Args Types of arguments to use to construct the object.
      * @param args Parameters to use to initialize the value.
      * @return A reference to the newly created object.
@@ -24145,7 +24145,7 @@ public:
 
     /**
      * @brief Unsets a context variable if it exists.
-     * @tparam Type Type of object to set.
+     * @tparam Format Format of object to set.
      */
     template<typename Type>
     void unset() {
@@ -24158,7 +24158,7 @@ public:
      * In case the context doesn't contain the given object, the parameters
      * provided are used to construct it.
      *
-     * @tparam Type Type of object to set.
+     * @tparam Format Format of object to set.
      * @tparam Args Types of arguments to use to construct the object.
      * @param args Parameters to use to initialize the object.
      * @return A reference to the object in the context of the registry.
@@ -24171,7 +24171,7 @@ public:
 
     /**
      * @brief Returns a pointer to an object in the context of the registry.
-     * @tparam Type Type of object to get.
+     * @tparam Format Format of object to get.
      * @return A pointer to the object if it exists in the context of the
      * registry, a null pointer otherwise.
      */
@@ -24195,7 +24195,7 @@ public:
      * Attempting to get a context variable that doesn't exist results in
      * undefined behavior.
      *
-     * @tparam Type Type of object to get.
+     * @tparam Format Format of object to get.
      * @return A valid reference to the object in the context of the registry.
      */
     template<typename Type>
@@ -24231,7 +24231,7 @@ public:
      * It's not specified whether a context variable created during the visit is
      * returned or not to the caller.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -24485,7 +24485,7 @@ public:
      * void(const entity_type);
      * @endcode
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -24599,7 +24599,7 @@ public:
      * Entities are serialized along with their versions. Destroyed entities are
      * taken in consideration as well by this function.
      *
-     * @tparam Archive Type of output archive.
+     * @tparam Archive Format of output archive.
      * @param archive A valid reference to an output archive.
      * @return An object of this type to continue creating the snapshot.
      */
@@ -24625,7 +24625,7 @@ public:
      * Entities are serialized along with their versions.
      *
      * @tparam Component Types of components to serialize.
-     * @tparam Archive Type of output archive.
+     * @tparam Archive Format of output archive.
      * @param archive A valid reference to an output archive.
      * @return An object of this type to continue creating the snapshot.
      */
@@ -24648,8 +24648,8 @@ public:
      * Entities are serialized along with their versions.
      *
      * @tparam Component Types of components to serialize.
-     * @tparam Archive Type of output archive.
-     * @tparam It Type of input iterator.
+     * @tparam Archive Format of output archive.
+     * @tparam It Format of input iterator.
      * @param archive A valid reference to an output archive.
      * @param first An iterator to the first element of the range to serialize.
      * @param last An iterator past the last element of the range to serialize.
@@ -24733,7 +24733,7 @@ public:
      * This function restores the entities that were in use during serialization
      * and gives them the versions they originally had.
      *
-     * @tparam Archive Type of input archive.
+     * @tparam Archive Format of input archive.
      * @param archive A valid reference to an input archive.
      * @return A valid loader to continue restoring data.
      */
@@ -24765,7 +24765,7 @@ public:
      * the version it originally had.
      *
      * @tparam Component Types of components to restore.
-     * @tparam Archive Type of input archive.
+     * @tparam Archive Format of input archive.
      * @param archive A valid reference to an input archive.
      * @return A valid loader to continue restoring data.
      */
@@ -24948,7 +24948,7 @@ public:
      * This function restores the entities that were in use during serialization
      * and creates local counterparts for them if required.
      *
-     * @tparam Archive Type of input archive.
+     * @tparam Archive Format of input archive.
      * @param archive A valid reference to an input archive.
      * @return A non-const reference to this loader.
      */
@@ -24986,9 +24986,9 @@ public:
      * entities. In both cases, the loader will visit them and update the
      * entities by replacing each one with its local counterpart.
      *
-     * @tparam Component Type of component to restore.
-     * @tparam Archive Type of input archive.
-     * @tparam Type Types of components to update with local counterparts.
+     * @tparam Component Format of component to restore.
+     * @tparam Archive Format of input archive.
+     * @tparam Format Types of components to update with local counterparts.
      * @tparam Member Types of members to update with their local counterparts.
      * @param archive A valid reference to an input archive.
      * @param member Members to update with their local counterparts.
@@ -25140,7 +25140,7 @@ enum class deletion_policy: std::uint8_t {
  * a sparse set. Do not make assumption on the order in any case.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Allocator Format of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Allocator>
 class basic_sparse_set {
@@ -25382,7 +25382,7 @@ public:
 
     /**
      * @brief Constructs an empty container with the given policy and allocator.
-     * @param pol Type of deletion policy.
+     * @param pol Format of deletion policy.
      * @param alloc Allocator to use (possibly default-constructed).
      */
     explicit basic_sparse_set(deletion_policy pol, const allocator_type &alloc = {})
@@ -25700,7 +25700,7 @@ public:
      * Attempting to assign an entity that already belongs to the sparse set
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -25736,7 +25736,7 @@ public:
      *
      * @sa erase
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param ud Optional user data that are forwarded as-is to derived classes.
@@ -25760,7 +25760,7 @@ public:
 
     /**
      * @brief Removes entities from a sparse set if they exist.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param ud Optional user data that are forwarded as-is to derived classes.
@@ -25848,8 +25848,8 @@ public:
      * * An iterator past the last element of the range to sort.
      * * A comparison function to use to compare the elements.
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param length Number of elements to sort.
      * @param compare A valid comparison function object.
@@ -25884,8 +25884,8 @@ public:
      *
      * @sa sort_n
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -26019,8 +26019,8 @@ namespace entt {
  * @sa sparse_set<Entity>
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Format Format of objects assigned to the entities.
+ * @tparam Allocator Format of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Type, typename Allocator, typename = void>
 class basic_storage_impl: public basic_sparse_set<Entity, typename std::allocator_traits<Allocator>::template rebind_alloc<Entity>> {
@@ -26266,7 +26266,7 @@ protected:
 public:
     /*! @brief Allocator type. */
     using allocator_type = typename alloc_traits::allocator_type;
-    /*! @brief Type of the objects assigned to entities. */
+    /*! @brief Format of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -26548,7 +26548,7 @@ public:
      * Attempting to assign an entity that already belongs to the storage
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param value An instance of the object to construct.
@@ -26577,8 +26577,8 @@ public:
      *
      * @sa construct
      *
-     * @tparam EIt Type of input iterator.
-     * @tparam CIt Type of input iterator.
+     * @tparam EIt Format of input iterator.
+     * @tparam CIt Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      * @param from An iterator to the first element of the range of objects.
@@ -26610,7 +26610,7 @@ public:
      *
      * @code{.cpp}
      * bool(const Entity, const Entity);
-     * bool(const Type &, const Type &);
+     * bool(const Format &, const Format &);
      * @endcode
      *
      * Moreover, the comparison function object shall induce a
@@ -26628,8 +26628,8 @@ public:
      * objects that require to return entities rather than components are
      * accepted.
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param length Number of elements to sort.
      * @param compare A valid comparison function object.
@@ -26653,8 +26653,8 @@ public:
      *
      * @sa sort_n
      *
-     * @tparam Compare Type of comparison function object.
-     * @tparam Sort Type of sort function object.
+     * @tparam Compare Format of comparison function object.
+     * @tparam Sort Format of sort function object.
      * @tparam Args Types of arguments to forward to the sort function object.
      * @param compare A valid comparison function object.
      * @param algo A valid sort function object.
@@ -26685,7 +26685,7 @@ class basic_storage_impl<Entity, Type, Allocator, std::enable_if_t<component_tra
 public:
     /*! @brief Allocator type. */
     using allocator_type = typename alloc_traits::allocator_type;
-    /*! @brief Type of the objects assigned to entities. */
+    /*! @brief Format of the objects assigned to entities. */
     using value_type = Type;
     /*! @brief Underlying entity identifier. */
     using entity_type = Entity;
@@ -26749,7 +26749,7 @@ public:
      * Attempting to assign an entity that already belongs to the storage
      * results in undefined behavior.
      *
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @param first An iterator to the first element of the range of entities.
      * @param last An iterator past the last element of the range of entities.
      */
@@ -26762,13 +26762,13 @@ public:
 
 /**
  * @brief Mixin type to use to wrap basic storage classes.
- * @tparam Type The type of the underlying storage.
+ * @tparam Format The type of the underlying storage.
  */
 template<typename Type>
 struct storage_adapter_mixin: Type {
     static_assert(std::is_same_v<typename Type::value_type, std::decay_t<typename Type::value_type>>, "Invalid object type");
 
-    /*! @brief Type of the objects assigned to entities. */
+    /*! @brief Format of the objects assigned to entities. */
     using value_type = typename Type::value_type;
     /*! @brief Underlying entity identifier. */
     using entity_type = typename Type::entity_type;
@@ -26790,7 +26790,7 @@ struct storage_adapter_mixin: Type {
 
     /**
      * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
      * to the entities.
      * @param first An iterator to the first element of the range of entities.
@@ -26819,7 +26819,7 @@ struct storage_adapter_mixin: Type {
 
 /**
  * @brief Mixin type to use to add signal support to storage types.
- * @tparam Type The type of the underlying storage.
+ * @tparam Format The type of the underlying storage.
  */
 template<typename Type>
 class sigh_storage_mixin final: public Type {
@@ -26928,7 +26928,7 @@ public:
 
     /**
      * @brief Assigns entities to a storage.
-     * @tparam It Type of input iterator.
+     * @tparam It Format of input iterator.
      * @tparam Args Types of arguments to use to construct the objects assigned
      * to the entities.
      * @param owner The registry that issued the request.
@@ -26973,8 +26973,8 @@ private:
 /**
  * @brief Storage implementation dispatcher.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects assigned to the entities.
- * @tparam Allocator Type of allocator used to manage memory and elements.
+ * @tparam Format Format of objects assigned to the entities.
+ * @tparam Allocator Format of allocator used to manage memory and elements.
  */
 template<typename Entity, typename Type, typename Allocator>
 struct basic_storage: basic_storage_impl<Entity, Type, Allocator> {
@@ -26985,7 +26985,7 @@ struct basic_storage: basic_storage_impl<Entity, Type, Allocator> {
 /**
  * @brief Provides a common way to access certain properties of storage types.
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Type Type of objects managed by the storage class.
+ * @tparam Format Format of objects managed by the storage class.
  */
 template<typename Entity, typename Type, typename = void>
 struct storage_traits {
@@ -26996,7 +26996,7 @@ struct storage_traits {
 
 /**
  * @brief Gets the element assigned to an entity from a storage, if any.
- * @tparam Type Storage type.
+ * @tparam Format Storage type.
  * @param container A valid instance of a storage class.
  * @param entt A valid entity identifier.
  * @return A possibly empty tuple containing the requested element.
@@ -27032,7 +27032,7 @@ namespace entt {
 
 /**
  * @brief Alias for exclusion lists.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 struct exclude_t: type_list<Type...> {};
@@ -27040,7 +27040,7 @@ struct exclude_t: type_list<Type...> {};
 
 /**
  * @brief Variable template for exclusion lists.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 inline constexpr exclude_t<Type...> exclude{};
@@ -27048,7 +27048,7 @@ inline constexpr exclude_t<Type...> exclude{};
 
 /**
  * @brief Alias for lists of observed components.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 struct get_t: type_list<Type...>{};
@@ -27056,7 +27056,7 @@ struct get_t: type_list<Type...>{};
 
 /**
  * @brief Variable template for lists of observed components.
- * @tparam Type List of types.
+ * @tparam Format List of types.
  */
 template<typename... Type>
 inline constexpr get_t<Type...> get{};
@@ -27448,7 +27448,7 @@ public:
 
     /**
      * @brief Forces the type to use to drive iterations.
-     * @tparam Comp Type of component to use to drive the iteration.
+     * @tparam Comp Format of component to use to drive the iteration.
      */
     template<typename Comp>
     void use() const ENTT_NOEXCEPT {
@@ -27602,15 +27602,15 @@ public:
      * forms:
      *
      * @code{.cpp}
-     * void(const entity_type, Type &...);
-     * void(Type &...);
+     * void(const entity_type, Format &...);
+     * void(Format &...);
      * @endcode
      *
      * @note
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -27628,8 +27628,8 @@ public:
      *
      * @sa each
      *
-     * @tparam Comp Type of component to use to drive the iteration.
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Comp Format of component to use to drive the iteration.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Comp, typename Func>
@@ -27664,7 +27664,7 @@ public:
      *
      * @sa each
      *
-     * @tparam Comp Type of component to use to drive the iteration.
+     * @tparam Comp Format of component to use to drive the iteration.
      * @return An iterable object to use to _visit_ the view.
      */
     template<typename Comp>
@@ -27721,7 +27721,7 @@ private:
  * In any other case, attempting to use a view results in undefined behavior.
  *
  * @tparam Entity A valid entity type (see entt_traits for more details).
- * @tparam Component Type of component iterated by the view.
+ * @tparam Component Format of component iterated by the view.
  */
 template<typename Entity, typename Component>
 class basic_view_impl<packed_storage_policy, Entity, exclude_t<>, Component> {
@@ -28021,7 +28021,7 @@ public:
      * Empty types aren't explicitly instantiated and therefore they are never
      * returned during iterations.
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template<typename Func>
@@ -28102,7 +28102,7 @@ struct basic_view<Entity, exclude_t<Exclude...>, Component...>
 
 /**
  * @brief Deduction guide.
- * @tparam Storage Type of storage classes used to create the view.
+ * @tparam Storage Format of storage classes used to create the view.
  * @param storage The storage for the types to iterate.
  */
 template<typename... Storage>
@@ -28241,11 +28241,11 @@ namespace entt {
  * based implementation tries to fill the gap and to get rid of the burden of
  * defining a different specific locator for each application.
  *
- * @tparam Service Type of service managed by the locator.
+ * @tparam Service Format of service managed by the locator.
  */
 template<typename Service>
 struct service_locator {
-    /*! @brief Type of service offered. */
+    /*! @brief Format of service offered. */
     using service_type = Service;
 
     /*! @brief Default constructor, deleted on purpose. */
@@ -28295,7 +28295,7 @@ struct service_locator {
 
     /**
      * @brief Sets or replaces a service.
-     * @tparam Impl Type of the new service to use.
+     * @tparam Impl Format of the new service to use.
      * @tparam Args Types of arguments to use to construct the service.
      * @param args Parameters to use to construct the service.
      */
@@ -28342,7 +28342,7 @@ namespace entt {
 
 /**
  * @brief ADL based lookup function for dereferencing meta pointer-like types.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  * @param value A pointer-like object.
  * @return The value returned from the dereferenced pointer.
  */
@@ -28354,7 +28354,7 @@ decltype(auto) dereference_meta_pointer_like(const Type &value) {
 
 /**
  * @brief Fake ADL based lookup function for meta pointer-like types.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  */
 template<typename Type>
 struct adl_meta_pointer_like {
@@ -28637,7 +28637,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -28648,7 +28648,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -28656,7 +28656,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -28672,7 +28672,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -28681,7 +28681,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -28714,11 +28714,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -28733,7 +28733,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -28744,7 +28744,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -28757,7 +28757,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -28765,7 +28765,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -28788,7 +28788,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -28801,7 +28801,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -28812,7 +28812,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -28825,7 +28825,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -28849,7 +28849,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -28858,8 +28858,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -28867,8 +28867,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -28876,8 +28876,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -28890,7 +28890,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -28902,7 +28902,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -29062,7 +29062,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -29070,7 +29070,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -29140,7 +29140,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -29153,7 +29153,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -29162,7 +29162,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -29177,7 +29177,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -29186,7 +29186,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -29209,7 +29209,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -29319,7 +29319,7 @@ struct meta_associative_container_traits;
 /**
  * @brief Provides the member constant `value` to true if a meta associative
  * container claims to wrap a key-only type, false otherwise.
- * @tparam Type Potentially key-only meta associative container type.
+ * @tparam Format Potentially key-only meta associative container type.
  */
 template<typename, typename = void>
 struct is_key_only_meta_associative_container: std::true_type {};
@@ -29334,7 +29334,7 @@ struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_as
 
 /**
  * @brief Helper variable template.
- * @tparam Type Potentially key-only meta associative container type.
+ * @tparam Format Potentially key-only meta associative container type.
  */
 template<typename Type>
 inline constexpr auto is_key_only_meta_associative_container_v = is_key_only_meta_associative_container<Type>::value;
@@ -29343,7 +29343,7 @@ inline constexpr auto is_key_only_meta_associative_container_v = is_key_only_met
 /**
  * @brief Provides the member constant `value` to true if a given type is a
  * pointer-like type from the point of view of the meta system, false otherwise.
- * @tparam Type Potentially pointer-like type.
+ * @tparam Format Potentially pointer-like type.
  */
 template<typename>
 struct is_meta_pointer_like: std::false_type {};
@@ -29352,7 +29352,7 @@ struct is_meta_pointer_like: std::false_type {};
 /**
  * @brief Partial specialization to ensure that const pointer-like types are
  * also accepted.
- * @tparam Type Potentially pointer-like type.
+ * @tparam Format Potentially pointer-like type.
  */
 template<typename Type>
 struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
@@ -29360,7 +29360,7 @@ struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
 
 /**
  * @brief Helper variable template.
- * @tparam Type Potentially pointer-like type.
+ * @tparam Format Potentially pointer-like type.
  */
 template<typename Type>
 inline constexpr auto is_meta_pointer_like_v = is_meta_pointer_like<Type>::value;
@@ -29378,12 +29378,12 @@ namespace entt {
 
 /**
  * @brief Container traits.
- * @tparam Container Type of the underlying container.
+ * @tparam Container Format of the underlying container.
  * @tparam Trait Traits associated with the underlying container.
  */
 template<typename Container, template<typename> class... Trait>
 struct meta_container_traits: public Trait<Container>... {
-    /*! @brief Type of container. */
+    /*! @brief Format of container. */
     using type = Container;
 };
 
@@ -29651,7 +29651,7 @@ struct fixed_sequence_container {
 
 /**
  * @brief Meta sequence container traits for `std::vector`s of any type.
- * @tparam Type The type of elements.
+ * @tparam Format The type of elements.
  * @tparam Args Other arguments.
  */
 template<typename Type, typename... Args>
@@ -29668,7 +29668,7 @@ struct meta_sequence_container_traits<std::vector<Type, Args...>>
 
 /**
  * @brief Meta sequence container traits for `std::array`s of any type.
- * @tparam Type The type of elements.
+ * @tparam Format The type of elements.
  * @tparam N The number of elements.
  */
 template<typename Type, auto N>
@@ -30304,8 +30304,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -30324,8 +30324,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -30348,8 +30348,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -30409,24 +30409,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -30461,7 +30461,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -30608,7 +30608,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -30621,8 +30621,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -30661,7 +30661,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -30793,8 +30793,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -30813,8 +30813,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -30837,8 +30837,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -30898,24 +30898,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -30950,7 +30950,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -31018,7 +31018,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -31029,7 +31029,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -31037,7 +31037,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -31053,7 +31053,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -31062,7 +31062,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -31095,11 +31095,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -31114,7 +31114,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -31125,7 +31125,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -31138,7 +31138,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -31146,7 +31146,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -31169,7 +31169,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -31182,7 +31182,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -31193,7 +31193,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -31206,7 +31206,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -31230,7 +31230,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -31239,8 +31239,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -31248,8 +31248,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -31257,8 +31257,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -31271,7 +31271,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -31283,7 +31283,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -31443,7 +31443,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -31451,7 +31451,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -31521,7 +31521,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -31534,7 +31534,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -31543,7 +31543,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -31558,7 +31558,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -31567,7 +31567,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -31590,7 +31590,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -31800,7 +31800,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -31815,7 +31815,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -31828,7 +31828,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
@@ -31894,12 +31894,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Format &> or forward_as_any instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;
@@ -31907,7 +31907,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
@@ -31943,7 +31943,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -32022,7 +32022,7 @@ template<std::size_t Len, std::size_t Align>
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @tparam Type Type to which conversion is required.
+ * @tparam Format Format to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  * @param data Target any object.
@@ -32073,7 +32073,7 @@ Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Args Types of arguments to use to construct the new instance.
@@ -32090,7 +32090,7 @@ basic_any<Len, Align> make_any(Args &&... args) {
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -32124,7 +32124,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -32137,8 +32137,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -32177,7 +32177,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -32230,7 +32230,7 @@ namespace entt {
 
 /**
  * @brief ADL based lookup function for dereferencing meta pointer-like types.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  * @param value A pointer-like object.
  * @return The value returned from the dereferenced pointer.
  */
@@ -32242,7 +32242,7 @@ decltype(auto) dereference_meta_pointer_like(const Type &value) {
 
 /**
  * @brief Fake ADL based lookup function for meta pointer-like types.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  */
 template<typename Type>
 struct adl_meta_pointer_like {
@@ -32626,8 +32626,8 @@ namespace entt {
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
- * @tparam Type Type of meta objects returned.
- * @tparam Node Type of meta nodes iterated.
+ * @tparam Format Format of meta objects returned.
+ * @tparam Node Format of meta nodes iterated.
  */
 template<typename Type, typename Node = typename Type::node_type>
 class meta_range {
@@ -32743,7 +32743,7 @@ public:
 
     /**
      * @brief Construct a proxy object for sequence containers.
-     * @tparam Type Type of container to wrap.
+     * @tparam Format Format of container to wrap.
      * @param instance The container to wrap.
      */
     template<typename Type>
@@ -32803,7 +32803,7 @@ public:
 
     /**
      * @brief Construct a proxy object for associative containers.
-     * @tparam Type Type of container to wrap.
+     * @tparam Format Format of container to wrap.
      * @param instance The container to wrap.
      */
     template<typename Type>
@@ -32909,7 +32909,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -32922,7 +32922,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -32935,7 +32935,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
@@ -32992,12 +32992,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This meta any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &>, emplace<Type &> or forward_as_meta instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &>, emplace<Format &> or forward_as_meta instead")]]
     meta_any & operator=(std::reference_wrapper<Type> value) {
         emplace<Type &>(value.get());
         return *this;
@@ -33005,7 +33005,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This meta any object.
      */
@@ -33058,7 +33058,7 @@ public:
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
-     * @tparam Type Type of value to assign.
+     * @tparam Format Format of value to assign.
      * @param id Unique identifier.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
@@ -33078,7 +33078,7 @@ public:
 
     /**
      * @brief Tries to cast an instance to a given type.
-     * @tparam Type Type to which to cast the instance.
+     * @tparam Format Format to which to cast the instance.
      * @return A (possibly null) pointer to the contained instance.
      */
     template<typename Type>
@@ -33116,7 +33116,7 @@ public:
      * @warning
      * Attempting to perform an invalid cast results in undefined behavior.
      *
-     * @tparam Type Type to which to cast the instance.
+     * @tparam Format Format to which to cast the instance.
      * @return A reference to the contained instance.
      */
     template<typename Type>
@@ -33137,7 +33137,7 @@ public:
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
-     * @tparam Type Type to which the cast is requested.
+     * @tparam Format Format to which the cast is requested.
      * @return A valid meta any object if there exists a viable conversion, an
      * invalid one otherwise.
      */
@@ -33156,7 +33156,7 @@ public:
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
-     * @tparam Type Type to which the cast is requested.
+     * @tparam Format Format to which the cast is requested.
      * @return True if there exists a viable conversion, false otherwise.
      */
     template<typename Type>
@@ -33176,7 +33176,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -33289,7 +33289,7 @@ private:
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Args Types of arguments to use to construct the new instance.
  * @param args Parameters to use to construct the instance.
  * @return A properly initialized wrapper for an object of the given type.
@@ -33302,7 +33302,7 @@ meta_any make_meta(Args &&... args) {
 
 /**
  * @brief Forwards its argument and avoids copies for lvalue references.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -33344,7 +33344,7 @@ struct meta_handle {
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
-     * @tparam Type Type of object to use to initialize the handle.
+     * @tparam Format Format of object to use to initialize the handle.
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
@@ -33564,7 +33564,7 @@ struct meta_data {
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
-     * @tparam Type Type of value to assign.
+     * @tparam Format Format of value to assign.
      * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
@@ -34189,7 +34189,7 @@ public:
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
-     * @tparam Type Type of value to assign.
+     * @tparam Format Format of value to assign.
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
@@ -34391,7 +34391,7 @@ class meta_sequence_container::meta_iterator {
 public:
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
+    /*! @brief Format of elements returned by the iterator. */
     using value_type = meta_any;
     /*! @brief Pointer type, `void` on purpose. */
     using pointer = void;
@@ -34405,7 +34405,7 @@ public:
 
     /**
      * @brief Constructs a meta iterator from a given iterator.
-     * @tparam It Type of actual iterator with which to build the meta iterator.
+     * @tparam It Format of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
     template<typename It>
@@ -34662,7 +34662,7 @@ class meta_associative_container::meta_iterator {
 public:
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
+    /*! @brief Format of elements returned by the iterator. */
     using value_type = std::pair<meta_any, meta_any>;
     /*! @brief Pointer type, `void` on purpose. */
     using pointer = void;
@@ -34677,7 +34677,7 @@ public:
     /**
      * @brief Constructs an meta iterator from a given iterator.
      * @tparam KeyOnly True if the container is also key-only, false otherwise.
-     * @tparam It Type of actual iterator with which to build the meta iterator.
+     * @tparam It Format of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
     template<bool KeyOnly, typename It>
@@ -34983,7 +34983,7 @@ struct meta_function_descriptor;
 
 /**
  * @brief Meta function descriptor.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
  * @tparam Class Actual owner of the member function.
  * @tparam Args Function arguments.
@@ -35004,7 +35004,7 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
 
 /**
  * @brief Meta function descriptor.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
  * @tparam Class Actual owner of the member function.
  * @tparam Args Function arguments.
@@ -35025,7 +35025,7 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
 
 /**
  * @brief Meta function descriptor.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
  * @tparam Args Function arguments.
  */
@@ -35049,7 +35049,7 @@ struct meta_function_descriptor<Type, Ret(*)(Args...)> {
  * Converts a function type to be associated with a reflected type into its meta
  * function descriptor.
  *
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Candidate The actual function to associate with the reflected type.
  */
 template<typename Type, typename Candidate>
@@ -35071,7 +35071,7 @@ public:
 
 /**
  * @brief Helper type.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Candidate The actual function to associate with the reflected type.
  */
 template<typename Type, typename Candidate>
@@ -35091,7 +35091,7 @@ template<typename... Args>
 
 /**
  * @brief Constructs an instance given a list of erased parameters, if possible.
- * @tparam Type Actual type of the instance to construct.
+ * @tparam Format Actual type of the instance to construct.
  * @tparam Args Types of arguments expected.
  * @tparam Index Indexes to use to extract erased arguments from their list.
  * @param args Parameters to use to construct the instance.
@@ -35109,7 +35109,7 @@ template<typename Type, typename... Args, std::size_t... Index>
 
 /**
  * @brief Sets the value of a given variable.
- * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Format Reflected type to which the variable is associated.
  * @tparam Data The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
  * @param value Parameter to use to set the variable.
@@ -35160,7 +35160,7 @@ template<typename Type, auto Data>
 /**
  * @brief Wraps a value depending on the given policy.
  * @tparam Policy Optional policy (no policy set by default).
- * @tparam Type Type of value to wrap.
+ * @tparam Format Format of value to wrap.
  * @param value Value to wrap.
  * @return A meta any containing the returned value.
  */
@@ -35182,7 +35182,7 @@ meta_any meta_dispatch(Type &&value) {
 
 /**
  * @brief Gets the value of a given variable.
- * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Format Reflected type to which the variable is associated.
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
@@ -35220,7 +35220,7 @@ template<typename Type, auto Data, typename Policy = as_is_t>
 
 /**
  * @brief Invokes a function given a list of erased parameters, if possible.
- * @tparam Type Reflected type to which the function is associated.
+ * @tparam Format Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Index Indexes to use to extract erased arguments from their list.
@@ -35270,7 +35270,7 @@ template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t..
 
 /**
  * @brief Invokes a function given a list of erased parameters, if possible.
- * @tparam Type Reflected type to which the function is associated.
+ * @tparam Format Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Index Indexes to use to extract erased arguments from their list.
@@ -35345,7 +35345,7 @@ struct meta_factory;
 
 /**
  * @brief Extended meta factory to be used for reflection purposes.
- * @tparam Type Reflected type for which the factory was created.
+ * @tparam Format Reflected type for which the factory was created.
  * @tparam Spec Property specialization pack used to disambiguate overloads.
  */
 template<typename Type, typename... Spec>
@@ -35417,7 +35417,7 @@ public:
      *
      * Both the key and the value (if any) must be at least copy constructible.
      *
-     * @tparam PropertyOrKey Type of the property or property key.
+     * @tparam PropertyOrKey Format of the property or property key.
      * @tparam Value Optional type of the property value.
      * @param property_or_key Property or property key.
      * @param value Optional property value.
@@ -35457,7 +35457,7 @@ private:
 
 /**
  * @brief Basic meta factory to be used for reflection purposes.
- * @tparam Type Reflected type for which the factory was created.
+ * @tparam Format Reflected type for which the factory was created.
  */
 template<typename Type>
 struct meta_factory<Type> {
@@ -35485,7 +35485,7 @@ struct meta_factory<Type> {
      *
      * A reflected base class must be a real base class of the reflected type.
      *
-     * @tparam Base Type of the base class to assign to the meta type.
+     * @tparam Base Format of the base class to assign to the meta type.
      * @return A meta factory for the parent type.
      */
     template<typename Base>
@@ -35573,7 +35573,7 @@ struct meta_factory<Type> {
      * The given type must be such that an instance of the reflected type can be
      * converted to it.
      *
-     * @tparam To Type of the conversion function to assign to the meta type.
+     * @tparam To Format of the conversion function to assign to the meta type.
      * @return A meta factory for the parent type.
      */
     template<typename To>
@@ -35681,7 +35681,7 @@ struct meta_factory<Type> {
      * The signature of the function should identical to the following:
      *
      * @code{.cpp}
-     * void(Type &);
+     * void(Format &);
      * @endcode
      *
      * The purpose is to give users the ability to free up resources that
@@ -35858,7 +35858,7 @@ struct meta_factory<Type> {
  * is created to which it will be possible to attach meta objects through a
  * dedicated factory.
  *
- * @tparam Type Type to reflect.
+ * @tparam Format Format to reflect.
  * @return A meta factory for the given type.
  */
 template<typename Type>
@@ -35934,7 +35934,7 @@ public:
 
     /**
      * @brief Construct a proxy object for sequence containers.
-     * @tparam Type Type of container to wrap.
+     * @tparam Format Format of container to wrap.
      * @param instance The container to wrap.
      */
     template<typename Type>
@@ -35994,7 +35994,7 @@ public:
 
     /**
      * @brief Construct a proxy object for associative containers.
-     * @tparam Type Type of container to wrap.
+     * @tparam Format Format of container to wrap.
      * @param instance The container to wrap.
      */
     template<typename Type>
@@ -36100,7 +36100,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -36113,7 +36113,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -36126,7 +36126,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_any>>>
@@ -36183,12 +36183,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This meta any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &>, emplace<Type &> or forward_as_meta instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_meta<T &>, emplace<Format &> or forward_as_meta instead")]]
     meta_any & operator=(std::reference_wrapper<Type> value) {
         emplace<Type &>(value.get());
         return *this;
@@ -36196,7 +36196,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This meta any object.
      */
@@ -36249,7 +36249,7 @@ public:
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
-     * @tparam Type Type of value to assign.
+     * @tparam Format Format of value to assign.
      * @param id Unique identifier.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
@@ -36269,7 +36269,7 @@ public:
 
     /**
      * @brief Tries to cast an instance to a given type.
-     * @tparam Type Type to which to cast the instance.
+     * @tparam Format Format to which to cast the instance.
      * @return A (possibly null) pointer to the contained instance.
      */
     template<typename Type>
@@ -36307,7 +36307,7 @@ public:
      * @warning
      * Attempting to perform an invalid cast results in undefined behavior.
      *
-     * @tparam Type Type to which to cast the instance.
+     * @tparam Format Format to which to cast the instance.
      * @return A reference to the contained instance.
      */
     template<typename Type>
@@ -36328,7 +36328,7 @@ public:
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
-     * @tparam Type Type to which the cast is requested.
+     * @tparam Format Format to which the cast is requested.
      * @return A valid meta any object if there exists a viable conversion, an
      * invalid one otherwise.
      */
@@ -36347,7 +36347,7 @@ public:
 
     /**
      * @brief Converts an object in such a way that a given cast becomes viable.
-     * @tparam Type Type to which the cast is requested.
+     * @tparam Format Format to which the cast is requested.
      * @return True if there exists a viable conversion, false otherwise.
      */
     template<typename Type>
@@ -36367,7 +36367,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -36480,7 +36480,7 @@ private:
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Args Types of arguments to use to construct the new instance.
  * @param args Parameters to use to construct the instance.
  * @return A properly initialized wrapper for an object of the given type.
@@ -36493,7 +36493,7 @@ meta_any make_meta(Args &&... args) {
 
 /**
  * @brief Forwards its argument and avoids copies for lvalue references.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -36535,7 +36535,7 @@ struct meta_handle {
 
     /**
      * @brief Creates a handle that points to an unmanaged object.
-     * @tparam Type Type of object to use to initialize the handle.
+     * @tparam Format Format of object to use to initialize the handle.
      * @param value An instance of an object to use to initialize the handle.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, meta_handle>>>
@@ -36755,7 +36755,7 @@ struct meta_data {
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
-     * @tparam Type Type of value to assign.
+     * @tparam Format Format of value to assign.
      * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
      * @return True in case of success, false otherwise.
@@ -37380,7 +37380,7 @@ public:
      * The type of the value must be such that a cast or conversion to the type
      * of the variable is possible. Otherwise, invoking the setter does nothing.
      *
-     * @tparam Type Type of value to assign.
+     * @tparam Format Format of value to assign.
      * @param id Unique identifier.
      * @param instance An opaque instance of the underlying type.
      * @param value Parameter to use to set the underlying variable.
@@ -37582,7 +37582,7 @@ class meta_sequence_container::meta_iterator {
 public:
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
+    /*! @brief Format of elements returned by the iterator. */
     using value_type = meta_any;
     /*! @brief Pointer type, `void` on purpose. */
     using pointer = void;
@@ -37596,7 +37596,7 @@ public:
 
     /**
      * @brief Constructs a meta iterator from a given iterator.
-     * @tparam It Type of actual iterator with which to build the meta iterator.
+     * @tparam It Format of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
     template<typename It>
@@ -37853,7 +37853,7 @@ class meta_associative_container::meta_iterator {
 public:
     /*! @brief Signed integer type. */
     using difference_type = std::ptrdiff_t;
-    /*! @brief Type of elements returned by the iterator. */
+    /*! @brief Format of elements returned by the iterator. */
     using value_type = std::pair<meta_any, meta_any>;
     /*! @brief Pointer type, `void` on purpose. */
     using pointer = void;
@@ -37868,7 +37868,7 @@ public:
     /**
      * @brief Constructs an meta iterator from a given iterator.
      * @tparam KeyOnly True if the container is also key-only, false otherwise.
-     * @tparam It Type of actual iterator with which to build the meta iterator.
+     * @tparam It Format of actual iterator with which to build the meta iterator.
      * @param iter The actual iterator with which to build the meta iterator.
      */
     template<bool KeyOnly, typename It>
@@ -38406,7 +38406,7 @@ namespace entt {
 
 /**
  * @brief Makes plain pointers pointer-like types for the meta system.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  */
 template<typename Type>
 struct is_meta_pointer_like<Type *>
@@ -38416,7 +38416,7 @@ struct is_meta_pointer_like<Type *>
 
 /**
  * @brief Partial specialization used to reject pointers to arrays.
- * @tparam Type Type of elements of the array.
+ * @tparam Format Format of elements of the array.
  * @tparam N Number of elements of the array.
  */
 template<typename Type, std::size_t N>
@@ -38428,7 +38428,7 @@ struct is_meta_pointer_like<Type(*)[N]>
 /**
  * @brief Makes `std::shared_ptr`s of any type pointer-like types for the meta
  * system.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  */
 template<typename Type>
 struct is_meta_pointer_like<std::shared_ptr<Type>>
@@ -38439,7 +38439,7 @@ struct is_meta_pointer_like<std::shared_ptr<Type>>
 /**
  * @brief Makes `std::unique_ptr`s of any type pointer-like types for the meta
  * system.
- * @tparam Type Element type.
+ * @tparam Format Element type.
  * @tparam Args Other arguments.
  */
 template<typename Type, typename... Args>
@@ -38496,8 +38496,8 @@ namespace entt {
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.
- * @tparam Type Type of meta objects returned.
- * @tparam Node Type of meta nodes iterated.
+ * @tparam Format Format of meta objects returned.
+ * @tparam Node Format of meta nodes iterated.
  */
 template<typename Type, typename Node = typename Type::node_type>
 class meta_range {
@@ -38607,7 +38607,7 @@ namespace entt {
 
 /**
  * @brief Returns the meta type associated with a given type.
- * @tparam Type Type to use to search for a meta type.
+ * @tparam Format Format to use to search for a meta type.
  * @return The meta type associated with the given type, if any.
  */
 template<typename Type>
@@ -38682,7 +38682,7 @@ struct meta_class_template_tag {};
 
 /**
  * @brief General purpose traits class for generating meta template information.
- * @tparam Clazz Type of class template.
+ * @tparam Clazz Format of class template.
  * @tparam Args Types of template arguments.
  */
 template<template<typename...> typename Clazz, typename... Args>
@@ -38737,7 +38737,7 @@ struct meta_associative_container_traits;
 /**
  * @brief Provides the member constant `value` to true if a meta associative
  * container claims to wrap a key-only type, false otherwise.
- * @tparam Type Potentially key-only meta associative container type.
+ * @tparam Format Potentially key-only meta associative container type.
  */
 template<typename, typename = void>
 struct is_key_only_meta_associative_container: std::true_type {};
@@ -38752,7 +38752,7 @@ struct is_key_only_meta_associative_container<Type, std::void_t<typename meta_as
 
 /**
  * @brief Helper variable template.
- * @tparam Type Potentially key-only meta associative container type.
+ * @tparam Format Potentially key-only meta associative container type.
  */
 template<typename Type>
 inline constexpr auto is_key_only_meta_associative_container_v = is_key_only_meta_associative_container<Type>::value;
@@ -38761,7 +38761,7 @@ inline constexpr auto is_key_only_meta_associative_container_v = is_key_only_met
 /**
  * @brief Provides the member constant `value` to true if a given type is a
  * pointer-like type from the point of view of the meta system, false otherwise.
- * @tparam Type Potentially pointer-like type.
+ * @tparam Format Potentially pointer-like type.
  */
 template<typename>
 struct is_meta_pointer_like: std::false_type {};
@@ -38770,7 +38770,7 @@ struct is_meta_pointer_like: std::false_type {};
 /**
  * @brief Partial specialization to ensure that const pointer-like types are
  * also accepted.
- * @tparam Type Potentially pointer-like type.
+ * @tparam Format Potentially pointer-like type.
  */
 template<typename Type>
 struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
@@ -38778,7 +38778,7 @@ struct is_meta_pointer_like<const Type>: is_meta_pointer_like<Type> {};
 
 /**
  * @brief Helper variable template.
- * @tparam Type Potentially pointer-like type.
+ * @tparam Format Potentially pointer-like type.
  */
 template<typename Type>
 inline constexpr auto is_meta_pointer_like_v = is_meta_pointer_like<Type>::value;
@@ -38820,7 +38820,7 @@ struct meta_function_descriptor;
 
 /**
  * @brief Meta function descriptor.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
  * @tparam Class Actual owner of the member function.
  * @tparam Args Function arguments.
@@ -38841,7 +38841,7 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...) const> {
 
 /**
  * @brief Meta function descriptor.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
  * @tparam Class Actual owner of the member function.
  * @tparam Args Function arguments.
@@ -38862,7 +38862,7 @@ struct meta_function_descriptor<Type, Ret(Class:: *)(Args...)> {
 
 /**
  * @brief Meta function descriptor.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Ret Function return type.
  * @tparam Args Function arguments.
  */
@@ -38886,7 +38886,7 @@ struct meta_function_descriptor<Type, Ret(*)(Args...)> {
  * Converts a function type to be associated with a reflected type into its meta
  * function descriptor.
  *
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Candidate The actual function to associate with the reflected type.
  */
 template<typename Type, typename Candidate>
@@ -38908,7 +38908,7 @@ public:
 
 /**
  * @brief Helper type.
- * @tparam Type Reflected type to which the meta function is associated.
+ * @tparam Format Reflected type to which the meta function is associated.
  * @tparam Candidate The actual function to associate with the reflected type.
  */
 template<typename Type, typename Candidate>
@@ -38928,7 +38928,7 @@ template<typename... Args>
 
 /**
  * @brief Constructs an instance given a list of erased parameters, if possible.
- * @tparam Type Actual type of the instance to construct.
+ * @tparam Format Actual type of the instance to construct.
  * @tparam Args Types of arguments expected.
  * @tparam Index Indexes to use to extract erased arguments from their list.
  * @param args Parameters to use to construct the instance.
@@ -38946,7 +38946,7 @@ template<typename Type, typename... Args, std::size_t... Index>
 
 /**
  * @brief Sets the value of a given variable.
- * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Format Reflected type to which the variable is associated.
  * @tparam Data The actual variable to set.
  * @param instance An opaque instance of the underlying type, if required.
  * @param value Parameter to use to set the variable.
@@ -38997,7 +38997,7 @@ template<typename Type, auto Data>
 /**
  * @brief Wraps a value depending on the given policy.
  * @tparam Policy Optional policy (no policy set by default).
- * @tparam Type Type of value to wrap.
+ * @tparam Format Format of value to wrap.
  * @param value Value to wrap.
  * @return A meta any containing the returned value.
  */
@@ -39019,7 +39019,7 @@ meta_any meta_dispatch(Type &&value) {
 
 /**
  * @brief Gets the value of a given variable.
- * @tparam Type Reflected type to which the variable is associated.
+ * @tparam Format Reflected type to which the variable is associated.
  * @tparam Data The actual variable to get.
  * @tparam Policy Optional policy (no policy set by default).
  * @param instance An opaque instance of the underlying type, if required.
@@ -39057,7 +39057,7 @@ template<typename Type, auto Data, typename Policy = as_is_t>
 
 /**
  * @brief Invokes a function given a list of erased parameters, if possible.
- * @tparam Type Reflected type to which the function is associated.
+ * @tparam Format Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Index Indexes to use to extract erased arguments from their list.
@@ -39107,7 +39107,7 @@ template<typename Type, auto Candidate, typename Policy = as_is_t, std::size_t..
 
 /**
  * @brief Invokes a function given a list of erased parameters, if possible.
- * @tparam Type Reflected type to which the function is associated.
+ * @tparam Format Reflected type to which the function is associated.
  * @tparam Candidate The actual function to invoke.
  * @tparam Policy Optional policy (no policy set by default).
  * @tparam Index Indexes to use to extract erased arguments from their list.
@@ -39513,7 +39513,7 @@ namespace entt {
 struct identity {
     /**
      * @brief Returns its argument unchanged.
-     * @tparam Type Type of the argument.
+     * @tparam Format Format of the argument.
      * @param value The actual argument.
      * @return The submitted value as-is.
      */
@@ -39526,8 +39526,8 @@ struct identity {
 
 /**
  * @brief Constant utility to disambiguate overloaded members of a class.
- * @tparam Type Type of the desired overload.
- * @tparam Class Type of class to which the member belongs.
+ * @tparam Format Format of the desired overload.
+ * @tparam Class Format of class to which the member belongs.
  * @param member A valid pointer to a member.
  * @return Pointer to the member.
  */
@@ -39566,7 +39566,7 @@ overloaded(Func...)
 
 /**
  * @brief Basic implementation of a y-combinator.
- * @tparam Func Type of a potentially recursive function.
+ * @tparam Func Format of a potentially recursive function.
  */
 template<class Func>
 struct y_combinator {
@@ -40030,8 +40030,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -40050,8 +40050,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -40074,8 +40074,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -40135,24 +40135,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -40187,7 +40187,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -40255,7 +40255,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -40266,7 +40266,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -40274,7 +40274,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -40290,7 +40290,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -40299,7 +40299,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -40332,11 +40332,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -40351,7 +40351,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -40362,7 +40362,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -40375,7 +40375,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -40383,7 +40383,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -40406,7 +40406,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -40419,7 +40419,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -40430,7 +40430,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -40443,7 +40443,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -40467,7 +40467,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -40476,8 +40476,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -40485,8 +40485,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -40494,8 +40494,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -40508,7 +40508,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -40520,7 +40520,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -40680,7 +40680,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -40688,7 +40688,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -40758,7 +40758,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -40771,7 +40771,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -40780,7 +40780,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -40795,7 +40795,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -40804,7 +40804,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -40827,7 +40827,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -41037,7 +41037,7 @@ public:
 
     /**
      * @brief Constructs a wrapper by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -41052,7 +41052,7 @@ public:
 
     /**
      * @brief Constructs a wrapper that holds an unmanaged object.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type>
@@ -41065,7 +41065,7 @@ public:
 
     /**
      * @brief Constructs a wrapper from a given value.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Type>, basic_any>>>
@@ -41131,12 +41131,12 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
     template<typename Type>
-    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Type &> or forward_as_any instead")]]
+    [[deprecated("Use std::in_place_type<T &>, entt::make_any<T &>, emplace<Format &> or forward_as_any instead")]]
     basic_any & operator=(std::reference_wrapper<Type> value) ENTT_NOEXCEPT {
         emplace<Type &>(value.get());
         return *this;
@@ -41144,7 +41144,7 @@ public:
 
     /**
      * @brief Value assignment operator.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @param value An instance of an object to use to initialize the wrapper.
      * @return This any object.
      */
@@ -41180,7 +41180,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the wrapper.
+     * @tparam Format Format of object to use to initialize the wrapper.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -41259,7 +41259,7 @@ template<std::size_t Len, std::size_t Align>
 
 /**
  * @brief Performs type-safe access to the contained object.
- * @tparam Type Type to which conversion is required.
+ * @tparam Format Format to which conversion is required.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Alignment requirement.
  * @param data Target any object.
@@ -41310,7 +41310,7 @@ Type * any_cast(basic_any<Len, Align> *data) ENTT_NOEXCEPT {
 
 /**
  * @brief Constructs a wrapper from a given type, passing it all arguments.
- * @tparam Type Type of object to use to initialize the wrapper.
+ * @tparam Format Format of object to use to initialize the wrapper.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
  * @tparam Args Types of arguments to use to construct the new instance.
@@ -41327,7 +41327,7 @@ basic_any<Len, Align> make_any(Args &&... args) {
  * @brief Forwards its argument and avoids copies for lvalue references.
  * @tparam Len Size of the storage reserved for the small buffer optimization.
  * @tparam Align Optional alignment requirement.
- * @tparam Type Type of argument to use to construct the new instance.
+ * @tparam Format Format of argument to use to construct the new instance.
  * @param value Parameter to use to construct the instance.
  * @return A properly initialized and not necessarily owning wrapper.
  */
@@ -41433,8 +41433,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -41453,8 +41453,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -41477,8 +41477,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -41538,24 +41538,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -41590,7 +41590,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -41658,7 +41658,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -41669,7 +41669,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -41677,7 +41677,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -41693,7 +41693,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -41702,7 +41702,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -41735,11 +41735,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -41754,7 +41754,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -41765,7 +41765,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -41778,7 +41778,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -41786,7 +41786,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -41809,7 +41809,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -41822,7 +41822,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -41833,7 +41833,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -41846,7 +41846,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -41870,7 +41870,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -41879,8 +41879,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -41888,8 +41888,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -41897,8 +41897,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -41911,7 +41911,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -41923,7 +41923,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -42083,7 +42083,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -42091,7 +42091,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -42161,7 +42161,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -42174,7 +42174,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -42183,7 +42183,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -42198,7 +42198,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -42207,7 +42207,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -42230,7 +42230,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -42339,7 +42339,7 @@ namespace entt {
 struct poly_inspector {
     /**
      * @brief Generic conversion operator (definition only).
-     * @tparam Type Type to which conversion is requested.
+     * @tparam Format Format to which conversion is requested.
      */
     template <class Type>
     operator Type &&() const;
@@ -42424,12 +42424,12 @@ public:
 
     /**
      * @brief Returns a static virtual table for a specific concept and type.
-     * @tparam Type The type for which to generate the virtual table.
+     * @tparam Format The type for which to generate the virtual table.
      * @return A static virtual table for the given concept and type.
      */
     template<typename Type>
     [[nodiscard]] static const auto * instance() {
-        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Type differs from its decayed form");
+        static_assert(std::is_same_v<Type, std::decay_t<Type>>, "Format differs from its decayed form");
         static const auto vtable = fill_vtable<Type>(std::make_index_sequence<Concept::template impl<Type>::size>{});
         return &vtable;
     }
@@ -42466,7 +42466,7 @@ struct poly_base {
 
 
 /**
- * @brief Shortcut for calling `poly_base<Type>::invoke`.
+ * @brief Shortcut for calling `poly_base<Format>::invoke`.
  * @tparam Member Index of the function to invoke.
  * @tparam Poly A fully defined poly object.
  * @tparam Args Types of arguments to pass to the function.
@@ -42514,7 +42514,7 @@ public:
 
     /**
      * @brief Constructs a poly by directly initializing the new object.
-     * @tparam Type Type of object to use to initialize the poly.
+     * @tparam Format Format of object to use to initialize the poly.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -42526,7 +42526,7 @@ public:
 
     /**
      * @brief Constructs a poly from a given value.
-     * @tparam Type Type of object to use to initialize the poly.
+     * @tparam Format Format of object to use to initialize the poly.
      * @param value An instance of an object to use to initialize the poly.
      */
     template<typename Type, typename = std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, basic_poly>>>
@@ -42583,7 +42583,7 @@ public:
 
     /**
      * @brief Replaces the contained object by creating a new instance directly.
-     * @tparam Type Type of object to use to initialize the poly.
+     * @tparam Format Format of object to use to initialize the poly.
      * @tparam Args Types of arguments to use to construct the new instance.
      * @param args Parameters to use to construct the instance.
      */
@@ -42814,7 +42814,7 @@ namespace entt {
  * @sa scheduler
  *
  * @tparam Derived Actual type of process that extends the class template.
- * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Delta Format to use to provide elapsed time.
  */
 template<typename Derived, typename Delta>
 class process {
@@ -42911,7 +42911,7 @@ protected:
     }
 
 public:
-    /*! @brief Type used to provide elapsed time. */
+    /*! @brief Format used to provide elapsed time. */
     using delta_type = Delta;
 
     /*! @brief Default destructor. */
@@ -43050,7 +43050,7 @@ private:
  * @sa scheduler
  *
  * @tparam Func Actual type of process.
- * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Delta Format to use to provide elapsed time.
  */
 template<typename Func, typename Delta>
 struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Func {
@@ -43163,7 +43163,7 @@ namespace entt {
  * @sa scheduler
  *
  * @tparam Derived Actual type of process that extends the class template.
- * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Delta Format to use to provide elapsed time.
  */
 template<typename Derived, typename Delta>
 class process {
@@ -43260,7 +43260,7 @@ protected:
     }
 
 public:
-    /*! @brief Type used to provide elapsed time. */
+    /*! @brief Format used to provide elapsed time. */
     using delta_type = Delta;
 
     /*! @brief Default destructor. */
@@ -43399,7 +43399,7 @@ private:
  * @sa scheduler
  *
  * @tparam Func Actual type of process.
- * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Delta Format to use to provide elapsed time.
  */
 template<typename Func, typename Delta>
 struct process_adaptor: process<process_adaptor<Func, Delta>, Delta>, private Func {
@@ -43458,7 +43458,7 @@ namespace entt {
  *
  * @sa process
  *
- * @tparam Delta Type to use to provide elapsed time.
+ * @tparam Delta Format to use to provide elapsed time.
  */
 template<typename Delta>
 class scheduler {
@@ -43586,7 +43586,7 @@ public:
      * .then<my_other_process>();
      * @endcode
      *
-     * @tparam Proc Type of process to schedule.
+     * @tparam Proc Format of process to schedule.
      * @tparam Args Types of arguments to use to initialize the process.
      * @param args Parameters to use to initialize the process.
      * @return An opaque object to use to concatenate processes.
@@ -43648,7 +43648,7 @@ public:
      *
      * @sa process_adaptor
      *
-     * @tparam Func Type of process to schedule.
+     * @tparam Func Format of process to schedule.
      * @param func Either a lambda or a functor to use as a process.
      * @return An opaque object to use to concatenate processes.
      */
@@ -43975,7 +43975,7 @@ namespace entt {
  * As a rule of thumb, resources should never be copied nor moved. Handles are
  * the way to go to keep references to them.
  *
- * @tparam Resource Type of resource managed by a handle.
+ * @tparam Resource Format of resource managed by a handle.
  */
 template<typename Resource>
 class resource_handle {
@@ -44009,7 +44009,7 @@ public:
 
     /**
      * @brief Copy constructs a handle which shares ownership of the resource.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to copy from.
      */
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
@@ -44019,7 +44019,7 @@ public:
 
     /**
      * @brief Move constructs a handle which takes ownership of the resource.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to move from.
      */
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
@@ -44043,7 +44043,7 @@ public:
 
     /**
      * @brief Copy assignment operator from foreign handle.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to copy from.
      * @return This resource handle.
      */
@@ -44056,7 +44056,7 @@ public:
 
     /**
      * @brief Move assignment operator from foreign handle.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to move from.
      * @return This resource handle.
      */
@@ -44184,8 +44184,8 @@ namespace entt {
  * any type. However, future changes won't be breaking ones by forcing the use
  * of a base class today and that's why the model is already in its place.
  *
- * @tparam Loader Type of the derived class.
- * @tparam Resource Type of resource for which to use the loader.
+ * @tparam Loader Format of the derived class.
+ * @tparam Resource Format of resource for which to use the loader.
  */
 template<typename Loader, typename Resource>
 class resource_loader {
@@ -44226,13 +44226,13 @@ namespace entt {
  * applications and can be freely inherited to add targeted functionalities for
  * large sized applications.
  *
- * @tparam Resource Type of resources managed by a cache.
+ * @tparam Resource Format of resources managed by a cache.
  */
 template<typename Resource>
 struct resource_cache {
     /*! @brief Unsigned integer type. */
     using size_type = std::size_t;
-    /*! @brief Type of resources managed by a cache. */
+    /*! @brief Format of resources managed by a cache. */
     using resource_type = Resource;
 
     /*! @brief Default constructor. */
@@ -44286,7 +44286,7 @@ struct resource_cache {
      * If the resource cannot be loaded correctly, the returned handle will be
      * invalid and any use of it will result in undefined behavior.
      *
-     * @tparam Loader Type of loader to use to load the resource if required.
+     * @tparam Loader Format of loader to use to load the resource if required.
      * @tparam Args Types of arguments to use to load the resource if required.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource if required.
@@ -44322,7 +44322,7 @@ struct resource_cache {
      * If the resource cannot be loaded correctly, the returned handle will be
      * invalid and any use of it will result in undefined behavior.
      *
-     * @tparam Loader Type of loader to use to load the resource.
+     * @tparam Loader Format of loader to use to load the resource.
      * @tparam Args Types of arguments to use to load the resource.
      * @param id Unique resource identifier.
      * @param args Arguments to use to load the resource.
@@ -44340,7 +44340,7 @@ struct resource_cache {
      * properly the requested resource. The handle isn't stored aside and the
      * cache isn't in charge of the lifetime of the resource itself.
      *
-     * @tparam Loader Type of loader to use to load the resource.
+     * @tparam Loader Format of loader to use to load the resource.
      * @tparam Args Types of arguments to use to load the resource.
      * @param args Arguments to use to load the resource.
      * @return A handle for the given resource.
@@ -44408,7 +44408,7 @@ struct resource_cache {
      * void(const entt::id_type, entt::resource_handle<Resource>);
      * @endcode
      *
-     * @tparam Func Type of the function object to invoke.
+     * @tparam Func Format of the function object to invoke.
      * @param func A valid function object.
      */
     template <typename Func>
@@ -44466,7 +44466,7 @@ namespace entt {
  * As a rule of thumb, resources should never be copied nor moved. Handles are
  * the way to go to keep references to them.
  *
- * @tparam Resource Type of resource managed by a handle.
+ * @tparam Resource Format of resource managed by a handle.
  */
 template<typename Resource>
 class resource_handle {
@@ -44500,7 +44500,7 @@ public:
 
     /**
      * @brief Copy constructs a handle which shares ownership of the resource.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to copy from.
      */
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
@@ -44510,7 +44510,7 @@ public:
 
     /**
      * @brief Move constructs a handle which takes ownership of the resource.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to move from.
      */
     template<typename Other, typename = std::enable_if_t<!std::is_same_v<Other, Resource> && std::is_base_of_v<Resource, Other>>>
@@ -44534,7 +44534,7 @@ public:
 
     /**
      * @brief Copy assignment operator from foreign handle.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to copy from.
      * @return This resource handle.
      */
@@ -44547,7 +44547,7 @@ public:
 
     /**
      * @brief Move assignment operator from foreign handle.
-     * @tparam Other Type of resource managed by the received handle.
+     * @tparam Other Format of resource managed by the received handle.
      * @param other The handle to move from.
      * @return This resource handle.
      */
@@ -44675,8 +44675,8 @@ namespace entt {
  * any type. However, future changes won't be breaking ones by forcing the use
  * of a base class today and that's why the model is already in its place.
  *
- * @tparam Loader Type of the derived class.
- * @tparam Resource Type of resource for which to use the loader.
+ * @tparam Loader Format of the derived class.
+ * @tparam Resource Format of resource for which to use the loader.
  */
 template<typename Loader, typename Resource>
 class resource_loader {
@@ -44875,7 +44875,7 @@ inline constexpr choice_t<N> choice{};
  * Useful to establish non-deduced contexts in template argument deduction
  * (waiting for C++20) or to provide types through function arguments.
  *
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 struct type_identity {
@@ -44886,7 +44886,7 @@ struct type_identity {
 
 /**
  * @brief Helper type.
- * @tparam Type A type.
+ * @tparam Format A type.
  */
 template<typename Type>
 using type_identity_t = typename type_identity<Type>::type;
@@ -44894,7 +44894,7 @@ using type_identity_t = typename type_identity<Type>::type;
 
 /**
  * @brief A type-only `sizeof` wrapper that returns 0 where `sizeof` complains.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  * @tparam The size of the type if `sizeof` accepts it, 0 otherwise.
  */
 template<typename Type, typename = void>
@@ -44910,7 +44910,7 @@ struct size_of<Type, std::void_t<decltype(sizeof(Type))>>
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type of which to return the size.
+ * @tparam Format The type of which to return the size.
  */
 template<class Type>
 inline constexpr std::size_t size_of_v = size_of<Type>::value;
@@ -44919,7 +44919,7 @@ inline constexpr std::size_t size_of_v = size_of<Type>::value;
 /**
  * @brief Using declaration to be used to _repeat_ the same type a number of
  * times equal to the size of a given parameter pack.
- * @tparam Type A type to repeat.
+ * @tparam Format A type to repeat.
  */
 template<typename Type, typename>
 using unpack_as_t = Type;
@@ -44952,11 +44952,11 @@ using tag = integral_constant<Value>;
 
 /**
  * @brief A class to use to push around lists of types, nothing more.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list {
-    /*! @brief Type list type. */
+    /*! @brief Format list type. */
     using type = type_list;
     /*! @brief Compile-time number of elements in the type list. */
     static constexpr auto size = sizeof...(Type);
@@ -44971,7 +44971,7 @@ struct type_list_element;
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
  * @tparam Index Index of the type to return.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<std::size_t Index, typename Type, typename... Other>
@@ -44982,7 +44982,7 @@ struct type_list_element<Index, type_list<Type, Other...>>
 
 /**
  * @brief Provides compile-time indexed access to the types of a type list.
- * @tparam Type First type provided by the type list.
+ * @tparam Format First type provided by the type list.
  * @tparam Other Other types provided by the type list.
  */
 template<typename Type, typename... Other>
@@ -44995,7 +44995,7 @@ struct type_list_element<0u, type_list<Type, Other...>> {
 /**
  * @brief Helper type.
  * @tparam Index Index of the type to return.
- * @tparam List Type list to search into.
+ * @tparam List Format list to search into.
  */
 template<std::size_t Index, typename List>
 using type_list_element_t = typename type_list_element<Index, List>::type;
@@ -45003,7 +45003,7 @@ using type_list_element_t = typename type_list_element<Index, List>::type;
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @return A type list composed by the types of both the type lists.
  */
@@ -45026,7 +45026,7 @@ struct type_list_cat<> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  * @tparam List Other type lists, if any.
  */
@@ -45039,7 +45039,7 @@ struct type_list_cat<type_list<Type...>, type_list<Other...>, List...> {
 
 /**
  * @brief Concatenates multiple type lists.
- * @tparam Type Types provided by the type list.
+ * @tparam Format Types provided by the type list.
  */
 template<typename... Type>
 struct type_list_cat<type_list<Type...>> {
@@ -45050,7 +45050,7 @@ struct type_list_cat<type_list<Type...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists to concatenate.
+ * @tparam List Format lists to concatenate.
  */
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
@@ -45063,7 +45063,7 @@ struct type_list_unique;
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam Type One of the types provided by the given type list.
+ * @tparam Format One of the types provided by the given type list.
  * @tparam Other The other types provided by the given type list.
  */
 template<typename Type, typename... Other>
@@ -45087,7 +45087,7 @@ struct type_list_unique<type_list<>> {
 
 /**
  * @brief Helper type.
- * @tparam Type A type list.
+ * @tparam Format A type list.
  */
 template<typename Type>
 using type_list_unique_t = typename type_list_unique<Type>::type;
@@ -45096,8 +45096,8 @@ using type_list_unique_t = typename type_list_unique<Type>::type;
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
  * given type, false otherwise.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<typename List, typename Type>
 struct type_list_contains;
@@ -45105,8 +45105,8 @@ struct type_list_contains;
 
 /**
  * @copybrief type_list_contains
- * @tparam Type Types provided by the type list.
- * @tparam Other Type to look for.
+ * @tparam Format Types provided by the type list.
+ * @tparam Other Format to look for.
  */
 template<typename... Type, typename Other>
 struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_same<Type, Other>...> {};
@@ -45114,8 +45114,8 @@ struct type_list_contains<type_list<Type...>, Other>: std::disjunction<std::is_s
 
 /**
  * @brief Helper variable template.
- * @tparam List Type list.
- * @tparam Type Type to look for.
+ * @tparam List Format list.
+ * @tparam Format Format to look for.
  */
 template<class List, typename Type>
 inline constexpr bool type_list_contains_v = type_list_contains<List, Type>::value;
@@ -45128,7 +45128,7 @@ struct type_list_diff;
 
 /**
  * @brief Computes the difference between two type lists.
- * @tparam Type Types provided by the first type list.
+ * @tparam Format Types provided by the first type list.
  * @tparam Other Types provided by the second type list.
  */
 template<typename... Type, typename... Other>
@@ -45140,7 +45140,7 @@ struct type_list_diff<type_list<Type...>, type_list<Other...>> {
 
 /**
  * @brief Helper type.
- * @tparam List Type lists between which to compute the difference.
+ * @tparam List Format lists between which to compute the difference.
  */
 template<typename... List>
 using type_list_diff_t = typename type_list_diff<List...>::type;
@@ -45300,7 +45300,7 @@ template<typename Type>
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_equality_comparable: std::bool_constant<internal::is_equality_comparable<Type>(choice<2>)> {};
@@ -45308,7 +45308,7 @@ struct is_equality_comparable: std::bool_constant<internal::is_equality_comparab
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<class Type>
 inline constexpr bool is_equality_comparable_v = is_equality_comparable<Type>::value;
@@ -45378,7 +45378,7 @@ inline constexpr bool is_applicable_r_v = is_applicable_r<Ret, Func, Args>::valu
 /**
  * @brief Provides the member constant `value` to true if a given type is
  * complete, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_complete: std::false_type {};
@@ -45391,7 +45391,7 @@ struct is_complete<Type, std::void_t<decltype(sizeof(Type))>>: std::true_type {}
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_complete_v = is_complete<Type>::value;
@@ -45400,7 +45400,7 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is an
  * iterator, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
@@ -45415,7 +45415,7 @@ struct is_iterator<Type, std::void_t<typename std::iterator_traits<Type>::iterat
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  */
 template<typename Type>
 inline constexpr bool is_iterator_v = is_iterator<Type>::value;
@@ -45424,7 +45424,7 @@ inline constexpr bool is_iterator_v = is_iterator<Type>::value;
 /**
  * @brief Provides the member constant `value` to true if a given type is of the
  * required iterator type, false otherwise.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It, typename = void>
@@ -45447,7 +45447,7 @@ struct is_iterator_type<Type, It, std::enable_if_t<!std::is_same_v<Type, It>, st
 
 /**
  * @brief Helper variable template.
- * @tparam Type The type to test.
+ * @tparam Format The type to test.
  * @tparam It Required iterator type.
  */
 template<typename Type, typename It>
@@ -45746,7 +45746,7 @@ public:
      * @brief Constructs a delegate and connects a free function with payload or
      * a bound member.
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -45795,7 +45795,7 @@ public:
      * define the delegate itself.
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -45816,10 +45816,10 @@ public:
      * @brief Connects a free function with payload or a bound member to a
      * delegate.
      *
-     * @sa connect(Type &)
+     * @sa connect(Format &)
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -45939,7 +45939,7 @@ delegate(connect_arg_t<Candidate>)
 /**
  * @brief Deduction guide.
  * @tparam Candidate Function or member to connect to the delegate.
- * @tparam Type Type of class or type of payload.
+ * @tparam Format Format of class or type of payload.
  */
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&)
@@ -46398,8 +46398,8 @@ template<typename Type>
 
 
 /**
- * @brief Type sequential identifier.
- * @tparam Type Type for which to generate a sequential identifier.
+ * @brief Format sequential identifier.
+ * @tparam Format Format for which to generate a sequential identifier.
  */
 template<typename Type, typename = void>
 struct ENTT_API type_seq final {
@@ -46418,8 +46418,8 @@ struct ENTT_API type_seq final {
 
 
 /**
- * @brief Type hash.
- * @tparam Type Type for which to generate a hash value.
+ * @brief Format hash.
+ * @tparam Format Format for which to generate a hash value.
  */
 template<typename Type, typename = void>
 struct type_hash final {
@@ -46442,8 +46442,8 @@ struct type_hash final {
 
 
 /**
- * @brief Type name.
- * @tparam Type Type for which to generate a name.
+ * @brief Format name.
+ * @tparam Format Format for which to generate a name.
  */
 template<typename Type, typename = void>
 struct type_name final {
@@ -46503,24 +46503,24 @@ public:
     }
 
     /**
-     * @brief Type sequential identifier.
-     * @return Type sequential identifier.
+     * @brief Format sequential identifier.
+     * @return Format sequential identifier.
      */
     [[nodiscard]] id_type seq() const ENTT_NOEXCEPT {
         return seq_value;
     }
 
     /**
-     * @brief Type hash.
-     * @return Type hash.
+     * @brief Format hash.
+     * @return Format hash.
      */
     [[nodiscard]] id_type hash() const ENTT_NOEXCEPT {
         return hash_value;
     }
 
     /**
-     * @brief Type name.
-     * @return Type name.
+     * @brief Format name.
+     * @return Format name.
      */
     [[nodiscard]] std::string_view name() const ENTT_NOEXCEPT {
         return name_value;
@@ -46555,7 +46555,7 @@ private:
 
 /**
  * @brief Returns the type info object for a given type.
- * @tparam Type Type for which to generate a type info object.
+ * @tparam Format Format for which to generate a type info object.
  * @return The type info object for the given type.
  */
 template<typename Type>
@@ -46740,7 +46740,7 @@ public:
      * @brief Constructs a delegate and connects a free function with payload or
      * a bound member.
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -46789,7 +46789,7 @@ public:
      * define the delegate itself.
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid reference that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -46810,10 +46810,10 @@ public:
      * @brief Connects a free function with payload or a bound member to a
      * delegate.
      *
-     * @sa connect(Type &)
+     * @sa connect(Format &)
      *
      * @tparam Candidate Function or member to connect to the delegate.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -46933,7 +46933,7 @@ delegate(connect_arg_t<Candidate>)
 /**
  * @brief Deduction guide.
  * @tparam Candidate Function or member to connect to the delegate.
- * @tparam Type Type of class or type of payload.
+ * @tparam Format Format of class or type of payload.
  */
 template<auto Candidate, typename Type>
 delegate(connect_arg_t<Candidate>, Type &&)
@@ -47050,7 +47050,7 @@ public:
 
     /**
      * @brief Instance type when it comes to connecting member functions.
-     * @tparam Class Type of class to which the member function belongs.
+     * @tparam Class Format of class to which the member function belongs.
      */
     template<typename Class>
     using instance_type = Class *;
@@ -47094,7 +47094,7 @@ public:
      * * The list of parameters is empty if `Ret` is `void`, otherwise it
      *   contains a single element such that `Ret` is convertible to it.
      *
-     * @tparam Func Type of collector to use, if any.
+     * @tparam Func Format of collector to use, if any.
      * @param func A valid function object.
      * @param args Arguments to use to invoke listeners.
      */
@@ -47303,7 +47303,7 @@ public:
      * @brief Returns a sink that connects before a free function with payload
      * or a bound member.
      * @tparam Candidate Member or free function to look for.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -47323,7 +47323,7 @@ public:
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -47335,7 +47335,7 @@ public:
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -47400,7 +47400,7 @@ public:
      * define the signal itself.
      *
      * @tparam Candidate Function or member to connect to the signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized connection object.
      */
@@ -47433,7 +47433,7 @@ public:
      * @brief Disconnects a free function with payload or a bound member from a
      * signal.
      * @tparam Candidate Function or member to disconnect from the signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -47447,7 +47447,7 @@ public:
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -47458,7 +47458,7 @@ public:
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -47614,7 +47614,7 @@ public:
      *
      * @sa sink
      *
-     * @tparam Event Type of event of which to get the sink.
+     * @tparam Event Format of event of which to get the sink.
      * @return A temporary sink object.
      */
     template<typename Event>
@@ -47628,7 +47628,7 @@ public:
      * All the listeners registered for the given type are immediately notified.
      * The event is discarded after the execution.
      *
-     * @tparam Event Type of event to trigger.
+     * @tparam Event Format of event to trigger.
      * @tparam Args Types of arguments to use to construct the event.
      * @param args Arguments to use to construct the event.
      */
@@ -47643,7 +47643,7 @@ public:
      * All the listeners registered for the given type are immediately notified.
      * The event is discarded after the execution.
      *
-     * @tparam Event Type of event to trigger.
+     * @tparam Event Format of event to trigger.
      * @param event An instance of the given type of event.
      */
     template<typename Event>
@@ -47657,7 +47657,7 @@ public:
      * An event of the given type is queued. No listener is invoked. Use the
      * `update` member function to notify listeners when ready.
      *
-     * @tparam Event Type of event to enqueue.
+     * @tparam Event Format of event to enqueue.
      * @tparam Args Types of arguments to use to construct the event.
      * @param args Arguments to use to construct the event.
      */
@@ -47672,7 +47672,7 @@ public:
      * An event of the given type is queued. No listener is invoked. Use the
      * `update` member function to notify listeners when ready.
      *
-     * @tparam Event Type of event to enqueue.
+     * @tparam Event Format of event to enqueue.
      * @param event An instance of the given type of event.
      */
     template<typename Event>
@@ -47683,7 +47683,7 @@ public:
     /**
      * @brief Utility function to disconnect everything related to a given value
      * or instance from a dispatcher.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -47694,7 +47694,7 @@ public:
     /**
      * @brief Utility function to disconnect everything related to a given value
      * or instance from a dispatcher.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -47712,7 +47712,7 @@ public:
      * If no types are provided, the dispatcher will clear all the existing
      * pools.
      *
-     * @tparam Event Type of events to discard.
+     * @tparam Event Format of events to discard.
      */
     template<typename... Event>
     void clear() {
@@ -47734,7 +47734,7 @@ public:
      * delivered to the registered listeners. It's responsibility of the users
      * to reduce at a minimum the time spent in the bodies of the listeners.
      *
-     * @tparam Event Type of events to send.
+     * @tparam Event Format of events to send.
      */
     template<typename Event>
     void update() {
@@ -47915,18 +47915,18 @@ class emitter {
     }
 
 public:
-    /** @brief Type of listeners accepted for the given event. */
+    /** @brief Format of listeners accepted for the given event. */
     template<typename Event>
     using listener = typename pool_handler<Event>::listener_type;
 
     /**
      * @brief Generic connection type for events.
      *
-     * Type of the connection object returned by the event emitter whenever a
+     * Format of the connection object returned by the event emitter whenever a
      * listener for the given type is registered.<br/>
      * It can be used to break connections still in use.
      *
-     * @tparam Event Type of event for which the connection is created.
+     * @tparam Event Format of event for which the connection is created.
      */
     template<typename Event>
     struct connection: private pool_handler<Event>::connection_type {
@@ -47966,7 +47966,7 @@ public:
      * the given event. The event type must either have a proper constructor for
      * the arguments provided or be an aggregate type.
      *
-     * @tparam Event Type of event to publish.
+     * @tparam Event Format of event to publish.
      * @tparam Args Types of arguments to use to construct the event.
      * @param args Parameters to use to initialize the event.
      */
@@ -47992,7 +47992,7 @@ public:
      * reference to the derived class. Listeners don't have to capture those
      * instances for later uses.
      *
-     * @tparam Event Type of event to which to connect the listener.
+     * @tparam Event Format of event to which to connect the listener.
      * @param instance The listener to register.
      * @return Connection object that can be used to disconnect the listener.
      */
@@ -48017,7 +48017,7 @@ public:
      * reference to the derived class. Listeners don't have to capture those
      * instances for later uses.
      *
-     * @tparam Event Type of event to which to connect the listener.
+     * @tparam Event Format of event to which to connect the listener.
      * @param instance The listener to register.
      * @return Connection object that can be used to disconnect the listener.
      */
@@ -48032,7 +48032,7 @@ public:
      * Do not use twice the same connection to disconnect a listener, it results
      * in undefined behavior. Once used, discard the connection object.
      *
-     * @tparam Event Type of event of the connection.
+     * @tparam Event Format of event of the connection.
      * @param conn A valid connection.
      */
     template<typename Event>
@@ -48046,7 +48046,7 @@ public:
      * All the connections previously returned for the given event are
      * invalidated. Using them results in undefined behavior.
      *
-     * @tparam Event Type of event to reset.
+     * @tparam Event Format of event to reset.
      */
     template<typename Event>
     void clear() {
@@ -48069,7 +48069,7 @@ public:
 
     /**
      * @brief Checks if there are listeners registered for the specific event.
-     * @tparam Event Type of event to test.
+     * @tparam Event Format of event to test.
      * @return True if there are no listeners registered, false otherwise.
      */
     template<typename Event>
@@ -48172,7 +48172,7 @@ public:
 
     /**
      * @brief Instance type when it comes to connecting member functions.
-     * @tparam Class Type of class to which the member function belongs.
+     * @tparam Class Format of class to which the member function belongs.
      */
     template<typename Class>
     using instance_type = Class *;
@@ -48216,7 +48216,7 @@ public:
      * * The list of parameters is empty if `Ret` is `void`, otherwise it
      *   contains a single element such that `Ret` is convertible to it.
      *
-     * @tparam Func Type of collector to use, if any.
+     * @tparam Func Format of collector to use, if any.
      * @param func A valid function object.
      * @param args Arguments to use to invoke listeners.
      */
@@ -48425,7 +48425,7 @@ public:
      * @brief Returns a sink that connects before a free function with payload
      * or a bound member.
      * @tparam Candidate Member or free function to look for.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -48445,7 +48445,7 @@ public:
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -48457,7 +48457,7 @@ public:
     /**
      * @brief Returns a sink that connects before a given instance or specific
      * payload.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid pointer that fits the purpose.
      * @return A properly initialized sink object.
      */
@@ -48522,7 +48522,7 @@ public:
      * define the signal itself.
      *
      * @tparam Candidate Function or member to connect to the signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      * @return A properly initialized connection object.
      */
@@ -48555,7 +48555,7 @@ public:
      * @brief Disconnects a free function with payload or a bound member from a
      * signal.
      * @tparam Candidate Function or member to disconnect from the signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<auto Candidate, typename Type>
@@ -48569,7 +48569,7 @@ public:
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>
@@ -48580,7 +48580,7 @@ public:
     /**
      * @brief Disconnects free functions with payload or bound members from a
      * signal.
-     * @tparam Type Type of class or type of payload.
+     * @tparam Format Format of class or type of payload.
      * @param value_or_instance A valid object that fits the purpose.
      */
     template<typename Type>

@@ -2,13 +2,13 @@
 
 #include "SIByLpch.h"
 
-#include "Sibyl/Renderer/GraphicContext.h"
-#include "Platform/DirectX12/Core/DescriptorAllocator.h"
-#include "Platform/DirectX12/Core/DX12CommandList.h"
-#include "Platform/DirectX12/Core/UploadBuffer.h"
-#include "Platform/DirectX12/Core/DX12Synchronizer.h"
-#include "Platform/DirectX12/Renderer/DX12RenderPipeline.h"
-#include "Platform/DirectX12/Core/DX12FrameResources.h"
+#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12DescriptorAllocator.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12UploadBuffer.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12Synchronizer.h"
+#include "Platform/DirectX12/AbstractAPI/Top/DX12RenderPipeline.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12FrameResources.h"
 
 namespace SIByL
 {

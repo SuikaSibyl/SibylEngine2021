@@ -1,5 +1,6 @@
 #include <SIByL.h>
 
+#include <Sibyl/Core/EntryPoint.h>
 #include <Sibyl/Graphic/Core/Camera.h>
 #include <Sibyl/Components/ViewCameraController.h>
 
@@ -54,12 +55,12 @@ public:
 
 	virtual void OnDrawImGui() 
 	{
-		ImGui::Begin("Setting");
-		unsigned int textureID = m_FrameBuffer->GetColorAttachment();
-		ImGui::Image((void*)textureID, ImVec2{ 512,512 }, { 1,1 }, { 0,0 });
-		ImGui::End();
+		//ImGui::Begin("Setting");
+		//unsigned int textureID = m_FrameBuffer->GetColorAttachment();
+		//ImGui::Image((void*)textureID, ImVec2{ 512,512 }, { 1,1 }, { 0,0 });
+		//ImGui::End();
 		static bool show = true;
-		//ImGui::ShowDemoWindow(&show);
+		ImGui::ShowDemoWindow(&show);
 	}
 
 	void OnEvent(SIByL::Event& event) override
@@ -69,11 +70,9 @@ public:
 
 	void OnDraw() override
 	{
-		m_FrameBuffer->Bind();
 		Renderer2D::BeginScene(camera);
 		Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
 		Renderer2D::EndScene();
-		m_FrameBuffer->Unbind();
 	}
 
 	Ref<Shader> shader;

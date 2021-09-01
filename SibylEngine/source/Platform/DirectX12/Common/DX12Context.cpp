@@ -3,8 +3,8 @@
 #include "DX12Utility.h"
 
 #include "Sibyl/Core/Application.h"
-#include "Sibyl/Renderer/GraphicContext.h"
-#include "Platform/DirectX12/Renderer/DX12SwapChain.h"
+#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12SwapChain.h"
 
 namespace SIByL
 {

@@ -21,7 +21,7 @@ namespace SIByL
 		//Create Default Buffer as the target
 		ComPtr<ID3D12Resource> defaultBuffer;
 		DXCall(DX12Context::GetDevice()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // Type Default
+			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), // Format Default
 			D3D12_HEAP_FLAG_NONE,
 			&CD3DX12_RESOURCE_DESC::Buffer(byteSize),
 			D3D12_RESOURCE_STATE_COMMON,
@@ -69,7 +69,7 @@ namespace SIByL
 		////（7）创建上传堆
 		//D3D12_HEAP_PROPERTIES  uploadheap;
 		//memset(&uploadheap, 0, sizeof(uploadheap));
-		//uploadheap.Type = D3D12_HEAP_TYPE_UPLOAD;
+		//uploadheap.Format = D3D12_HEAP_TYPE_UPLOAD;
 
 		////（8）在上传堆上创建资源
 		//DXCall(DX12Context::GetDevice()->CreateCommittedResource(

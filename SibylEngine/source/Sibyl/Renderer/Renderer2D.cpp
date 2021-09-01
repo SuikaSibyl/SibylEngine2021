@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "Renderer2D.h"
 
-#include "Shader.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/Shader.h"
 #include "Sibyl/Graphic/Geometry/TriangleMesh.h"
 
 namespace SIByL

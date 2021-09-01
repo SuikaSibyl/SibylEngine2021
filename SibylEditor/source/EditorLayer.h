@@ -39,6 +39,7 @@ namespace SIByLEditor
 			FrameBufferDesc desc;
 			desc.Width = 1280;
 			desc.Height = 720;
+			desc.Channel = 4;
 			m_FrameBuffer = FrameBuffer::Create(desc);
 		}
 
@@ -61,11 +62,6 @@ namespace SIByLEditor
 			Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
 			Renderer2D::EndScene();
 			m_FrameBuffer->Unbind();
-
-
-			Renderer2D::BeginScene(camera);
-			Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
-			Renderer2D::EndScene();
 		}
 
 		Ref<Shader> shader;

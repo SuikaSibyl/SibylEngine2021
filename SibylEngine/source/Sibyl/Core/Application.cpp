@@ -4,7 +4,7 @@
 #include "Sibyl/Events/ApplicationEvent.h"
 #include "Sibyl/Core/Input.h"
 #include "glad/glad.h"
-#include "Sibyl/Renderer/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
 #include "Sibyl/Renderer/Renderer2D.h"
 #include "Sibyl/Graphic/Geometry/Vertex.h"
 

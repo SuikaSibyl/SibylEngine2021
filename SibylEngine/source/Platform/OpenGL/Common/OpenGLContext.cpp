@@ -5,8 +5,8 @@
 #include "GLFW/glfw3.h"
 
 #include "Sibyl/Core/Application.h"
-#include "Platform/OpenGL/Renderer/OpenGLCommandList.h"
-#include "Platform/OpenGL/Renderer/OpenGLSynchronizer.h"
+#include "Platform/OpenGL/AbstractAPI/Bottom/OpenGLSynchronizer.h"
+#include "Platform/OpenGL/AbstractAPI/Middle/OpenGLCommandList.h"
 
 namespace SIByL
 {

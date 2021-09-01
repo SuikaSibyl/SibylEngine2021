@@ -2,7 +2,7 @@
 
 #include "Core.h"
 #include "Sibyl/Events/Event.h"
-#include "Sibyl/Renderer/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
 
 namespace SIByL
 {

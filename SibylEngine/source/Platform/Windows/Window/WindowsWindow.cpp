@@ -5,7 +5,7 @@
 #include "Sibyl/Events/MouseEvent.h"
 #include "Sibyl/Events/KeyEvent.h"
 
-#include "Platform/DirectX12/Renderer/DX12RenderPipeline.h"
+#include "Platform/DirectX12/AbstractAPI/Top/DX12RenderPipeline.h"
 
 namespace SIByL
 {

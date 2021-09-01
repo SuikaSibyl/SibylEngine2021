@@ -96,46 +96,46 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12SwapChain.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12SwapChain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\UploadBuffer.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12UploadBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocator.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocatorPage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DescriptorAllocation.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocation.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DynamicDescriptorHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DX12CommandList.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DX12Synchronizer.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Synchronizer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Top\DX12RenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLRenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLSwapChain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLVertexBuffer.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLVertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLShader.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Renderer\Renderer.cpp">
@@ -144,37 +144,37 @@
     <ClCompile Include="source\Sibyl\Core\Input.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\VertexBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\IndexBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\IndexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLIndexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Graphic\Geometry\OpenGLTriangleMesh.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLTriangleMesh.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\Geometry\TriangleMesh.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\Shader.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\Shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\Core\Camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12Shader.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12Shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Top\DX12TriangleMesh.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12IndexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Core\FrameTimer.cpp">
@@ -183,22 +183,22 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\ShaderBinder.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\ShaderBinder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12ShaderBinder.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12ShaderBinder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\DX12FrameResources.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12FrameResources.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\Material\Material.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\Texture\Texture.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Graphic\Texture\OpenGLTexture.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLTexture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
@@ -207,13 +207,13 @@
     <ClCompile Include="source\Sibyl\Graphic\Texture\Image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Core\RootSignature.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12RootSignature.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLShaderBinder.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShaderBinder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Components\ViewCameraController.cpp">
@@ -222,16 +222,28 @@
     <ClCompile Include="source\Sibyl\Renderer\Renderer2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\FrameBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\Renderer\OpenGLFrameBuffer.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\Renderer\DX12FrameBuffer.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Scene\scene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Resource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12CommonResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandQueue.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1202,85 +1214,73 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\GraphicContext.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Top\GraphicContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\Common\OpenGLContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\SwapChain.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\SwapChain.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\FrameBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\FrameBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\VertexBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\VertexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\IndexBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\IndexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\Shader.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\State.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\Pipelines.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\RenderPass.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\Windows\Window\WindowsInput.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12SwapChain.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12SwapChain.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\UploadBuffer.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12UploadBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocator.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocatorPage.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocatorPage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DescriptorAllocation.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocation.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DynamicDescriptorHeap.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DynamicDescriptorHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\ResourceStateTracker.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DX12CommandList.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Synchronizer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DX12Synchronizer.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Top\DX12RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12RenderPipeline.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Top\RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\RenderPipeline.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLRenderPipeline.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLRenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\include\d3dx12.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLSwapChain.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLSwapChain.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\ImGui\ImGuiGLFWRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLVertexBuffer.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLVertexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h">
@@ -1292,16 +1292,16 @@
     <ClInclude Include="source\Sibyl\Graphic\Geometry\Vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLShader.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Renderer\Renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLIndexBuffer.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLIndexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Graphic\Geometry\OpenGLTriangleMesh.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLTriangleMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\Core\Camera.h">
@@ -1310,7 +1310,7 @@
     <ClInclude Include="source\Sibyl\Graphic\Texture\Image.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Texture\Texture.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\Cuda\Common\CudaContext.h">
@@ -1319,16 +1319,16 @@
     <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12Shader.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Graphic\Geometry\DX12TriangleMesh.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Top\DX12TriangleMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12VertexBuffer.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12VertexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12IndexBuffer.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12IndexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Core\FrameTimer.h">
@@ -1337,22 +1337,22 @@
     <ClInclude Include="source\Platform\Windows\Window\WindowsFrameTimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\ShaderBinder.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\ShaderBinder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12ShaderBinder.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12ShaderBinder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\CommandList.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\CommandList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\Synchronizer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Bottom\Synchronizer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLCommandList.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLCommandList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLSynchronizer.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLSynchronizer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Components\Common\Transform.h">
@@ -1361,16 +1361,16 @@
     <ClInclude Include="source\Sibyl\Graphic\Material\Material.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\DX12FrameResources.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12FrameResources.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\ShaderData.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\ShaderData.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Graphic\Texture\OpenGLTexture.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLTexture.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Graphic\Texture\DX12Texture.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="vendor\stb_image\stb_image.h">
@@ -1379,10 +1379,10 @@
     <ClInclude Include="source\Sibyl\Renderer\Renderer2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Core\RootSignature.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12RootSignature.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLShaderBinder.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShaderBinder.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Components\ViewCameraController.h">
@@ -1397,10 +1397,10 @@
     <ClInclude Include="source\Sibyl\Core\Instrumental.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\Renderer\OpenGLFrameBuffer.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\Renderer\DX12FrameBuffer.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="vendor\entt\entt.hpp">
@@ -1416,6 +1416,27 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Components\Components.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Bottom\Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Bottom\CommandList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12CommonResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\ThreadSafeQueue.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

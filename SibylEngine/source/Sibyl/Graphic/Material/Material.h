@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Sibyl/Renderer/Shader.h>
+#include <Sibyl/Graphic/AbstractAPI/Middle/Shader.h>
 
 namespace SIByL
 {

@@ -27,11 +27,11 @@
 
 // Render Basic
 #include "Sibyl/Renderer/Renderer.h"
-#include "Sibyl/Renderer/Shader.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/Shader.h"
 #include "Sibyl/Graphic/Geometry/TriangleMesh.h"
-#include "Sibyl/Graphic/Texture/Texture.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/Texture.h"
 #include "Sibyl/Renderer/Renderer2D.h"
-#include "Sibyl/Renderer/FrameBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/FrameBuffer.h"
 
 // Components
 #include <Sibyl/Graphic/Core/Camera.h>

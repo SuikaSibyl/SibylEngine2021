@@ -1,6 +1,6 @@
 #pragma once
 #include "Sibyl/Core/Window.h"
-#include "Sibyl/Renderer/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
 #include <GLFW/glfw3.h>
 
 namespace SIByL

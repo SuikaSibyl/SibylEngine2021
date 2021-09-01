@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sibyl/Graphic/Core/Camera.h"
-#include "Sibyl/Graphic/Texture/Texture.h"
+#include "Sibyl/Graphic/AbstractAPI/Middle/Texture.h"
 
 namespace SIByL
 {
