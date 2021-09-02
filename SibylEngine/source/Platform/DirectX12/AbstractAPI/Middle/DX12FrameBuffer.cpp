@@ -25,6 +25,8 @@ namespace SIByL
 
 		m_DepthStencilResource = CreateRef<DX12DepthStencilResource>
 			(m_Desc.Width, m_Desc.Height, DX12Context::GetInFlightSCmdList());
+
+		SetViewportRect(m_Desc.Width, m_Desc.Height);
 	}
 
 	DX12FrameBuffer::~DX12FrameBuffer()
@@ -42,6 +44,9 @@ namespace SIByL
 		cmdList->GetGraphicsCommandList()->ResourceBarrier(1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(m_RenderTargetResource->GetResource()->GetD3D12Resource().Get(),//转换资源为后台缓冲区资源
 				D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET));//从呈现到渲染目标转换
+
+		cmdList->GetGraphicsCommandList()->RSSetViewports(1, &viewPort);
+		cmdList->GetGraphicsCommandList()->RSSetScissorRects(1, &scissorRect);
 
 		cmdList->GetGraphicsCommandList()->OMSetRenderTargets(1,
 			&m_RenderTargetResource->GetRTVCpuHandle(),
@@ -73,9 +78,14 @@ namespace SIByL
 		m_Desc.Width = width;
 		m_Desc.Height = height;
 
+		SetViewportRect(m_Desc.Width, m_Desc.Height);
+
 		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
 		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
 		DX12Context::SetInFlightSCmdList(cmdList);
+
+		uint64_t fence = cmdQueue->Signal();
+		cmdQueue->WaitForFenceValue(fence);
 
 		m_RenderTargetResource->Resize(width, height, cmdList);
 		m_DepthStencilResource->Resize(width, height, cmdList);
@@ -85,6 +95,20 @@ namespace SIByL
 
 	void DX12FrameBuffer::ClearBuffer()
 	{
+		Ref<DX12CommandList> sCmdList = DX12Context::GetInFlightSCmdList();
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
+
+		// Clear Render Targets
+		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_RenderTargetResource->GetRTVCpuHandle();
+		cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::Transparent, 0, nullptr);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_DepthStencilResource->GetDSVCpuHandle();
+		cmdList->ClearDepthStencilView(dsvHandle,	//DSV描述符句柄
+			D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,	//FLAG
+			1.0f,
+			0,
+			0,
+			nullptr);
 
 	}
 
@@ -123,4 +147,22 @@ namespace SIByL
 		//	m_Desc.Height, m_Desc.Channel, Texture2D::Format::R24G8));
 		return texture;
 	}
+
+	void DX12FrameBuffer::SetViewportRect(int width, int height)
+	{
+		// Set Viewport
+		viewPort.TopLeftX = 0;
+		viewPort.TopLeftY = 0;
+		viewPort.Width = (float)width;
+		viewPort.Height = (float)height;
+		viewPort.MaxDepth = 1.0f;
+		viewPort.MinDepth = 0.0f;
+
+		// Set Scissor Rect
+		scissorRect.left = 0;
+		scissorRect.top = 0;
+		scissorRect.right = width;
+		scissorRect.bottom = height;
+	}
+
 }

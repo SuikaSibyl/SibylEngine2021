@@ -22,6 +22,9 @@ namespace SIByL
 		static DX12Context* Main;
 		~DX12Context();
 
+		virtual void StartCommandList() override;
+		virtual void EndCommandList() override;
+
 		virtual void Init() override;
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
 

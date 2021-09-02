@@ -246,6 +246,9 @@
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandQueue.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\ImGui\ImGuiUtility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1437,6 +1440,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Basic\ThreadSafeQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ImGui\ImGuiUtility.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

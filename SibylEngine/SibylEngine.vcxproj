@@ -168,6 +168,7 @@
     <ClCompile Include="source\Sibyl\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\FrameBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\IndexBuffer.cpp" />
+    <ClCompile Include="source\Sibyl\ImGui\ImGuiUtility.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Renderer.cpp" />
     <ClCompile Include="source\Sibyl\Renderer\Renderer2D.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\Shader.cpp" />
@@ -270,6 +271,7 @@
     <ClInclude Include="source\Sibyl\Graphic\Material\Material.h" />
     <ClInclude Include="source\Sibyl\Graphic\Texture\Image.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\Texture.h" />
+    <ClInclude Include="source\Sibyl\ImGui\ImGuiUtility.h" />
     <ClInclude Include="source\Sibyl\ImGui\ImGuiLayer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\CommandList.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\FrameBuffer.h" />

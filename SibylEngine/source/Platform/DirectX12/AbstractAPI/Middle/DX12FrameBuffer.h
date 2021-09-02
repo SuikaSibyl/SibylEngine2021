@@ -35,8 +35,14 @@ namespace SIByL
 		virtual Ref<Texture2D> DepthStencilAsTexutre() override;
 
 	private:
+		void SetViewportRect(int width, int height);
+
+	private:
 		FrameBufferDesc m_Desc;
 		Ref<DX12DepthStencilResource> m_DepthStencilResource;
 		Ref<DX12RenderTargetResource> m_RenderTargetResource;
+
+		D3D12_VIEWPORT viewPort;
+		D3D12_RECT scissorRect;
 	};
 }

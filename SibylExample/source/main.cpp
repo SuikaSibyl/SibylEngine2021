@@ -74,6 +74,7 @@ public:
 
 	void OnDraw() override
 	{
+		m_FrameBuffer->ClearBuffer();
 		m_FrameBuffer->Bind();
 		Renderer2D::BeginScene(camera);
 		Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);

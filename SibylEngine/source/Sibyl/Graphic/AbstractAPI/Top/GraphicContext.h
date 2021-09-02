@@ -13,6 +13,8 @@ namespace SIByL
 		virtual void OnWindowResize(uint32_t width, uint32_t height) = 0;
 
 	public:
+		virtual void StartCommandList() = 0;
+		virtual void EndCommandList() = 0;
 		Ref<SwapChain> GetSwapChain() { return m_SwapChain; }
 		Ref<CommandList> GetCommandList() { return m_CommandList; }
 		inline Ref<Synchronizer> GetSynchronizer() { return m_Synchronizer; }

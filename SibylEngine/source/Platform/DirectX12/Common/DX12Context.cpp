@@ -31,6 +31,19 @@ namespace SIByL
 		SIByL_CORE_INFO("DirectX 12 Init finished");
 	}
 
+	void DX12Context::StartCommandList()
+	{
+		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
+		DX12Context::SetInFlightSCmdList(cmdList);
+	}
+
+	void DX12Context::EndCommandList()
+	{
+		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+		cmdQueue->ExecuteCommandList(DX12Context::GetInFlightSCmdList());
+	}
+
 	void DX12Context::OnWindowResize(uint32_t width, uint32_t height)
 	{
 		PROFILE_SCOPE_FUNCTION();

@@ -58,15 +58,7 @@ namespace SIByL
 		PROFILE_SCOPE_FUNCTION();
 		// Awake: Render Objects
 		// --------------------------------
-		//Ref<CommandList> cmdList = m_Window->GetGraphicContext()->GetCommandList();
-		//Ref<Synchronizer> synchronizer = m_Window->GetGraphicContext()->GetSynchronizer();
-
-		//synchronizer->StartFrame();
-		//cmdList->Restart();
-
-		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
-		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
-		DX12Context::SetInFlightSCmdList(cmdList);
+		m_Window->GetGraphicContext()->StartCommandList();
 
 		// ---------------------------------------
 
@@ -79,12 +71,7 @@ namespace SIByL
 			layer->OnInitResource();
 
 		// ---------------------------------------
-		cmdQueue->ExecuteCommandList(cmdList);
-
-		
-		//cmdList->Execute();
-		//synchronizer->EndFrame();
-		//m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
+		m_Window->GetGraphicContext()->EndCommandList();
 	}
 
 	void Application::Run()

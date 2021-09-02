@@ -107,7 +107,7 @@ namespace SIByL
 
         CD3DX12_CLEAR_VALUE optClear;
         optClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        optClear.DepthStencil.Depth = 1;
+        optClear.DepthStencil.Depth = 1.0f;
         optClear.DepthStencil.Stencil = 0;
 
         ComPtr<ID3D12Resource> resource;
@@ -187,8 +187,7 @@ namespace SIByL
 
         CD3DX12_CLEAR_VALUE optClear;
         optClear.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        float ClearColor[4] = { 0, 0, 0, 0 };
-        memcpy(optClear.Color, &ClearColor, 4 * sizeof(float));
+        memcpy(optClear.Color, DirectX::Colors::Transparent, 4 * sizeof(float));
 
         ComPtr<ID3D12Resource> resource;
 

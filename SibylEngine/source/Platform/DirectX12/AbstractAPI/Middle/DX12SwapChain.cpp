@@ -96,7 +96,7 @@ namespace SIByL
 
         // Clear Render Targets
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_SwapChainResource[m_CurrentBackBuffer]->GetRTVCpuHandle();
-        cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::Black, 0, nullptr);
+        cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::Transparent, 0, nullptr);
 
         D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_DepthStencilResource->GetDSVCpuHandle();
         cmdList->ClearDepthStencilView(dsvHandle,	//DSVÃèÊö·û¾ä±ú

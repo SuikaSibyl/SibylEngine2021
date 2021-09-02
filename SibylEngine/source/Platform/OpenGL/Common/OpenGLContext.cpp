@@ -33,6 +33,16 @@ namespace SIByL
 		Application::Get().OnResourceDestroy();
 	}
 
+	void OpenGLContext::StartCommandList()
+	{
+
+	}
+
+	void OpenGLContext::EndCommandList()
+	{
+
+	}
+
 	void OpenGLContext::Init()
 	{
 		// Init GLFW Context

@@ -1,4 +1,5 @@
 #include "EditorLayer.h"
+#include "Sibyl/ImGui/ImGuiUtility.h"
 
 namespace SIByLEditor
 {
@@ -124,12 +125,11 @@ namespace SIByLEditor
 				camera->Resize(viewportPanelSize.x, viewportPanelSize.y);
 			}
 
-			unsigned int textureID = m_FrameBuffer->GetColorAttachment();
+			//unsigned int textureID = m_FrameBuffer->GetColorAttachment();
 
-			ImGui::Image((void*)textureID, ImVec2{
+			ImGui::DrawImage((void*)m_FrameBuffer->GetColorAttachment(), ImVec2{
 				viewportPanelSize.x,
-				viewportPanelSize.y },
-				{ 0,1 }, { 1, 0 });
+				viewportPanelSize.y });
 
 			ImGui::End();
 			ImGui::PopStyleVar();

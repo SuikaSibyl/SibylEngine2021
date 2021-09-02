@@ -17,6 +17,9 @@ namespace SIByL
 		OpenGLContext(GLFWwindow* windowHandle);
 		~OpenGLContext();
 
+		virtual void StartCommandList() override;
+		virtual void EndCommandList() override;
+
 	public:
 		virtual void Init() override;
 		virtual void OnWindowResize(uint32_t width, uint32_t height) override;
