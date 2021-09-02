@@ -55,10 +55,14 @@ public:
 
 	virtual void OnDrawImGui() 
 	{
-		//ImGui::Begin("Setting");
-		//unsigned int textureID = m_FrameBuffer->GetColorAttachment();
-		//ImGui::Image((void*)textureID, ImVec2{ 512,512 }, { 1,1 }, { 0,0 });
-		//ImGui::End();
+		ImGui::Begin("RenderTarget");
+
+		ImGui::Image(m_FrameBuffer->GetColorAttachment(), ImVec2{
+			300,
+			300 },
+			{ 0,1 }, { 1, 0 });
+
+		ImGui::End();
 		static bool show = true;
 		ImGui::ShowDemoWindow(&show);
 	}
@@ -70,9 +74,11 @@ public:
 
 	void OnDraw() override
 	{
+		m_FrameBuffer->Bind();
 		Renderer2D::BeginScene(camera);
 		Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
 		Renderer2D::EndScene();
+		m_FrameBuffer->Unbind();
 	}
 
 	Ref<Shader> shader;
@@ -102,7 +108,7 @@ public:
 SIByL::Application* SIByL::CreateApplication()
 {
 	//_CrtSetBreakAlloc(1330);
-	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
+	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	SIByL_APP_TRACE("Create Application");
 	return new SIByLEditor();

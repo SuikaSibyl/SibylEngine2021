@@ -15,11 +15,11 @@ namespace SIByL
 		DX12SwapChain(int width, int height);
 		~DX12SwapChain() { }
 		void CreateSwapChain(int width, int height);
-		void RecreateRenderTarget();
+		void RecreateRenderTarget(int width, int height);
 		void CreateDepthStencil(int width, int height);
 		void RecreateDepthStencil(int width, int height);
 
-		virtual void BindRenderTarget() override;
+		virtual void BindRenderTarget() override {};
 		virtual void SetRenderTarget() override;
 		virtual void PreparePresent() override;
 		virtual void Present() override;
@@ -30,13 +30,13 @@ namespace SIByL
 
 	private:
 		ComPtr<IDXGISwapChain> m_SwapChain;
-		ComPtr<ID3D12Resource> m_SwapChainBuffer[2];
-		ComPtr<ID3D12Resource> m_SwapChainDepthStencil;
-		DescriptorAllocation m_DescriptorAllocation;
-		DescriptorAllocation m_DSVDespAllocation;
+
+		DX12DescriptorAllocation m_DescriptorAllocation;
+		DX12DescriptorAllocation m_DSVDespAllocation;
 		UINT m_CurrentBackBuffer = 0;
 		
 		Ref<DX12DepthStencilResource> m_DepthStencilResource;
+		Ref<DX12SwapChainResource> m_SwapChainResource[2];
 
 	private:
 		D3D12_VIEWPORT viewPort;

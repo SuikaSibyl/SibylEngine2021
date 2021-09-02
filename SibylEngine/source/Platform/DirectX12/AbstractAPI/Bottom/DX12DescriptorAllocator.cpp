@@ -5,19 +5,20 @@
 
 namespace SIByL
 {
-    DescriptorAllocator::DescriptorAllocator(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptorsPerHeap)
+    DescriptorAllocator::DescriptorAllocator(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptorsPerHeap, bool gpuVisible)
         : m_HeapType(type)
         , m_NumDescriptorsPerHeap(numDescriptorsPerHeap)
+        , m_GpuVisible(gpuVisible)
     {
     }
 
     // DESCRIPTORALLOCATOR::CREATEALLOCATORPAGE
     // The CreateAllocatorPage method is used to create a new page of descriptors.
-    // The DescriptorAllocatorPage class (which will be shown later) is a wrapper for
+    // The DX12DescriptorAllocatorPage class (which will be shown later) is a wrapper for
     // the ID3D12DescriptorHeapand manages the actual descriptors.
-    std::shared_ptr<DescriptorAllocatorPage> DescriptorAllocator::CreateAllocatorPage()
+    std::shared_ptr<DX12DescriptorAllocatorPage> DescriptorAllocator::CreateAllocatorPage()
     {
-        auto newPage = std::make_shared<DescriptorAllocatorPage>(m_HeapType, m_NumDescriptorsPerHeap);
+        auto newPage = std::make_shared<DX12DescriptorAllocatorPage>(m_HeapType, m_NumDescriptorsPerHeap, m_GpuVisible);
 
         m_HeapPool.emplace_back(newPage);
         m_AvailableHeaps.insert(m_HeapPool.size() - 1);
@@ -29,11 +30,11 @@ namespace SIByL
     // The Allocate method allocates a contiguous block of descriptors from a descriptor heap.
     // The method iterates through the available descriptor heap (pages) and tries to allocate
     // the requested number of descriptors until a descriptor heap (page) is able to fulfill the requested allocation. 
-    DescriptorAllocation DescriptorAllocator::Allocate(uint32_t numDescriptors)
+    DX12DescriptorAllocation DescriptorAllocator::Allocate(uint32_t numDescriptors)
     {
         std::lock_guard<std::mutex> lock(m_AllocationMutex);
 
-        DescriptorAllocation allocation;
+        DX12DescriptorAllocation allocation;
 
         for (auto iter = m_AvailableHeaps.begin(); iter != m_AvailableHeaps.end(); ++iter)
         {

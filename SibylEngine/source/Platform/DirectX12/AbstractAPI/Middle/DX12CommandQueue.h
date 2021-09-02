@@ -40,8 +40,8 @@ namespace SIByL
         using CommandListEntry = std::tuple<uint64_t, Ref<DX12CommandList> >;
 
         D3D12_COMMAND_LIST_TYPE                         m_CommandListType;
-        Microsoft::WRL::ComPtr<ID3D12CommandQueue>      m_d3d12CommandQueue;
-        Microsoft::WRL::ComPtr<ID3D12Fence>             m_d3d12Fence;
+        ComPtr<ID3D12CommandQueue>                      m_d3d12CommandQueue;
+        ComPtr<ID3D12Fence>                             m_d3d12Fence;
         std::atomic_uint64_t                            m_FenceValue;
 
         ThreadSafeQueue<CommandListEntry>               m_InFlightCommandLists;

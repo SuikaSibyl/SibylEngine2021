@@ -5,6 +5,7 @@
 #include "Sibyl/Core/Application.h"
 #include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12SwapChain.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
 
 namespace SIByL
 {
@@ -26,12 +27,7 @@ namespace SIByL
 		CreateSynchronizer();
 		CreateUploadBuffer();
 		CreateFrameResourcesManager();
-
-		m_CommandList->Restart();
 		CreateSwapChain();
-		m_CommandList->Execute();
-
-
 		SIByL_CORE_INFO("DirectX 12 Init finished");
 	}
 
@@ -50,7 +46,7 @@ namespace SIByL
 		m_Synchronizer->ForceSynchronize();
 
 		m_SwapChain = nullptr;
-		m_CommandQueue = nullptr;
+		m_SGraphicQueue = nullptr;
 
 		// Release Main Descriptor Allocators
 		m_RtvDescriptorAllocator = nullptr;
@@ -100,15 +96,14 @@ namespace SIByL
 
 	void DX12Context::CreateCommandQueue()
 	{
-		D3D12_COMMAND_QUEUE_DESC commandQueueDesc = {};
-		commandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-		commandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-		DXCall(m_D3dDevice->CreateCommandQueue(&commandQueueDesc, IID_PPV_ARGS(&m_CommandQueue)));
+		m_SGraphicQueue = CreateRef<DX12CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT);
 	}
 
 	void DX12Context::CreateGraphicCommandList()
 	{
 		m_CommandList = std::make_shared<DX12GraphicCommandList>();
+		m_InFlightSCmdList = m_SGraphicQueue->GetCommandList();
+		m_InFlightSCmdList->Close();
 	}
 
 	void DX12Context::CreateDescriptorAllocator()
@@ -116,12 +111,12 @@ namespace SIByL
 		m_RtvDescriptorAllocator = std::make_shared<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 		m_DsvDescriptorAllocator = std::make_shared<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 		m_SrvDescriptorAllocator = std::make_shared<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_SrvDescriptorAllocatorGpu = std::make_shared<DescriptorAllocator>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 256, true);
 	}
 
 	void DX12Context::CreateSwapChain()
 	{
 		m_SwapChain = std::make_shared<DX12SwapChain>();
-		m_SwapChain->BindRenderTarget();
 	}
 
 	void DX12Context::CreateRenderPipeline()
@@ -149,7 +144,7 @@ namespace SIByL
 		ComPtr<ID3D12DescriptorHeap> g_pd3dSrvDescHeap;
 		D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		desc.NumDescriptors = 1;
+		desc.NumDescriptors = 64;
 		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		DXCall(m_D3dDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&g_pd3dSrvDescHeap)));
 		return g_pd3dSrvDescHeap;
@@ -201,4 +196,15 @@ namespace SIByL
 
 		return{ pointWarp, pointClamp, linearWarp, linearClamp, anisotropicWarp, anisotropicClamp };
 	}
+
+	ID3D12CommandQueue* DX12Context::GetCommandQueue()
+	{
+		return Main->m_SGraphicQueue->GetD3D12CommandQueue().Get();
+	}
+
+	ID3D12GraphicsCommandList* DX12Context::GetInFlightDXGraphicCommandList()
+	{
+		return GetInFlightSCmdList()->GetGraphicsCommandList().Get();
+	}
+
 }

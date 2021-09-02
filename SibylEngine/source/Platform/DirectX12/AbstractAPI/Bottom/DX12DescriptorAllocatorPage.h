@@ -1,17 +1,17 @@
 #pragma once
 #include "SIByLpch.h"
 
-// The purpose of the DescriptorAllocatorPage class is to provide the free list allocator strategy
+// The purpose of the DX12DescriptorAllocatorPage class is to provide the free list allocator strategy
 // for an ID3D12DescriptorHeap.
 
 namespace SIByL
 {
-    class DescriptorAllocation;
+    class DX12DescriptorAllocation;
 
-	class DescriptorAllocatorPage : public std::enable_shared_from_this<DescriptorAllocatorPage>
+	class DX12DescriptorAllocatorPage : public std::enable_shared_from_this<DX12DescriptorAllocatorPage>
 	{
     public:
-        DescriptorAllocatorPage(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors);
+        DX12DescriptorAllocatorPage(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptorsm, bool gpuVisible);
 
         D3D12_DESCRIPTOR_HEAP_TYPE GetHeapType() const;
 
@@ -31,15 +31,15 @@ namespace SIByL
          * If the allocation cannot be satisfied, then a NULL descriptor
          * is returned.
          */
-        DescriptorAllocation Allocate(uint32_t numDescriptors);
+        DX12DescriptorAllocation Allocate(uint32_t numDescriptors);
 
         /**
          * Return a descriptor back to the heap.
          * @param frameNumber Stale descriptors are not freed directly, but put
          * on a stale allocations queue. Stale allocations are returned to the heap
-         * using the DescriptorAllocatorPage::ReleaseStaleAllocations method.
+         * using the DX12DescriptorAllocatorPage::ReleaseStaleAllocations method.
          */
-        void Free(DescriptorAllocation&& descriptorHandle, uint64_t frameNumber);
+        void Free(DX12DescriptorAllocation&& descriptorHandle, uint64_t frameNumber);
 
         /**
          * Returned the stale descriptors back to the descriptor heap.
@@ -113,11 +113,14 @@ namespace SIByL
         ComPtr<ID3D12DescriptorHeap>    m_d3d12DescriptorHeap;
         D3D12_DESCRIPTOR_HEAP_TYPE      m_HeapType;
         CD3DX12_CPU_DESCRIPTOR_HANDLE   m_BaseDescriptor;
+        CD3DX12_GPU_DESCRIPTOR_HANDLE   m_BaseDescriptorGpu;
 
         uint32_t    m_DescriptorHandleIncrementSize;
         uint32_t    m_NumDescriptorsInHeap;
         uint32_t    m_NumFreeHandles;
 
         std::mutex  m_AllocationMutex;
+
+        bool m_GpuVisible;
 	};
 }

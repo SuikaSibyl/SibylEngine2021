@@ -97,8 +97,19 @@ namespace SIByL
         }
         else
         {
-            // Otherwise create a new command list.
-            commandList = CreateRef<DX12CommandList>(m_CommandListType);
+            if (m_InFlightCommandLists.Size() > 3)
+            {
+                while (m_AvailableCommandLists.Empty())
+                {
+
+                }
+                m_AvailableCommandLists.TryPop(commandList);
+            }
+            else
+            {
+                // Otherwise create a new command list.
+                commandList = CreateRef<DX12CommandList>(m_CommandListType);
+            }
         }
 
         return commandList;
@@ -179,7 +190,7 @@ namespace SIByL
         m_d3d12CommandQueue->Wait(other.m_d3d12Fence.Get(), other.m_FenceValue);
     }
 
-    Microsoft::WRL::ComPtr<ID3D12CommandQueue> DX12CommandQueue::GetD3D12CommandQueue() const
+    ComPtr<ID3D12CommandQueue> DX12CommandQueue::GetD3D12CommandQueue() const
     {
         return m_d3d12CommandQueue;
     }

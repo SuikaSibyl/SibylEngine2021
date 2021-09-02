@@ -14,7 +14,7 @@ namespace SIByL
 
 		virtual void Bind() override;
 		virtual void Unbind() override;
-		virtual unsigned int GetColorAttachment() override;
+		virtual void* GetColorAttachment() override;
 		virtual void Resize(uint32_t width, uint32_t height) override;
 		virtual void ClearBuffer() override;
 		virtual void ClearRgba() override;

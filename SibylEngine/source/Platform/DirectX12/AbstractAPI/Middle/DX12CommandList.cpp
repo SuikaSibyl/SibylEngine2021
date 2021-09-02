@@ -13,10 +13,26 @@
 namespace SIByL
 {
 	DX12CommandList::DX12CommandList(D3D12_COMMAND_LIST_TYPE type)
+		:m_d3d12CommandListType(type)
 	{
+		auto device = DX12Context::GetDevice();
+
+		DXCall(device->CreateCommandAllocator(m_d3d12CommandListType, IID_PPV_ARGS(&m_d3d12CommandAllocator)));
+
+		DXCall(device->CreateCommandList(0, m_d3d12CommandListType, m_d3d12CommandAllocator.Get(),
+			nullptr, IID_PPV_ARGS(&m_d3d12CommandList)));
+
+		m_UploadBuffer = std::make_unique<DX12UploadBuffer>();
+
+		m_ResourceStateTracker = std::make_unique<DX12ResourceStateTracker>();
+
+		for (int i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
+		{
+			m_DynamicDescriptorHeap[i] = std::make_unique<DX12DynamicDescriptorHeap>(static_cast<D3D12_DESCRIPTOR_HEAP_TYPE>(i));
+			m_DescriptorHeaps[i] = nullptr;
+		}
+
 		m_ResourceStateTracker = CreateScope<DX12ResourceStateTracker>();
-
-
 	}
 
 	DX12CommandList::~DX12CommandList()
@@ -142,6 +158,35 @@ namespace SIByL
 	void DX12CommandList::TrackResource(const DX12Resource& res)
 	{
 		TrackObject(res.GetD3D12Resource());
+	}
+
+	////////////////////////////////////////////////////////////////////////////////
+	//                             Descriptor Binding                             //
+	////////////////////////////////////////////////////////////////////////////////
+	void DX12CommandList::SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ComPtr<ID3D12DescriptorHeap> heap)
+	{
+		if (m_DescriptorHeaps[heapType] != heap)
+		{
+			m_DescriptorHeaps[heapType] = heap;
+			BindDescriptorHeaps();
+		}
+	}
+
+	void DX12CommandList::BindDescriptorHeaps()
+	{
+		UINT numDescriptorHeaps = 0;
+		ID3D12DescriptorHeap* descriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES] = {};
+
+		for (uint32_t i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
+		{
+			ID3D12DescriptorHeap* descriptorHeap = m_DescriptorHeaps[i].Get();
+			if (descriptorHeap)
+			{
+				descriptorHeaps[numDescriptorHeaps++] = descriptorHeap;
+			}
+		}
+
+		m_d3d12CommandList->SetDescriptorHeaps(numDescriptorHeaps, descriptorHeaps);
 	}
 
 	DX12GraphicCommandList::DX12GraphicCommandList()

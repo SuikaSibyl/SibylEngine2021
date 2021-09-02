@@ -66,7 +66,7 @@ namespace SIByL
 		PROFILE_SCOPE_FUNCTION();
 
 		// Set PSO
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		cmdList->SetPipelineState(m_PipelineStateObject.Get());
 		// Bind Stuff
 		m_ShaderBinder->Bind();

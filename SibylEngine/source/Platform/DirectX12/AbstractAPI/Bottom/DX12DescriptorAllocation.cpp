@@ -7,26 +7,30 @@
 
 namespace SIByL
 {
-    DescriptorAllocation::DescriptorAllocation()
+    DX12DescriptorAllocation::DX12DescriptorAllocation()
         : m_Descriptor{ 0 }
         , m_NumHandles(0)
         , m_DescriptorSize(0)
         , m_Page(nullptr)
     {}
 
-    DescriptorAllocation::DescriptorAllocation(D3D12_CPU_DESCRIPTOR_HANDLE descriptor, uint32_t numHandles, uint32_t descriptorSize, std::shared_ptr<DescriptorAllocatorPage> page)
+    DX12DescriptorAllocation::DX12DescriptorAllocation(
+        D3D12_CPU_DESCRIPTOR_HANDLE descriptor,
+        D3D12_GPU_DESCRIPTOR_HANDLE descriptorGpu,
+        uint32_t numHandles, uint32_t descriptorSize, std::shared_ptr<DX12DescriptorAllocatorPage> page, bool gpuVisible)
         : m_Descriptor(descriptor)
+        , m_DescriptorGpu(descriptorGpu)
         , m_NumHandles(numHandles)
         , m_DescriptorSize(descriptorSize)
         , m_Page(page)
     {}
 
-    DescriptorAllocation::~DescriptorAllocation()
+    DX12DescriptorAllocation::~DX12DescriptorAllocation()
     {
         Free();
     }
 
-    DescriptorAllocation::DescriptorAllocation(DescriptorAllocation&& allocation)
+    DX12DescriptorAllocation::DX12DescriptorAllocation(DX12DescriptorAllocation&& allocation)
         : m_Descriptor(allocation.m_Descriptor)
         , m_NumHandles(allocation.m_NumHandles)
         , m_DescriptorSize(allocation.m_DescriptorSize)
@@ -37,7 +41,7 @@ namespace SIByL
         allocation.m_DescriptorSize = 0;
     }
 
-    DescriptorAllocation& DescriptorAllocation::operator=(DescriptorAllocation&& other)
+    DX12DescriptorAllocation& DX12DescriptorAllocation::operator=(DX12DescriptorAllocation&& other)
     {
         // Free this descriptor if it points to anything.
         Free();
@@ -54,7 +58,7 @@ namespace SIByL
         return *this;
     }
 
-    void DescriptorAllocation::Free()
+    void DX12DescriptorAllocation::Free()
     {
         if (!IsNull() && m_Page)
         {
@@ -68,24 +72,31 @@ namespace SIByL
     }
 
     // Check if this a valid descriptor.
-    bool DescriptorAllocation::IsNull() const
+    bool DX12DescriptorAllocation::IsNull() const
     {
         return m_Descriptor.ptr == 0;
     }
 
     // Get a descriptor at a particular offset in the allocation.
-    D3D12_CPU_DESCRIPTOR_HANDLE DescriptorAllocation::GetDescriptorHandle(uint32_t offset) const
+    D3D12_CPU_DESCRIPTOR_HANDLE DX12DescriptorAllocation::GetDescriptorHandle(uint32_t offset) const
     {
         assert(offset < m_NumHandles);
         return { m_Descriptor.ptr + (m_DescriptorSize * offset) };
     }
 
-    uint32_t DescriptorAllocation::GetNumHandles() const
+    // Get a descriptor at a particular offset in the allocation.
+    D3D12_GPU_DESCRIPTOR_HANDLE DX12DescriptorAllocation::GetDescriptorHandleGpu(uint32_t offset) const
+    {
+        assert(offset < m_NumHandles);
+        return { m_DescriptorGpu.ptr + (m_DescriptorSize * offset) };
+    }
+
+    uint32_t DX12DescriptorAllocation::GetNumHandles() const
     {
         return m_NumHandles;
     }
 
-    std::shared_ptr<DescriptorAllocatorPage> DescriptorAllocation::GetDescriptorAllocatorPage() const
+    std::shared_ptr<DX12DescriptorAllocatorPage> DX12DescriptorAllocation::GetDescriptorAllocatorPage() const
     {
         return m_Page;
     }

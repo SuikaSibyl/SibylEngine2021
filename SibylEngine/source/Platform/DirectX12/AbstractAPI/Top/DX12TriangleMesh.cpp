@@ -25,7 +25,7 @@ namespace SIByL
 	{
 		PROFILE_SCOPE_FUNCTION();
 
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		DX12VertexBuffer* dxVertexBuffer = dynamic_cast<DX12VertexBuffer*>(m_VertexBuffer.get());
 		cmdList->IASetVertexBuffers(0, 1, &(dxVertexBuffer->GetVertexBufferView()));
 		DX12IndexBuffer* dxIndexBuffer = dynamic_cast<DX12IndexBuffer*>(m_IndexBuffer.get());

@@ -8,6 +8,12 @@
 #include "Sibyl/Renderer/Renderer2D.h"
 #include "Sibyl/Graphic/Geometry/Vertex.h"
 
+#include "Platform/DirectX12/Common/DX12Context.h"
+#include "Platform/DirectX12/Common/DX12Utility.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
+
+
 namespace SIByL
 {
 	Application* Application::s_Instance = nullptr;
@@ -52,11 +58,15 @@ namespace SIByL
 		PROFILE_SCOPE_FUNCTION();
 		// Awake: Render Objects
 		// --------------------------------
-		Ref<CommandList> cmdList = m_Window->GetGraphicContext()->GetCommandList();
-		Ref<Synchronizer> synchronizer = m_Window->GetGraphicContext()->GetSynchronizer();
+		//Ref<CommandList> cmdList = m_Window->GetGraphicContext()->GetCommandList();
+		//Ref<Synchronizer> synchronizer = m_Window->GetGraphicContext()->GetSynchronizer();
 
-		synchronizer->StartFrame();
-		cmdList->Restart();
+		//synchronizer->StartFrame();
+		//cmdList->Restart();
+
+		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
+		DX12Context::SetInFlightSCmdList(cmdList);
 
 		// ---------------------------------------
 
@@ -69,9 +79,12 @@ namespace SIByL
 			layer->OnInitResource();
 
 		// ---------------------------------------
-		cmdList->Execute();
-		synchronizer->EndFrame();
-		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
+		cmdQueue->ExecuteCommandList(cmdList);
+
+		
+		//cmdList->Execute();
+		//synchronizer->EndFrame();
+		//m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
 	}
 
 	void Application::Run()

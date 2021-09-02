@@ -25,7 +25,7 @@ namespace SIByL
 		virtual void ClearRgba() = 0;
 		virtual void ClearDepthStencil() = 0;
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
-		virtual unsigned int GetColorAttachment() = 0;
+		virtual void* GetColorAttachment() = 0;
 
 		// Caster
 		// -------------------------------------------------

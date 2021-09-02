@@ -86,7 +86,7 @@ namespace SIByL
 
 	void ImGuiLayer::OnDraw()
 	{
-		NewFrameEnd();
+		DrawCall();
 	}
 
 	void ImGuiLayer::OnDrawImGui()

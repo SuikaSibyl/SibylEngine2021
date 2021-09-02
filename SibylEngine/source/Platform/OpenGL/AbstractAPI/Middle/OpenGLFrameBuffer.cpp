@@ -72,9 +72,9 @@ namespace SIByL
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	unsigned int OpenGLFrameBuffer::GetColorAttachment()
+	void* OpenGLFrameBuffer::GetColorAttachment()
 	{
-		return m_TextureObject;
+		return (void*)m_TextureObject;
 	}
 
 	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)

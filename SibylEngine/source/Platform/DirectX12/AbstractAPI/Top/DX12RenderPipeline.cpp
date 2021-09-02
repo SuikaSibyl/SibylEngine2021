@@ -8,6 +8,7 @@
 #include "Sibyl/Core/Application.h"
 
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12SwapChain.h"
 
 #include "Sibyl/ImGui/ImGuiLayer.h"
@@ -26,12 +27,15 @@ namespace SIByL
 	{
 		PROFILE_SCOPE_FUNCTION();
 
-		DX12GraphicCommandList* cmdList = DX12Context::GetGraphicCommandList();
-		SwapChain* swapChain = DX12Context::GetSwapChain();
-		DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
+		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
+		DX12Context::SetInFlightSCmdList(cmdList);
 
-		synchronizer->StartFrame();
-		cmdList->Restart();
+		SwapChain* swapChain = DX12Context::GetSwapChain();
+		//DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
+
+		//synchronizer->StartFrame();
+		//cmdList->Restart
 
 		// Bind Swap Chain as Render Target
 		// -------------------------------------
@@ -45,12 +49,13 @@ namespace SIByL
 		}
 
 		swapChain->PreparePresent();
-		cmdList->Execute();
+		//cmdList->Execute();
+		cmdQueue->ExecuteCommandList(cmdList);
 
 		ImGuiLayer::OnDrawAdditionalWindows();
 
 		swapChain->Present();
-		synchronizer->EndFrame();
+		//synchronizer->EndFrame();
 		//synchronizer->ForceSynchronize();
 	}
 }

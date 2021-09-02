@@ -60,11 +60,13 @@ namespace SIByL
 		void TrackResource(const DX12Resource& res);
 
 	private:
+		D3D12_COMMAND_LIST_TYPE  m_d3d12CommandListType;
+
+	private:
 		Scope<DX12ResourceStateTracker>		m_ResourceStateTracker;
 		ComPtr<ID3D12CommandAllocator>		m_d3d12CommandAllocator;
 		Scope<DX12UploadBuffer>				m_UploadBuffer;
 		Scope<DX12DynamicDescriptorHeap>	m_DynamicDescriptorHeap[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
-		ID3D12DescriptorHeap*				m_DescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
 		// For copy queues, it may be necessary to generate mips while loading textures.
 		// Mips can't be generated on copy queues but must be generated on compute or
 		// direct queues. In this case, a Compute command list is generated and executed 
@@ -80,6 +82,18 @@ namespace SIByL
 		// reset.
 		using TrackedObjects = std::vector<ComPtr<ID3D12Object>>;
 		TrackedObjects m_TrackedObjects;
+
+		////////////////////////////////////////////////////////////////////////////////
+		//                             Descriptor Binding                             //
+		////////////////////////////////////////////////////////////////////////////////
+	public:
+		void SetDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, ComPtr<ID3D12DescriptorHeap> heap);
+	private:
+		// Keep track of the currently bound descriptor heaps. Only change descriptor 
+		// heaps if they are different than the currently bound descriptor heaps.
+		ComPtr<ID3D12DescriptorHeap> m_DescriptorHeaps[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+		// Binds the current descriptor heaps to the command list.
+		void BindDescriptorHeaps();
 	};
 
 	class DX12GraphicCommandList : public CommandList

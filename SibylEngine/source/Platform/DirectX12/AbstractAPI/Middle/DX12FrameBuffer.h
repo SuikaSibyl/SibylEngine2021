@@ -4,6 +4,9 @@
 
 namespace SIByL
 {
+	class DX12DepthStencilResource;
+	class DX12RenderTargetResource;
+
 	class DX12FrameBuffer :public FrameBuffer
 	{
 	public:
@@ -24,7 +27,7 @@ namespace SIByL
 		/////////////////////////////////////////////////////////
 		///				     Fetcher / Setter		          ///
 		virtual const FrameBufferDesc& GetDesc() const override { return m_Desc; }
-		virtual unsigned int GetColorAttachment() override { return 0; }
+		virtual void* GetColorAttachment() override;
 
 		/////////////////////////////////////////////////////////
 		///				          Caster		              ///
@@ -33,6 +36,7 @@ namespace SIByL
 
 	private:
 		FrameBufferDesc m_Desc;
-
+		Ref<DX12DepthStencilResource> m_DepthStencilResource;
+		Ref<DX12RenderTargetResource> m_RenderTargetResource;
 	};
 }

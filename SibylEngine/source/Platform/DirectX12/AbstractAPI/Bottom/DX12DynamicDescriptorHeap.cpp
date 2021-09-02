@@ -143,8 +143,8 @@ namespace SIByL
         if (numDescriptorsToCommit > 0)
         {
             auto device = DX12Context::GetDevice();
-            auto d3d12GraphicsCommandList = DX12Context::GetDXGraphicCommandList();
-            DX12GraphicCommandList* dx12GraphicsCommandList = DX12Context::GetGraphicCommandList();
+            auto d3d12GraphicsCommandList = DX12Context::GetInFlightDXGraphicCommandList();
+            Ref<DX12CommandList> sCommandList = DX12Context::GetInFlightSCmdList();
             assert(d3d12GraphicsCommandList != nullptr);
     
             if (!m_CurrentDescriptorHeap || m_NumFreeHandles < numDescriptorsToCommit)
@@ -154,12 +154,13 @@ namespace SIByL
                 m_CurrentGPUDescriptorHandle = m_CurrentDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
                 m_NumFreeHandles = m_NumDescriptorsPerHeap;
     
-                dx12GraphicsCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap);
+                sCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap);
                 // When updating the descriptor heap on the command list, all descriptor
                 // tables must be (re)recopied to the new descriptor heap (not just
                 // the stale descriptor tables).
                 m_StaleDescriptorTableBitMask = m_DescriptorTableBitMask;
             }
+            sCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap);
 
             m_CurrentCPUDescriptorHandle = m_CurrentDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
             m_CurrentGPUDescriptorHandle = m_CurrentDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
@@ -211,7 +212,7 @@ namespace SIByL
     
     D3D12_GPU_DESCRIPTOR_HANDLE DX12DynamicDescriptorHeap::CopyDescriptor(CommandList& comandList, D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptor)
     {
-        DX12GraphicCommandList* dx12GraphicsCommandList = DX12Context::GetGraphicCommandList();
+        Ref<DX12CommandList> sCommandList = DX12Context::GetInFlightSCmdList();
 
         if (!m_CurrentDescriptorHeap || m_NumFreeHandles < 1)
         {
@@ -220,7 +221,7 @@ namespace SIByL
             m_CurrentGPUDescriptorHandle = m_CurrentDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
             m_NumFreeHandles = m_NumDescriptorsPerHeap;
     
-            dx12GraphicsCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap.Get());
+            sCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap.Get());
     
             // When updating the descriptor heap on the command list, all descriptor
             // tables must be (re)recopied to the new descriptor heap (not just

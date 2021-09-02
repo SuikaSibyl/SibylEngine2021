@@ -129,7 +129,7 @@ namespace SIByL
 	protected:
 		virtual void RecalculateProjectionMatrix() override
 		{
-			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.1f, 100.0f);
+			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
 		}
 
 	private:

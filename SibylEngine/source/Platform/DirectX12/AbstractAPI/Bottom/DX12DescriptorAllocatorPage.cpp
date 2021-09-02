@@ -7,19 +7,22 @@
 
 namespace SIByL
 {
-    DescriptorAllocatorPage::DescriptorAllocatorPage(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors)
+    DX12DescriptorAllocatorPage::DX12DescriptorAllocatorPage(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors, bool gpuVisible)
         : m_HeapType(type)
         , m_NumDescriptorsInHeap(numDescriptors)
+        , m_GpuVisible(gpuVisible)
     {
         auto device = DX12Context::GetDevice();
 
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
         heapDesc.Type = m_HeapType;
         heapDesc.NumDescriptors = m_NumDescriptorsInHeap;
+        if (gpuVisible) heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
         DXCall(device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_d3d12DescriptorHeap)));
 
         m_BaseDescriptor = m_d3d12DescriptorHeap->GetCPUDescriptorHandleForHeapStart();
+        m_BaseDescriptorGpu = m_d3d12DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
         m_DescriptorHandleIncrementSize = device->GetDescriptorHandleIncrementSize(m_HeapType);
         m_NumFreeHandles = m_NumDescriptorsInHeap;
 
@@ -27,29 +30,29 @@ namespace SIByL
         AddNewBlock(0, m_NumFreeHandles);
     }
 
-    D3D12_DESCRIPTOR_HEAP_TYPE DescriptorAllocatorPage::GetHeapType() const
+    D3D12_DESCRIPTOR_HEAP_TYPE DX12DescriptorAllocatorPage::GetHeapType() const
     {
         return m_HeapType;
     }
 
-    uint32_t DescriptorAllocatorPage::NumFreeHandles() const
+    uint32_t DX12DescriptorAllocatorPage::NumFreeHandles() const
     {
         return m_NumFreeHandles;
     }
 
-    bool DescriptorAllocatorPage::HasSpace(uint32_t numDescriptors) const
+    bool DX12DescriptorAllocatorPage::HasSpace(uint32_t numDescriptors) const
     {
         return m_FreeListBySize.lower_bound(numDescriptors) != m_FreeListBySize.end();
     }
 
-    void DescriptorAllocatorPage::AddNewBlock(uint32_t offset, uint32_t numDescriptors)
+    void DX12DescriptorAllocatorPage::AddNewBlock(uint32_t offset, uint32_t numDescriptors)
     {
         auto offsetIt = m_FreeListByOffset.emplace(offset, numDescriptors);
         auto sizeIt = m_FreeListBySize.emplace(numDescriptors, offsetIt.first);
         offsetIt.first->second.FreeListBySizeIt = sizeIt;
     }
 
-    DescriptorAllocation DescriptorAllocatorPage::Allocate(uint32_t numDescriptors)
+    DX12DescriptorAllocation DX12DescriptorAllocatorPage::Allocate(uint32_t numDescriptors)
     {
         std::lock_guard<std::mutex> lock(m_AllocationMutex);
 
@@ -57,7 +60,7 @@ namespace SIByL
         // Return a NULL descriptor and try another heap.
         if (numDescriptors > m_NumFreeHandles)
         {
-            return DescriptorAllocation();
+            return DX12DescriptorAllocation();
         }
 
         // Get the first block that is large enough to satisfy the request.
@@ -65,7 +68,7 @@ namespace SIByL
         if (smallestBlockIt == m_FreeListBySize.end())
         {
             // There was no free block that could satisfy the request.
-            return DescriptorAllocation();
+            return DX12DescriptorAllocation();
         }
 
         // The size of the smallest block that satisfies the request.
@@ -95,22 +98,23 @@ namespace SIByL
         // Decrement free handles.
         m_NumFreeHandles -= numDescriptors;
 
-        return DescriptorAllocation(
+        return DX12DescriptorAllocation(
             CD3DX12_CPU_DESCRIPTOR_HANDLE(m_BaseDescriptor, offset, m_DescriptorHandleIncrementSize),
-            numDescriptors, m_DescriptorHandleIncrementSize, shared_from_this());
+            CD3DX12_GPU_DESCRIPTOR_HANDLE(m_BaseDescriptorGpu, offset, m_DescriptorHandleIncrementSize),
+            numDescriptors, m_DescriptorHandleIncrementSize, shared_from_this(), m_GpuVisible);
 
     }
 
     // The ComputeOffset method is used to compute the offset (in descriptor handles) from the base descriptor
     // (first descriptor in the descriptor heap) to a given descriptor.
-    uint32_t DescriptorAllocatorPage::ComputeOffset(D3D12_CPU_DESCRIPTOR_HANDLE handle)
+    uint32_t DX12DescriptorAllocatorPage::ComputeOffset(D3D12_CPU_DESCRIPTOR_HANDLE handle)
     {
         return static_cast<uint32_t>(handle.ptr - m_BaseDescriptor.ptr) / m_DescriptorHandleIncrementSize;
     }
 
     // The Free method returns a block of descriptors back to the free list.
     // Descriptors are not immediately returned to the free list but instead are added to a queue of stale descriptors. 
-    void DescriptorAllocatorPage::Free(DescriptorAllocation&& descriptor, uint64_t frameNumber)
+    void DX12DescriptorAllocatorPage::Free(DX12DescriptorAllocation&& descriptor, uint64_t frameNumber)
     {
         // Compute the offset of the descriptor within the descriptor heap.
         auto offset = ComputeOffset(descriptor.GetDescriptorHandle());
@@ -121,7 +125,7 @@ namespace SIByL
         m_StaleDescriptors.emplace(offset, descriptor.GetNumHandles(), frameNumber);
     }
 
-    void DescriptorAllocatorPage::FreeBlock(uint32_t offset, uint32_t numDescriptors)
+    void DX12DescriptorAllocatorPage::FreeBlock(uint32_t offset, uint32_t numDescriptors)
     {
         // Find the first element whose offset is greater than the specified offset.
         // This is the block that should appear after the block that is being freed.
@@ -192,7 +196,7 @@ namespace SIByL
     // DESCRIPTORALLOCATORPAGE::RELEASESTALEDESCRIPTORS
     // Stale descriptors are returned to the free list using the ReleaseStaleDescriptors method
     // when the frame that they were freed in is finished executing on the GPU.
-    void DescriptorAllocatorPage::ReleaseStaleDescriptors(uint64_t frameNumber)
+    void DX12DescriptorAllocatorPage::ReleaseStaleDescriptors(uint64_t frameNumber)
     {
         std::lock_guard<std::mutex> lock(m_AllocationMutex);
 

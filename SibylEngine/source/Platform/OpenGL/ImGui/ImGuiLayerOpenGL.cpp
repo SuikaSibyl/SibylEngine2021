@@ -33,7 +33,7 @@ namespace SIByL
 		ImGui_ImplGlfw_NewFrame();
 	}
 
-	void ImGuiLayerOpenGL::NewFrameEnd()
+	void ImGuiLayerOpenGL::DrawCall()
 	{
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}

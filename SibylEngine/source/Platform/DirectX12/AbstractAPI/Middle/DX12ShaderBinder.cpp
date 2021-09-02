@@ -122,7 +122,7 @@ namespace SIByL
 		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
 		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = buffer->GetCurrentGPUAddress();
 
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		cmdList->SetGraphicsRootConstantBufferView(index, gpuAddr);
 	}
 
@@ -131,7 +131,7 @@ namespace SIByL
 		PROFILE_SCOPE_FUNCTION();
 
 		// Bind Root Signature
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		cmdList->SetGraphicsRootSignature(GetRootSignature());
 
 		//// Bind Descriptor Table

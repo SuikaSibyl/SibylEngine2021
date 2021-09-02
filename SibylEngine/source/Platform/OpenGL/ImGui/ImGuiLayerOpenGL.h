@@ -9,7 +9,7 @@ namespace SIByL
 	protected:
 		virtual void PlatformInit() override;
 		virtual void NewFrameBegin() override;
-		virtual void NewFrameEnd() override;
+		virtual void DrawCall() override;
 		virtual void PlatformDestroy() override;
 		virtual void OnDrawAdditionalWindowsImpl() override;
 	};

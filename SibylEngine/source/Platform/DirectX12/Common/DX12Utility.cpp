@@ -29,7 +29,7 @@ namespace SIByL
 			IID_PPV_ARGS(&defaultBuffer)));
 
 		// Set defualt buffer to copy dest
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		cmdList->ResourceBarrier(1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer.Get(),
 				D3D12_RESOURCE_STATE_COMMON,
@@ -82,7 +82,7 @@ namespace SIByL
 		//));
 
 		//// Set defualt buffer to copy dest
-		//ID3D12GraphicsCommandList* cmdList = DX12Context::GetDXGraphicCommandList();
+		//ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		//cmdList->ResourceBarrier(1,
 		//	&CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer.Get(),
 		//		D3D12_RESOURCE_STATE_COMMON,

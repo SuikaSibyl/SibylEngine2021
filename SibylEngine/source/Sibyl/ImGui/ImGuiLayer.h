@@ -31,7 +31,7 @@ namespace SIByL
 	protected:
 		virtual void PlatformInit() {};
 		virtual void NewFrameBegin() {};
-		virtual void NewFrameEnd() {};
+		virtual void DrawCall() {};
 		virtual void PlatformDestroy() {};
 
 	private:

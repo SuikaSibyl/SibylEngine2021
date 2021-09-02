@@ -32,17 +32,17 @@
 
 namespace SIByL
 {
-	class DescriptorAllocatorPage;
+	class DX12DescriptorAllocatorPage;
 
 	class DescriptorAllocator
 	{
 	public:
-		DescriptorAllocator(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptorsPerHeap = 256);
+		DescriptorAllocator(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptorsPerHeap = 256, bool gpuVisible = false);
 		virtual ~DescriptorAllocator() {};
 
 		// DescriptorAllocator::Allocate:
 		// Allocates a number of contiguous descriptors from a CPU visible descriptor heap.
-		DescriptorAllocation Allocate(uint32_t numDescriptors = 1);
+		DX12DescriptorAllocation Allocate(uint32_t numDescriptors = 1);
 
 		// DescriptorAllocator::ReleaseStaleDescriptors:
 		// Frees any stale descriptors that can be returned to the list of available descriptors for reuse.
@@ -51,10 +51,10 @@ namespace SIByL
 		void ReleaseStaleDescriptors(uint64_t frameNumber);
 
 	private:
-		using DescriptorHeapPool = std::vector< std::shared_ptr<DescriptorAllocatorPage> >;
+		using DescriptorHeapPool = std::vector< std::shared_ptr<DX12DescriptorAllocatorPage> >;
 
 		// Create a new heap with a specific number of descriptors.
-		std::shared_ptr<DescriptorAllocatorPage> CreateAllocatorPage();
+		std::shared_ptr<DX12DescriptorAllocatorPage> CreateAllocatorPage();
 
 		D3D12_DESCRIPTOR_HEAP_TYPE m_HeapType;
 		uint32_t m_NumDescriptorsPerHeap;
@@ -64,9 +64,11 @@ namespace SIByL
 		std::set<size_t> m_AvailableHeaps;
 
 		std::mutex m_AllocationMutex;
+
+		bool m_GpuVisible;
 	}; 
 
 }
 
-// DescriptorAllocatorPage: This class is a wrapper for a ID3D12DescriptorHeap.
-// The DescriptorAllocatorPage also keeps track of the free list for the page.
+// DX12DescriptorAllocatorPage: This class is a wrapper for a ID3D12DescriptorHeap.
+// The DX12DescriptorAllocatorPage also keeps track of the free list for the page.

@@ -29,6 +29,6 @@ namespace SIByL
 
 		ComPtr<ID3D12Resource> m_Resource;
 		ComPtr<ID3D12Resource> m_Uploader;
-		DescriptorAllocation m_DescriptorAllocation;
+		DX12DescriptorAllocation m_DescriptorAllocation;
 	};
 }
