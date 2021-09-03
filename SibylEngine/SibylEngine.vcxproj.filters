@@ -138,16 +138,16 @@
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\Renderer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\Core\Renderer\Renderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Core\Input.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\VertexBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\IndexBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\IndexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLIndexBuffer.cpp">
@@ -156,10 +156,10 @@
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLTriangleMesh.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\Geometry\TriangleMesh.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\Shader.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\Core\Camera.cpp">
@@ -183,7 +183,7 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\ShaderBinder.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderBinder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12ShaderBinder.cpp">
@@ -192,10 +192,10 @@
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12FrameResources.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\Material\Material.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\Core\Material\Material.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\Texture.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLTexture.cpp">
@@ -204,7 +204,7 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\Texture\Image.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\Core\Texture\Image.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12Texture.cpp">
@@ -216,13 +216,13 @@
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShaderBinder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Components\ViewCameraController.cpp">
+    <ClCompile Include="source\Sibyl\ECS\Components\ViewCameraController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Renderer\Renderer2D.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\Core\Renderer\Renderer2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Middle\FrameBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBuffer.cpp">
@@ -231,7 +231,7 @@
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Scene\scene.cpp">
+    <ClCompile Include="source\Sibyl\ECS\Scene\Scene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.cpp">
@@ -247,6 +247,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\ImGui\ImGuiUtility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\ECS\Core\Entity.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\ECS\Components\Render\RenderImpl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -266,16 +272,16 @@
     <ClInclude Include="source\Sibyl\Core\Log.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Events\Event.h">
+    <ClInclude Include="source\Sibyl\Core\Events\Event.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Events\ApplicationEvent.h">
+    <ClInclude Include="source\Sibyl\Core\Events\ApplicationEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Events\KeyEvent.h">
+    <ClInclude Include="source\Sibyl\Core\Events\KeyEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Events\MouseEvent.h">
+    <ClInclude Include="source\Sibyl\Core\Events\MouseEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\SIByLpch.h">
@@ -1217,25 +1223,25 @@
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Top\GraphicContext.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\GraphicContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\Common\OpenGLContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\SwapChain.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\SwapChain.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\FrameBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\VertexBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\IndexBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\IndexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\Shader.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\Windows\Window\WindowsInput.h">
@@ -1268,7 +1274,7 @@
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Top\DX12RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Top\RenderPipeline.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLRenderPipeline.h">
@@ -1286,19 +1292,19 @@
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLVertexBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Geometry\Primitive.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Primitive.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Geometry\TriangleMesh.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Geometry\Vertex.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Vertex.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShader.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\Renderer.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Renderer\Renderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLIndexBuffer.h">
@@ -1310,10 +1316,10 @@
     <ClInclude Include="source\Sibyl\Graphic\Core\Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Texture\Image.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Texture\Image.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\Texture.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\Cuda\Common\CudaContext.h">
@@ -1340,16 +1346,16 @@
     <ClInclude Include="source\Platform\Windows\Window\WindowsFrameTimer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\ShaderBinder.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderBinder.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12ShaderBinder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\CommandList.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\CommandList.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Bottom\Synchronizer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Synchronizer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLCommandList.h">
@@ -1358,16 +1364,16 @@
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLSynchronizer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Components\Common\Transform.h">
+    <ClInclude Include="source\Sibyl\ECS\Components\Common\Transform.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Material\Material.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Material\Material.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12FrameResources.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Middle\ShaderData.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderData.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLTexture.h">
@@ -1379,7 +1385,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Renderer\Renderer2D.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Renderer\Renderer2D.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12RootSignature.h">
@@ -1388,13 +1394,13 @@
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLShaderBinder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Components\ViewCameraController.h">
+    <ClInclude Include="source\Sibyl\ECS\Components\ViewCameraController.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Animation\Core\KeyFrame.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Animation\Core\KeyFrame.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Animation\Core\AnimationCurve.h">
+    <ClInclude Include="source\Sibyl\Graphic\Core\Animation\Core\AnimationCurve.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Core\Instrumental.h">
@@ -1409,22 +1415,22 @@
     <ClInclude Include="vendor\entt\entt.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Scene\Scene.h">
+    <ClInclude Include="source\Sibyl\ECS\Scene\Scene.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Components\Render\MeshRenderer.h">
+    <ClInclude Include="source\Sibyl\ECS\Components\Render\MeshRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Components\Render\SpriteRenderer.h">
+    <ClInclude Include="source\Sibyl\ECS\Components\Render\SpriteRenderer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Components\Components.h">
+    <ClInclude Include="source\Sibyl\ECS\Components\Components.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Bottom\Resource.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Bottom\CommandList.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.h">
@@ -1443,6 +1449,24 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\ImGui\ImGuiUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Core\Entity.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Components\Common\Tag.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Components\Common\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Components\Script\NativeScript.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Components\Script\ScriptableEntity.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Components\Render\MeshFilter.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

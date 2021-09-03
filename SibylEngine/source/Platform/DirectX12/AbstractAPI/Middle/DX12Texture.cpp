@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "DX12Texture.h"
 
-#include "Sibyl/Graphic/Texture/Image.h"
+#include "Sibyl/Graphic/Core/Texture/Image.h"
 
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"

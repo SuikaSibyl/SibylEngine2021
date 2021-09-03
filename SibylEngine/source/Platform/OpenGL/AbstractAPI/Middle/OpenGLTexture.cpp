@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "OpenGLTexture.h"
 
-#include "Sibyl/Graphic/Texture/Image.h"
+#include "Sibyl/Graphic/Core/Texture/Image.h"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 

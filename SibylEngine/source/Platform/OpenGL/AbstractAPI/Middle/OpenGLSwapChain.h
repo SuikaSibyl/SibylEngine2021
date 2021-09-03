@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/SwapChain.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/SwapChain.h"
 
 namespace SIByL
 {

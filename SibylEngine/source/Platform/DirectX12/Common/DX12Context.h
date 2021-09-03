@@ -2,7 +2,7 @@
 
 #include "SIByLpch.h"
 
-#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12DescriptorAllocator.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12UploadBuffer.h"

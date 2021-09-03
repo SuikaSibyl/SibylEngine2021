@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/Texture.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
 
 namespace SIByL
 {

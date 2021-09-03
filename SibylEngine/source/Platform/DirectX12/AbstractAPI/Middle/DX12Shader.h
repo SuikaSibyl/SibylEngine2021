@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/Shader.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
 
 namespace SIByL
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/FrameBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 
 namespace SIByL
 {

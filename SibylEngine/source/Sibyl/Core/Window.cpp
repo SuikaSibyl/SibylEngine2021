@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "Window.h"
 
-#include "Sibyl/Renderer/Renderer.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 #include "Platform/OpenGL/Window/GLFWWindow.h"
 #include "Platform/Windows/Window/WindowsWindow.h"
 

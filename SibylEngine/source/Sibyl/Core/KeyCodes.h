@@ -1,6 +1,6 @@
 #pragma once
 #include "SIByLpch.h"
-#include "Sibyl/Renderer/Renderer.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 
 inline int GetKeyCode(int GLFWCode, int WinCode)
 {

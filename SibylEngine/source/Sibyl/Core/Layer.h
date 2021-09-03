@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Sibyl/Core/Core.h"
-#include "Sibyl/Events/Event.h"
+#include "Sibyl/Core/Events/Event.h"
 
 namespace SIByL
 {

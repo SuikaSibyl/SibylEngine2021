@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/IndexBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/IndexBuffer.h"
 
 namespace SIByL
 {

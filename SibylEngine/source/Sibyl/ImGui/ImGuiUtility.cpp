@@ -1,6 +1,6 @@
 #include "SIByLpch.h"
 #include "ImGuiUtility.h"
-#include "Sibyl/Renderer/Renderer.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 
 namespace ImGui
 {

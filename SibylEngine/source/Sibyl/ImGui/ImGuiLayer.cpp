@@ -7,7 +7,7 @@
 #include "GLFW/glfw3.h"
 #include "Sibyl/Core/Application.h"
 
-#include "Sibyl/Renderer/Renderer.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 #include "Platform/OpenGL/ImGui/ImGuiLayerOpenGL.h"
 #include "Platform/DirectX12/ImGui/ImGuiLayerDX12.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SIByLpch.h"
-#include "Sibyl/Graphic/AbstractAPI/Middle/SwapChain.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/SwapChain.h"
 
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12DescriptorAllocation.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12CommonResource.h"

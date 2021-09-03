@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 #include "Platform/OpenGL/AbstractAPI/Top/OpenGLRenderPipeline.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLSwapChain.h"
 

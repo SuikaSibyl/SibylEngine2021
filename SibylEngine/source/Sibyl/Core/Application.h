@@ -2,14 +2,14 @@
 
 #include "Core.h"
 #include "Window.h"
-#include "Sibyl/Events/ApplicationEvent.h"
-#include "Sibyl/Events/KeyEvent.h"
-#include "Sibyl/Events/MouseEvent.h"
+#include "Sibyl/Core/Events/ApplicationEvent.h"
+#include "Sibyl/Core/Events/KeyEvent.h"
+#include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/LayerStack.h"
 #include "Sibyl/Core/FrameTimer.h"
-#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 #include "Sibyl/ImGui/ImGuiLayer.h"
-#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 
 namespace SIByL
 {

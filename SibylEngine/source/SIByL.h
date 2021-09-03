@@ -17,22 +17,26 @@
 #include "imgui.h"
 
 // Scene
-#include "Sibyl/Scene/Scene.h"
-#include "Sibyl/Components/Components.h"
+#include "Sibyl/ECS/Scene/Scene.h"
+#include "Sibyl/ECS/Components/Components.h"
 
 // GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// ECS
+#include "Sibyl/ECS/Core/Entity.h"
+
+
 // Render Basic
-#include "Sibyl/Renderer/Renderer.h"
-#include "Sibyl/Graphic/AbstractAPI/Middle/Shader.h"
-#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
-#include "Sibyl/Graphic/AbstractAPI/Middle/Texture.h"
-#include "Sibyl/Renderer/Renderer2D.h"
-#include "Sibyl/Graphic/AbstractAPI/Middle/FrameBuffer.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
+#include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 
 // Components
 #include <Sibyl/Graphic/Core/Camera.h>
-#include <Sibyl/Components/ViewCameraController.h>
+#include <Sibyl/ECS/Components/ViewCameraController.h>

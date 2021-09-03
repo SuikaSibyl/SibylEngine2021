@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/IndexBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/IndexBuffer.h"
 
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12Resource.h"
 

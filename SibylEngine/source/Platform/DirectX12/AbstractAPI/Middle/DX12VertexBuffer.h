@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/VertexBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/VertexBuffer.h"
 
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12Resource.h"
 

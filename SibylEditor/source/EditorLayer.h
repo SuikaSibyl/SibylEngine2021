@@ -1,5 +1,6 @@
 #pragma once
 #include <SIByL.h>
+#include "Editor/Panels/SceneHierarchyPanel.h"
 
 using namespace SIByL;
 
@@ -43,17 +44,6 @@ namespace SIByLEditor
 			m_FrameBuffer = FrameBuffer::Create(desc);
 		}
 
-		virtual void OnAttach() override;
-
-		virtual void OnUpdate() override;
-
-		virtual void OnDrawImGui();
-
-		void OnEvent(SIByL::Event& event) override
-		{
-			//viewCameraController->OnEvent(event);
-		}
-
 		void OnDraw() override
 		{
 			m_FrameBuffer->Bind();
@@ -62,6 +52,16 @@ namespace SIByLEditor
 			Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
 			Renderer2D::EndScene();
 			m_FrameBuffer->Unbind();
+		}
+
+		virtual void OnAttach() override;
+
+		virtual void OnUpdate() override;
+
+		virtual void OnDrawImGui();
+
+		void OnEvent(SIByL::Event& event) override
+		{
 		}
 
 		Ref<Shader> shader;
@@ -73,6 +73,7 @@ namespace SIByLEditor
 		Ref<Camera> orthoCamera;
 		Ref<FrameBuffer> m_FrameBuffer;
 		Ref<Scene> m_ActiveScene;
+		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 		/////////////////////
 		////   Viewport  ////

@@ -6,8 +6,9 @@ namespace SIByLEditor
 	void EditorLayer::OnAttach()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		auto square = m_ActiveScene->CreateEntity();
-		
+		Entity square = m_ActiveScene->CreateEntity();
+		Entity hello = m_ActiveScene->CreateEntity("Hello");
+		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_ActiveScene);
 	}
 
 	void EditorLayer::OnUpdate()
@@ -19,7 +20,6 @@ namespace SIByLEditor
 		SIByL_CORE_INFO("FPS: {0}, {1} ms",
 			Application::Get().GetFrameTimer()->GetFPS(),
 			Application::Get().GetFrameTimer()->GetMsPF());
-
 
 		if (m_ViewportFocused)
 			viewCameraController->OnUpdate();
@@ -145,6 +145,11 @@ namespace SIByLEditor
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
+
+		//////////////////////////////////////////////
+		// Scene Hierarchy
+		//////////////////////////////////////////////
+		m_SceneHierarchyPanel->OnImGuiRender();
 
 		ImGui::End();
 	}

@@ -3,7 +3,7 @@
 #include "DX12Utility.h"
 
 #include "Sibyl/Core/Application.h"
-#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12SwapChain.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
 

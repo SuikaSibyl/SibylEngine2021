@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Top/RenderPipeline.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/RenderPipeline.h"
 
 namespace SIByL
 {

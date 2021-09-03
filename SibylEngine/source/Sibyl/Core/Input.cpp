@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "Input.h"
 
-#include "Sibyl/Renderer/Renderer.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 #include "Platform/OpenGL/Window/GLFWInput.h"
 #include "Platform/Windows/Window/WindowsInput.h"
 

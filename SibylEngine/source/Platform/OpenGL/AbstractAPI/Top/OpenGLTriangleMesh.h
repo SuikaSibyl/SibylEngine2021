@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 
 namespace SIByL
 {

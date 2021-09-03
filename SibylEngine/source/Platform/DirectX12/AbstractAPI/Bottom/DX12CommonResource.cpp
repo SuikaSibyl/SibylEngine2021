@@ -151,6 +151,7 @@ namespace SIByL
         m_RTVDescriptorAllocation = rtvDespAllocator->Allocate(1);
         m_SRVDescriptorAllocationCpu = srvDespAllocator->Allocate(1);
         m_SRVDescriptorAllocationGpu = srvDespAllocatorGpu->Allocate(1);
+        m_ImGuiAllocation = ImGuiLayerDX12::Get()->RegistShaderResource();
 
         // Create the actual buffer
         CreateResource(pSCommandList);
@@ -213,8 +214,6 @@ namespace SIByL
             resource.Get(),
             nullptr,
             m_SRVDescriptorAllocationCpu.GetDescriptorHandle());
-
-        m_ImGuiAllocation = ImGuiLayerDX12::Get()->RegistShaderResource();
 
         DX12Context::GetDevice()->CreateShaderResourceView(
             resource.Get(),

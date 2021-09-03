@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Core.h"
-#include "Sibyl/Events/Event.h"
-#include "Sibyl/Graphic/AbstractAPI/Top/GraphicContext.h"
+#include "Sibyl/Core/Events/Event.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 
 namespace SIByL
 {

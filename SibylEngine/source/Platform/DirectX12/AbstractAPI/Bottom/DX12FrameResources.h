@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12UploadBuffer.h"
 #include <iostream>
 #include <memory>

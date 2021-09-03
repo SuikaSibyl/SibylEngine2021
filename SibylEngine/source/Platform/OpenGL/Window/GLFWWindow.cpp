@@ -2,9 +2,9 @@
 #include <glad/glad.h> 
 #include "GLFWWindow.h"
 
-#include "Sibyl/Events/ApplicationEvent.h"
-#include "Sibyl/Events/MouseEvent.h"
-#include "Sibyl/Events/KeyEvent.h"
+#include "Sibyl/Core/Events/ApplicationEvent.h"
+#include "Sibyl/Core/Events/MouseEvent.h"
+#include "Sibyl/Core/Events/KeyEvent.h"
 #include "Sibyl/Core/Input.h"
 
 #include "Platform/OpenGL/Common/OpenGLContext.h"

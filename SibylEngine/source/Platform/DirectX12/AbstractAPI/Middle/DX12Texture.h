@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/Texture.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12DescriptorAllocation.h"
 
 namespace SIByL

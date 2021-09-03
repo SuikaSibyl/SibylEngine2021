@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Sibyl/Core/Layer.h"
-#include "Sibyl/Events/MouseEvent.h"
-#include "Sibyl/Events/KeyEvent.h"
-#include "Sibyl/Events/ApplicationEvent.h"
+#include "Sibyl/Core/Events/MouseEvent.h"
+#include "Sibyl/Core/Events/KeyEvent.h"
+#include "Sibyl/Core/Events/ApplicationEvent.h"
 
 namespace SIByL
 {

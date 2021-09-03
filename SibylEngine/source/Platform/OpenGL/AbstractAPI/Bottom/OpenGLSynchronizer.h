@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Bottom/Synchronizer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Bottom/Synchronizer.h"
 
 namespace SIByL
 {

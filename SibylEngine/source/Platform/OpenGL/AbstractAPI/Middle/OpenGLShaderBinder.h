@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 
 namespace SIByL
 {

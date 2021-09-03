@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Components/Common/Transform.h"
+#include "Sibyl/ECS/Components/Common/Transform.h"
 
 namespace SIByL
 {
@@ -9,22 +9,22 @@ namespace SIByL
 	public:
 		Camera()
 		{
-			m_Transform = std::make_shared<Transform>();
+			m_Transform = std::make_shared<TransformComponent>();
 			m_WorldUp = m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 			SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
 			SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
 		}
 
-		Ref<Transform> GetTransform() { return m_Transform; }
-		void SetTransform(Ref<Transform> transform)
+		Ref<TransformComponent> GetTransform() { return m_Transform; }
+		void SetTransform(Ref<TransformComponent> transform)
 		{
-			SetPosition(transform->position);
-			SetRotation(transform->eulerAngles);
+			SetPosition(transform->Translation);
+			SetRotation(transform->EulerAngles);
 		}
 
 		const glm::vec3& GetPosition() const { return m_Posistion; }
 		void SetPosition(const glm::vec3& position) {
-			m_Transform->position = position;
+			m_Transform->Translation = position;
 			m_Posistion = position;
 			RecalculateViewMatrix();
 		}
@@ -40,7 +40,7 @@ namespace SIByL
 		const glm::vec3& GetRotation() const { return m_Rotation; }
 		void SetRotation(const glm::vec3& rotation) { 
 			m_Rotation = rotation;
-			m_Transform->eulerAngles = rotation;
+			m_Transform->EulerAngles = rotation;
 			m_Front.x = sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
 			m_Front.y = sin(glm::radians(rotation.x));
 			m_Front.z = cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
@@ -92,7 +92,7 @@ namespace SIByL
 		glm::mat4 m_View;
 		glm::mat4 m_ViewProjection;
 
-		Ref<Transform> m_Transform;
+		Ref<TransformComponent> m_Transform;
 
 		float m_Width;
 		float m_Height;

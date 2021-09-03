@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Middle/VertexBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/VertexBuffer.h"
 
 namespace SIByL
 {
