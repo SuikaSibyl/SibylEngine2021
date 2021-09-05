@@ -1,7 +1,7 @@
 #pragma once
 #include <SIByL.h>
 #include "Editor/Panels/SceneHierarchyPanel.h"
-
+#include "Sibyl/Graphic/Core/Texture/Image.h"
 using namespace SIByL;
 
 namespace SIByLEditor
@@ -24,6 +24,7 @@ namespace SIByLEditor
 
 		void OnInitResource() override
 		{
+			//Ref<Image> image = CreateRef<Image>(16, 16, 4, { 1,1,1,1 });
 			texture = Texture2D::Create("fen4.png");
 			texture1 = Texture2D::Create("amagami4.png");
 
@@ -49,7 +50,11 @@ namespace SIByLEditor
 			m_FrameBuffer->Bind();
 			m_FrameBuffer->ClearBuffer();
 			Renderer2D::BeginScene(camera);
-			Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, texture);
+			float totalTime = Application::Get().GetFrameTimer()->TotalTime();
+			//if ((int)(totalTime) % 2 == 1)
+			//	Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 }, texture);
+			//else
+				Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 });
 			Renderer2D::EndScene();
 			m_FrameBuffer->Unbind();
 		}
@@ -75,6 +80,7 @@ namespace SIByLEditor
 		Ref<Scene> m_ActiveScene;
 		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
+		Entity m_SqureTest;
 		/////////////////////
 		////   Viewport  ////
 		/////////////////////

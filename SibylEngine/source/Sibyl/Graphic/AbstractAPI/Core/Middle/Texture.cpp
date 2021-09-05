@@ -22,4 +22,16 @@ namespace SIByL
 		return nullptr;
 	}
 
+	Ref<Texture2D> Texture2D::Create(Ref<Image> image)
+	{
+		switch (Renderer::GetRaster())
+		{
+		case RasterRenderer::OpenGL: return std::make_shared<OpenGLTexture2D>(image); break;
+		case RasterRenderer::DirectX12: return std::make_shared<DX12Texture2D>(image); break;
+		case RasterRenderer::CpuSoftware: return nullptr; break;
+		case RasterRenderer::GpuSoftware: return nullptr; break;
+		default: return nullptr; break;
+		}
+		return nullptr;
+	}
 }

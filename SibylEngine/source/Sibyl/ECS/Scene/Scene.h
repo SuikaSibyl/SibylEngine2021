@@ -17,9 +17,13 @@ namespace SIByL
 		void OnUpdate();
 
 		Entity CreateEntity(const std::string& name = "New Entity");
+		void DestroyEntity(Entity entity);
 
 	private:
 		entt::registry m_Registry;
 		friend class SceneHierarchyPanel;
+
+		template<typename T>
+		void OnComponentAdded(Entity entity, T& component);
 	};
 }

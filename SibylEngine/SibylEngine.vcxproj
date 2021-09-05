@@ -147,6 +147,7 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
+    <ClCompile Include="source\Sibyl\ECS\Components\Common\CommonUnity.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Render\RenderImpl.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\ViewCameraController.cpp" />
     <ClCompile Include="source\Sibyl\Core\Input.cpp" />

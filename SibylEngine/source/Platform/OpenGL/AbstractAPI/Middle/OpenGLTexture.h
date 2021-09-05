@@ -4,11 +4,15 @@
 
 namespace SIByL
 {
+	class Image;
+
 	class OpenGLTexture2D :public Texture2D
 	{
 	public:
 		friend class OpenGLFrameBuffer;
 		OpenGLTexture2D(const std::string& path);
+		OpenGLTexture2D(Ref<Image> image);
+		void InitFromImage(Image* img);
 		OpenGLTexture2D(const uint32_t& id, const uint32_t& width, 
 			const uint32_t& height, const uint32_t& channel, const Format& type);
 

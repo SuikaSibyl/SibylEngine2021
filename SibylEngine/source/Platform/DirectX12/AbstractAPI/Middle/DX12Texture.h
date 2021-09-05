@@ -5,10 +5,13 @@
 
 namespace SIByL
 {
+	class Image;
 	class DX12Texture2D :public Texture2D
 	{
 	public:
 		DX12Texture2D(const std::string& path);
+		DX12Texture2D(Ref<Image> image);
+		void InitFromImage(Image* img);
 		virtual ~DX12Texture2D();
 
 		virtual uint32_t GetWidth() const override;

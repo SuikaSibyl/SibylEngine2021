@@ -2,6 +2,8 @@
 
 namespace SIByL
 {
+	class Image;
+
 	class Texture
 	{
 	public:
@@ -27,7 +29,8 @@ namespace SIByL
 	public:
 		virtual ~Texture2D() = default;
 		static Ref<Texture2D> Create(const std::string & path);
-		
+		static Ref<Texture2D> Create(Ref<Image> image);
+
 	public:
 		//virtual uint32_t GetImGuiIdentifier() = 0;
 	};

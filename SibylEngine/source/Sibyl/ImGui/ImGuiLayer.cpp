@@ -58,6 +58,10 @@ namespace SIByL
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+		
+		io.Fonts->AddFontFromFileTTF("../SibylEditor/assets/fonts/opensans/OpenSans-Bold.ttf", 18.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("../SibylEditor/assets/fonts/opensans/OpenSans-Regular.ttf", 18.0f);
+
 		// Setup Platform/Renderer bindings
 		PlatformInit();
 	}

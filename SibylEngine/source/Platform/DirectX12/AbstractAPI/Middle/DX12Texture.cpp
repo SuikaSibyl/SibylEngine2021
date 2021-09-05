@@ -12,12 +12,23 @@ namespace SIByL
 	DX12Texture2D::DX12Texture2D(const std::string& path)
 	{
 		PROFILE_SCOPE_FUNCTION();
-
-		Image image(path);
 		m_Path = path;
-		m_Width = image.GetWidth();
-		m_Height = image.GetHeight();
-		m_Channel = image.GetChannel();
+		Image image(path);
+		InitFromImage(&image);
+	}
+
+	DX12Texture2D::DX12Texture2D(Ref<Image> img)
+	{
+		PROFILE_SCOPE_FUNCTION();
+		m_Path = "NONE";
+		InitFromImage(img.get());
+	}
+
+	void DX12Texture2D::InitFromImage(Image* img)
+	{
+		m_Width = img->GetWidth();
+		m_Height = img->GetHeight();
+		m_Channel = img->GetChannel();
 
 		bool hasAlpha = (m_Channel == 4);
 
@@ -89,7 +100,7 @@ namespace SIByL
 				D3D12_RESOURCE_STATE_COPY_DEST));
 
 		D3D12_SUBRESOURCE_DATA subResourceData = {};
-		subResourceData.pData = image.GetData();
+		subResourceData.pData = img->GetData();
 		subResourceData.RowPitch = m_Width * 4;
 		subResourceData.SlicePitch = total_bytes;
 

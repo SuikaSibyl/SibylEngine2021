@@ -16,7 +16,7 @@ out vec2 v_TexCoord;
 uniform mat4 Model;
 uniform mat4 Projection;
 uniform mat4 View;
-uniform vec3 Color;
+uniform vec4 Color;
 
 void main()
 {
@@ -36,10 +36,10 @@ in vec2 v_TexCoord;
 // Fragment outputs
 out vec4 FragColor;  
 // Uniform items
-uniform vec3 Color;
+uniform vec4 Color;
 uniform sampler2D u_Texture;
 
 void main()
 {
-    FragColor = texture(u_Texture, v_TexCoord);
+    FragColor = Color * texture(u_Texture, v_TexCoord);
 }

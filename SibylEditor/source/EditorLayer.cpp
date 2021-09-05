@@ -1,14 +1,23 @@
 #include "EditorLayer.h"
 #include "Sibyl/ImGui/ImGuiUtility.h"
 
+#include "Sibyl/ECS/Components/Render/SpriteRenderer.h"
+#include "Sibyl/Graphic/Core/Texture/Image.h"
+
+
 namespace SIByLEditor
 {
 	void EditorLayer::OnAttach()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		Entity square = m_ActiveScene->CreateEntity();
-		Entity hello = m_ActiveScene->CreateEntity("Hello");
 		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_ActiveScene);
+
+		Entity square = m_ActiveScene->CreateEntity();
+		square.AddComponent<SpriteRendererComponent>();
+		m_SqureTest = square;
+		Entity hello = m_ActiveScene->CreateEntity("Hello");
+
+		Image image(8, 8, 4, { 0.1,0.2,0.3,1 });
 	}
 
 	void EditorLayer::OnUpdate()
@@ -140,7 +149,7 @@ namespace SIByLEditor
 		//////////////////////////////////////////////
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2({ 0,0 }));
-			ImGui::Begin("Inspector");
+			ImGui::Begin("Assets");
 
 			ImGui::End();
 			ImGui::PopStyleVar();

@@ -3,6 +3,7 @@
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Core/Texture/Image.h"
 
 namespace SIByL
 {
@@ -11,7 +12,9 @@ namespace SIByL
 		Ref<TriangleMesh> QuadMesh = nullptr;
 		Ref<Shader> FlatColorShader = nullptr;
 		Ref<Shader> TextureShader = nullptr;
-		Ref<Texture> TexCheckboard = nullptr;
+		Ref<Texture2D> TexCheckboard = nullptr;
+		Ref<Texture2D> TexWhite = nullptr;
+		Ref<Image> WhiteImage = nullptr;
 	};
 
 	static Renderer2DStorage* s_Data;
@@ -70,6 +73,8 @@ namespace SIByL
 		};
 
 		s_Data->QuadMesh = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
+		s_Data->WhiteImage = CreateRef<Image>(16, 16, 4, glm::vec4{ 1,1,1,1 });
+		s_Data->TexWhite = Texture2D::Create(s_Data->WhiteImage);
 	}
 	
 	void Renderer2D::Shutdown()
@@ -89,37 +94,73 @@ namespace SIByL
 
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
 	{
-
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
-	{
-
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, Ref<Texture2D> texture)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-
-		model = glm::translate(model, { position,0 });
-	}
-
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, Ref<Texture2D> texture)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-
-		model = glm::scale(model, { size, 1 });
-		model = glm::translate(model, { position });
-
 		s_Data->TextureShader->Use();
-		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", model);
+		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
+		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+
+		s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
+		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+
+		s_Data->TextureShader->GetBinder()->SetTexture2D("Main", s_Data->TexWhite);
+		s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
+
+		s_Data->QuadMesh->RasterDraw();
+	}
+
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, Ref<Texture2D> texture)
+	{
+		s_Data->TextureShader->Use();
+		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
+		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+
+		s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
 		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
 
 		s_Data->TextureShader->GetBinder()->SetTexture2D("Main", texture);
 		s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
 
 		s_Data->QuadMesh->RasterDraw();
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+
+		model = glm::scale(model, { size, 1 });
+		model = glm::translate(model, { position,0 });
+
+		DrawQuad(model, color);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+
+		model = glm::scale(model, { size, 1 });
+		model = glm::translate(model, { position });
+
+		DrawQuad(model, color);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+
+		model = glm::scale(model, { size, 1 });
+		model = glm::translate(model, { position,0 });
+
+		DrawQuad(model, color, texture);
+	}
+
+	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+
+		model = glm::scale(model, { size, 1 });
+		model = glm::translate(model, { position });
+
+		DrawQuad(model, color, texture);
 	}
 }
