@@ -99,6 +99,8 @@ namespace SIByL
 				glm::vec3 currRotation = m_Camera->GetRotation();
 
 				float mouseSensitivityFactor = RotationCurveEvalue(glm::vec2(diffx, diffy).length() * 1. / 10);
+				float dpi = Application::Get().GetWindow().GetHighDPI();
+				mouseSensitivityFactor /= dpi;
 
 				m_TargetState.pitch += -m_RotateSpeed * 400 * deltaTime * diffy * mouseSensitivityFactor;
 				m_TargetState.yaw += +m_RotateSpeed * 400 * deltaTime * diffx * mouseSensitivityFactor;
