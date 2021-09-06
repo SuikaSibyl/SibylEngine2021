@@ -25,5 +25,7 @@ namespace SIByL
 
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
+
+		friend class SceneSerializer;
 	};
 }

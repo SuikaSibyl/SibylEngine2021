@@ -258,6 +258,9 @@
     <ClCompile Include="source\Sibyl\ECS\Components\Common\CommonUnity.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1470,6 +1473,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\ECS\Components\Render\MeshFilter.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Scene\SceneSerializer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

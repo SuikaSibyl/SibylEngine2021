@@ -28,6 +28,9 @@ namespace SIByL
 
 		void SetBlockEvents(bool block) { m_BlockEvents = block; }
 
+	private:
+		void SetDarkThemeColors();
+
 	protected:
 		virtual void PlatformInit() {};
 		virtual void NewFrameBegin() {};
