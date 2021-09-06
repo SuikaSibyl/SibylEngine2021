@@ -185,4 +185,10 @@ namespace SIByL
 		return (void*)m_Window;
 	}
 
+	float GLFWWindow::GetHighDPI()
+	{
+		float x, y;
+		glfwGetWindowContentScale(m_Window, &x, &y);
+		return x;
+	}
 }

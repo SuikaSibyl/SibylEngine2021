@@ -282,4 +282,11 @@ namespace SIByL
 	{
 		return m_Data.VSync;
 	}
+
+#define INCH 0.03937
+
+	float WindowsWindow::GetHighDPI()
+	{
+		return GetDpiForWindow(mhMainWnd);
+	}
 }
