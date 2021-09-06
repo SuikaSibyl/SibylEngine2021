@@ -31,7 +31,9 @@ namespace SIByL
 		// before CreateWindow returns, and thus before mhMainWnd is valid.
 		return WindowsWindow::Main->MsgProc(hwnd, msg, wParam, lParam);
 	}
-	
+
+	HRGN rgnMain, rgnCaptionbar;
+
 	LRESULT CALLBACK WindowsWindow::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam))
@@ -49,6 +51,7 @@ namespace SIByL
 		{
 			m_Data.Width = LOWORD(lParam);
 			m_Data.Height = HIWORD(lParam);
+
 			WindowResizeEvent event(m_Data.Width, m_Data.Height);
 			if (m_Data.EventCallback == nullptr) return 0;
 			m_Data.EventCallback(event);

@@ -1,0 +1,16 @@
+Scene: Untitled
+Entities:
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Hello
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [0, 0, 0]
+      Scale: [0, 0, 0]
+  - Entity: 124531623461
+    TagComponent:
+      Tag: New Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [0, 0, 0]
+      Scale: [0, 0, 0]

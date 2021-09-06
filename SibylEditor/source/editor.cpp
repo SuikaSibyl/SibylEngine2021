@@ -21,6 +21,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
+	//_CrtSetBreakAlloc(7833);
 	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	return new Editor();

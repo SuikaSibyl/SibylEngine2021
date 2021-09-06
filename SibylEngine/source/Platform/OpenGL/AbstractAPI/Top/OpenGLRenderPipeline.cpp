@@ -21,6 +21,8 @@ namespace SIByL
 
 		Ref<SwapChain> swapChain = OpenGLContext::Get()->GetSwapChain();
 
+
+
 		// Bind Swap Chain as Render Target
 		// -------------------------------------
 		swapChain->SetRenderTarget();

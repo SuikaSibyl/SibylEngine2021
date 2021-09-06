@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/Core/Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 #include "Sibyl/Core/Events/Event.h"
 #include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/Events/ApplicationEvent.h"

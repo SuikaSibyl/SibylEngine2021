@@ -1,7 +1,7 @@
 #include "SIByLpch.h"
 #include "Camera.h"
 
-#include "Sibyl/Graphic/Core/Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 
 namespace SIByL
 {

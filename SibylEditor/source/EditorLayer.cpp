@@ -3,7 +3,7 @@
 
 #include "Sibyl/ECS/Components/Render/SpriteRenderer.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
-
+#include "Sibyl/ECS/Scene/SceneSerializer.h"
 
 namespace SIByLEditor
 {
@@ -16,6 +16,9 @@ namespace SIByLEditor
 		square.AddComponent<SpriteRendererComponent>();
 		m_SqureTest = square;
 		Entity hello = m_ActiveScene->CreateEntity("Hello");
+
+		SceneSerializer serialzier(m_ActiveScene);
+		serialzier.Serialize("../Assets/Scenes/Example.scene");
 
 		Image image(8, 8, 4, { 0.1,0.2,0.3,1 });
 	}

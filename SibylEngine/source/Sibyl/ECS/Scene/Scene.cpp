@@ -5,7 +5,7 @@
 
 #include "Sibyl/ECS/Core/Entity.h"
 #include "Sibyl/ECS/Components/Components.h"
-#include "Sibyl/Graphic/Core/Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 
 namespace SIByL
 {

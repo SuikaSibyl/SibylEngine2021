@@ -4,7 +4,7 @@
 
 namespace SIByL
 {
-	class OpenGLRenderPipeline :public RenderPipeline
+	class OpenGLRenderPipeline
 	{
 	public:
 		OpenGLRenderPipeline();

@@ -13,6 +13,10 @@
 
 #include "Sibyl/ImGui/ImGuiLayer.h"
 
+
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/RenderContextManager.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/RenderPipeline.h"
+
 namespace SIByL
 {
 	DX12RenderPipeline* DX12RenderPipeline::Main;
@@ -32,10 +36,9 @@ namespace SIByL
 		DX12Context::SetInFlightSCmdList(cmdList);
 
 		SwapChain* swapChain = DX12Context::GetSwapChain();
-		//DX12Synchronizer* synchronizer = DX12Context::GetSynchronizer();
 
-		//synchronizer->StartFrame();
-		//cmdList->Restart
+		RenderPipeline* pipeline = RenderPipeline::Get();
+		pipeline->Render(RenderContext::GetSRContext(), RenderContext::GetCameras());
 
 		// Bind Swap Chain as Render Target
 		// -------------------------------------
@@ -49,13 +52,11 @@ namespace SIByL
 		}
 
 		swapChain->PreparePresent();
-		//cmdList->Execute();
+
 		cmdQueue->ExecuteCommandList(cmdList);
 
 		ImGuiLayer::OnDrawAdditionalWindows();
 
 		swapChain->Present();
-		//synchronizer->EndFrame();
-		//synchronizer->ForceSynchronize();
 	}
 }
