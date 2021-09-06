@@ -21,7 +21,7 @@ public:
 
 SIByL::Application* SIByL::CreateApplication()
 {
-	Renderer::SetRaster(SIByL::RasterRenderer::OpenGL);
+	Renderer::SetRaster(SIByL::RasterRenderer::DirectX12);
 	Renderer::SetRayTracer(SIByL::RayTracerRenderer::Cuda);
 	return new Editor();
 }

@@ -61,8 +61,8 @@ namespace SIByL
 		
 		float dpi = Application::Get().GetWindow().GetHighDPI();
 
-		io.Fonts->AddFontFromFileTTF("../SibylEditor/assets/fonts/opensans/OpenSans-Bold.ttf", 15.0f);
-		io.FontDefault = io.Fonts->AddFontFromFileTTF("../SibylEditor/assets/fonts/opensans/OpenSans-Regular.ttf", 15.0f);
+		io.Fonts->AddFontFromFileTTF("../SibylEditor/assets/fonts/opensans/OpenSans-Bold.ttf", dpi * 15.0f);
+		io.FontDefault = io.Fonts->AddFontFromFileTTF("../SibylEditor/assets/fonts/opensans/OpenSans-Regular.ttf", dpi * 15.0f);
 
 		// Setup Platform/Renderer bindings
 		PlatformInit();

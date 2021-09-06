@@ -287,6 +287,6 @@ namespace SIByL
 
 	float WindowsWindow::GetHighDPI()
 	{
-		return GetDpiForWindow(mhMainWnd);
+		return 1. * GetDpiForWindow(mhMainWnd) / 96;
 	}
 }
