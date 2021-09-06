@@ -6,6 +6,8 @@
 #include "Camera.h"
 
 #include "Sibyl/Graphic/Core/Material/Color.h"
+#include "Culling.h"
+#include "Drawing.h"
 
 namespace SIByL
 {
@@ -42,6 +44,15 @@ namespace SIByL
 		}
 
 		void DrawVisibleGeometry() {
+			SortingSettings sortingSettings(camera);
+			sortingSettings.criteria = SortingCriteria::CommonOpaque;
+			DrawingSettings drawingSettings(0, sortingSettings);
+			FilteringSettings filteringSettings(RenderQueueRange::all);
+
+			context->DrawRenderers(
+				cullingResults, drawingSettings, filteringSettings
+			);
+
 			buffer.EndSample(bufferName);
 			context->DrawSkybox(camera);
 		}
@@ -54,6 +65,17 @@ namespace SIByL
 			context->ExecuteCommandBuffer(&buffer);
 			buffer.Clear();
 		}
+
+		bool Cull() {
+			ScriptableCullingParameters p;
+			if (camera->TryGetCullingParameters(p)) {
+				cullingResults = context->Cull(p);
+				return true;
+			}
+			return false;
+		}
+
+		CullingResults cullingResults;
 	};
 
 	CameraRenderer renderer;

@@ -4,6 +4,8 @@
 
 namespace SIByL
 {
+	class ScriptableCullingParameters;
+
 	class Camera
 	{
 	public:
@@ -69,6 +71,8 @@ namespace SIByL
 		const glm::mat4& GetProjectionMatrix() const { return m_Projection; }
 		const glm::mat4& GetViewMatrix() const { return m_View; }
 		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjection; }
+
+		virtual bool TryGetCullingParameters(ScriptableCullingParameters& p) { return true; }
 
 	protected:
 		virtual void RecalculateViewMatrix()

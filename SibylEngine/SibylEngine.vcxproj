@@ -165,6 +165,7 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\CommandBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DefaultRenderPipeline.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Drawing.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\GraphicContext.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderContextManager.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderPipeline.cpp" />
@@ -282,7 +283,9 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\CommandBuffer.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Culling.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DefaultRenderPipeline.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Drawing.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderContextManager.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ScriptableRenderContext.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Library\FrameBufferLibrary.h" />

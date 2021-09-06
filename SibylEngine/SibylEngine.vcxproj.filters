@@ -285,6 +285,9 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\GraphicContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Drawing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1521,6 +1524,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderContextManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Culling.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Drawing.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
