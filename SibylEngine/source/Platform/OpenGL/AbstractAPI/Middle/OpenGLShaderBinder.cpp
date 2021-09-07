@@ -6,6 +6,36 @@
 
 namespace SIByL
 {
+	OpenGLShaderConstantsBuffer::OpenGLShaderConstantsBuffer(ShaderConstantsDesc* desc)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::SetFloat(const std::string& name, const float& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::SetMatrix4x4(const std::string& name, const glm::mat4& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::UploadDataIfDirty()
+	{
+
+	}
+
 	OpenGLShaderBinder::~OpenGLShaderBinder()
 	{
 

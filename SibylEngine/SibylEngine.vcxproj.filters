@@ -192,7 +192,7 @@
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12FrameResources.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\Core\Material\Material.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.cpp">
@@ -261,16 +261,16 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderPipeline.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ScriptableRenderContext.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\ScriptableRenderContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DefaultRenderPipeline.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\DefaultRenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\CommandBuffer.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Library\ResourceLibrary.cpp">
@@ -279,13 +279,28 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Library\FrameBufferLibrary.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderContextManager.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderContextManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\GraphicContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Drawing.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Drawing.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\ECS\Scene\DrawItemPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1307,7 +1322,7 @@
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Top\DX12RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderPipeline.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLRenderPipeline.h">
@@ -1400,7 +1415,7 @@
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Transform.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Core\Material\Material.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12FrameResources.h">
@@ -1505,13 +1520,13 @@
     <ClInclude Include="source\Sibyl\ECS\Scene\SceneSerializer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ScriptableRenderContext.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\ScriptableRenderContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DefaultRenderPipeline.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\DefaultRenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\CommandBuffer.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\Core\Material\Color.h">
@@ -1523,13 +1538,31 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Library\FrameBufferLibrary.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\RenderContextManager.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderContextManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Culling.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Culling.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Drawing.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Drawing.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Mesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderItem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Scene\DrawItemPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

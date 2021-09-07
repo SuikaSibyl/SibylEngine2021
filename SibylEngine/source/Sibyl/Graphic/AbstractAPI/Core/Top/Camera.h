@@ -5,18 +5,14 @@
 namespace SIByL
 {
 	class ScriptableCullingParameters;
+	class ShaderConstantsBuffer;
 
 	class Camera
 	{
 	public:
-		Camera()
-		{
-			m_Transform = std::make_shared<TransformComponent>();
-			m_WorldUp = m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
-			SetPosition(glm::vec3(0.0f, 0.0f, -1.0f));
-			SetRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-		}
+		Camera();
 
+		virtual ~Camera() = default;
 		Ref<TransformComponent> GetTransform() { return m_Transform; }
 		void SetTransform(Ref<TransformComponent> transform)
 		{
@@ -80,6 +76,8 @@ namespace SIByL
 			glm::vec3 center = m_Posistion + m_Front;
 			m_View = glm::lookAtLH(m_Posistion, center, m_Up);
 			m_ViewProjection = m_View * m_Projection;
+
+			UpdateViewConstant();
 		}
 
 	protected:
@@ -100,12 +98,22 @@ namespace SIByL
 
 		float m_Width;
 		float m_Height;
+
+	public:
+		void SetCamera();
+		void OnDrawCall();
+		ShaderConstantsBuffer& GetConstantsBuffer();
+	protected:
+		void UpdateProjectionConstant();
+		void UpdateViewConstant();
+		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 	};
 
 	class OrthographicCamera :public Camera
 	{
 	public:
 		OrthographicCamera(float width, float height)
+			:Camera()
 		{
 			m_Width = width;
 			m_Height = height;
@@ -116,6 +124,7 @@ namespace SIByL
 		virtual void RecalculateProjectionMatrix() override
 		{
 			m_Projection = glm::orthoLH_NO(-1.0f, 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
+			UpdateProjectionConstant();
 		}
 	};
 
@@ -123,7 +132,7 @@ namespace SIByL
 	{
 	public:
 		PerspectiveCamera(float fov, float width, float height)
-			:m_FoV(fov)
+			:m_FoV(fov), Camera()
 		{
 			m_Width = width;
 			m_Height = height;
@@ -134,6 +143,7 @@ namespace SIByL
 		virtual void RecalculateProjectionMatrix() override
 		{
 			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
+			UpdateProjectionConstant();
 		}
 
 	private:

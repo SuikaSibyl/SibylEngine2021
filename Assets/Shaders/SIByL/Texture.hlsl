@@ -10,9 +10,22 @@ Texture2D gDiffuseMap: register(t0);
 cbuffer cbPerObject : register(b0)
 {
 	float4x4 Model;
+};
+
+cbuffer cbPerMaterial : register(b1)
+{
+	float4   Color;
+};
+
+cbuffer cbPerCamera : register(b2)
+{
 	float4x4 View;
 	float4x4 Projection;
-	float4   Color;
+};
+
+cbuffer cbPerFrame : register(b3)
+{
+	float4 LightColor;
 };
 
 struct VertexIn
@@ -44,5 +57,5 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
 	float4 color = gDiffuseMap.Sample(gSamLinearWarp, pin.UV);
-    return color * pin.Color;
+    return pin.Color;
 }

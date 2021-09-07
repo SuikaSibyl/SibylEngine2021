@@ -8,6 +8,89 @@
 
 namespace SIByL
 {
+	///////////////////////////////////////////////////////////////////////////////
+	//							DX12ShaderConstantsBuffer						///
+	///////////////////////////////////////////////////////////////////////////////
+	DX12ShaderConstantsBuffer::DX12ShaderConstantsBuffer(ShaderConstantsDesc* desc)
+	{
+		m_ConstantsTableBuffer = std::make_shared<DX12FrameResourceBuffer>(desc->Size);
+		m_ConstantsMapper = &desc->Mapper;
+	}
+
+	void DX12ShaderConstantsBuffer::SetFloat(const std::string& name, const float& value)
+	{
+		m_IsDirty = true;
+	}
+
+	void DX12ShaderConstantsBuffer::SetFloat3(const std::string& name, const glm::vec3& value)
+	{
+		m_IsDirty = true;
+	}
+
+	void DX12ShaderConstantsBuffer::SetFloat4(const std::string& name, const glm::vec4& value)
+	{
+		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderConstantsBuffer::SetMatrix4x4(const std::string& name, const glm::mat4& value)
+	{
+		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value[0][0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderConstantsBuffer::UploadDataIfDirty()
+	{
+		if (m_IsDirty)
+		{
+			m_ConstantsTableBuffer->UploadCurrentBuffer();
+			m_IsDirty = false;
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
+	//								DX12ShaderBinder							///
+	///////////////////////////////////////////////////////////////////////////////
+	void DX12ShaderBinder::BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer)
+	{
+		DX12ShaderConstantsBuffer& dxBuffer = dynamic_cast<DX12ShaderConstantsBuffer&>(buffer);
+		Ref<DX12FrameResourceBuffer> frameBuffer = dxBuffer.m_ConstantsTableBuffer;
+		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = frameBuffer->GetCurrentGPUAddress();
+
+		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
+		cmdList->SetGraphicsRootConstantBufferView(slot, gpuAddr);
+	}
+
+	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
+	{
+		PROFILE_SCOPE_FUNCTION();
+
+		m_Desc = desc;
+		InitMappers(desc);
+		BuildRootSignature();
+
+		// Init Shader Resource Buffer
+		m_SrvDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_SamplerDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+		m_SrvDynamicDescriptorHeap->ParseRootSignature(*m_RootSignature);
+
+		// Init Constant Buffer
+		m_ConstantsTableBuffer = new Ref<DX12FrameResourceBuffer>[desc.ConstantBufferCount()];
+		for (int i = 0; i < desc.ConstantBufferCount(); i++)
+		{
+			ConstantBufferLayout& cbLayout = m_Desc.m_ConstantBufferLayouts[i];
+			m_ConstantsTableBuffer[i] = std::make_shared<DX12FrameResourceBuffer>(cbLayout.GetStide());
+		}
+	}
+
 	void DX12ShaderBinder::SetFloat(const std::string& name, const float& value)
 	{
 		PROFILE_SCOPE_FUNCTION();
@@ -65,28 +148,6 @@ namespace SIByL
 		}
 	}
 
-	DX12ShaderBinder::DX12ShaderBinder(const ShaderBinderDesc& desc)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		m_Desc = desc;
-		InitMappers(desc);
-		BuildRootSignature();
-
-		// Init Shader Resource Buffer
-		m_SrvDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		m_SamplerDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
-		m_SrvDynamicDescriptorHeap->ParseRootSignature(*m_RootSignature);
-
-		// Init Constant Buffer
-		m_ConstantsTableBuffer = new Ref<DX12FrameResourceBuffer>[desc.ConstantBufferCount()];
-		for (int i = 0; i < desc.ConstantBufferCount(); i++)
-		{
-			ConstantBufferLayout& cbLayout = m_Desc.m_ConstantBufferLayouts[i];
-			m_ConstantsTableBuffer[i] = std::make_shared<DX12FrameResourceBuffer>(cbLayout.GetStide());
-		}
-	}
-
 	DX12ShaderBinder::~DX12ShaderBinder()
 	{
 		PROFILE_SCOPE_FUNCTION();
@@ -133,13 +194,6 @@ namespace SIByL
 		// Bind Root Signature
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
 		cmdList->SetGraphicsRootSignature(GetRootSignature());
-
-		//// Bind Descriptor Table
-		//int objCbvIndex = 0;
-		//auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
-		//handle.Offset(objCbvIndex, cbv_srv_uavDescriptorSize);
-		//cmdList->SetGraphicsRootDescriptorTable(0, //根参数的起始索引
-		//	handle);
 	}
 
 	void DX12ShaderBinder::BuildRootSignature()

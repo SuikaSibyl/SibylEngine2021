@@ -4,6 +4,7 @@
 #include "Sibyl/ECS/Components/Render/SpriteRenderer.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 #include "Sibyl/ECS/Scene/SceneSerializer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByLEditor
 {
@@ -165,6 +166,7 @@ namespace SIByLEditor
 		// Scene Hierarchy
 		//////////////////////////////////////////////
 		m_SceneHierarchyPanel->OnImGuiRender();
+		m_ContentBrowserPanel.OnImGuiRender();
 
 		ImGui::End();
 	}

@@ -4,6 +4,10 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
+
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
 
 namespace SIByL
 {
@@ -15,6 +19,9 @@ namespace SIByL
 		Ref<Texture2D> TexCheckboard = nullptr;
 		Ref<Texture2D> TexWhite = nullptr;
 		Ref<Image> WhiteImage = nullptr;
+		Ref<Material> DefaultMaterial = nullptr;
+		Ref<Camera> Camera = nullptr;
+		Ref<DrawItem> DrawItem = nullptr;
 	};
 
 	static Renderer2DStorage* s_Data;
@@ -31,13 +38,16 @@ namespace SIByL
 
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
-			// ConstantBuffer1
+			// ConstantBuffer0 : Per Object
+			ConstantBufferLayout::PerObjectConstants,
+			// ConstantBuffer1 : Per Material
 			{
-				{ShaderDataType::Mat4, "Model"},
-				{ShaderDataType::Mat4, "View"},
-				{ShaderDataType::Mat4, "Projection"},
 				{ShaderDataType::Float4, "Color"},
 			},
+			// ConstantBuffer2 : Per Camera
+			ConstantBufferLayout::PerCameraConstants,
+			// ConstantBuffer3 : Per Frame
+			ConstantBufferLayout::PerFrameConstants,
 		};
 
 		std::vector<ShaderResourceLayout> SRlayouts =
@@ -75,18 +85,23 @@ namespace SIByL
 		s_Data->QuadMesh = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
 		s_Data->WhiteImage = CreateRef<Image>(16, 16, 4, glm::vec4{ 1,1,1,1 });
 		s_Data->TexWhite = Texture2D::Create(s_Data->WhiteImage);
+		s_Data->DefaultMaterial = CreateRef<Material>(s_Data->TextureShader);
+
+		s_Data->DefaultMaterial->SetFloat4("Color", { 1,0,0,1 });
+		s_Data->DrawItem = CreateRef<DrawItem>(s_Data->QuadMesh);
 	}
 	
 	void Renderer2D::Shutdown()
 	{
 		delete s_Data;
 	}
-
+	
 	void Renderer2D::BeginScene(Ref<Camera> camera)
 	{
 		s_Data->TextureShader->Use();
 		s_Data->TextureShader->GetBinder()->SetMatrix4x4("View", camera->GetViewMatrix());
 		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Projection", camera->GetProjectionMatrix());
+		s_Data->Camera = camera;
 	}
 
 	void Renderer2D::EndScene()
@@ -96,17 +111,22 @@ namespace SIByL
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
 	{
-		s_Data->TextureShader->Use();
-		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
-		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+		s_Data->Camera->SetCamera();
+		s_Data->DefaultMaterial->SetPass();
 
-		s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
-		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+		//s_Data->TextureShader->Use();
+		//s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
+		//s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
+		s_Data->DrawItem->SetObjectMatrix(transform);
 
-		s_Data->TextureShader->GetBinder()->SetTexture2D("Main", s_Data->TexWhite);
-		s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
+		//s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
+		//s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
 
-		s_Data->QuadMesh->RasterDraw();
+		//s_Data->TextureShader->GetBinder()->SetTexture2D("Main", s_Data->TexWhite);
+		//s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
+		Graphic::CurrentCamera->OnDrawCall();
+		Graphic::CurrentMaterial->OnDrawCall();
+		s_Data->DrawItem->OnDrawCall();
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, Ref<Texture2D> texture)

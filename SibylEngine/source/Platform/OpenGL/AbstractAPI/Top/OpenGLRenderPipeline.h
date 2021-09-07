@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Core/Top/RenderPipeline.h"
-
 namespace SIByL
 {
 	class OpenGLRenderPipeline

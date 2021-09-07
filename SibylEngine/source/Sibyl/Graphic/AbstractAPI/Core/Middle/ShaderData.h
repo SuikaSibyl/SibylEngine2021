@@ -79,6 +79,9 @@ namespace SIByL
 		}
 	};
 
+	////////////////////////////////////////////////////////////////////////////
+	//							Constant Buffer Layout						  //
+	////////////////////////////////////////////////////////////////////////////
 	class ConstantBufferLayout
 	{
 	public:
@@ -93,6 +96,10 @@ namespace SIByL
 		inline const uint32_t GetStide() const { return m_Stride; }
 		std::vector<BufferElement>::iterator begin() { return m_Elements.begin(); }
 		std::vector<BufferElement>::iterator end() { return m_Elements.end(); }
+
+		static ConstantBufferLayout PerObjectConstants;
+		static ConstantBufferLayout PerCameraConstants;
+		static ConstantBufferLayout PerFrameConstants;
 
 	private:
 		void CalculateOffsetsAndStride()
@@ -112,6 +119,9 @@ namespace SIByL
 		uint32_t m_Stride = 0;
 	};
 
+	////////////////////////////////////////////////////////////////////////////
+	//					Descriptor Table Buffer Layout						  //
+	////////////////////////////////////////////////////////////////////////////
 	struct TextureTableElement
 	{
 		ShaderResourceType Type;

@@ -64,11 +64,45 @@ namespace SIByL
 		std::unordered_map<std::string, ShaderResourceItem> m_Mapper;
 	};
 
+	//////////////////////////////////////////////
+	///			Shader Constants Buffer			//
+	//////////////////////////////////////////////
+	struct ShaderConstantsDesc
+	{
+		uint32_t Size = -1;
+		ConstantsMapper Mapper;
+	};
+
+	class ShaderConstantsBuffer
+	{
+	public:
+		static Ref<ShaderConstantsBuffer> Create(ShaderConstantsDesc* desc);
+		virtual ~ShaderConstantsBuffer() = default;
+
+		virtual void SetFloat(const std::string& name, const float& value) = 0;
+		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
+		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
+		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) = 0;
+
+		virtual void UploadDataIfDirty() = 0;
+	};
+	//////////////////////////////////////////////
+
+	class ShaderDescriptorTableBuffer
+	{
+
+	};
+
 	class ShaderBinder
 	{
 	public:
 		static Ref<ShaderBinder> Create(const ShaderBinderDesc& desc);
-		virtual ~ShaderBinder() {}
+		virtual ~ShaderBinder() { delete[] m_ShaderConstantDescs; }
+
+
+		virtual void BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer) = 0;
+		virtual ShaderConstantsDesc* GetShaderConstantsDesc(unsigned int slot) { return &m_ShaderConstantDescs[slot]; }
+		
 		virtual void Bind() = 0;
 
 		virtual void SetFloat(const std::string& name, const float& value) = 0;
@@ -82,6 +116,7 @@ namespace SIByL
 	protected:
 		void InitMappers(const ShaderBinderDesc& desc);
 		ConstantsMapper m_ConstantsMapper;
+		ShaderConstantsDesc* m_ShaderConstantDescs;
 		ResourcesMapper m_ResourcesMapper;
 	};
 }

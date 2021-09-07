@@ -2,7 +2,7 @@
 #include "RenderContextManager.h"
 
 #include "ScriptableRenderContext.h"
-#include "Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 
 namespace SIByL
 {

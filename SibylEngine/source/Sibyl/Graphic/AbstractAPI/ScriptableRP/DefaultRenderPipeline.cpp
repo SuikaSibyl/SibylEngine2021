@@ -3,7 +3,7 @@
 
 #include "ScriptableRenderContext.h"
 #include "CommandBuffer.h"
-#include "Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 
 #include "Sibyl/Graphic/Core/Material/Color.h"
 #include "Culling.h"

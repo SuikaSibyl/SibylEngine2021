@@ -16,7 +16,7 @@ namespace SIByL
 	class FrameBuffer
 	{
 	public:
-		static Ref<FrameBuffer> Create(const FrameBufferDesc& desc);
+		static Ref<FrameBuffer> Create(const FrameBufferDesc& desc, const std::string& key);
 		virtual ~FrameBuffer() {}
 
 		virtual void Bind() = 0;

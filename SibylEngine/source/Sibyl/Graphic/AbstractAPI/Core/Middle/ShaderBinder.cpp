@@ -8,6 +8,26 @@
 
 namespace SIByL
 {
+	//////////////////////////////////////////////
+	///			Shader Constants Buffer			//
+	//////////////////////////////////////////////
+
+	Ref<ShaderConstantsBuffer> ShaderConstantsBuffer::Create(ShaderConstantsDesc* desc)
+	{
+		switch (Renderer::GetRaster())
+		{
+		case RasterRenderer::OpenGL: return CreateRef<OpenGLShaderConstantsBuffer>(desc);; break;
+		case RasterRenderer::DirectX12: return CreateRef<DX12ShaderConstantsBuffer>(desc); break;
+		case RasterRenderer::CpuSoftware: return nullptr; break;
+		case RasterRenderer::GpuSoftware: return nullptr; break;
+		default: return nullptr; break;
+		}
+		return nullptr;
+	}
+
+	//////////////////////////////////////////////
+	///			Shader Binder			//
+	//////////////////////////////////////////////
 	Ref<ShaderBinder> ShaderBinder::Create(const ShaderBinderDesc& desc)
 	{
 		switch (Renderer::GetRaster())
@@ -25,11 +45,14 @@ namespace SIByL
 	{
 		int cbIndex = 0;
 		int paraIndex = 0;
+		m_ShaderConstantDescs = new ShaderConstantsDesc[desc.ConstantBufferCount()];
 		for (auto constantBuffer : desc.m_ConstantBufferLayouts)
 		{
+			m_ShaderConstantDescs[cbIndex].Size = constantBuffer.GetStide();
 			for (auto bufferElement : constantBuffer)
 			{
 				m_ConstantsMapper.InsertConstant(bufferElement, cbIndex);
+				m_ShaderConstantDescs[cbIndex].Mapper.InsertConstant(bufferElement, cbIndex);
 			}
 			cbIndex++; paraIndex++;
 		}

@@ -99,10 +99,12 @@
   <ItemGroup>
     <ClCompile Include="source\editor.cpp" />
     <ClCompile Include="source\EditorLayer.cpp" />
+    <ClCompile Include="source\Editor\Panels\ContentBrowserPanel.cpp" />
     <ClCompile Include="source\Editor\Panels\SceneHierarchyPanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\EditorLayer.h" />
+    <ClInclude Include="source\Editor\Panels\ContentBrowserPanel.h" />
     <ClInclude Include="source\Editor\Panels\SceneHierarchyPanel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

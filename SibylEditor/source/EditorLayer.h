@@ -1,12 +1,15 @@
 #pragma once
 #include <SIByL.h>
 #include "Editor/Panels/SceneHierarchyPanel.h"
+#include "Editor/Panels/ContentBrowserPanel.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
+
+#include "Sibyl/Graphic/AbstractAPI/Library/FrameBufferLibrary.h"
+
 using namespace SIByL;
 
 namespace SIByLEditor
 {
-
 	class EditorLayer :public SIByL::Layer
 	{
 	public:
@@ -42,19 +45,16 @@ namespace SIByLEditor
 			desc.Width = 1280;
 			desc.Height = 720;
 			desc.Channel = 4;
-			m_FrameBuffer = FrameBuffer::Create(desc);
+			m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
 		}
 
 		void OnDraw() override
 		{
-			m_FrameBuffer->Bind();
-			m_FrameBuffer->ClearBuffer();
+			FrameBufferLibrary::Fetch("SceneView")->Bind();
+			FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
 			Renderer2D::BeginScene(camera);
 			float totalTime = Application::Get().GetFrameTimer()->TotalTime();
-			//if ((int)(totalTime) % 2 == 1)
-			//	Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 }, texture);
-			//else
-				Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 });
+			Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 });
 			Renderer2D::EndScene();
 			m_FrameBuffer->Unbind();
 		}
@@ -79,6 +79,7 @@ namespace SIByLEditor
 		Ref<FrameBuffer> m_FrameBuffer;
 		Ref<Scene> m_ActiveScene;
 		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 
 		Entity m_SqureTest;
 		/////////////////////
