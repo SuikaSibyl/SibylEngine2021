@@ -1,15 +1,17 @@
 #pragma once
 
+#include <filesystem>
+
 namespace SIByL
 {
 	class ContentBrowserPanel
 	{
 	public:
-		ContentBrowserPanel() = default;
+		ContentBrowserPanel();
 
 		void OnImGuiRender();
 
 	private:
-
+		std::filesystem::path m_CurrentDirectory;
 	};
 }
