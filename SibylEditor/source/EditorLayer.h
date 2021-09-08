@@ -19,34 +19,15 @@ namespace SIByLEditor
 
 		}
 
+		~EditorLayer();
+
 		struct VertexData
 		{
 			float position[3];
 			float uv[2];
 		};
 
-		void OnInitResource() override
-		{
-			//Ref<Image> image = CreateRef<Image>(16, 16, 4, { 1,1,1,1 });
-			texture = Texture2D::Create("fen4.png");
-			texture1 = Texture2D::Create("amagami4.png");
-
-			camera = std::make_shared<PerspectiveCamera>(45,
-				Application::Get().GetWindow().GetWidth(),
-				Application::Get().GetWindow().GetHeight());
-
-			orthoCamera = std::make_shared<OrthographicCamera>(
-				Application::Get().GetWindow().GetWidth(),
-				Application::Get().GetWindow().GetHeight());
-
-			viewCameraController = std::make_shared<ViewCameraController>(camera);
-
-			FrameBufferDesc desc;
-			desc.Width = 1280;
-			desc.Height = 720;
-			desc.Channel = 4;
-			m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
-		}
+		void OnInitResource() override;
 
 		void OnDraw() override
 		{
@@ -88,6 +69,13 @@ namespace SIByLEditor
 		glm::vec2 m_ViewportSize;
 		bool m_ViewportFocused;
 		bool m_ViewportHoverd;
+
+		static Ref<Texture2D> IconFolder;
+		static Ref<Texture2D> IconImage;
+		static Ref<Texture2D> IconMesh;
+		static Ref<Texture2D> IconScene;
+		static Ref<Texture2D> IconFile;
+
 	};
 
 }

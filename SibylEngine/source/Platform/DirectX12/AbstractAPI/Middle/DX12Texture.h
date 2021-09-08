@@ -2,6 +2,7 @@
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12DescriptorAllocation.h"
+#include "Platform/DirectX12/ImGui/ImGuiLayerDX12.h"
 
 namespace SIByL
 {
@@ -19,6 +20,9 @@ namespace SIByL
 
 		virtual void Bind(uint32_t slot) const override;
 
+		virtual void RegisterImGui() override;
+		virtual void* GetImGuiHandle() override;
+
 		D3D12_CPU_DESCRIPTOR_HANDLE GetSRVHandle();
 
 	private:
@@ -33,5 +37,6 @@ namespace SIByL
 		ComPtr<ID3D12Resource> m_Resource;
 		ComPtr<ID3D12Resource> m_Uploader;
 		DX12DescriptorAllocation m_DescriptorAllocation;
+		ImGuiLayerDX12::ImGuiAllocation m_ImGuiAllocation;
 	};
 }

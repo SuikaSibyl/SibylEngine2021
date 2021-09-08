@@ -23,6 +23,8 @@ namespace SIByL
 
 		virtual void Bind(uint32_t slot) const override;
 
+		virtual void* GetImGuiHandle() override;
+
 	private:
 		uint32_t m_Width;
 		uint32_t m_Height;

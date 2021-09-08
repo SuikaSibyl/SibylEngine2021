@@ -90,4 +90,10 @@ namespace SIByL
 	{
 		glBindTextureUnit(slot, m_TexID);
 	}
+	
+	void* OpenGLTexture2D::GetImGuiHandle()
+	{
+		return (void*)m_TexID;
+	}
+
 }

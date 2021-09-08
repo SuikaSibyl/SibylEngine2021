@@ -8,6 +8,12 @@
 
 namespace SIByLEditor
 {
+	Ref<Texture2D> EditorLayer::IconFolder = nullptr;
+	Ref<Texture2D> EditorLayer::IconImage  = nullptr;
+	Ref<Texture2D> EditorLayer::IconMesh   = nullptr;
+	Ref<Texture2D> EditorLayer::IconScene  = nullptr;
+	Ref<Texture2D> EditorLayer::IconFile   = nullptr;
+
 	void EditorLayer::OnAttach()
 	{
 		m_ActiveScene = CreateRef<Scene>();
@@ -22,8 +28,49 @@ namespace SIByLEditor
 		serialzier.Serialize("../Assets/Scenes/Example.scene");
 
 		Image image(8, 8, 4, { 0.1,0.2,0.3,1 });
+
+		IconFolder = Texture2D::Create("../SibylEditor/assets/icons/folder.png");
+		IconImage = Texture2D::Create("../SibylEditor/assets/icons/image.png");
+		IconMesh = Texture2D::Create("../SibylEditor/assets/icons/mesh.png");
+		IconScene = Texture2D::Create("../SibylEditor/assets/icons/scene.png");
+		IconFile = Texture2D::Create("../SibylEditor/assets/icons/file.png");
+
+		IconFolder->RegisterImGui();
+		IconImage->RegisterImGui();
+		IconMesh->RegisterImGui();
+		IconScene->RegisterImGui();
+		IconFile->RegisterImGui();
 	}
 
+	EditorLayer::~EditorLayer()
+	{
+		IconFolder = nullptr;
+		IconImage = nullptr;
+		IconMesh = nullptr;
+	}
+
+	void EditorLayer::OnInitResource()
+	{
+		//Ref<Image> image = CreateRef<Image>(16, 16, 4, { 1,1,1,1 });
+		texture = Texture2D::Create(TexturePath + "fen4.png");
+		texture1 = Texture2D::Create(TexturePath + "amagami4.png");
+
+		camera = std::make_shared<PerspectiveCamera>(45,
+			Application::Get().GetWindow().GetWidth(),
+			Application::Get().GetWindow().GetHeight());
+
+		orthoCamera = std::make_shared<OrthographicCamera>(
+			Application::Get().GetWindow().GetWidth(),
+			Application::Get().GetWindow().GetHeight());
+
+		viewCameraController = std::make_shared<ViewCameraController>(camera);
+
+		FrameBufferDesc desc;
+		desc.Width = 1280;
+		desc.Height = 720;
+		desc.Channel = 4;
+		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
+	}
 	void EditorLayer::OnUpdate()
 	{
 		PROFILE_SCOPE_FUNCTION();
@@ -146,17 +193,6 @@ namespace SIByLEditor
 			ImGui::DrawImage((void*)m_FrameBuffer->GetColorAttachment(), ImVec2{
 				viewportPanelSize.x,
 				viewportPanelSize.y });
-
-			ImGui::End();
-			ImGui::PopStyleVar();
-		}
-
-		//////////////////////////////////////////////
-		// Inspect Ports
-		//////////////////////////////////////////////
-		{
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2({ 0,0 }));
-			ImGui::Begin("Assets");
 
 			ImGui::End();
 			ImGui::PopStyleVar();

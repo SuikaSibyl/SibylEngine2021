@@ -150,4 +150,21 @@ namespace SIByL
 	{
 
 	}
+
+	void DX12Texture2D::RegisterImGui()
+	{
+		m_ImGuiAllocation = ImGuiLayerDX12::Get()->RegistShaderResource();
+
+		DX12Context::GetDevice()->CreateShaderResourceView(
+			m_Resource.Get(),
+			nullptr,
+			m_ImGuiAllocation.m_CpuHandle);
+	}
+
+	void* DX12Texture2D::GetImGuiHandle()
+	{
+		D3D12_GPU_DESCRIPTOR_HANDLE* handle = &m_ImGuiAllocation.m_GpuHandle;
+		return *(void**)(handle); 
+	}
+
 }
