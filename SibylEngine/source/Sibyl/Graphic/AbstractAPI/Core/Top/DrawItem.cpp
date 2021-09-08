@@ -72,6 +72,7 @@ namespace SIByL
 	{
 		Graphic::CurrentMaterial->m_Shader->GetBinder()->BindConstantsBuffer(0, *m_ConstantsBuffer);
 		m_ConstantsBuffer->UploadDataIfDirty();
+		m_ConstantsBuffer->UploadDataIfDirty();
 		m_Mesh->RasterDraw();
 	}
 

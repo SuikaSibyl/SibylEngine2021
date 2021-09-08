@@ -36,6 +36,21 @@ namespace SIByL
 
 	}
 
+	OpenGLShaderResourcesBuffer::OpenGLShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rs)
+	{
+
+	}
+
+	void OpenGLShaderResourcesBuffer::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
+	{
+
+	}
+
+	void OpenGLShaderResourcesBuffer::UploadDataIfDirty()
+	{
+
+	}
+
 	OpenGLShaderBinder::~OpenGLShaderBinder()
 	{
 

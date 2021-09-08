@@ -140,7 +140,7 @@ namespace SIByL
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 		ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 		psoDesc.InputLayout = { m_InputLayoutDesc.data(), (UINT)m_InputLayoutDesc.size() };
-		psoDesc.pRootSignature = dxShaderBinder->GetRootSignature();
+		psoDesc.pRootSignature = dxShaderBinder->GetDXRootSignature();
 		psoDesc.VS = { reinterpret_cast<BYTE*>(m_VsBytecode->GetBufferPointer()), m_VsBytecode->GetBufferSize() };
 		psoDesc.PS = { reinterpret_cast<BYTE*>(m_PsBytecode->GetBufferPointer()), m_PsBytecode->GetBufferSize() };
 		psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);

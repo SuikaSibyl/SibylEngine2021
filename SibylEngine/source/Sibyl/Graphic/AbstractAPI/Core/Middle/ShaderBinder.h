@@ -88,6 +88,31 @@ namespace SIByL
 	};
 	//////////////////////////////////////////////
 
+	//////////////////////////////////////////////
+	///			Shader Resource Buffer			//
+	//////////////////////////////////////////////
+	struct ShaderResourcesDesc
+	{
+		uint32_t Size = -1;
+		ResourcesMapper Mapper;
+	};
+	class RootSignature;
+	class ShaderResourcesBuffer
+	{
+	public:
+		static Ref<ShaderResourcesBuffer> Create(ShaderResourcesDesc* desc, RootSignature* rs);
+		virtual ~ShaderResourcesBuffer() = default;
+
+		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
+
+		virtual void UploadDataIfDirty() = 0;
+	};
+
+	//////////////////////////////////////////////
+
+	//////////////////////////////////////////////
+	///				Shader Binder				//
+	//////////////////////////////////////////////
 	class ShaderDescriptorTableBuffer
 	{
 
@@ -102,21 +127,17 @@ namespace SIByL
 
 		virtual void BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer) = 0;
 		virtual ShaderConstantsDesc* GetShaderConstantsDesc(unsigned int slot) { return &m_ShaderConstantDescs[slot]; }
-		
+		virtual ShaderResourcesDesc* GetShaderResourcesDesc() { return &m_ShaderResourceDescs; }
+		virtual RootSignature* GetRootSignature() { return nullptr; }
+
 		virtual void Bind() = 0;
 
-		virtual void SetFloat(const std::string& name, const float& value) = 0;
-		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
-		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
-		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) = 0;
-		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
-
-		virtual void TEMPUpdateAllConstants() = 0;
-		virtual void TEMPUpdateAllResources() = 0;
 	protected:
 		void InitMappers(const ShaderBinderDesc& desc);
 		ConstantsMapper m_ConstantsMapper;
-		ShaderConstantsDesc* m_ShaderConstantDescs;
 		ResourcesMapper m_ResourcesMapper;
+		ShaderConstantsDesc* m_ShaderConstantDescs;
+		ShaderResourcesDesc m_ShaderResourceDescs;
 	};
+	//////////////////////////////////////////////
 }

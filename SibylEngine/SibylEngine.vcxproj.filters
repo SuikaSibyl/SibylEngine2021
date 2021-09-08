@@ -1565,6 +1565,9 @@
     <ClInclude Include="source\Sibyl\ECS\Scene\DrawItemPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\RootSignature.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\glm\glm\detail\func_common.inl">

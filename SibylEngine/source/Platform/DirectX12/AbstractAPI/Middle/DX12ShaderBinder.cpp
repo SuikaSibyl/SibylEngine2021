@@ -4,6 +4,7 @@
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
 #include "Platform/DirectX12/AbstractAPI/Bottom/DX12UploadBuffer.h"
+#include "Platform/DirectX12/AbstractAPI/Bottom/DX12RootSignature.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12Texture.h"
 
 namespace SIByL
@@ -57,6 +58,46 @@ namespace SIByL
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
+	//							DX12ShaderConstantsBuffer						///
+	///////////////////////////////////////////////////////////////////////////////
+	DX12ShaderResourcesBuffer::DX12ShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rootsignature)
+	{
+		m_ResourcesMapper = &desc->Mapper;
+
+		// Init Shader Resource Buffer
+		m_SrvDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		m_SamplerDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+
+		DX12RootSignature* rs = dynamic_cast<DX12RootSignature*>(rootsignature);
+		m_SrvDynamicDescriptorHeap->ParseRootSignature(*rs);
+	}
+
+	void DX12ShaderResourcesBuffer::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
+	{
+		m_IsDirty = true;
+
+		ShaderResourceItem item;
+		if (m_ResourcesMapper->FetchResource(name, item))
+		{
+			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
+			m_SrvDynamicDescriptorHeap->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
+		}
+	}
+
+	void DX12ShaderResourcesBuffer::UploadDataIfDirty()
+	{
+		if (m_IsDirty)
+		{
+			m_SrvDynamicDescriptorHeap->CommitStagedDescriptorsForDraw();
+			m_IsDirty = false;
+		}
+		else
+		{
+			m_SrvDynamicDescriptorHeap->SetAsShaderResourceHeap();
+		}
+	}
+
+	///////////////////////////////////////////////////////////////////////////////
 	//								DX12ShaderBinder							///
 	///////////////////////////////////////////////////////////////////////////////
 	void DX12ShaderBinder::BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer)
@@ -81,58 +122,6 @@ namespace SIByL
 		m_SrvDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		m_SamplerDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 		m_SrvDynamicDescriptorHeap->ParseRootSignature(*m_RootSignature);
-
-		// Init Constant Buffer
-		m_ConstantsTableBuffer = new Ref<DX12FrameResourceBuffer>[desc.ConstantBufferCount()];
-		for (int i = 0; i < desc.ConstantBufferCount(); i++)
-		{
-			ConstantBufferLayout& cbLayout = m_Desc.m_ConstantBufferLayouts[i];
-			m_ConstantsTableBuffer[i] = std::make_shared<DX12FrameResourceBuffer>(cbLayout.GetStide());
-		}
-	}
-
-	void DX12ShaderBinder::SetFloat(const std::string& name, const float& value)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		ShaderConstantItem item;
-		if (m_ConstantsMapper.FetchConstant(name, item))
-		{
-			CopyMemoryToConstantsBuffer((void*)&value, item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
-		}
-	}
-
-	void DX12ShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		ShaderConstantItem item;
-		if (m_ConstantsMapper.FetchConstant(name, item))
-		{
-			CopyMemoryToConstantsBuffer((void*)&value[0], item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
-		}
-	}
-
-	void DX12ShaderBinder::SetFloat4(const std::string& name, const glm::vec4& value)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		ShaderConstantItem item;
-		if (m_ConstantsMapper.FetchConstant(name, item))
-		{
-			CopyMemoryToConstantsBuffer((void*)&value[0], item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
-		}
-	}
-
-	void DX12ShaderBinder::SetMatrix4x4(const std::string& name, const glm::mat4& value)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		ShaderConstantItem item;
-		if (m_ConstantsMapper.FetchConstant(name, item))
-		{
-			CopyMemoryToConstantsBuffer((void*)&value[0][0], item.CBIndex, item.Offset, ShaderDataTypeSize(item.Type));
-		}
 	}
 
 	void DX12ShaderBinder::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
@@ -150,41 +139,7 @@ namespace SIByL
 
 	DX12ShaderBinder::~DX12ShaderBinder()
 	{
-		PROFILE_SCOPE_FUNCTION();
 
-		for (int i = 0; i < m_Desc.ConstantBufferCount(); i++)
-		{
-			m_ConstantsTableBuffer[i] = nullptr;
-		}
-		delete[] m_ConstantsTableBuffer;
-	}
-
-	void DX12ShaderBinder::CopyMemoryToConstantsBuffer
-		(void* data, int index, uint32_t offset, uint32_t length)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
-		buffer->CopyMemoryToConstantsBuffer(data, offset, length);
-	}
-
-	void DX12ShaderBinder::UpdateConstantsBuffer(int index)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
-		buffer->UploadCurrentBuffer();
-	}
-	
-	void DX12ShaderBinder::BindConstantsBuffer(int index)
-	{
-		PROFILE_SCOPE_FUNCTION();
-
-		Ref<DX12FrameResourceBuffer> buffer = m_ConstantsTableBuffer[index];
-		D3D12_GPU_VIRTUAL_ADDRESS gpuAddr = buffer->GetCurrentGPUAddress();
-
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
-		cmdList->SetGraphicsRootConstantBufferView(index, gpuAddr);
 	}
 
 	void DX12ShaderBinder::Bind()
@@ -193,7 +148,7 @@ namespace SIByL
 
 		// Bind Root Signature
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
-		cmdList->SetGraphicsRootSignature(GetRootSignature());
+		cmdList->SetGraphicsRootSignature(GetDXRootSignature());
 	}
 
 	void DX12ShaderBinder::BuildRootSignature()
@@ -253,7 +208,7 @@ namespace SIByL
 		}
 		DXCall(hr);
 
-		m_RootSignature = std::make_shared<RootSignature>(rootSig);
+		m_RootSignature = std::make_shared<DX12RootSignature>(rootSig);
 		delete[] srvTable;
 	}
 }

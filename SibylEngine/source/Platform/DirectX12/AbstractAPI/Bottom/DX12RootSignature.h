@@ -1,15 +1,17 @@
 #pragma once
 
+#include "Sibyl/Graphic/AbstractAPI/Core/Bottom/RootSignature.h"
+
 namespace SIByL
 {
-    class RootSignature
+    class DX12RootSignature :public RootSignature
     {
     public:
-        RootSignature();
-        RootSignature(
+        DX12RootSignature();
+        DX12RootSignature(
             const CD3DX12_ROOT_SIGNATURE_DESC& rootSignatureDesc);
 
-        virtual ~RootSignature();
+        virtual ~DX12RootSignature();
 
         void Destroy();
 

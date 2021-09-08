@@ -288,6 +288,7 @@
     <ClInclude Include="source\Sibyl\ECS\Scene\SceneSerializer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\RootSignature.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderItem.h" />

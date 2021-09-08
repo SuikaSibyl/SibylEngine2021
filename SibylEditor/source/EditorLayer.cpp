@@ -198,6 +198,15 @@ namespace SIByLEditor
 			ImGui::PopStyleVar();
 		}
 
+		ImGui::Begin("Debug");
+		if (ImGui::Button("What"))
+		{
+			Ref<Material> mat = Renderer2D::GetMaterial();
+			mat->SetFloat4("Color", { 0,1,0,1 });
+			mat->SetTexture2D("Main", Texture2D::Create("Resources/Textures/checkboard.png"));
+		}
+		ImGui::End();
+
 		//////////////////////////////////////////////
 		// Scene Hierarchy
 		//////////////////////////////////////////////

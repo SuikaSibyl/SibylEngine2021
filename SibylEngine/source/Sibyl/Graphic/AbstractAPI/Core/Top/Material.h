@@ -7,6 +7,7 @@ namespace SIByL
 	class Shader;
 	class Texture2D;
 	class ShaderConstantsBuffer;
+	class ShaderResourcesBuffer;
 
 	class Material
 	{
@@ -32,6 +33,7 @@ namespace SIByL
 	private:
 		Ref<Shader> m_Shader = nullptr;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
+		Ref<ShaderResourcesBuffer> m_ResourcesBuffer = nullptr;
 
 		friend class DrawItem;
 	};

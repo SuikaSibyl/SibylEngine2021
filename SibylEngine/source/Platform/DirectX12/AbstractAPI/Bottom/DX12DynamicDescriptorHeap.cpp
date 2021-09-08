@@ -26,7 +26,7 @@ namespace SIByL
     DX12DynamicDescriptorHeap::~DX12DynamicDescriptorHeap()
     {}
     
-    void DX12DynamicDescriptorHeap::ParseRootSignature(const RootSignature& rootSignature)
+    void DX12DynamicDescriptorHeap::ParseRootSignature(const DX12RootSignature& rootSignature)
     {
         // If the root signature changes, all descriptors must be (re)bound to the
         // command list.
@@ -256,5 +256,30 @@ namespace SIByL
         {
             m_DescriptorTableCache[i].Reset();
         }
+    }
+
+    void DX12DynamicDescriptorHeap::SetAsShaderResourceHeap()
+    {
+        uint32_t tables = m_DescriptorTableBitMask;
+        DWORD rootIndex;
+
+        Ref<DX12CommandList> sCommandList = DX12Context::GetInFlightSCmdList();
+        sCommandList->SetDescriptorHeap(m_DescriptorHeapType, m_CurrentDescriptorHeap);
+
+        m_CurrentGPUDescriptorHandle = m_CurrentDescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+
+        // Scan from LSB to MSB for a bit set in staleDescriptorsBitMask
+        while (_BitScanForward(&rootIndex, tables))
+        {
+            UINT numSrcDescriptors = m_DescriptorTableCache[rootIndex].NumDescriptors;
+
+            // Set the descriptors on the command list using the passed-in setter function.
+            sCommandList->GetGraphicsCommandList()->SetGraphicsRootDescriptorTable(rootIndex, m_CurrentGPUDescriptorHandle);
+
+            m_CurrentGPUDescriptorHandle.Offset(numSrcDescriptors, m_DescriptorHandleIncrementSize);
+
+            tables ^= (1 << rootIndex);
+        }
+
     }
 }

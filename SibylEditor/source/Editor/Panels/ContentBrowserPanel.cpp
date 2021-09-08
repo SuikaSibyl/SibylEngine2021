@@ -29,8 +29,9 @@ namespace SIByL
 			}
 		}
 
-		static float padding = 16.0f;
-		static float thumbnailSize = 96.f;
+		static float dpi = Application::Get().GetWindow().GetHighDPI();
+		static float padding = 16.0f * dpi;
+		static float thumbnailSize = 64.f * dpi;
 		float cellSize = thumbnailSize + padding;
 
 		float panelWidth = ImGui::GetContentRegionAvail().x;

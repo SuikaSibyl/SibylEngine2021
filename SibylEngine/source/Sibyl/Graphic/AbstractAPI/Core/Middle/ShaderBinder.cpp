@@ -3,6 +3,7 @@
 
 #include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 
+#include "Sibyl/Graphic/AbstractAPI/Core/Bottom/RootSignature.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12ShaderBinder.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLShaderBinder.h"
 
@@ -26,7 +27,24 @@ namespace SIByL
 	}
 
 	//////////////////////////////////////////////
-	///			Shader Binder			//
+	///			Shader Resource Buffer			//
+	//////////////////////////////////////////////
+	
+	Ref<ShaderResourcesBuffer> ShaderResourcesBuffer::Create(ShaderResourcesDesc* desc, RootSignature* rs)
+	{
+		switch (Renderer::GetRaster())
+		{
+		case RasterRenderer::OpenGL: return CreateRef<OpenGLShaderResourcesBuffer>(desc, rs); break;
+		case RasterRenderer::DirectX12: return CreateRef<DX12ShaderResourcesBuffer>(desc, rs); break;
+		case RasterRenderer::CpuSoftware: return nullptr; break;
+		case RasterRenderer::GpuSoftware: return nullptr; break;
+		default: return nullptr; break;
+		}
+		return nullptr;
+	}
+
+	//////////////////////////////////////////////
+	///				Shader Binder				//
 	//////////////////////////////////////////////
 	Ref<ShaderBinder> ShaderBinder::Create(const ShaderBinderDesc& desc)
 	{
@@ -64,6 +82,7 @@ namespace SIByL
 			innerIndex = 0;
 			for (auto bufferElement : resourceBuffer)
 			{
+				m_ShaderResourceDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
 				m_ResourcesMapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
 				innerIndex++;
 			}

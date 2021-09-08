@@ -17,7 +17,7 @@
 namespace SIByL
 {
     class CommandList;
-    class RootSignature;
+    class DX12RootSignature;
 
     class DX12DynamicDescriptorHeap
     {
@@ -78,7 +78,7 @@ namespace SIByL
          * descriptor tables and determine the number of descriptors needed for
          * each table.
          */
-        void ParseRootSignature(const RootSignature& rootSignature);
+        void ParseRootSignature(const DX12RootSignature& rootSignature);
 
         /**
          * Reset used descriptors. This should only be done if any descriptors
@@ -86,6 +86,8 @@ namespace SIByL
          * command queue.
          */
         void Reset();
+
+        void SetAsShaderResourceHeap();
 
     protected:
 

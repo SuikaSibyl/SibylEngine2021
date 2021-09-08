@@ -6,14 +6,14 @@
 
 namespace SIByL
 {
-    RootSignature::RootSignature()
+    DX12RootSignature::DX12RootSignature()
         : m_RootSignatureDesc{}
         , m_NumDescriptorsPerTable{ 0 }
         , m_SamplerTableBitMask(0)
         , m_DescriptorTableBitMask(0)
     {}
 
-    RootSignature::RootSignature(
+    DX12RootSignature::DX12RootSignature(
         const CD3DX12_ROOT_SIGNATURE_DESC& rootSignatureDesc)
         : m_RootSignatureDesc{}
         , m_NumDescriptorsPerTable{ 0 }
@@ -23,12 +23,12 @@ namespace SIByL
         SetRootSignatureDesc(rootSignatureDesc);
     }
 
-    RootSignature::~RootSignature()
+    DX12RootSignature::~DX12RootSignature()
     {
         Destroy();
     }
 
-    void RootSignature::Destroy()
+    void DX12RootSignature::Destroy()
     {
         for (UINT i = 0; i < m_RootSignatureDesc.NumParameters; ++i)
         {
@@ -53,7 +53,7 @@ namespace SIByL
         memset(m_NumDescriptorsPerTable, 0, sizeof(m_NumDescriptorsPerTable));
     }
 
-    void RootSignature::SetRootSignatureDesc(
+    void DX12RootSignature::SetRootSignatureDesc(
         const CD3DX12_ROOT_SIGNATURE_DESC& rootSignatureDesc)
     {
         // Make sure any previously allocated root signature description is cleaned 
@@ -140,7 +140,7 @@ namespace SIByL
 	        IID_PPV_ARGS(&m_RootSignature)));
     }
 
-    uint32_t RootSignature::GetDescriptorTableBitMask(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) const
+    uint32_t DX12RootSignature::GetDescriptorTableBitMask(D3D12_DESCRIPTOR_HEAP_TYPE descriptorHeapType) const
     {
         uint32_t descriptorTableBitMask = 0;
         switch (descriptorHeapType)
@@ -156,7 +156,7 @@ namespace SIByL
         return descriptorTableBitMask;
     }
 
-    uint32_t RootSignature::GetNumDescriptors(uint32_t rootIndex) const
+    uint32_t DX12RootSignature::GetNumDescriptors(uint32_t rootIndex) const
     {
         assert(rootIndex < 32);
         return m_NumDescriptorsPerTable[rootIndex];

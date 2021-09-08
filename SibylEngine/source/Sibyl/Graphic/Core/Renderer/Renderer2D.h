@@ -2,6 +2,7 @@
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByL
 {
@@ -13,6 +14,8 @@ namespace SIByL
 
 		static void BeginScene(Ref<Camera> camera);
 		static void EndScene();
+
+		static Ref<Material> GetMaterial();
 
 		// Primitives
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);

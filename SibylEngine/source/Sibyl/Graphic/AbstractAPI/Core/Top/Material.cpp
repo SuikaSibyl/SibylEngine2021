@@ -25,6 +25,8 @@ namespace SIByL
 	{
 		// Upload Per-Material parameters to GPU
 		m_ConstantsBuffer->UploadDataIfDirty();
+
+		m_ResourcesBuffer->UploadDataIfDirty();
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -51,7 +53,7 @@ namespace SIByL
 
 	void Material::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
 	{
-		//m_ConstantsBuffer->SetFloat(name, value);
+		m_ResourcesBuffer->SetTexture2D(name, texture);
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -66,6 +68,9 @@ namespace SIByL
 		m_Shader = shader;
 		m_ConstantsBuffer = ShaderConstantsBuffer::Create
 			(shader->GetBinder()->GetShaderConstantsDesc(1));
+		m_ResourcesBuffer = ShaderResourcesBuffer::Create
+			(shader->GetBinder()->GetShaderResourcesDesc(), 
+			 shader->GetBinder()->GetRootSignature());
 	}
 
 }

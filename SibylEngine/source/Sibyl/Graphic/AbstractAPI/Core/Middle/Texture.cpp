@@ -6,19 +6,32 @@
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12Texture.h"
 
+#include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
+
 namespace SIByL
 {
 	Ref<Texture2D> Texture2D::Create(const std::string& path)
 	{
-		switch (Renderer::GetRaster())
+		static const std::string root = "../Assets/";
+		std::string id = "FILE=" + path;
+
+		Ref<Texture2D> image = Library<Texture2D>::Fetch(id);
+
+		if (image == nullptr)
 		{
-		case RasterRenderer::OpenGL: return std::make_shared<OpenGLTexture2D>(path); break;
-		case RasterRenderer::DirectX12: return std::make_shared<DX12Texture2D>(path); break;
-		case RasterRenderer::CpuSoftware: return nullptr; break;
-		case RasterRenderer::GpuSoftware: return nullptr; break;
-		default: return nullptr; break;
+			switch (Renderer::GetRaster())
+			{
+			case RasterRenderer::OpenGL: image = std::make_shared<OpenGLTexture2D>(root + path); break;
+			case RasterRenderer::DirectX12: image = std::make_shared<DX12Texture2D>(root + path); break;
+			case RasterRenderer::CpuSoftware: image = nullptr; break;
+			case RasterRenderer::GpuSoftware: image = nullptr; break;
+			default: image = nullptr; break;
+			}
+
+			Library<Texture2D>::Push(id, image);
 		}
-		return nullptr;
+
+		return image;
 	}
 
 	Ref<Texture2D> Texture2D::Create(Ref<Image> image)

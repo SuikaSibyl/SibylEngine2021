@@ -88,9 +88,15 @@ namespace SIByL
 		s_Data->DefaultMaterial = CreateRef<Material>(s_Data->TextureShader);
 
 		s_Data->DefaultMaterial->SetFloat4("Color", { 1,0,0,1 });
+		s_Data->DefaultMaterial->SetTexture2D("Main", s_Data->TexWhite);
 		s_Data->DrawItem = CreateRef<DrawItem>(s_Data->QuadMesh);
 	}
-	
+
+	Ref<Material> Renderer2D::GetMaterial()
+	{
+		return s_Data->DefaultMaterial;
+	}
+
 	void Renderer2D::Shutdown()
 	{
 		delete s_Data;
@@ -98,9 +104,9 @@ namespace SIByL
 	
 	void Renderer2D::BeginScene(Ref<Camera> camera)
 	{
-		s_Data->TextureShader->Use();
-		s_Data->TextureShader->GetBinder()->SetMatrix4x4("View", camera->GetViewMatrix());
-		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Projection", camera->GetProjectionMatrix());
+		//s_Data->TextureShader->Use();
+		//s_Data->TextureShader->GetBinder()->SetMatrix4x4("View", camera->GetViewMatrix());
+		//s_Data->TextureShader->GetBinder()->SetMatrix4x4("Projection", camera->GetProjectionMatrix());
 		s_Data->Camera = camera;
 	}
 
@@ -114,16 +120,8 @@ namespace SIByL
 		s_Data->Camera->SetCamera();
 		s_Data->DefaultMaterial->SetPass();
 
-		//s_Data->TextureShader->Use();
-		//s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
-		//s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
 		s_Data->DrawItem->SetObjectMatrix(transform);
 
-		//s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
-		//s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
-
-		//s_Data->TextureShader->GetBinder()->SetTexture2D("Main", s_Data->TexWhite);
-		//s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
 		Graphic::CurrentCamera->OnDrawCall();
 		Graphic::CurrentMaterial->OnDrawCall();
 		s_Data->DrawItem->OnDrawCall();
@@ -131,17 +129,11 @@ namespace SIByL
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, Ref<Texture2D> texture)
 	{
-		s_Data->TextureShader->Use();
-		s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
-		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
-
-		s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
-		s_Data->TextureShader->GetBinder()->TEMPUpdateAllConstants();
-
-		s_Data->TextureShader->GetBinder()->SetTexture2D("Main", texture);
-		s_Data->TextureShader->GetBinder()->TEMPUpdateAllResources();
-
-		s_Data->QuadMesh->RasterDraw();
+		//s_Data->TextureShader->Use();
+		//s_Data->TextureShader->GetBinder()->SetMatrix4x4("Model", transform);
+		//s_Data->TextureShader->GetBinder()->SetFloat4("Color", color);
+		//s_Data->TextureShader->GetBinder()->SetTexture2D("Main", texture);
+		//s_Data->QuadMesh->RasterDraw();
 	}
 
 	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
