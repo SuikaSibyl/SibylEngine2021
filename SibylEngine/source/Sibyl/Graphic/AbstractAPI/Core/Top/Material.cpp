@@ -63,9 +63,23 @@ namespace SIByL
 		UseShader(shader);
 	}
 
+	////////////////////////////////////////////////////////////////////
+	///							Fetcher								 ///
+	ShaderConstantsDesc* Material::GetConstantsDesc()
+	{
+		return m_ConstantsDesc;
+	}
+
+	ShaderResourcesDesc* Material::GetResourcesDesc()
+	{
+		return m_ResourcesDesc;
+	}
+
 	void Material::UseShader(Ref<Shader> shader)
 	{
 		m_Shader = shader;
+		m_ConstantsDesc = shader->GetBinder()->GetShaderConstantsDesc(1);
+		m_ResourcesDesc = shader->GetBinder()->GetShaderResourcesDesc();
 		m_ConstantsBuffer = ShaderConstantsBuffer::Create
 			(shader->GetBinder()->GetShaderConstantsDesc(1));
 		m_ResourcesBuffer = ShaderResourcesBuffer::Create

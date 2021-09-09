@@ -30,6 +30,8 @@ namespace SIByL
 		case SIByL::ShaderDataType::Int3:	return DXGI_FORMAT_R32G32B32_SINT;
 		case SIByL::ShaderDataType::Int4:	return DXGI_FORMAT_R8G8B8A8_SINT;
 		case SIByL::ShaderDataType::Bool:	return DXGI_FORMAT_R8_TYPELESS;
+		case SIByL::ShaderDataType::RGB:	return DXGI_FORMAT_R32G32B32_FLOAT;
+		case SIByL::ShaderDataType::RGBA:	return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		default:return DXGI_FORMAT_R8_TYPELESS;
 		}
 	}

@@ -29,16 +29,7 @@ namespace SIByLEditor
 
 		void OnInitResource() override;
 
-		void OnDraw() override
-		{
-			FrameBufferLibrary::Fetch("SceneView")->Bind();
-			FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
-			Renderer2D::BeginScene(camera);
-			float totalTime = Application::Get().GetFrameTimer()->TotalTime();
-			Renderer2D::DrawQuad({ 0,0,0 }, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 });
-			Renderer2D::EndScene();
-			m_FrameBuffer->Unbind();
-		}
+		void OnDraw() override;
 
 		virtual void OnAttach() override;
 
@@ -59,6 +50,7 @@ namespace SIByLEditor
 		Ref<Camera> orthoCamera;
 		Ref<FrameBuffer> m_FrameBuffer;
 		Ref<Scene> m_ActiveScene;
+
 		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
 

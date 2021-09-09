@@ -39,6 +39,10 @@ namespace SIByL
 	public:
 		void InsertConstant(const BufferElement& element, int CBIndex);
 		bool FetchConstant(std::string name, ShaderConstantItem& buffer);
+		//m_Mapper.begin()
+		using iterator = std::unordered_map<std::string, ShaderConstantItem>::iterator;
+		iterator begin() { return m_Mapper.begin(); }
+		iterator end() { return m_Mapper.end(); }
 
 	private:
 		std::unordered_map<std::string, ShaderConstantItem> m_Mapper;
@@ -71,6 +75,9 @@ namespace SIByL
 	{
 		uint32_t Size = -1;
 		ConstantsMapper Mapper;
+
+		ConstantsMapper::iterator begin() { return Mapper.begin(); }
+		ConstantsMapper::iterator end() { return Mapper.end(); }
 	};
 
 	class ShaderConstantsBuffer

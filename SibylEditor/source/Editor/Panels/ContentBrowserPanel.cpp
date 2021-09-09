@@ -2,7 +2,6 @@
 #include "ContentBrowserPanel.h"
 
 #include <imgui.h>
-#include <filesystem>
 
 #include "EditorLayer.h"
 
@@ -50,7 +49,7 @@ namespace SIByL
 			std::string relativePathString = relativePath.string();
 			std::string filenameString = relativePath.filename().string();
 
-			ImGui::PushID((const void*)path.c_str());
+			ImGui::PushID(filenameString.c_str());
 			// If is directory
 			Ref<Texture2D> icon = directoryEntry.is_directory() ? SIByLEditor::EditorLayer::IconFolder : SIByLEditor::EditorLayer::IconFile;
 
@@ -59,8 +58,10 @@ namespace SIByL
 
 			if (ImGui::BeginDragDropSource())
 			{
+				ImGui::Text("Dragged");
+
 				const wchar_t* itemPath = relativePath.c_str();
-				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t), ImGuiCond_Once);
+				ImGui::SetDragDropPayload("ASSET", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 				ImGui::EndDragDropSource();
 			}
 

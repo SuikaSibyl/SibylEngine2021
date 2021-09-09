@@ -17,6 +17,7 @@
 #include <codecvt>
 #include <comdef.h>
 #include <mutex>
+#include <filesystem>
 
 #include <map>
 #include <set>

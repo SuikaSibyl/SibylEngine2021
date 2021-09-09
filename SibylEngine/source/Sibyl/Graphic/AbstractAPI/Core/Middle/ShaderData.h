@@ -16,6 +16,8 @@ namespace SIByL
 		Int3,
 		Int4,
 		Bool,
+		RGB,
+		RGBA,
 	};
 
 	enum class ShaderResourceType
@@ -40,6 +42,8 @@ namespace SIByL
 		case SIByL::ShaderDataType::Int3:	return 4 * 3;
 		case SIByL::ShaderDataType::Int4:	return 4 * 4;
 		case SIByL::ShaderDataType::Bool:	return 1;
+		case SIByL::ShaderDataType::RGB:	return 4 * 3;
+		case SIByL::ShaderDataType::RGBA:	return 4 * 4;
 		default:return 0;
 		}
 	}
@@ -74,6 +78,8 @@ namespace SIByL
 			case SIByL::ShaderDataType::Int3:	return 3;
 			case SIByL::ShaderDataType::Int4:	return 4;
 			case SIByL::ShaderDataType::Bool:	return 1;
+			case SIByL::ShaderDataType::RGB:	return 3;
+			case SIByL::ShaderDataType::RGBA:	return 4;
 			default:return 0;
 			}
 		}

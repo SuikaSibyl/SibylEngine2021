@@ -4,10 +4,22 @@
 
 namespace SIByL
 {
+	class Material;
+}
+
+namespace SIByLEditor
+{
+	extern void DrawMaterial(const std::string& label, SIByL::Material& material);
+}
+
+namespace SIByL
+{
 	class Shader;
 	class Texture2D;
 	class ShaderConstantsBuffer;
 	class ShaderResourcesBuffer;
+	class ShaderConstantsDesc;
+	class ShaderResourcesDesc;
 
 	class Material
 	{
@@ -29,12 +41,20 @@ namespace SIByL
 		void UseShader(Ref<Shader> shader);
 		void OnDrawCall();
 
+		////////////////////////////////////////////////////////////////////
+		///							Fetcher								 ///
+		ShaderConstantsDesc* GetConstantsDesc();
+		ShaderResourcesDesc* GetResourcesDesc();
 
 	private:
 		Ref<Shader> m_Shader = nullptr;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 		Ref<ShaderResourcesBuffer> m_ResourcesBuffer = nullptr;
 
+		ShaderConstantsDesc* m_ConstantsDesc = nullptr;
+		ShaderResourcesDesc* m_ResourcesDesc = nullptr;
+
 		friend class DrawItem;
+		friend void SIByLEditor::DrawMaterial(const std::string& label, SIByL::Material& material);
 	};
 }

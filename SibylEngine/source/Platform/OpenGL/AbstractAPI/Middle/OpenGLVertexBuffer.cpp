@@ -30,6 +30,8 @@ namespace SIByL
 		case SIByL::ShaderDataType::Int3:	return GL_INT;
 		case SIByL::ShaderDataType::Int4:	return GL_INT;
 		case SIByL::ShaderDataType::Bool:	return GL_BOOL;
+		case SIByL::ShaderDataType::RGB:	return GL_FLOAT;
+		case SIByL::ShaderDataType::RGBA:	return GL_FLOAT;
 		default:return 0;
 		}
 	}

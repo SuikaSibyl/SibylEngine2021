@@ -20,7 +20,7 @@ namespace SIByLEditor
 		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_ActiveScene);
 
 		Entity square = m_ActiveScene->CreateEntity();
-		square.AddComponent<SpriteRendererComponent>();
+		SpriteRendererComponent& spriteRenderer = square.AddComponent<SpriteRendererComponent>();
 		m_SqureTest = square;
 		Entity hello = m_ActiveScene->CreateEntity("Hello");
 
@@ -51,7 +51,6 @@ namespace SIByLEditor
 
 	void EditorLayer::OnInitResource()
 	{
-		//Ref<Image> image = CreateRef<Image>(16, 16, 4, { 1,1,1,1 });
 		texture = Texture2D::Create(TexturePath + "fen4.png");
 		texture1 = Texture2D::Create(TexturePath + "amagami4.png");
 
@@ -70,19 +69,35 @@ namespace SIByLEditor
 		desc.Height = 720;
 		desc.Channel = 4;
 		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
+
+		SpriteRendererComponent& spriteRenderer = m_SqureTest.GetComponent<SpriteRendererComponent>();
+		spriteRenderer.Material = Renderer2D::GetMaterial();
 	}
+
 	void EditorLayer::OnUpdate()
 	{
 		PROFILE_SCOPE_FUNCTION();
 
 		m_ActiveScene->OnUpdate();
 
-		SIByL_CORE_INFO("FPS: {0}, {1} ms",
-			Application::Get().GetFrameTimer()->GetFPS(),
-			Application::Get().GetFrameTimer()->GetMsPF());
+		//SIByL_CORE_INFO("FPS: {0}, {1} ms",
+		//	Application::Get().GetFrameTimer()->GetFPS(),
+		//	Application::Get().GetFrameTimer()->GetMsPF());
 
 		if (m_ViewportFocused)
 			viewCameraController->OnUpdate();
+	}
+
+	void EditorLayer::OnDraw()
+	{
+		FrameBufferLibrary::Fetch("SceneView")->Bind();
+		FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
+		Renderer2D::BeginScene(camera);
+		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
+		TransformComponent& trans = m_SqureTest.GetComponent<TransformComponent>();
+		Renderer2D::DrawQuad(trans.Translation, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 });
+		Renderer2D::EndScene();
+		m_FrameBuffer->Unbind();
 	}
 
 	void EditorLayer::OnDrawImGui()
@@ -193,6 +208,13 @@ namespace SIByLEditor
 			ImGui::DrawImage((void*)m_FrameBuffer->GetColorAttachment(), ImVec2{
 				viewportPanelSize.x,
 				viewportPanelSize.y });
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE");
+
+				ImGui::EndDragDropTarget();
+			}
 
 			ImGui::End();
 			ImGui::PopStyleVar();

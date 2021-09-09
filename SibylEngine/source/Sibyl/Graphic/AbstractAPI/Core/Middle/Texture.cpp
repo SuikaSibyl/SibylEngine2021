@@ -12,8 +12,10 @@ namespace SIByL
 {
 	Ref<Texture2D> Texture2D::Create(const std::string& path)
 	{
-		static const std::string root = "../Assets/";
-		std::string id = "FILE=" + path;
+		static const std::string root = "..\\Assets\\";
+		std::string pathortho = path;
+		replace(pathortho.begin(), pathortho.end(), '/', '\\');
+		std::string id = "FILE=" + pathortho;
 
 		Ref<Texture2D> image = Library<Texture2D>::Fetch(id);
 
