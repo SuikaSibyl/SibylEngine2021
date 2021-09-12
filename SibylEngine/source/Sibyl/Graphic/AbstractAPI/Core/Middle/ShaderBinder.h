@@ -63,6 +63,10 @@ namespace SIByL
 	public:
 		void InsertResource(const ShaderResourceItem& element);
 		bool FetchResource(std::string name, ShaderResourceItem& buffer);
+		//m_Mapper.begin()
+		using iterator = std::unordered_map<std::string, ShaderResourceItem>::iterator;
+		iterator begin() { return m_Mapper.begin(); }
+		iterator end() { return m_Mapper.end(); }
 
 	private:
 		std::unordered_map<std::string, ShaderResourceItem> m_Mapper;
@@ -91,7 +95,19 @@ namespace SIByL
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
 		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) = 0;
 
+		virtual void GetFloat(const std::string& name, float& value) = 0;
+		virtual void GetFloat3(const std::string& name, glm::vec3& value) = 0;
+		virtual void GetFloat4(const std::string& name, glm::vec4& value) = 0;
+		virtual void GetMatrix4x4(const std::string& name, glm::mat4& value) = 0;
+
+		virtual float* PtrFloat(const std::string& name) = 0;
+		virtual float* PtrFloat3(const std::string& name) = 0;
+		virtual float* PtrFloat4(const std::string& name) = 0;
+		virtual float* PtrMatrix4x4(const std::string& name) = 0;
+
+
 		virtual void UploadDataIfDirty() = 0;
+		virtual void SetDirty() = 0;
 	};
 	//////////////////////////////////////////////
 
@@ -102,6 +118,9 @@ namespace SIByL
 	{
 		uint32_t Size = -1;
 		ResourcesMapper Mapper;
+
+		ResourcesMapper::iterator begin() { return Mapper.begin(); }
+		ResourcesMapper::iterator end() { return Mapper.end(); }
 	};
 	class RootSignature;
 	class ShaderResourcesBuffer

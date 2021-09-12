@@ -3,6 +3,10 @@
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace SIByLEditor
 {
@@ -69,15 +73,81 @@ namespace SIByLEditor
 		ImGui::PopID();
 	}
 
+	void DrawTexture2D(SIByL::Material& material, SIByL::ShaderResourceItem& item)
+	{
+		ImGui::PushID(item.Name.c_str());
+		ImGui::Text(item.Name.c_str());
+		ImGui::SameLine();
+
+		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				std::filesystem::path texturePath = std::filesystem::path("../Assets/") / path;
+				SIByL::Ref<SIByL::Texture2D> texture = SIByL::Texture2D::Create(texturePath.string());
+				material.SetTexture2D(item.Name, texture);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::PopID();
+	}
+
 	void DrawMaterial(const std::string& label, SIByL::Material& material)
 	{
-		SIByL::ShaderConstantsDesc* constant = material.GetConstantsDesc();
-
-		for (auto iter : *constant)
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+		bool opened = ImGui::TreeNodeEx((void*)1000, flags, "Material");
+		if (opened)
 		{
-			SIByL::ShaderConstantItem& item = iter.second;
+			// If Material Already Exist
+			if (&material != nullptr)
+			{
+				// ================================================================
+				// Draw constants
+				SIByL::ShaderConstantsDesc* constant = material.GetConstantsDesc();
 
-			
+				for (auto iter : *constant)
+				{
+					SIByL::ShaderConstantItem& item = iter.second;
+
+					ImGui::Text(item.Name.c_str());
+					ImGui::SameLine();
+
+					if (item.Type == SIByL::ShaderDataType::RGB)
+					{
+
+					}
+					else if (item.Type == SIByL::ShaderDataType::RGBA)
+					{
+						ImGui::PushID(item.Name.c_str());
+						float* color = material.PtrFloat4(item.Name);
+						if (ImGui::ColorEdit4(" ", color))
+						{
+							material.SetDirty();
+						}
+						ImGui::PopID();
+					}
+				}
+
+				// ================================================================
+				// Draw resources
+				SIByL::ShaderResourcesDesc* resources = material.GetResourcesDesc();
+
+				for (auto iter : *resources)
+				{
+					SIByL::ShaderResourceItem& item = iter.second;
+
+					DrawTexture2D(material, item);
+				}
+			}
+			// If Material Not Exist Yet
+			else
+			{
+
+			}
+
+			ImGui::TreePop();
 		}
 	}
 }

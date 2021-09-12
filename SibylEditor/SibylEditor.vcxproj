@@ -47,11 +47,11 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Release;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -61,13 +61,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)SibylEditor\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\assimp\include;$(SolutionDir)vendor\yaml\include;$(SolutionDir)SibylEditor\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SibylEngine.lib;glfw3.lib;yaml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mt.lib;SibylEngine.lib;glfw3.lib;yaml.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCD;LIBCMTD;MSVCRT;</IgnoreSpecificDefaultLibraries>
     </Link>
     <Manifest>
@@ -82,7 +82,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)SibylEditor\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\assimp\include;$(SolutionDir)vendor\yaml\include;$(SolutionDir)SibylEditor\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

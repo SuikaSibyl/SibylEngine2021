@@ -1,4 +1,9 @@
 #include "SIByLpch.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "Renderer2D.h"
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
@@ -8,6 +13,7 @@
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
+#include "Sibyl/Graphic/Core/Geometry/MeshLoader.h"
 
 namespace SIByL
 {
@@ -42,7 +48,7 @@ namespace SIByL
 			ConstantBufferLayout::PerObjectConstants,
 			// ConstantBuffer1 : Per Material
 			{
-				{ShaderDataType::Float4, "Color"},
+				{ShaderDataType::RGBA, "Color"},
 			},
 			// ConstantBuffer2 : Per Camera
 			ConstantBufferLayout::PerCameraConstants,
@@ -82,7 +88,11 @@ namespace SIByL
 			1, 2, 3  // 第二个三角形
 		};
 
-		s_Data->QuadMesh = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
+		//s_Data->QuadMesh = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
+
+		MeshLoader meshLoader("Resources/Meshes/1.FBX", layout);
+		s_Data->QuadMesh = meshLoader.GetTriangleMesh();
+
 		s_Data->WhiteImage = CreateRef<Image>(16, 16, 4, glm::vec4{ 1,1,1,1 });
 		s_Data->TexWhite = Texture2D::Create(s_Data->WhiteImage);
 		s_Data->DefaultMaterial = CreateRef<Material>(s_Data->TextureShader);
@@ -95,6 +105,11 @@ namespace SIByL
 	Ref<Material> Renderer2D::GetMaterial()
 	{
 		return s_Data->DefaultMaterial;
+	}
+
+	Ref<TriangleMesh> Renderer2D::GetMesh()
+	{
+		return s_Data->QuadMesh;
 	}
 
 	void Renderer2D::Shutdown()
@@ -115,10 +130,11 @@ namespace SIByL
 
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, Ref<Material> material)
 	{
 		s_Data->Camera->SetCamera();
-		s_Data->DefaultMaterial->SetPass();
+
+		material->SetPass();
 
 		s_Data->DrawItem->SetObjectMatrix(transform);
 
@@ -136,43 +152,43 @@ namespace SIByL
 		//s_Data->QuadMesh->RasterDraw();
 	}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
+	//void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
+	//{
+	//	glm::mat4 model = glm::mat4(1.0f);
 
-		model = glm::scale(model, { size, 1 });
-		model = glm::translate(model, { position,0 });
+	//	model = glm::scale(model, { size, 1 });
+	//	model = glm::translate(model, { position,0 });
 
-		DrawQuad(model, color);
-	}
+	//	DrawQuad(model, color);
+	//}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
+	//void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
+	//{
+	//	glm::mat4 model = glm::mat4(1.0f);
 
-		model = glm::scale(model, { size, 1 });
-		model = glm::translate(model, { position });
+	//	model = glm::scale(model, { size, 1 });
+	//	model = glm::translate(model, { position });
 
-		DrawQuad(model, color);
-	}
+	//	DrawQuad(model, color);
+	//}
 
-	void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
+	//void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
+	//{
+	//	glm::mat4 model = glm::mat4(1.0f);
 
-		model = glm::scale(model, { size, 1 });
-		model = glm::translate(model, { position,0 });
+	//	model = glm::scale(model, { size, 1 });
+	//	model = glm::translate(model, { position,0 });
 
-		DrawQuad(model, color, texture);
-	}
+	//	DrawQuad(model, color, texture);
+	//}
 
-	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
+	//void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
+	//{
+	//	glm::mat4 model = glm::mat4(1.0f);
 
-		model = glm::scale(model, { size, 1 });
-		model = glm::translate(model, { position });
+	//	model = glm::scale(model, { size, 1 });
+	//	model = glm::translate(model, { position });
 
-		DrawQuad(model, color, texture);
-	}
+	//	DrawQuad(model, color, texture);
+	//}
 }

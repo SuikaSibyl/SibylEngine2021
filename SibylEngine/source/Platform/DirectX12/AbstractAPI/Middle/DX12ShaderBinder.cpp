@@ -21,11 +21,21 @@ namespace SIByL
 	void DX12ShaderConstantsBuffer::SetFloat(const std::string& name, const float& value)
 	{
 		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
+		}
 	}
 
 	void DX12ShaderConstantsBuffer::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
 	}
 
 	void DX12ShaderConstantsBuffer::SetFloat4(const std::string& name, const glm::vec4& value)
@@ -48,6 +58,82 @@ namespace SIByL
 		}
 	}
 
+	void DX12ShaderConstantsBuffer::GetFloat(const std::string& name, float& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryFromConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderConstantsBuffer::GetFloat3(const std::string& name, glm::vec3& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryFromConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderConstantsBuffer::GetFloat4(const std::string& name, glm::vec4& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryFromConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderConstantsBuffer::GetMatrix4x4(const std::string& name, glm::mat4& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value[0][0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	float* DX12ShaderConstantsBuffer::PtrFloat(const std::string& name)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			return (float*)m_ConstantsTableBuffer->GetPtrFromConstantsBuffer(item.Offset, ShaderDataTypeSize(item.Type));
+		}
+		return nullptr;
+	}
+
+	float* DX12ShaderConstantsBuffer::PtrFloat3(const std::string& name)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			return (float*)m_ConstantsTableBuffer->GetPtrFromConstantsBuffer(item.Offset, ShaderDataTypeSize(item.Type));
+		}
+		return nullptr;
+	}
+
+	float* DX12ShaderConstantsBuffer::PtrFloat4(const std::string& name)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			return (float*)m_ConstantsTableBuffer->GetPtrFromConstantsBuffer(item.Offset, ShaderDataTypeSize(item.Type));
+		}
+		return nullptr;
+	}
+
+	float* DX12ShaderConstantsBuffer::PtrMatrix4x4(const std::string& name)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			return (float*)m_ConstantsTableBuffer->GetPtrFromConstantsBuffer(item.Offset, ShaderDataTypeSize(item.Type));
+		}
+		return nullptr;
+	}
+
 	void DX12ShaderConstantsBuffer::UploadDataIfDirty()
 	{
 		if (m_IsDirty)
@@ -55,6 +141,11 @@ namespace SIByL
 			m_ConstantsTableBuffer->UploadCurrentBuffer();
 			m_IsDirty = false;
 		}
+	}
+	
+	void DX12ShaderConstantsBuffer::SetDirty()
+	{
+		m_IsDirty = true;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////

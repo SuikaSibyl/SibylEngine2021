@@ -14,14 +14,14 @@ namespace SIByL
 	public:
 		glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 EulerAngles = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Scale = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
 		//TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 		TransformComponent(
 			const glm::vec3& translation = {0,0,0}, 
 			const glm::vec3& rotate = { 0,0,0 }, 
-			const glm::vec3& scale = { 0,0,0 })
+			const glm::vec3& scale = { 1,1,1 })
 			: Translation(translation), EulerAngles(rotate), Scale(scale) {}
 
 		glm::mat4 GetTransform() const
@@ -29,6 +29,9 @@ namespace SIByL
 			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), EulerAngles.x, { 1,0,0 })
 				* glm::rotate(glm::mat4(1.0f), EulerAngles.y, { 0,1,0 })
 				* glm::rotate(glm::mat4(1.0f), EulerAngles.z, { 0,0,1 });
+
+			glm::mat4 test = glm::translate(glm::mat4(1.0f), Translation);
+			glm::mat4 test2 = glm::scale(glm::mat4(1.0f), Scale);
 
 			return glm::translate(glm::mat4(1.0f), Translation)
 				* rotation

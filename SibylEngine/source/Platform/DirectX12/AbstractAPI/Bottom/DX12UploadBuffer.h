@@ -35,7 +35,7 @@ namespace SIByL
 		/**
 		 * @param pageSize The size to use to allocate new pages in GPU memory.
 		 */
-		explicit DX12UploadBuffer(size_t pageSize = _2MB);
+		explicit DX12UploadBuffer(size_t pageSize = _64MB);
 		size_t GetPageSize() const { return m_PageSize; }
 		Allocation Allocate(size_t sizeInBytes, size_t alignment);
 		Allocation Allocate(size_t sizeInBytes, bool isConstantBuffer);

@@ -63,6 +63,21 @@ namespace SIByL
 				, length);
 		}
 
+		void CopyMemoryFromConstantsBuffer
+		(void* data, uint32_t offset, uint32_t length)
+		{
+			void* target = (void*)((char*)m_CpuBuffer + offset);
+			memcpy(data
+				, (target)
+				, length);
+		}
+
+		void* GetPtrFromConstantsBuffer
+		(uint32_t offset, uint32_t length)
+		{
+			return (void*)((char*)m_CpuBuffer + offset);
+		}
+
 		void* GetCurrentBuffer();
 		void UploadCurrentBuffer();
 		D3D12_GPU_VIRTUAL_ADDRESS GetCurrentGPUAddress();

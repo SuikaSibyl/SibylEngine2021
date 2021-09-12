@@ -47,13 +47,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Debug\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -61,7 +61,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -84,7 +84,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -178,6 +178,7 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Camera.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Library\FrameBufferLibrary.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Library\ResourceLibrary.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\MeshLoader.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Texture\Image.cpp" />
@@ -305,6 +306,7 @@
     <ClInclude Include="source\Sibyl\Graphic\Core\Animation\Core\AnimationCurve.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Animation\Core\KeyFrame.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Camera.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\MeshLoader.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Primitive.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Vertex.h" />

@@ -13,6 +13,8 @@ namespace SIByL
 			VertexBufferLayout layout);
 
 		virtual void RasterDraw() override;
+		virtual void RasterDrawSubmeshStart() override;
+		virtual void RasterDrawSubmesh(SubMesh& submesh) override;
 
 	protected:
 		unsigned int m_VertexArrayObject;

@@ -303,6 +303,9 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\DrawItemPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\MeshLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1566,6 +1569,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\RootSignature.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\MeshLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

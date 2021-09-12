@@ -171,21 +171,6 @@ namespace SIByL
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
-				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
-			
-				ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
-				if (ImGui::BeginDragDropTarget())
-				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
-					{
-						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath = std::filesystem::path("../Assets/") / path;
-						Ref<Texture2D> text = Texture2D::Create(texturePath.string());
-						Renderer2D::GetMaterial()->SetTexture2D("Main", text);
-					}
-					ImGui::EndDragDropTarget();
-				}
-
 				SIByLEditor::DrawMaterial("Material", *component.Material);
 			});
 

@@ -34,6 +34,18 @@ namespace SIByL
 		void SetMatrix4x4(const std::string& name, const glm::mat4& value);
 		void SetTexture2D(const std::string& name, Ref<Texture2D> texture);
 
+		void GetFloat(const std::string& name, float& value);
+		void GetFloat3(const std::string& name, glm::vec3& value);
+		void GetFloat4(const std::string& name, glm::vec4& value);
+		void GetMatrix4x4(const std::string& name, glm::mat4& value);
+
+		float* PtrFloat(const std::string& name);
+		float* PtrFloat3(const std::string& name);
+		float* PtrFloat4(const std::string& name);
+		float* PtrMatrix4x4(const std::string& name);
+
+		void SetDirty();
+
 		////////////////////////////////////////////////////////////////////
 		///							Initializer							 ///
 		Material() = default;

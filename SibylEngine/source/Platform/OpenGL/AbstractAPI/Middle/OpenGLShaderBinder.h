@@ -14,7 +14,18 @@ namespace SIByL
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) override;
 
+		virtual void GetFloat(const std::string& name, float& value) override;
+		virtual void GetFloat3(const std::string& name, glm::vec3& value) override;
+		virtual void GetFloat4(const std::string& name, glm::vec4& value) override;
+		virtual void GetMatrix4x4(const std::string& name, glm::mat4& value) override;
+
+		virtual float* PtrFloat(const std::string& name) override;
+		virtual float* PtrFloat3(const std::string& name) override;
+		virtual float* PtrFloat4(const std::string& name) override;
+		virtual float* PtrMatrix4x4(const std::string& name) override; 
+
 		virtual void UploadDataIfDirty() override;
+		virtual void SetDirty() override;
 	};
 
 	class OpenGLShaderResourcesBuffer :public ShaderResourcesBuffer

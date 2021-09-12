@@ -13,7 +13,7 @@ namespace SIByL
 		VertexBufferLayout layout)
 	{
 		uint32_t floatCount = layout.GetStide() * vCount * 0.25;
-
+		
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: 
@@ -26,4 +26,22 @@ namespace SIByL
 		}
 		return nullptr;
 	}
+
+	Ref<TriangleMesh> TriangleMesh::Create(
+		const std::vector<MeshData>& meshDatas,
+		VertexBufferLayout layout)
+	{
+		switch (Renderer::GetRaster())
+		{
+		case RasterRenderer::OpenGL:
+			return nullptr; break;
+		case RasterRenderer::DirectX12:
+			return std::make_shared<DX12TriangleMesh>(meshDatas, layout);
+		case RasterRenderer::CpuSoftware: return nullptr; break;
+		case RasterRenderer::GpuSoftware: return nullptr; break;
+		default: return nullptr; break;
+		}
+		return nullptr;
+	}
+
 }

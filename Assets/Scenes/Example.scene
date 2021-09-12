@@ -6,11 +6,11 @@ Entities:
     TransformComponent:
       Translation: [0, 0, 0]
       EulerAngles: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 1, 1]
   - Entity: 124531623461
     TagComponent:
       Tag: New Entity
     TransformComponent:
       Translation: [0, 0, 0]
       EulerAngles: [0, 0, 0]
-      Scale: [0, 0, 0]
+      Scale: [1, 1, 1]

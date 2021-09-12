@@ -1,3 +1,8 @@
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "EditorLayer.h"
 #include "Sibyl/ImGui/ImGuiUtility.h"
 
@@ -13,6 +18,8 @@ namespace SIByLEditor
 	Ref<Texture2D> EditorLayer::IconMesh   = nullptr;
 	Ref<Texture2D> EditorLayer::IconScene  = nullptr;
 	Ref<Texture2D> EditorLayer::IconFile   = nullptr;
+
+	Ref<TriangleMesh> m_Mesh = nullptr;
 
 	void EditorLayer::OnAttach()
 	{
@@ -72,6 +79,17 @@ namespace SIByLEditor
 
 		SpriteRendererComponent& spriteRenderer = m_SqureTest.GetComponent<SpriteRendererComponent>();
 		spriteRenderer.Material = Renderer2D::GetMaterial();
+
+		VertexBufferLayout layout =
+		{
+			{ShaderDataType::Float3, "POSITION"},
+			{ShaderDataType::Float2, "TEXCOORD"},
+		};
+		//if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+		//{
+		//	SIByL_CORE_ERROR("Mesh Load Error");
+		//	return;
+		//}
 	}
 
 	void EditorLayer::OnUpdate()
@@ -95,7 +113,7 @@ namespace SIByLEditor
 		Renderer2D::BeginScene(camera);
 		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
 		TransformComponent& trans = m_SqureTest.GetComponent<TransformComponent>();
-		Renderer2D::DrawQuad(trans.Translation, { .2,.2 }, { 0.5 + 0.5 * sin(totalTime),1,1,1 });
+		Renderer2D::DrawQuad(trans.GetTransform(), Renderer2D::GetMaterial());
 		Renderer2D::EndScene();
 		m_FrameBuffer->Unbind();
 	}

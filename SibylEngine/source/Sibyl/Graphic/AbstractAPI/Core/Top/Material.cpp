@@ -56,6 +56,51 @@ namespace SIByL
 		m_ResourcesBuffer->SetTexture2D(name, texture);
 	}
 
+	void Material::GetFloat(const std::string& name, float& value)
+	{
+		m_ConstantsBuffer->SetFloat(name, value);
+	}
+
+	void Material::GetFloat3(const std::string& name, glm::vec3& value)
+	{
+		m_ConstantsBuffer->GetFloat3(name, value);
+	}
+
+	void Material::GetFloat4(const std::string& name, glm::vec4& value)
+	{
+		m_ConstantsBuffer->GetFloat4(name, value);
+	}
+
+	void Material::GetMatrix4x4(const std::string& name, glm::mat4& value)
+	{
+		m_ConstantsBuffer->GetMatrix4x4(name, value);
+	}
+
+	float* Material::PtrFloat(const std::string& name)
+	{
+		return m_ConstantsBuffer->PtrFloat(name);
+	}
+
+	float* Material::PtrFloat3(const std::string& name)
+	{
+		return m_ConstantsBuffer->PtrFloat3(name);
+	}
+
+	float* Material::PtrFloat4(const std::string& name)
+	{
+		return m_ConstantsBuffer->PtrFloat4(name);
+	}
+
+	float* Material::PtrMatrix4x4(const std::string& name)
+	{
+		return m_ConstantsBuffer->PtrMatrix4x4(name);
+	}
+
+	void Material::SetDirty()
+	{
+		m_ConstantsBuffer->SetDirty();
+	}
+
 	////////////////////////////////////////////////////////////////////
 	///							Initializer							 ///
 	Material::Material(Ref<Shader> shader)

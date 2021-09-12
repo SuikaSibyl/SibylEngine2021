@@ -31,7 +31,52 @@ namespace SIByL
 
 	}
 
+	void OpenGLShaderConstantsBuffer::GetFloat(const std::string& name, float& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::GetFloat3(const std::string& name, glm::vec3& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::GetFloat4(const std::string& name, glm::vec4& value)
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::GetMatrix4x4(const std::string& name, glm::mat4& value)
+	{
+
+	}
+
+	float* OpenGLShaderConstantsBuffer::PtrFloat(const std::string& name)
+	{
+		return nullptr;
+	}
+
+	float* OpenGLShaderConstantsBuffer::PtrFloat3(const std::string& name)
+	{
+		return nullptr;
+	}
+
+	float* OpenGLShaderConstantsBuffer::PtrFloat4(const std::string& name)
+	{
+		return nullptr;
+	}
+
+	float* OpenGLShaderConstantsBuffer::PtrMatrix4x4(const std::string& name)
+	{
+		return nullptr;
+	}
+
 	void OpenGLShaderConstantsBuffer::UploadDataIfDirty()
+	{
+
+	}
+
+	void OpenGLShaderConstantsBuffer::SetDirty()
 	{
 
 	}

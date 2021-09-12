@@ -29,4 +29,15 @@ namespace SIByL
 		glBindVertexArray(m_VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, m_IndexBuffer->Count() , GL_UNSIGNED_INT, 0);
 	}
+
+	void OpenGLTriangleMesh::RasterDrawSubmeshStart()
+	{
+
+	}
+
+	void OpenGLTriangleMesh::RasterDrawSubmesh(SubMesh& submesh)
+	{
+
+	}
+
 }
