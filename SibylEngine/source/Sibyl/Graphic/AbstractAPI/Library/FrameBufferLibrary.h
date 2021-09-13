@@ -9,6 +9,7 @@ namespace SIByL
 	public:
 		static void Register(const std::string& name, Ref<FrameBuffer>);
 		static void Remove(const std::string& name);
+		static void Reset();
 		static Ref<FrameBuffer> Fetch(const std::string& name);
 
 	private:

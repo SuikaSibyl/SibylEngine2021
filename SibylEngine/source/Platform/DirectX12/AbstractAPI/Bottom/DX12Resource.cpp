@@ -5,6 +5,8 @@
 #include "Platform/DirectX12/Common/DX12Utility.h"
 
 #include "DX12ResourceStateTracker.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
 
 namespace SIByL
 {
@@ -90,6 +92,13 @@ namespace SIByL
 
     DX12Resource::~DX12Resource()
     {
+        Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+        Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
+        
+        DX12Context::SetInFlightSCmdList(cmdList);
+
+        uint64_t fence = cmdQueue->Signal();
+        cmdQueue->WaitForFenceValue(fence);
     }
 
     void DX12Resource::SetD3D12Resource(ComPtr<ID3D12Resource> d3d12Resource, const D3D12_CLEAR_VALUE* clearValue)

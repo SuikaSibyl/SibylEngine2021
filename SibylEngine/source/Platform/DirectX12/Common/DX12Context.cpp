@@ -6,6 +6,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12SwapChain.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
+#include "Sibyl/Graphic/AbstractAPI/Library/FrameBufferLibrary.h"
 
 namespace SIByL
 {
@@ -57,6 +58,8 @@ namespace SIByL
 
 		//Application::Get().OnResourceDestroy();
 		m_Synchronizer->ForceSynchronize();
+
+		FrameBufferLibrary::Reset();
 
 		m_SwapChain = nullptr;
 		m_SGraphicQueue = nullptr;

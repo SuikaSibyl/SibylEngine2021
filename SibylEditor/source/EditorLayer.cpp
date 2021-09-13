@@ -10,6 +10,8 @@
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 #include "Sibyl/ECS/Scene/SceneSerializer.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
 
 namespace SIByLEditor
 {
@@ -110,12 +112,27 @@ namespace SIByLEditor
 	{
 		FrameBufferLibrary::Fetch("SceneView")->Bind();
 		FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
-		Renderer2D::BeginScene(camera);
-		float totalTime = Application::Get().GetFrameTimer()->TotalTime();
-		TransformComponent& trans = m_SqureTest.GetComponent<TransformComponent>();
-		Renderer2D::DrawQuad(trans.GetTransform(), Renderer2D::GetMaterial());
-		Renderer2D::EndScene();
-		m_FrameBuffer->Unbind();
+
+		//Renderer2D::BeginScene(camera);
+		//float totalTime = Application::Get().GetFrameTimer()->TotalTime();
+		//TransformComponent& trans = m_SqureTest.GetComponent<TransformComponent>();
+		//Renderer2D::DrawQuad(trans.GetTransform(), Renderer2D::GetMaterial());
+		//Renderer2D::EndScene();
+		camera->SetCamera();
+		Renderer2D::GetMaterial()->SetPass();
+
+
+		//material->SetPass();
+		DrawItemPool& diPool = m_ActiveScene->GetDrawItems();
+		for (Ref<DrawItem> drawItem : diPool)
+		{
+			Graphic::CurrentCamera->OnDrawCall();
+			Graphic::CurrentMaterial->OnDrawCall();
+			drawItem->OnDrawCall();
+		}
+
+
+		FrameBufferLibrary::Fetch("SceneView")->Unbind();
 	}
 
 	void EditorLayer::OnDrawImGui()

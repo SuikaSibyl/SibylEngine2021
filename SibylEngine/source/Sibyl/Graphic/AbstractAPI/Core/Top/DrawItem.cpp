@@ -9,58 +9,28 @@
 
 namespace SIByL
 {
-	static ShaderConstantsDesc PerObjectConstantsDesc;
-	static ShaderConstantsDesc* GetPerObjectConstantsDesc()
+	DrawItem::DrawItem()
+		:m_Mesh(nullptr), m_SubMesh(nullptr)
 	{
-		// Init if not Inited
-		if (PerObjectConstantsDesc.Size == -1)
-		{
-			ConstantBufferLayout& layout = ConstantBufferLayout::PerObjectConstants;
-			int paraIndex = 0;
 
-			PerObjectConstantsDesc.Size = layout.GetStide();
-			for (auto bufferElement : layout)
-			{
-				PerObjectConstantsDesc.Mapper.InsertConstant(bufferElement, 1);
-			}
-		}
-
-		return &PerObjectConstantsDesc;
 	}
 
-	std::vector<Ref<ShaderConstantsBuffer>> PerObjectConstantsBufferPool::m_IdleConstantsBuffer;
-
-	Ref<ShaderConstantsBuffer> PerObjectConstantsBufferPool::GetPerObjectConstantsBuffer()
-	{
-		Ref<ShaderConstantsBuffer> result;
-		if (!m_IdleConstantsBuffer.empty())
-		{
-			result = m_IdleConstantsBuffer.back();
-			m_IdleConstantsBuffer.pop_back();
-		}
-		else
-		{
-			result = ShaderConstantsBuffer::Create
-				(GetPerObjectConstantsDesc());
-
-		}
-		return result;
-	}
-	
-	void PerObjectConstantsBufferPool::PushToPool(Ref<ShaderConstantsBuffer> buffer)
-	{
-		m_IdleConstantsBuffer.push_back(buffer);
-	}
 
 	DrawItem::DrawItem(Ref<TriangleMesh> mesh)
-		:m_Mesh(mesh)
+		:m_Mesh(mesh), m_SubMesh(&(*mesh->begin()))
 	{
-		m_ConstantsBuffer = PerObjectConstantsBufferPool::GetPerObjectConstantsBuffer();
+
+	}
+
+	DrawItem::DrawItem(Ref<TriangleMesh> mesh, SubMesh* submesh)
+		:m_Mesh(mesh), m_SubMesh(submesh)
+	{
+
 	}
 
 	DrawItem::~DrawItem()
 	{
-		PerObjectConstantsBufferPool::PushToPool(m_ConstantsBuffer);
+
 	}
 
 	void DrawItem::SetObjectMatrix(const glm::mat4& transform)
@@ -72,12 +42,8 @@ namespace SIByL
 	{
 		Graphic::CurrentMaterial->m_Shader->GetBinder()->BindConstantsBuffer(0, *m_ConstantsBuffer);
 		m_ConstantsBuffer->UploadDataIfDirty();
-		m_ConstantsBuffer->UploadDataIfDirty();
 		m_Mesh->RasterDrawSubmeshStart();
-		for (SubMesh& iter : *m_Mesh)
-		{
-			m_Mesh->RasterDrawSubmesh(iter);
-		}
+		m_Mesh->RasterDrawSubmesh(*m_SubMesh);
 	}
 
 }

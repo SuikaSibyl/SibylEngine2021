@@ -4,29 +4,23 @@
 
 namespace SIByL
 {
+	struct SubMesh;
 	class TriangleMesh;
 	class ShaderConstantsBuffer;
-
-	class PerObjectConstantsBufferPool
-	{
-	public:
-		static Ref<ShaderConstantsBuffer> GetPerObjectConstantsBuffer();
-		static void PushToPool(Ref<ShaderConstantsBuffer>);
-	private:
-		static std::vector<Ref<ShaderConstantsBuffer>> m_IdleConstantsBuffer;
-	};
 
 	class DrawItem
 	{
 	public:
+		DrawItem();
 		DrawItem(Ref<TriangleMesh> mesh);
+		DrawItem(Ref<TriangleMesh> mesh, SubMesh* submesh);
 		~DrawItem();
 
 		void SetObjectMatrix(const glm::mat4& transform);
 		void OnDrawCall();
 
-	private:
 		Ref<TriangleMesh> m_Mesh;
+		SubMesh* m_SubMesh;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 	};
 }

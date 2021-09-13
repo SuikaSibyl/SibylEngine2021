@@ -44,4 +44,9 @@ namespace SIByL
 		return nullptr;
 	}
 
+	UINT TriangleMesh::GetSubmesh()
+	{
+		return m_SubMeshes.size();
+	}
+
 }

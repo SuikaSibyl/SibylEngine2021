@@ -3,9 +3,12 @@
 
 #include "glm/glm.hpp"
 
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
 #include "Sibyl/ECS/Core/Entity.h"
 #include "Sibyl/ECS/Components/Components.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 
 namespace SIByL
 {
@@ -33,6 +36,29 @@ namespace SIByL
 				}
 			}
 		}
+
+		// Update Draw Items Pool
+
+		{
+			DIPool.Reset();
+			auto view = m_Registry.view<TransformComponent, MeshFilterComponent, MeshRendererComponent>();
+			for (auto entity : view)
+			{
+				auto& [transform, meshFilter, meshRenderer] = 
+					view.get<TransformComponent, MeshFilterComponent, MeshRendererComponent>(entity);
+
+				meshFilter.PerObjectBuffer->SetMatrix4x4("Model", transform.GetTransform());
+
+				for (auto& submesh : *(meshFilter.Mesh))
+				{
+					Ref<DrawItem> item = DIPool.Request();
+					item->m_Mesh = meshFilter.Mesh;
+					item->m_SubMesh = &submesh;
+					item->m_ConstantsBuffer = meshFilter.PerObjectBuffer;
+					DIPool.Push(item);
+				}
+			}
+		}
 	}
 
 	Entity Scene::CreateEntity(const std::string& name)
@@ -57,6 +83,18 @@ namespace SIByL
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<MeshFilterComponent>(Entity entity, MeshFilterComponent& component)
+	{
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<MeshRendererComponent>(Entity entity, MeshRendererComponent& component)
 	{
 
 	}

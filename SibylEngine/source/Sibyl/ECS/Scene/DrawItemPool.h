@@ -9,9 +9,15 @@ namespace SIByL
 	{
 	public:
 		void Reset();
-		void Push(DrawItem* item);
+		void Push(Ref<DrawItem> item);
+		Ref<DrawItem> Request();
+
+		using iter = std::vector<Ref<DrawItem>>::iterator;
+		iter begin() { return DrawItems.begin(); }
+		iter end() { return DrawItems.end(); }
 		
 	private:
-		std::vector<DrawItem*> DrawItems;
+		std::vector<Ref<DrawItem>> DrawItems;
+		std::vector<Ref<DrawItem>> AvailableDrawItems;
 	};
 }

@@ -4,6 +4,8 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
+#include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Core/Geometry/MeshLoader.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -88,6 +90,34 @@ namespace SIByLEditor
 				std::filesystem::path texturePath = std::filesystem::path("../Assets/") / path;
 				SIByL::Ref<SIByL::Texture2D> texture = SIByL::Texture2D::Create(texturePath.string());
 				material.SetTexture2D(item.Name, texture);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::PopID();
+	}
+
+	void DrawTriangleMeshSocket(const std::string& label, SIByL::MeshFilterComponent& mesh)
+	{
+		static const std::string name = "Mesh";
+		ImGui::PushID(label.c_str());
+		ImGui::Text(name.c_str());
+		ImGui::SameLine();
+
+		ImGui::Button("Mesh", ImVec2(100.0f, 0.0f));
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
+			{
+				SIByL::VertexBufferLayout layout =
+				{
+					{SIByL::ShaderDataType::Float3, "POSITION"},
+					{SIByL::ShaderDataType::Float2, "TEXCOORD"},
+				};
+
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				std::filesystem::path texturePath = path;
+				SIByL::MeshLoader meshLoader(texturePath.string(), layout);
+				mesh.Mesh = meshLoader.GetTriangleMesh();
 			}
 			ImGui::EndDragDropTarget();
 		}

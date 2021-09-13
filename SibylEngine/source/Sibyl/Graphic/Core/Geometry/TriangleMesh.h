@@ -29,6 +29,7 @@ namespace SIByL
 		using iter = std::vector<SubMesh>::iterator;
 		iter begin() { return m_SubMeshes.begin(); }
 		iter end() { return m_SubMeshes.end(); }
+		UINT GetSubmesh();
 
 		virtual void RasterDraw() = 0;
 		virtual void RasterDrawSubmeshStart() = 0;

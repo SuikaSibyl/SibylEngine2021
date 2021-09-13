@@ -6,6 +6,7 @@
 
 #include "MeshLoader.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer.h"
 
 namespace SIByL
 {
@@ -18,7 +19,9 @@ namespace SIByL
 	void MeshLoader::LoadFile(const std::string& path)
 	{
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+        const aiScene* scene = importer.ReadFile(path, 
+            ((Renderer::GetRaster() == RasterRenderer::OpenGL) ? aiProcess_FlipUVs : 0) | 
+            aiProcess_Triangulate | aiProcess_GenNormals);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {

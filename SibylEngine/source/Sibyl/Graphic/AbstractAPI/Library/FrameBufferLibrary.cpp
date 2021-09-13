@@ -31,6 +31,11 @@ namespace SIByL
 		}
 	}
 
+	void FrameBufferLibrary::Reset()
+	{
+		m_Mapper.clear();
+	}
+
 	Ref<FrameBuffer> FrameBufferLibrary::Fetch(const std::string& name)
 	{
 		if (m_Mapper.find(name) != m_Mapper.end())

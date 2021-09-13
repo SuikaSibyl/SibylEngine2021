@@ -174,6 +174,16 @@ namespace SIByL
 				SIByLEditor::DrawMaterial("Material", *component.Material);
 			});
 
+		DrawComponent<MeshFilterComponent>("Mesh Filter", entity, [](auto& component)
+			{
+				SIByLEditor::DrawTriangleMeshSocket("Mesh", component);
+			});
+
+		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
+			{
+				
+			});
+
 		{			
 			ImGui::Separator();
 			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
@@ -194,6 +204,24 @@ namespace SIByL
 				if (ImGui::MenuItem("SpriteRenderer"))
 				{
 					m_SelectContext.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("MeshFilter"))
+				{
+					m_SelectContext.AddComponent<MeshFilterComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("MeshRenderer"))
+				{
+					if (m_SelectContext.HasComponent<MeshFilterComponent>())
+					{
+						MeshFilterComponent& meshFilter = m_SelectContext.GetComponent<MeshFilterComponent>();
+						UINT matNum = meshFilter.GetSubmeshNum();
+						MeshRendererComponent& meshRenderer = m_SelectContext.AddComponent<MeshRendererComponent>();
+						meshRenderer.MaterialNum = matNum;
+					}
 					ImGui::CloseCurrentPopup();
 				}
 
