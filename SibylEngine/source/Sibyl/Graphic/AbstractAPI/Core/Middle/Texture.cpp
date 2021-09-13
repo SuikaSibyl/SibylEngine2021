@@ -12,10 +12,7 @@ namespace SIByL
 {
 	Ref<Texture2D> Texture2D::Create(const std::string& path)
 	{
-		static const std::string root = "..\\Assets\\";
-		std::string pathortho = path;
-		replace(pathortho.begin(), pathortho.end(), '/', '\\');
-		std::string id = "FILE=" + pathortho;
+		std::string id = GetPathID(path);
 
 		Ref<Texture2D> image = Library<Texture2D>::Fetch(id);
 
@@ -23,8 +20,8 @@ namespace SIByL
 		{
 			switch (Renderer::GetRaster())
 			{
-			case RasterRenderer::OpenGL: image = std::make_shared<OpenGLTexture2D>(root + path); break;
-			case RasterRenderer::DirectX12: image = std::make_shared<DX12Texture2D>(root + path); break;
+			case RasterRenderer::OpenGL: image = std::make_shared<OpenGLTexture2D>(AssetRoot + path); break;
+			case RasterRenderer::DirectX12: image = std::make_shared<DX12Texture2D>(AssetRoot + path); break;
 			case RasterRenderer::CpuSoftware: image = nullptr; break;
 			case RasterRenderer::GpuSoftware: image = nullptr; break;
 			default: image = nullptr; break;

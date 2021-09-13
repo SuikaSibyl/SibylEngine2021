@@ -8,6 +8,8 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 
+#include "yaml-cpp/yaml.h"
+
 namespace SIByL
 {
 	void Material::SetPass()
@@ -132,4 +134,52 @@ namespace SIByL
 			 shader->GetBinder()->GetRootSignature());
 	}
 
+
+	MaterialSerializer::MaterialSerializer(const Ref<Material>& material)
+		:m_Material(material)
+	{
+
+	}
+
+	void MaterialSerializer::Serialize(const std::string& filepath)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Material" << YAML::Value << "Unamed";
+		out << YAML::Key << "Constants Buffer" << YAML::Value << YAML::BeginSeq;
+		
+		ShaderConstantsDesc* desc = m_Material->GetConstantsDesc();
+		for (auto& item : *desc)
+		{
+
+		}
+		//m_Scene->m_Registry.each([&](auto entityID)
+		//	{
+		//		Entity entity = { entityID, m_Scene.get() };
+		//		if (!entity)
+		//			return;
+
+		//		SerializeEntity(out, entity);
+		//	});
+
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+
+		std::ofstream fout(filepath);
+		fout << out.c_str();
+
+	}
+	void MaterialSerializer::SerializeRuntime(const std::string& filepath)
+	{
+
+	}
+
+	bool MaterialSerializer::Deserialize(const std::string& filepath)
+	{
+		return true;
+	}
+	bool MaterialSerializer::DeserializeRuntime(const std::string& filepath)
+	{
+		return false;
+	}
 }

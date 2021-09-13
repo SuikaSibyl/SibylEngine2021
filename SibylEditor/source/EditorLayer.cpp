@@ -28,14 +28,6 @@ namespace SIByLEditor
 		m_ActiveScene = CreateRef<Scene>();
 		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_ActiveScene);
 
-		Entity square = m_ActiveScene->CreateEntity();
-		SpriteRendererComponent& spriteRenderer = square.AddComponent<SpriteRendererComponent>();
-		m_SqureTest = square;
-		Entity hello = m_ActiveScene->CreateEntity("Hello");
-
-		SceneSerializer serialzier(m_ActiveScene);
-		serialzier.Serialize("../Assets/Scenes/Example.scene");
-
 		Image image(8, 8, 4, { 0.1,0.2,0.3,1 });
 
 		IconFolder = Texture2D::Create("../SibylEditor/assets/icons/folder.png");
@@ -79,19 +71,11 @@ namespace SIByLEditor
 		desc.Channel = 4;
 		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
 
-		SpriteRendererComponent& spriteRenderer = m_SqureTest.GetComponent<SpriteRendererComponent>();
-		spriteRenderer.Material = Renderer2D::GetMaterial();
-
 		VertexBufferLayout layout =
 		{
 			{ShaderDataType::Float3, "POSITION"},
 			{ShaderDataType::Float2, "TEXCOORD"},
 		};
-		//if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-		//{
-		//	SIByL_CORE_ERROR("Mesh Load Error");
-		//	return;
-		//}
 	}
 
 	void EditorLayer::OnUpdate()
@@ -113,11 +97,6 @@ namespace SIByLEditor
 		FrameBufferLibrary::Fetch("SceneView")->Bind();
 		FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
 
-		//Renderer2D::BeginScene(camera);
-		//float totalTime = Application::Get().GetFrameTimer()->TotalTime();
-		//TransformComponent& trans = m_SqureTest.GetComponent<TransformComponent>();
-		//Renderer2D::DrawQuad(trans.GetTransform(), Renderer2D::GetMaterial());
-		//Renderer2D::EndScene();
 		camera->SetCamera();
 		Renderer2D::GetMaterial()->SetPass();
 
@@ -130,7 +109,6 @@ namespace SIByLEditor
 			Graphic::CurrentMaterial->OnDrawCall();
 			drawItem->OnDrawCall();
 		}
-
 
 		FrameBufferLibrary::Fetch("SceneView")->Unbind();
 	}
@@ -218,6 +196,7 @@ namespace SIByLEditor
 
 		bool showdemo = true;
 		ImGui::ShowDemoWindow(&showdemo);
+
 		//////////////////////////////////////////////
 		// View Ports
 		//////////////////////////////////////////////
@@ -256,11 +235,15 @@ namespace SIByLEditor
 		}
 
 		ImGui::Begin("Debug");
-		if (ImGui::Button("What"))
+		if (ImGui::Button("Save"))
 		{
-			Ref<Material> mat = Renderer2D::GetMaterial();
-			mat->SetFloat4("Color", { 0,1,0,1 });
-			mat->SetTexture2D("Main", Texture2D::Create("Resources/Textures/checkboard.png"));
+			SceneSerializer serialzier(m_ActiveScene);
+			serialzier.Serialize("../Assets/Scenes/Example.scene");
+		}
+		if (ImGui::Button("Load"))
+		{
+			SceneSerializer serialzier(m_ActiveScene);
+			serialzier.Deserialize("../Assets/Scenes/Example.scene");
 		}
 		ImGui::End();
 

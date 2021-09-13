@@ -29,19 +29,24 @@ namespace SIByL
 
 	Ref<TriangleMesh> TriangleMesh::Create(
 		const std::vector<MeshData>& meshDatas,
-		VertexBufferLayout layout)
+		VertexBufferLayout layout,
+		const std::string& path)
 	{
+		Ref<TriangleMesh> res = nullptr;
+
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL:
-			return nullptr; break;
+			res = nullptr; break;
 		case RasterRenderer::DirectX12:
-			return std::make_shared<DX12TriangleMesh>(meshDatas, layout);
-		case RasterRenderer::CpuSoftware: return nullptr; break;
-		case RasterRenderer::GpuSoftware: return nullptr; break;
-		default: return nullptr; break;
+			res = std::make_shared<DX12TriangleMesh>(meshDatas, layout);
+			break;
+		case RasterRenderer::CpuSoftware: res = nullptr; break;
+		case RasterRenderer::GpuSoftware: res = nullptr; break;
+		default: res = nullptr; break;
 		}
-		return nullptr;
+		res->m_Path = path;
+		return res;
 	}
 
 	UINT TriangleMesh::GetSubmesh()

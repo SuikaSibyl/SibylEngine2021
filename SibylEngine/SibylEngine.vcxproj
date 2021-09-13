@@ -162,6 +162,7 @@
     <ClCompile Include="source\Sibyl\Core\FrameTimer.cpp" />
     <ClCompile Include="source\Sibyl\Core\Window.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Core\Entity.cpp" />
+    <ClCompile Include="source\Sibyl\ECS\Core\SerializeUtility.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\DrawItemPool.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.cpp" />
@@ -285,6 +286,7 @@
     <ClInclude Include="source\Sibyl\Core\Events\MouseEvent.h" />
     <ClInclude Include="source\Sibyl\Core\Log.h" />
     <ClInclude Include="source\Sibyl\ECS\Core\Entity.h" />
+    <ClInclude Include="source\Sibyl\ECS\Core\SerializeUtility.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\DrawItemPool.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\SceneSerializer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h" />

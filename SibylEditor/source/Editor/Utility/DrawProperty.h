@@ -8,6 +8,7 @@
 
 namespace SIByL
 {
+	class Shader;
 	class Material;
 	class Texture2D;
 	class TriangleMesh;
@@ -21,5 +22,9 @@ namespace SIByLEditor
 
 	void DrawTexture2D(SIByL::Material& material, SIByL::ShaderConstantItem& item);
 
+	void DrawShaderSlot(const std::string& label, SIByL::Ref<SIByL::Shader>* shader);
+
+	void DrawMaterialSlot(const std::string& label);
 	void DrawMaterial(const std::string& label, SIByL::Material& material);
+	//void DrawMeshRenderer(const std::string& label, SIByL::)
 }

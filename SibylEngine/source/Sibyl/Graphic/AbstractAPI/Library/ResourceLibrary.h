@@ -4,6 +4,15 @@
 
 namespace SIByL
 {
+	static const std::string AssetRoot = "..\\Assets\\";
+
+	static std::string GetPathID(std::string pathortho)
+	{
+		replace(pathortho.begin(), pathortho.end(), '/', '\\');
+		std::string id = "FILE=" + pathortho;
+		return id;
+	}
+
 	template<class T>
 	class Library
 	{
@@ -11,6 +20,7 @@ namespace SIByL
 		static void Push(const std::string& id, Ref<T> instance);
 		static Ref<T> Fetch(const std::string& id);
 		static void Remove(const std::string& id);
+		static void Reset();
 
 		static std::unordered_map<std::string, Ref<T>> Mapper;
 	};
@@ -42,6 +52,12 @@ namespace SIByL
 		{
 			Mapper.erase(id);
 		}
+	}
+
+	template<class T>
+	void Library<T>::Reset()
+	{
+		Mapper.clear();
 	}
 
 	template<class T>

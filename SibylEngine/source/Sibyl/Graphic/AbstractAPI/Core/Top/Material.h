@@ -69,4 +69,19 @@ namespace SIByL
 		friend class DrawItem;
 		friend void SIByLEditor::DrawMaterial(const std::string& label, SIByL::Material& material);
 	};
+
+	class MaterialSerializer
+	{
+	public:
+		MaterialSerializer(const Ref<Material>& material);
+
+		void Serialize(const std::string& filepath);
+		void SerializeRuntime(const std::string& filepath);
+
+		bool Deserialize(const std::string& filepath);
+		bool DeserializeRuntime(const std::string& filepath);
+
+	private:
+		Ref<Material> m_Material;
+	};
 }

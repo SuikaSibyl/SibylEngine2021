@@ -2,26 +2,15 @@
 #include "SceneSerializer.h"
 
 #include "yaml-cpp/yaml.h"
+#include "Sibyl/ECS/Core/SerializeUtility.h"
 
 #include "Sibyl/ECS/Core/Entity.h"
 #include "Sibyl/ECS/Components/Components.h"
 
+#include "Sibyl/Graphic/Core/Geometry/MeshLoader.h"
+
 namespace SIByL
 {
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
-	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-		return out;
-	}
-
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v)
-	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-		return out;
-	}
-
 	SceneSerializer::SceneSerializer(const Ref<Scene>& scene)
 		:m_Scene(scene)
 	{
@@ -53,6 +42,28 @@ namespace SIByL
 			out << YAML::Key << "Translation" << YAML::Value << transform.Translation;
 			out << YAML::Key << "EulerAngles" << YAML::Value << transform.EulerAngles;
 			out << YAML::Key << "Scale" << YAML::Value << transform.Scale;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<MeshFilterComponent>())
+		{
+			out << YAML::Key << "MeshFilterComponent";
+			out << YAML::BeginMap;
+
+			auto& meshFilter = entity.GetComponent<MeshFilterComponent>();
+			out << YAML::Key << "Mesh" << YAML::Value << meshFilter.Mesh;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.HasComponent<MeshRendererComponent>())
+		{
+			out << YAML::Key << "MeshRendererComponent";
+			out << YAML::BeginMap;
+
+			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+			//out << YAML::Key << "Mesh" << YAML::Value << meshFilter.Mesh;
 
 			out << YAML::EndMap;
 		}
@@ -108,6 +119,8 @@ namespace SIByL
 		{
 			for (auto entity : entities)
 			{
+				// Tag Component
+				// -----------------------------------------------
 				uint64_t uuid = entity["Entity"].as<uint64_t>();
 
 				std::string name;
@@ -117,15 +130,42 @@ namespace SIByL
 
 				SIByL_CORE_TRACE("Deserialized entity with ID = {0}, NAME = {1}", uuid, name);
 
-				Entity deserializedEntity = m_Scene->CreateEntity();
+				Entity deserializedEntity = m_Scene->CreateEntity(name);
 
+				// Transform Component
+				// -----------------------------------------------
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
 					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
-					//tc.Translation = transformComponent["Translation"].as<glm::vec3>();
-					//tc.EulerAngles = transformComponent["EulerAngles"].as<glm::vec3>();
-					//tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+					tc.Translation = transformComponent["Translation"].as<glm::vec3>();
+					tc.EulerAngles = transformComponent["EulerAngles"].as<glm::vec3>();
+					tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+				}
+
+				// MeshFilter Component
+				// -----------------------------------------------
+				auto meshFilterComponent = entity["MeshFilterComponent"];
+				if (meshFilterComponent)
+				{
+					auto& tc = deserializedEntity.AddComponent<MeshFilterComponent>();
+					
+					VertexBufferLayout layout =
+					{
+						{ShaderDataType::Float3, "POSITION"},
+						{ShaderDataType::Float2, "TEXCOORD"},
+					};
+					std::string path = meshFilterComponent["Mesh"].as<std::string>();
+					MeshLoader loader(path, layout);
+					tc.Mesh = loader.GetTriangleMesh();
+				}
+
+				// MeshRenderer Component
+				// -----------------------------------------------
+				auto meshRendererComponent = entity["MeshRendererComponent"];
+				if (meshRendererComponent)
+				{
+					auto& tc = deserializedEntity.AddComponent<MeshRendererComponent>();
 				}
 			}
 		}

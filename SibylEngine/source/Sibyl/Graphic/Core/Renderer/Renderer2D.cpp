@@ -66,7 +66,7 @@ namespace SIByL
 
 		//s_Data->TexCheckboard = Texture2D::Create("checkboard.png");
 
-		s_Data->TextureShader = Shader::Create("SIByL/Texture",
+		s_Data->TextureShader = Shader::Create("Shaders/SIByL/Texture",
 			ShaderDesc({ true,layout }),
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 
@@ -151,44 +151,4 @@ namespace SIByL
 		//s_Data->TextureShader->GetBinder()->SetTexture2D("Main", texture);
 		//s_Data->QuadMesh->RasterDraw();
 	}
-
-	//void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color)
-	//{
-	//	glm::mat4 model = glm::mat4(1.0f);
-
-	//	model = glm::scale(model, { size, 1 });
-	//	model = glm::translate(model, { position,0 });
-
-	//	DrawQuad(model, color);
-	//}
-
-	//void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
-	//{
-	//	glm::mat4 model = glm::mat4(1.0f);
-
-	//	model = glm::scale(model, { size, 1 });
-	//	model = glm::translate(model, { position });
-
-	//	DrawQuad(model, color);
-	//}
-
-	//void Renderer2D::DrawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
-	//{
-	//	glm::mat4 model = glm::mat4(1.0f);
-
-	//	model = glm::scale(model, { size, 1 });
-	//	model = glm::translate(model, { position,0 });
-
-	//	DrawQuad(model, color, texture);
-	//}
-
-	//void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, Ref<Texture2D> texture)
-	//{
-	//	glm::mat4 model = glm::mat4(1.0f);
-
-	//	model = glm::scale(model, { size, 1 });
-	//	model = glm::translate(model, { position });
-
-	//	DrawQuad(model, color, texture);
-	//}
 }

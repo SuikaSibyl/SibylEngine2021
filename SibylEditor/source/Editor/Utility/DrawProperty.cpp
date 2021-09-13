@@ -1,9 +1,11 @@
 #include "SIByLpch.h"
 #include "DrawProperty.h"
 
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
+#include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/Core/Geometry/MeshLoader.h"
 
@@ -124,6 +126,77 @@ namespace SIByLEditor
 		ImGui::PopID();
 	}
 
+	void DrawShaderSlot(const std::string& label, SIByL::Ref<SIByL::Shader>* shader)
+	{
+		if (ImGui::Button("Select Shader"))
+			ImGui::OpenPopup("Shaders Library");
+
+		if (ImGui::BeginPopup("Shaders Library"))
+		{
+			//if (ImGui::MenuItem("Transform"))
+			//{
+			//	m_SelectContext.AddComponent<TransformComponent>();
+			//	ImGui::CloseCurrentPopup();
+			//}
+
+			//if (ImGui::MenuItem("SpriteRenderer"))
+			//{
+			//	m_SelectContext.AddComponent<SpriteRendererComponent>();
+			//	ImGui::CloseCurrentPopup();
+			//}
+
+			//if (ImGui::MenuItem("MeshFilter"))
+			//{
+			//	m_SelectContext.AddComponent<MeshFilterComponent>();
+			//	ImGui::CloseCurrentPopup();
+			//}
+
+			//if (ImGui::MenuItem("MeshRenderer"))
+			//{
+			//	if (m_SelectContext.HasComponent<MeshFilterComponent>())
+			//	{
+			//		MeshFilterComponent& meshFilter = m_SelectContext.GetComponent<MeshFilterComponent>();
+			//		UINT matNum = meshFilter.GetSubmeshNum();
+			//		MeshRendererComponent& meshRenderer = m_SelectContext.AddComponent<MeshRendererComponent>();
+			//		meshRenderer.MaterialNum = matNum;
+			//	}
+			//	ImGui::CloseCurrentPopup();
+			//}
+
+			static int selected = -1;
+			int index = 0;
+			for (auto& iter : SIByL::Library<SIByL::Shader>::Mapper)
+			{
+				if (ImGui::Selectable(iter.first.c_str(), selected == index))
+				{
+					selected = index;
+					*shader = iter.second;
+					ImGui::CloseCurrentPopup();
+				}
+				index++;
+			}
+
+			//for (int n = 0; n < 5; n++)
+			//{
+			//	char buf[32];
+			//	sprintf(buf, "Object %d", n);
+			//	if (ImGui::Selectable(buf, selected == n))
+			//		selected = n;
+			//}
+
+			ImGui::EndPopup();
+		}
+		for (auto& iter : SIByL::Library<SIByL::Shader>::Mapper)
+		{
+
+		}
+	}
+
+	void DrawMaterialSlot(const std::string& label)
+	{
+
+	}
+
 	void DrawMaterial(const std::string& label, SIByL::Material& material)
 	{
 		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -133,6 +206,8 @@ namespace SIByLEditor
 			// If Material Already Exist
 			if (&material != nullptr)
 			{
+				DrawShaderSlot("Shader", &material.m_Shader);
+
 				// ================================================================
 				// Draw constants
 				SIByL::ShaderConstantsDesc* constant = material.GetConstantsDesc();
@@ -180,4 +255,5 @@ namespace SIByLEditor
 			ImGui::TreePop();
 		}
 	}
+
 }

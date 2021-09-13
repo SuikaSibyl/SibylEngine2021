@@ -8,7 +8,6 @@ namespace SIByL
 
 	struct MeshRendererComponent
 	{
-		Ref<TriangleMesh> Mesh;
 		std::vector<Ref<Material>> Materials;
 
 		UINT MaterialNum;

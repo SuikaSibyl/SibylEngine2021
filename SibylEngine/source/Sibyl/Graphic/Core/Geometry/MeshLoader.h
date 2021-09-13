@@ -37,5 +37,6 @@ namespace SIByL
 		VertexBufferLayout m_Layout;
 		std::vector<MeshData> m_Meshes;
 		std::string m_Directory;
+		std::string m_Path;
 	};
 }

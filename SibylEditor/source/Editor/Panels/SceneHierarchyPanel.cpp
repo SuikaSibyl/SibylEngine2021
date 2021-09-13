@@ -181,7 +181,11 @@ namespace SIByL
 
 		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
 			{
-				
+				for (int i = 0; i < component.MaterialNum; i++)
+				{
+					std::string slot = std::string("Material ") + std::to_string(i);
+					ImGui::Text(slot.c_str());
+				}
 			});
 
 		{			

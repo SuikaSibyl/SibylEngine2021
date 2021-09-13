@@ -24,6 +24,8 @@ namespace SIByL
 		virtual void SetVertexBufferLayout() = 0;
 
 		Ref<ShaderBinder> GetBinder() { return m_ShaderBinder; }
+		std::string ShaderID;
+
 	protected:
 		Ref<ShaderBinder> m_ShaderBinder;
 		ShaderDesc m_Descriptor;

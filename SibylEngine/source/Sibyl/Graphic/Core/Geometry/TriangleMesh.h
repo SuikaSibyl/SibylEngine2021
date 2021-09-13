@@ -24,7 +24,7 @@ namespace SIByL
 		
 		static Ref<TriangleMesh> Create(
 			const std::vector<MeshData>& meshDatas,
-			VertexBufferLayout layout);
+			VertexBufferLayout layout, const std::string& path);
 
 		using iter = std::vector<SubMesh>::iterator;
 		iter begin() { return m_SubMeshes.begin(); }
@@ -34,6 +34,8 @@ namespace SIByL
 		virtual void RasterDraw() = 0;
 		virtual void RasterDrawSubmeshStart() = 0;
 		virtual void RasterDrawSubmesh(SubMesh& submesh) = 0;
+
+		std::string m_Path;
 
 	protected:
 		Ref<VertexBuffer>	m_VertexBuffer;

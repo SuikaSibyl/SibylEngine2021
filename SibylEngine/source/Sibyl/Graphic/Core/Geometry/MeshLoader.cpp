@@ -11,7 +11,7 @@
 namespace SIByL
 {
     MeshLoader::MeshLoader(const std::string& path, const VertexBufferLayout& layout)
-        :m_Layout(layout)
+        :m_Layout(layout), m_Path(path)
     {
         LoadFile("../Assets/" + path);
     }
@@ -94,6 +94,6 @@ namespace SIByL
 
     Ref<TriangleMesh> MeshLoader::GetTriangleMesh()
     {
-        return TriangleMesh::Create(m_Meshes, m_Layout);
+        return TriangleMesh::Create(m_Meshes, m_Layout, m_Path);
     }
 }
