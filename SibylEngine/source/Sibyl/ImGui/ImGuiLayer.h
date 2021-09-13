@@ -4,6 +4,7 @@
 #include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/Events/KeyEvent.h"
 #include "Sibyl/Core/Events/ApplicationEvent.h"
+#include "ImGuizmo.h"
 
 namespace SIByL
 {

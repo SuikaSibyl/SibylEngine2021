@@ -2,22 +2,11 @@ Scene: Untitled
 Entities:
   - Entity: 124531623461
     TagComponent:
-      Tag: Little
+      Tag: Empty Entity
     TransformComponent:
-      Translation: [-0.800000012, -1, 0]
-      EulerAngles: [0, -0.200000003, 0]
-      Scale: [0.5, 0.5, 0.5]
-    MeshFilterComponent:
-      Mesh: Resources\Meshes\Little.fbx
-    MeshRendererComponent:
-      {}
-  - Entity: 124531623461
-    TagComponent:
-      Tag: TestEnitity
-    TransformComponent:
-      Translation: [0.200000003, 0.400000006, 0.5]
-      EulerAngles: [-1.60000002, 0, 0]
-      Scale: [1.39999998, 1.39999998, 1.39999998]
+      Translation: [0.582720041, 1.13214445, 0.404119611]
+      EulerAngles: [0, 0, 0]
+      Scale: [1, 1, 1]
     MeshFilterComponent:
       Mesh: Resources\Meshes\1.FBX
     MeshRendererComponent:

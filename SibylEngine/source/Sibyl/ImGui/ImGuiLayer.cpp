@@ -119,6 +119,7 @@ namespace SIByL
 
 		NewFrameBegin();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 
 		app.DrawImGui();
 

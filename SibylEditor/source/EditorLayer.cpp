@@ -3,15 +3,21 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include "EditorLayer.h"
 #include "Sibyl/ImGui/ImGuiUtility.h"
-
+#include "Sibyl/Basic/Utils/PlatformUtils.h"
 #include "Sibyl/ECS/Components/Render/SpriteRenderer.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 #include "Sibyl/ECS/Scene/SceneSerializer.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
+#include "Sibyl/Core/Events/KeyEvent.h"
+#include "Sibyl/Core/Events/MouseEvent.h"
+#include "Sibyl/Core/Events/ApplicationEvent.h"
 
 namespace SIByLEditor
 {
@@ -113,6 +119,76 @@ namespace SIByLEditor
 		FrameBufferLibrary::Fetch("SceneView")->Unbind();
 	}
 
+	void EditorLayer::OnEvent(SIByL::Event& event)
+	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		
+	}
+
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
+	{
+		// Shortcuts
+		if (e.GetRepeatCount() > 0)
+			return false;
+
+
+		bool control = Input::IsKeyPressed(SIByL_KEY_LEFT_CONTROL) || Input::IsKeyPressed(SIByL_KEY_RIGHT_CONTROL);
+		bool shift = Input::IsKeyPressed(SIByL_KEY_LEFT_SHIFT) || Input::IsKeyPressed(SIByL_KEY_RIGHT_SHIFT);
+
+		if (e.GetKeyCode() == SIByL_KEY_N)
+		{
+			if (control)
+			{
+				NewScene();
+			}
+		}
+		else if (e.GetKeyCode() == SIByL_KEY_O)
+		{
+			if (control)
+			{
+				OpenScene();
+			}
+		}
+		else if (e.GetKeyCode() == SIByL_KEY_S)
+		{
+			if (control && shift)
+			{
+				SaveScene();
+			}
+		}
+	}
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		camera->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+	}
+	void EditorLayer::OpenScene()
+	{
+		std::string filepath = FileDialogs::OpenFile("SIByL Scene (*.scene)\0*.scene\0");
+		if (!filepath.empty())
+		{
+			m_ActiveScene = CreateRef<Scene>();
+			m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
+			camera->Resize(m_ViewportSize.x, m_ViewportSize.y);
+			m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+
+			SceneSerializer serialzier(m_ActiveScene);
+			serialzier.Deserialize(filepath);
+		}
+	}
+	void EditorLayer::SaveScene()
+	{
+		std::string filepath = FileDialogs::SaveFile("SIByL Scene (*.scene)\0*.scene\0");
+		if (!filepath.empty())
+		{
+			SceneSerializer serialzier(m_ActiveScene);
+			serialzier.Serialize(filepath);
+		}
+	}
+
 	void EditorLayer::OnDrawImGui()
 	{
 		static bool dockspaceOpen = true;
@@ -169,25 +245,28 @@ namespace SIByLEditor
 		}
 		//style.WindowMinSize.x = 32.0f;
 
+		//////////////////////////////////////////////
+		// MenuBar
+		//////////////////////////////////////////////
 		if (ImGui::BeginMenuBar())
 		{
-			if (ImGui::BeginMenu("Options"))
+			if (ImGui::BeginMenu("File"))
 			{
-				// Disabling fullscreen would allow the window to be moved to the front of other windows,
-				// which we can't undo at the moment without finer window depth/z control.
-				ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen);
-				ImGui::MenuItem("Padding", NULL, &opt_padding);
-				ImGui::Separator();
+				if (ImGui::MenuItem("New", "Ctrl+N"))
+				{
+					NewScene();
+				}
 
-				if (ImGui::MenuItem("Flag: NoSplit", "", (dockspace_flags & ImGuiDockNodeFlags_NoSplit) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoSplit; }
-				if (ImGui::MenuItem("Flag: NoResize", "", (dockspace_flags & ImGuiDockNodeFlags_NoResize) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoResize; }
-				if (ImGui::MenuItem("Flag: NoDockingInCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_NoDockingInCentralNode) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_NoDockingInCentralNode; }
-				if (ImGui::MenuItem("Flag: AutoHideTabBar", "", (dockspace_flags & ImGuiDockNodeFlags_AutoHideTabBar) != 0)) { dockspace_flags ^= ImGuiDockNodeFlags_AutoHideTabBar; }
-				if (ImGui::MenuItem("Flag: PassthruCentralNode", "", (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode) != 0, opt_fullscreen)) { dockspace_flags ^= ImGuiDockNodeFlags_PassthruCentralNode; }
-				ImGui::Separator();
+				if (ImGui::MenuItem("Save Scene", "Ctrl+Shift+S"))
+				{
+					SaveScene();
+				}
 
-				if (ImGui::MenuItem("Close", NULL, false, &dockspaceOpen != NULL))
-					dockspaceOpen = false;
+				if (ImGui::MenuItem("Load Scene", "Ctrl+O"))
+				{
+					OpenScene();
+				}
+
 				ImGui::EndMenu();
 			}
 
@@ -223,6 +302,31 @@ namespace SIByLEditor
 				viewportPanelSize.x,
 				viewportPanelSize.y });
 
+			Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
+			if (selectedEntity)
+			{
+				ImGuizmo::SetOrthographic(false);
+				ImGuizmo::SetDrawlist();
+
+				float windowWidth = (float)ImGui::GetWindowWidth();
+				float windowHeight = (float)ImGui::GetWindowHeight();
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+				glm::mat4 cameraView = camera->GetViewMatrix();
+				glm::mat4 cameraProj = camera->GetProjectionMatrix();
+
+				auto& tc = selectedEntity.GetComponent<TransformComponent>();
+				glm::mat4 transform = tc.GetTransform();
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
+			
+				if (ImGuizmo::IsUsing())
+				{
+					//glm::
+					tc.Translation = glm::vec3(transform[3]);
+				}
+			}
+
 			if (ImGui::BeginDragDropTarget())
 			{
 				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE");
@@ -233,19 +337,6 @@ namespace SIByLEditor
 			ImGui::End();
 			ImGui::PopStyleVar();
 		}
-
-		ImGui::Begin("Debug");
-		if (ImGui::Button("Save"))
-		{
-			SceneSerializer serialzier(m_ActiveScene);
-			serialzier.Serialize("../Assets/Scenes/Example.scene");
-		}
-		if (ImGui::Button("Load"))
-		{
-			SceneSerializer serialzier(m_ActiveScene);
-			serialzier.Deserialize("../Assets/Scenes/Example.scene");
-		}
-		ImGui::End();
 
 		//////////////////////////////////////////////
 		// Scene Hierarchy

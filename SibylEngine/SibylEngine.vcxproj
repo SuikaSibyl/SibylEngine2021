@@ -61,7 +61,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -84,7 +84,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -144,9 +144,11 @@
     <ClCompile Include="source\Platform\OpenGL\Common\OpenGLContext.cpp" />
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLSwapChain.cpp" />
     <ClCompile Include="source\Platform\Windows\ImGui\ImGuiWin32Renderer.cpp" />
+    <ClCompile Include="source\Platform\Windows\Utils\WindowsPlatformUtils.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
+    <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Common\CommonUnity.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Render\RenderImpl.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\ViewCameraController.cpp" />
@@ -197,6 +199,7 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\Scene.cpp" />
     <ClCompile Include="vendor\glad\src\glad.cpp" />
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp" />
+    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp" />
     <ClCompile Include="vendor\imgui\imgui.cpp" />
     <ClCompile Include="vendor\imgui\imgui_demo.cpp" />
     <ClCompile Include="vendor\imgui\imgui_draw.cpp" />
@@ -259,6 +262,8 @@
     <ClInclude Include="source\SIByLpch.h" />
     <ClInclude Include="source\SIByLsettings.h" />
     <ClInclude Include="source\Sibyl\Basic\ThreadSafeQueue.h" />
+    <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h" />
+    <ClInclude Include="source\Sibyl\Basic\Utils\PlatformUtils.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Camera.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Tag.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Components.h" />
@@ -621,6 +626,7 @@
     <ClInclude Include="vendor\glm\glm\vec3.hpp" />
     <ClInclude Include="vendor\glm\glm\vec4.hpp" />
     <ClInclude Include="vendor\glm\glm\vector_relational.hpp" />
+    <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h" />
     <ClInclude Include="vendor\imgui\imconfig.h" />
     <ClInclude Include="vendor\imgui\imgui.h" />
     <ClInclude Include="vendor\imgui\imgui_internal.h" />

@@ -37,9 +37,7 @@ namespace SIByLEditor
 
 		virtual void OnDrawImGui();
 
-		void OnEvent(SIByL::Event& event) override
-		{
-		}
+		void OnEvent(SIByL::Event& event) override;
 
 		Ref<Shader> shader;
 		Ref<ViewCameraController> viewCameraController;
@@ -68,6 +66,12 @@ namespace SIByLEditor
 		static Ref<Texture2D> IconScene;
 		static Ref<Texture2D> IconFile;
 
+	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+
+		void NewScene();
+		void OpenScene();
+		void SaveScene();
 	};
 
 }

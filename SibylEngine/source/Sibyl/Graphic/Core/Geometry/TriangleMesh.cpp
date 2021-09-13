@@ -17,9 +17,9 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: 
-			return std::make_shared<OpenGLTriangleMesh>(vertices, floatCount, indices, iCount, layout);
+			return std::make_shared<OpenGLTriangleMesh>(vertices, floatCount, indices, iCount, layout); break;
 		case RasterRenderer::DirectX12:
-			return std::make_shared<DX12TriangleMesh>(vertices, floatCount, indices, iCount, layout);
+			return std::make_shared<DX12TriangleMesh>(vertices, floatCount, indices, iCount, layout); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

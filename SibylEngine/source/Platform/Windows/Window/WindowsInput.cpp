@@ -8,7 +8,7 @@ namespace SIByL
 {
 	bool WindowsInput::IsKeyPressedImpl(int keycode)
 	{
-		if (GetKeyState(keycode) & 0x8000)
+		if (GetAsyncKeyState(keycode) & 0x8000)
 		{
 			return true;
 		}
@@ -17,7 +17,7 @@ namespace SIByL
 	}
 	bool WindowsInput::IsMouseButtonPressedImpl(int button)
 	{
-		if (GetKeyState(button) & 0x8000)
+		if (GetAsyncKeyState(button) & 0x8000)
 		{
 			return true;
 		}

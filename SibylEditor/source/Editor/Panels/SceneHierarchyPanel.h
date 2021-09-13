@@ -14,6 +14,8 @@ namespace SIByL
 		
 		void OnImGuiRender();
 
+		Entity GetSelectedEntity() const { return m_SelectContext; }
+
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawComponents(Entity entity);

@@ -309,6 +309,15 @@
     <ClCompile Include="source\Sibyl\ECS\Core\SerializeUtility.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Platform\Windows\Utils\WindowsPlatformUtils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1578,6 +1587,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\ECS\Core\SerializeUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Utils\PlatformUtils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\ImGuizmo\ImGuizmo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
