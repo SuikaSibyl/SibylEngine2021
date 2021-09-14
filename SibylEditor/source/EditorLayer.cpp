@@ -91,9 +91,9 @@ namespace SIByLEditor
 
 		m_ActiveScene->OnUpdate();
 
-		//SIByL_CORE_INFO("FPS: {0}, {1} ms",
-		//	Application::Get().GetFrameTimer()->GetFPS(),
-		//	Application::Get().GetFrameTimer()->GetMsPF());
+		SIByL_CORE_INFO("FPS: {0}, {1} ms",
+			Application::Get().GetFrameTimer()->GetFPS(),
+			Application::Get().GetFrameTimer()->GetMsPF());
 
 		if (m_ViewportFocused)
 			viewCameraController->OnUpdate();

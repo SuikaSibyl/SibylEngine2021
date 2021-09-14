@@ -13,7 +13,6 @@
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
 
-
 namespace SIByL
 {
 	Application* Application::s_Instance = nullptr;

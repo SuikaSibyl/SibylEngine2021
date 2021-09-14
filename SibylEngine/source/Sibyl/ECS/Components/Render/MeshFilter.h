@@ -23,6 +23,7 @@ namespace SIByL
 		~MeshFilterComponent();
 
 		UINT GetSubmeshNum();
+		std::string Path;
 		Ref<TriangleMesh> Mesh;
 		Ref<ShaderConstantsBuffer> PerObjectBuffer;
 	};
