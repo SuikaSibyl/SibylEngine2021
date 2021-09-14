@@ -304,7 +304,7 @@ namespace SIByLEditor
 
 			m_ViewportFocused = ImGui::IsWindowFocused();
 			m_ViewportHoverd = ImGui::IsWindowHovered();
-			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused || !m_ViewportHoverd);
+			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHoverd);
 
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize))

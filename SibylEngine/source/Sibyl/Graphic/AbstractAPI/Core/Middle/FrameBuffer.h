@@ -4,6 +4,13 @@
 
 namespace SIByL
 {
+	enum class FrameBufferTextureFormat
+	{
+		None = 0,
+		RGBA8, 
+		DEPTH24STENCIL8,
+	};
+
 	struct FrameBufferDesc
 	{
 		uint32_t Width;
