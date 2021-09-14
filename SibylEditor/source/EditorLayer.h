@@ -66,6 +66,8 @@ namespace SIByLEditor
 		static Ref<Texture2D> IconScene;
 		static Ref<Texture2D> IconFile;
 
+		int GizmoType = -1;
+
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 

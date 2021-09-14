@@ -9,6 +9,7 @@
 #include "EditorLayer.h"
 #include "Sibyl/ImGui/ImGuiUtility.h"
 #include "Sibyl/Basic/Utils/PlatformUtils.h"
+#include "Sibyl/Basic/Utils/MathUtils.h"
 #include "Sibyl/ECS/Components/Render/SpriteRenderer.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 #include "Sibyl/ECS/Scene/SceneSerializer.h"
@@ -157,6 +158,26 @@ namespace SIByLEditor
 				SaveScene();
 			}
 		}
+		else if (e.GetKeyCode() == SIByL_KEY_Q)
+		{
+			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
+				GizmoType = -1;
+		}
+		else if (e.GetKeyCode() == SIByL_KEY_W)
+		{
+			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
+				GizmoType = 0;
+		}
+		else if (e.GetKeyCode() == SIByL_KEY_E)
+		{
+			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
+				GizmoType = 1;
+		}
+		else if (e.GetKeyCode() == SIByL_KEY_R)
+		{
+			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
+				GizmoType = 2;
+		}
 	}
 	void EditorLayer::NewScene()
 	{
@@ -303,7 +324,7 @@ namespace SIByLEditor
 				viewportPanelSize.y });
 
 			Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
-			if (selectedEntity)
+			if (selectedEntity && GizmoType != -1)
 			{
 				ImGuizmo::SetOrthographic(false);
 				ImGuizmo::SetDrawlist();
@@ -318,12 +339,17 @@ namespace SIByLEditor
 				auto& tc = selectedEntity.GetComponent<TransformComponent>();
 				glm::mat4 transform = tc.GetTransform();
 
-				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj), ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, glm::value_ptr(transform));
-			
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj), ImGuizmo::OPERATION(GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform));
+				
 				if (ImGuizmo::IsUsing())
 				{
-					//glm::
-					tc.Translation = glm::vec3(transform[3]);
+					glm::vec3 translation, rotation, scale;
+					DecomposeTransform(transform, translation, rotation, scale);
+					glm::vec3 deltaRotation = rotation - tc.EulerAngles;
+					tc.Translation = translation;
+					tc.Scale = scale;
+					tc.EulerAngles += deltaRotation;
+					transform = tc.GetTransform();
 				}
 			}
 

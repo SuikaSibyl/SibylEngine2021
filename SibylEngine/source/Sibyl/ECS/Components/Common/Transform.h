@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -26,12 +29,7 @@ namespace SIByL
 
 		glm::mat4 GetTransform() const
 		{
-			glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), EulerAngles.x, { 1,0,0 })
-				* glm::rotate(glm::mat4(1.0f), EulerAngles.y, { 0,1,0 })
-				* glm::rotate(glm::mat4(1.0f), EulerAngles.z, { 0,0,1 });
-
-			glm::mat4 test = glm::translate(glm::mat4(1.0f), Translation);
-			glm::mat4 test2 = glm::scale(glm::mat4(1.0f), Scale);
+			glm::mat4 rotation = glm::toMat4(glm::quat(EulerAngles));
 
 			return glm::translate(glm::mat4(1.0f), Translation)
 				* rotation
