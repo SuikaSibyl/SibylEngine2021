@@ -41,7 +41,7 @@ namespace SIByL
 	void DrawItem::OnDrawCall()
 	{
 		Graphic::CurrentMaterial->m_Shader->GetBinder()->BindConstantsBuffer(0, *m_ConstantsBuffer);
-		m_ConstantsBuffer->UploadDataIfDirty();
+		m_ConstantsBuffer->UploadDataIfDirty(Graphic::CurrentMaterial->m_Shader->GetBinder().get());
 		m_Mesh->RasterDrawSubmeshStart();
 		m_Mesh->RasterDrawSubmesh(*m_SubMesh);
 	}

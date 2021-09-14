@@ -9,6 +9,7 @@ namespace SIByL
 {
 	struct SubMesh
 	{
+		unsigned int Index;
 		uint32_t VertexLocation;
 		uint32_t IndexLocation;
 		uint32_t IndexNumber;

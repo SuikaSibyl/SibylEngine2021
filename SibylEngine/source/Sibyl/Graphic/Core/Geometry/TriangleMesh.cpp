@@ -37,7 +37,8 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL:
-			res = nullptr; break;
+			res = std::make_shared<OpenGLTriangleMesh>(meshDatas, layout);
+			break;
 		case RasterRenderer::DirectX12:
 			res = std::make_shared<DX12TriangleMesh>(meshDatas, layout);
 			break;

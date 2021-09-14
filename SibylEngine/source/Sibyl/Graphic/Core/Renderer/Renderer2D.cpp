@@ -90,9 +90,6 @@ namespace SIByL
 
 		s_Data->QuadMesh = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
 
-		//MeshLoader meshLoader("Resources/Meshes/1.FBX", layout);
-		//s_Data->QuadMesh = meshLoader.GetTriangleMesh();
-
 		s_Data->WhiteImage = CreateRef<Image>(16, 16, 4, glm::vec4{ 1,1,1,1 });
 		s_Data->TexWhite = Texture2D::Create(s_Data->WhiteImage);
 		s_Data->DefaultMaterial = CreateRef<Material>(s_Data->TextureShader);

@@ -1,13 +1,16 @@
 #pragma once
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
+#include "Platform/OpenGL/AbstractAPI/Middle/OpenGLShaderBinder.h"
 
 namespace SIByL
 {
+	class OpenGLShaderBinder;
 	class OpenGLShaderConstantsBuffer :public ShaderConstantsBuffer
 	{
 	public:
 		OpenGLShaderConstantsBuffer(ShaderConstantsDesc* desc);
+		~OpenGLShaderConstantsBuffer();
 
 		virtual void SetFloat(const std::string& name, const float& value) override;
 		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override;
@@ -24,8 +27,17 @@ namespace SIByL
 		virtual float* PtrFloat4(const std::string& name) override;
 		virtual float* PtrMatrix4x4(const std::string& name) override; 
 
-		virtual void UploadDataIfDirty() override;
+		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 		virtual void SetDirty() override;
+
+	private:
+		void CopyMemoryToConstantsBuffer(void* data, uint32_t offset, uint32_t length);
+		void CopyMemoryFromConstantsBuffer(void* data, uint32_t offset, uint32_t length);
+		void* GetPtrFromConstantsBuffer(uint32_t offset, uint32_t length);
+
+		ConstantsMapper* m_ConstantsMapper;
+		void* m_CpuBuffer;
+		bool m_IsDirty = true;
 	};
 
 	class OpenGLShaderResourcesBuffer :public ShaderResourcesBuffer

@@ -5,6 +5,7 @@
 
 #include <Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h>
 #include <Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h>
+#include <Sibyl/Graphic/AbstractAPI/Core/Top/Material.h>
 
 namespace SIByL
 {
@@ -48,7 +49,7 @@ namespace SIByL
 	void Camera::OnDrawCall()
 	{
 		// Upload Per-Material parameters to GPU
-		m_ConstantsBuffer->UploadDataIfDirty();
+		m_ConstantsBuffer->UploadDataIfDirty(Graphic::CurrentMaterial->m_Shader->GetBinder().get());
 	}
 
 	ShaderConstantsBuffer& Camera::GetConstantsBuffer()

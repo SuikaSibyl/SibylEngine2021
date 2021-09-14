@@ -83,7 +83,7 @@ namespace SIByL
 		ConstantsMapper::iterator begin() { return Mapper.begin(); }
 		ConstantsMapper::iterator end() { return Mapper.end(); }
 	};
-
+	class ShaderBinder;
 	class ShaderConstantsBuffer
 	{
 	public:
@@ -106,7 +106,7 @@ namespace SIByL
 		virtual float* PtrMatrix4x4(const std::string& name) = 0;
 
 
-		virtual void UploadDataIfDirty() = 0;
+		virtual void UploadDataIfDirty(ShaderBinder* m_ShaderBinder) = 0;
 		virtual void SetDirty() = 0;
 	};
 	//////////////////////////////////////////////

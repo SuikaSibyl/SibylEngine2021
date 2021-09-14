@@ -150,16 +150,6 @@ namespace SIByL
 				{
 					auto& tc = deserializedEntity.AddComponent<MeshFilterComponent>();
 					tc.Path = meshFilterComponent["Mesh"].as<std::string>();
-					//auto& meshFilter = deserializedEntity.GetComponent<MeshFilterComponent>();
-
-					//VertexBufferLayout layout =
-					//{
-					//	{ShaderDataType::Float3, "POSITION"},
-					//	{ShaderDataType::Float2, "TEXCOORD"},
-					//};
-					//std::string path = meshFilterComponent["Mesh"].as<std::string>();
-					//MeshLoader loader(path, layout);
-					//meshFilter.Mesh = loader.GetTriangleMesh();
 				}
 
 				// MeshRenderer Component

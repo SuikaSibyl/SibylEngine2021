@@ -67,6 +67,7 @@ namespace SIByL
 		ShaderResourcesDesc* m_ResourcesDesc = nullptr;
 
 		friend class DrawItem;
+		friend class Camera;
 		friend void SIByLEditor::DrawMaterial(const std::string& label, SIByL::Material& material);
 	};
 

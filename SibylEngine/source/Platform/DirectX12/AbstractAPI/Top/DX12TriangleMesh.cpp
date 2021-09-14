@@ -33,10 +33,11 @@ namespace SIByL
 		std::vector<uint32_t> indices;
 		uint32_t vCount = 0, iCount = 0;
 
-		//
+		unsigned int index = 0;
 		for (const MeshData& data : meshDatas)
 		{
 			m_SubMeshes.push_back(SubMesh({
+				index++,
 				(uint32_t)((uint32_t)vertices.size() * sizeof(float) / layout.GetStide()),
 				(uint32_t)((uint32_t)indices.size()),
 				(uint32_t)data.indices.size() }));

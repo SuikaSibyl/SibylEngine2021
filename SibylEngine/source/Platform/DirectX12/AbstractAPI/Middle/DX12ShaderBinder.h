@@ -30,7 +30,7 @@ namespace SIByL
 		virtual float* PtrFloat4(const std::string& name) override;
 		virtual float* PtrMatrix4x4(const std::string& name) override;
 
-		virtual void UploadDataIfDirty() override;
+		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 		virtual void SetDirty() override;
 
 

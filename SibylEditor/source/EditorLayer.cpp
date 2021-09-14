@@ -107,7 +107,6 @@ namespace SIByLEditor
 		camera->SetCamera();
 		Renderer2D::GetMaterial()->SetPass();
 
-		//material->SetPass();
 		DrawItemPool& diPool = m_ActiveScene->GetDrawItems();
 		for (Ref<DrawItem> drawItem : diPool)
 		{

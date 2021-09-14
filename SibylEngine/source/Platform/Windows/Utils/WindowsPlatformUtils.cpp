@@ -21,10 +21,10 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL:
-			ofn.hwndOwner = (HWND)Application::Get().GetWindow().GetNativeWindow();
+			ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
 			break;
 		case RasterRenderer::DirectX12:
-			ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
+			ofn.hwndOwner = (HWND)Application::Get().GetWindow().GetNativeWindow();
 			break;
 		}
 		ofn.lpstrFile = szFile;
@@ -49,10 +49,10 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL:
-			ofn.hwndOwner = (HWND)Application().GetWindow().GetNativeWindow();
+			ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
 			break;
 		case RasterRenderer::DirectX12:
-			ofn.hwndOwner = glfwGetWin32Window((GLFWwindow*)Application::Get().GetWindow().GetNativeWindow());
+			ofn.hwndOwner = (HWND)Application::Get().GetWindow().GetNativeWindow();
 			break;
 		}
 		ofn.lpstrFile = szFile;

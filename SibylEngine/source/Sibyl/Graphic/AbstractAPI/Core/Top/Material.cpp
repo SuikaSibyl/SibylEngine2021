@@ -26,7 +26,7 @@ namespace SIByL
 	void Material::OnDrawCall()
 	{
 		// Upload Per-Material parameters to GPU
-		m_ConstantsBuffer->UploadDataIfDirty();
+		m_ConstantsBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
 
 		m_ResourcesBuffer->UploadDataIfDirty();
 	}
