@@ -4,7 +4,7 @@ Entities:
     TagComponent:
       Tag: Empty Entity
     TransformComponent:
-      Translation: [0.582720041, 1.13214445, 0.404119611]
+      Translation: [0.582720041, 1.13214445, -0.643900156]
       EulerAngles: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshFilterComponent:

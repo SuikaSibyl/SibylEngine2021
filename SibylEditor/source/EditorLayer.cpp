@@ -107,7 +107,6 @@ namespace SIByLEditor
 		camera->SetCamera();
 		Renderer2D::GetMaterial()->SetPass();
 
-
 		//material->SetPass();
 		DrawItemPool& diPool = m_ActiveScene->GetDrawItems();
 		for (Ref<DrawItem> drawItem : diPool)
@@ -336,10 +335,22 @@ namespace SIByLEditor
 				glm::mat4 cameraView = camera->GetViewMatrix();
 				glm::mat4 cameraProj = camera->GetProjectionMatrix();
 
+				// Entity transform
 				auto& tc = selectedEntity.GetComponent<TransformComponent>();
 				glm::mat4 transform = tc.GetTransform();
 
-				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj), ImGuizmo::OPERATION(GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform));
+				// Snapping 
+				bool snap = Input::IsKeyPressed(SIByL_KEY_LEFT_CONTROL);
+				float snapValue = 0.5f;
+				if (GizmoType == ImGuizmo::OPERATION::ROTATE)
+					snapValue = 45.0f;
+
+				float snapValues[3] = { snapValue, snapValue ,snapValue };
+
+
+				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj),
+					ImGuizmo::OPERATION(GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform), 
+					nullptr, snap ? snapValues : nullptr);
 				
 				if (ImGuizmo::IsUsing())
 				{
