@@ -2,6 +2,19 @@
 
 namespace SIByL
 {
+	enum class TextureFormat
+	{
+		None = 0,
+		R8G8B8A8,
+		DEPTH24STENCIL8,
+	};
+
+	struct TextureDesc
+	{
+		TextureFormat Format;
+		unsigned int Width, Height;
+	};
+
 	class Image;
 
 	class Texture

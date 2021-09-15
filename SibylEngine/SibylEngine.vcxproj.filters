@@ -318,6 +318,18 @@
     <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLCommonResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12RenderTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1596,6 +1608,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLCommonResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12RenderTarget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

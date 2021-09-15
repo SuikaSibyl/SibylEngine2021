@@ -97,13 +97,13 @@ namespace SIByL
 
 	void OpenGLFrameBuffer::ClearRgba()
 	{
-		//glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	void OpenGLFrameBuffer::ClearDepthStencil()
 	{
-
+		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
 	Ref<Texture2D> OpenGLFrameBuffer::ColorAsTexutre()
