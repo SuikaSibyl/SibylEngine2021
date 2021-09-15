@@ -27,8 +27,28 @@ namespace SIByLEditor
 	Ref<Texture2D> EditorLayer::IconMesh   = nullptr;
 	Ref<Texture2D> EditorLayer::IconScene  = nullptr;
 	Ref<Texture2D> EditorLayer::IconFile   = nullptr;
+	Ref<Texture2D> EditorLayer::IconMaterial = nullptr;
+	Ref<Texture2D> EditorLayer::IconShader = nullptr;
 
 	Ref<TriangleMesh> m_Mesh = nullptr;
+
+	Ref<Texture2D> EditorLayer::GetIcon(const std::string& path)
+	{
+		std::string::size_type pos = path.rfind('.');
+		std::string ext = path.substr(pos == std::string::npos ? path.length() : pos + 1);
+		if (ext == "mat")
+			return EditorLayer::IconMaterial;
+		else if (ext == "fbx" || ext == "FBX")
+			return EditorLayer::IconMesh;
+		else if (ext == "png" || ext == "jpg")
+			return EditorLayer::IconImage;
+		else if (ext == "scene")
+			return EditorLayer::IconScene;
+		else if (ext == "glsl" || ext == "hlsl")
+			return EditorLayer::IconShader;
+
+		return EditorLayer::IconFile;
+	}
 
 	void EditorLayer::OnAttach()
 	{
@@ -42,12 +62,16 @@ namespace SIByLEditor
 		IconMesh = Texture2D::Create("../SibylEditor/assets/icons/mesh.png");
 		IconScene = Texture2D::Create("../SibylEditor/assets/icons/scene.png");
 		IconFile = Texture2D::Create("../SibylEditor/assets/icons/file.png");
+		IconMaterial = Texture2D::Create("../SibylEditor/assets/icons/material.png");
+		IconShader = Texture2D::Create("../SibylEditor/assets/icons/shader.png");
 
 		IconFolder->RegisterImGui();
 		IconImage->RegisterImGui();
 		IconMesh->RegisterImGui();
 		IconScene->RegisterImGui();
 		IconFile->RegisterImGui();
+		IconMaterial->RegisterImGui();
+		IconShader->RegisterImGui();
 	}
 
 	EditorLayer::~EditorLayer()
@@ -91,9 +115,9 @@ namespace SIByLEditor
 
 		m_ActiveScene->OnUpdate();
 
-		SIByL_CORE_INFO("FPS: {0}, {1} ms",
-			Application::Get().GetFrameTimer()->GetFPS(),
-			Application::Get().GetFrameTimer()->GetMsPF());
+		//SIByL_CORE_INFO("FPS: {0}, {1} ms",
+		//	Application::Get().GetFrameTimer()->GetFPS(),
+		//	Application::Get().GetFrameTimer()->GetMsPF());
 
 		if (m_ViewportFocused)
 			viewCameraController->OnUpdate();

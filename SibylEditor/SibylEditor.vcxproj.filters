@@ -30,6 +30,9 @@
     <ClCompile Include="source\Editor\Utility\DrawProperty.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Editor\Panels\InspectorPanel.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\EditorLayer.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Editor\Utility\DrawProperty.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Editor\Panels\InspectorPanel.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

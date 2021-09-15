@@ -149,9 +149,12 @@ namespace SIByL
 		out << YAML::Key << "Constants Buffer" << YAML::Value << YAML::BeginSeq;
 		
 		ShaderConstantsDesc* desc = m_Material->GetConstantsDesc();
-		for (auto& item : *desc)
+		if (desc != nullptr)
 		{
+			for (auto& item : *desc)
+			{
 
+			}
 		}
 		//m_Scene->m_Registry.each([&](auto entityID)
 		//	{

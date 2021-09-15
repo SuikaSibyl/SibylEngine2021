@@ -65,6 +65,9 @@ namespace SIByLEditor
 		static Ref<Texture2D> IconMesh;
 		static Ref<Texture2D> IconScene;
 		static Ref<Texture2D> IconFile;
+		static Ref<Texture2D> IconMaterial;
+		static Ref<Texture2D> IconShader;
+		static Ref<Texture2D> GetIcon(const std::string& path);
 
 		int GizmoType = -1;
 

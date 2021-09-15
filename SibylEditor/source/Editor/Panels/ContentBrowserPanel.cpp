@@ -5,6 +5,8 @@
 
 #include "EditorLayer.h"
 
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
+
 namespace SIByL
 {
 	constexpr const char* s_AssetsDirectory = "../Assets";
@@ -51,7 +53,7 @@ namespace SIByL
 
 			ImGui::PushID(filenameString.c_str());
 			// If is directory
-			Ref<Texture2D> icon = directoryEntry.is_directory() ? SIByLEditor::EditorLayer::IconFolder : SIByLEditor::EditorLayer::IconFile;
+			Ref<Texture2D> icon = directoryEntry.is_directory() ? SIByLEditor::EditorLayer::IconFolder : SIByLEditor::EditorLayer::GetIcon(filenameString);
 
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 			ImGui::ImageButton(icon->GetImGuiHandle(), { thumbnailSize,thumbnailSize }, { 0,1 }, { 1,0 });
@@ -79,6 +81,44 @@ namespace SIByL
 			ImGui::NextColumn();
 
 			ImGui::PopID();
+		}
+
+		////////////////////////////////////////////////////////////////////////////
+		//							   Add Material Tab						      //
+		////////////////////////////////////////////////////////////////////////////
+		static bool NewMaterial = false;
+		// Right-click on blank space
+		if (ImGui::BeginPopupContextWindow(0, 1, false))
+		{
+			if (ImGui::MenuItem("Create New Material"))
+			{
+				NewMaterial = true;
+			}
+
+			ImGui::EndPopup();
+		}
+
+		if (NewMaterial)
+		{
+			Ref<Texture2D> icon = SIByLEditor::EditorLayer::IconMaterial;
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			ImGui::ImageButton(icon->GetImGuiHandle(), { thumbnailSize,thumbnailSize }, { 0,1 }, { 1,0 });
+			ImGui::PopStyleColor();
+
+			//ImGui::ShowDemoWindow
+			static char buf[32] = "DefaultMaterial";
+			//static char buf[32] = u8"NIHONGO"; // <- this is how you would write it with C++11, using real kanjis
+			if (ImGui::InputText(" ", buf, IM_ARRAYSIZE(buf), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
+			{
+				NewMaterial = false;
+				Ref<Material> newMat = CreateRef<Material>();
+				MaterialSerializer matSerializer(newMat);
+				std::string fullPath = m_CurrentDirectory.string() + "/" + std::string(buf) + ".mat";
+				matSerializer.Serialize(fullPath);
+			}
+
+			//ImGui::TextWrapped(filenameString.c_str());
 		}
 
 		ImGui::End();
