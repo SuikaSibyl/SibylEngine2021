@@ -16,7 +16,7 @@ namespace SIByL
 #ifdef SIBYL_PLATFORM_CUDA
 			SCudaContext::Init();
 #else
-			SIByL_CORE_ERROR("FAIL TO LOAD CUDA!");
+			SIByL_CORE_ERROR("Please Compile With CUDA! Currently Cuda Module is Not Included");
 #endif // SIBYL_PLATFORM_CUDA
 		}
 	}

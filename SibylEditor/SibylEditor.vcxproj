@@ -45,8 +45,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='ReleaseCuda|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCuda|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -54,12 +58,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCuda|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -72,11 +83,17 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules\CudaModule\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Release;E:\CUDA102\Development\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules\CudaModule\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Release;$(CudaPath)/lib/x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Release;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCuda|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules\CudaModule\;$(SolutionDir)bin\$(Configuration)-$(Platform)\SibylEngine\;$(SolutionDir)bin\$(Configuration)-$(Platform)\yaml\;$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Release;$(CudaPath)/lib/x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
@@ -98,12 +115,15 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
+    <PostBuildEvent>
+      <Command>Copy "$(SolutionDir)vendor\assimp\library\Release\assimp-vc142-mt.dll" "$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\assimp-vc142-mt.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SIBYL_PLATFORM_CUDA;SIBYL_PLATFORM_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\assimp\include;$(SolutionDir)vendor\yaml\include;$(SolutionDir)SibylEditor\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -117,6 +137,9 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
+    <PostBuildEvent>
+      <Command>Copy "$(SolutionDir)vendor\assimp\library\Release\assimp-vc142-mt.dll" "$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\assimp-vc142-mt.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -139,6 +162,34 @@
     <Manifest>
       <EnableDpiAwareness>true</EnableDpiAwareness>
     </Manifest>
+    <PostBuildEvent>
+      <Command>Copy "$(SolutionDir)vendor\assimp\library\Release\assimp-vc142-mt.dll" "$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\assimp-vc142-mt.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseCuda|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>SIBYL_PLATFORM_CUDA;SIBYL_PLATFORM_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\assimp\include;$(SolutionDir)vendor\yaml\include;$(SolutionDir)SibylEditor\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc142-mt.lib;SibylEngine.lib;glfw3.lib;yaml.lib;CudaModule.lib;cudart.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>true</EnableDpiAwareness>
+    </Manifest>
+    <PostBuildEvent>
+      <Command>Copy "$(SolutionDir)vendor\assimp\library\Release\assimp-vc142-mt.dll" "$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\assimp-vc142-mt.dll"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\editor.cpp" />

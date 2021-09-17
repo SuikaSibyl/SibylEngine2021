@@ -1,5 +1,7 @@
 #pragma once
 
+class cudaDeviceProp;
+
 namespace SIByL
 {
 	class CudaContext
@@ -8,11 +10,17 @@ namespace SIByL
 		static void Init();
 
 
-		struct CudaDeviceInfo
+
+		struct CudaDevicesInfo
 		{
 			int DeviceCount = 0;
+			std::vector<cudaDeviceProp> Devices;
 		};
 
-		static CudaDeviceInfo s_DeviceInfo;
+		static CudaDevicesInfo s_DeviceInfo;
+
+	private:
+		static void DeviceQuery();
+		static bool CUDASupport;
 	};
 }
