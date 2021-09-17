@@ -15,7 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylExample", "SibylExampl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SibylEditor", "SibylEditor\SibylEditor.vcxproj", "{901A25EC-013A-49C3-87A6-5D8D4CCFDD22}"
 	ProjectSection(ProjectDependencies) = postProject
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39} = {AD31191E-887B-4A13-8960-7DCFEFCADC39}
 		{BCC5C14C-384A-4B5B-A826-2A5456C7D33B} = {BCC5C14C-384A-4B5B-A826-2A5456C7D33B}
 		{D5738559-A252-4307-BF8F-9F44E106E922} = {D5738559-A252-4307-BF8F-9F44E106E922}
 	EndProjectSection
@@ -25,8 +24,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{50BACD35-3468-4940-BFAE-5D8ECDEFA7B7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yaml", "vendor\yaml\yaml.vcxproj", "{D5738559-A252-4307-BF8F-9F44E106E922}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CudaModule", "Modules\CudaModule\CudaModule.vcxproj", "{AD31191E-887B-4A13-8960-7DCFEFCADC39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,29 +89,12 @@ Global
 		{D5738559-A252-4307-BF8F-9F44E106E922}.ReleaseCuda|x64.Build.0 = Release|x64
 		{D5738559-A252-4307-BF8F-9F44E106E922}.ReleaseCuda|x86.ActiveCfg = Release|Win32
 		{D5738559-A252-4307-BF8F-9F44E106E922}.ReleaseCuda|x86.Build.0 = Release|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Debug|x64.ActiveCfg = Debug|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Debug|x64.Build.0 = Debug|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Debug|x86.ActiveCfg = Debug|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Debug|x86.Build.0 = Debug|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.DebugCuda|x64.ActiveCfg = DebugCuda|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.DebugCuda|x64.Build.0 = DebugCuda|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.DebugCuda|x86.ActiveCfg = DebugCuda|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.DebugCuda|x86.Build.0 = DebugCuda|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Release|x64.ActiveCfg = Release|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Release|x64.Build.0 = Release|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Release|x86.ActiveCfg = Release|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.Release|x86.Build.0 = Release|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.ReleaseCuda|x64.ActiveCfg = Release|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.ReleaseCuda|x64.Build.0 = Release|x64
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.ReleaseCuda|x86.ActiveCfg = Release|Win32
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39}.ReleaseCuda|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D5738559-A252-4307-BF8F-9F44E106E922} = {50BACD35-3468-4940-BFAE-5D8ECDEFA7B7}
-		{AD31191E-887B-4A13-8960-7DCFEFCADC39} = {AAED3A2E-092C-4F55-84D2-9389696D5156}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D550D001-90EB-4AA5-B155-8644473D3487}

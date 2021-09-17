@@ -13,7 +13,11 @@ namespace SIByL
 		s_RayTracer = rayTracer; 
 		if (rayTracer == RayTracerRenderer::Cuda)
 		{
+#ifdef SIBYL_PLATFORM_CUDA
 			SCudaContext::Init();
+#else
+			SIByL_CORE_ERROR("FAIL TO LOAD CUDA!");
+#endif // SIBYL_PLATFORM_CUDA
 		}
 	}
 }
