@@ -5,6 +5,7 @@
 
 #include "EditorLayer.h"
 
+#include "Sibyl/ECS/Asset/AssetUtility.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByL
@@ -76,6 +77,25 @@ namespace SIByL
 					m_CurrentDirectory /= path.filename();
 				}
 			}
+
+			if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+			{
+				AssetType type = GetAssetType(filenameString);
+				switch (type)
+				{
+				case SIByL::AssetType::Unknown:
+					break;
+				case SIByL::AssetType::Material:
+				{
+					Ref<Material> mat = GetAssetByPath<Material>(relativePathString);
+					SIByLEditor::EditorLayer::s_InspectorPanel.SetSelectedMaterial(mat);
+					break;
+				}
+				default:
+					break;
+				}
+			}
+
 			ImGui::TextWrapped(filenameString.c_str());
 
 			ImGui::NextColumn();

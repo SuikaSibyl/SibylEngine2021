@@ -16,6 +16,8 @@ namespace SIByL
 	{
 		m_ConstantsTableBuffer = std::make_shared<DX12FrameResourceBuffer>(desc->Size);
 		m_ConstantsMapper = &desc->Mapper;
+
+		InitConstant();
 	}
 
 	void DX12ShaderConstantsBuffer::SetFloat(const std::string& name, const float& value)
@@ -148,6 +150,24 @@ namespace SIByL
 		m_IsDirty = true;
 	}
 
+	void DX12ShaderConstantsBuffer::InitConstant()
+	{
+		for each (auto & constant in *m_ConstantsMapper)
+		{
+			switch (constant.second.Type)
+			{
+			case ShaderDataType::RGBA:
+				SetFloat4(constant.first, { 0, 0, 0, 1 });
+				break;
+			case ShaderDataType::Float4:
+				SetFloat4(constant.first, { 0, 0, 0, 0 });
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
 	///////////////////////////////////////////////////////////////////////////////
 	//							DX12ShaderConstantsBuffer						///
 	///////////////////////////////////////////////////////////////////////////////

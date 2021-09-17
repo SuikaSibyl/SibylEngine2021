@@ -9,6 +9,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
 
 namespace SIByL
 {
@@ -61,8 +62,10 @@ namespace SIByL
 					//std::filesystem::path texturePath = path;
 					SIByL::MeshLoader meshLoader(meshFilter.Path, layout);
 					meshFilter.Mesh = meshLoader.GetTriangleMesh();
-
+					meshRenderer.SetMaterialNums(meshFilter.GetSubmeshNum());
 				}
+
+				int submeshIndex = 0;
 
 				for (auto& submesh : *(meshFilter.Mesh))
 				{
@@ -70,6 +73,7 @@ namespace SIByL
 					item->m_Mesh = meshFilter.Mesh;
 					item->m_SubMesh = &submesh;
 					item->m_ConstantsBuffer = meshFilter.PerObjectBuffer;
+					item->m_Material = meshRenderer.Materials[submeshIndex++];
 					DIPool.Push(item);
 				}
 			}

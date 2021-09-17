@@ -333,6 +333,9 @@
     <ClCompile Include="source\Platform\Cuda\Common\SCudaContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\ECS\Asset\AssetUtility.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1626,6 +1629,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\SIByLCompile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Asset\AssetUtility.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

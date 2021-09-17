@@ -123,7 +123,7 @@ namespace SIByL
 				for (int i = 0; i < component.MaterialNum; i++)
 				{
 					std::string slot = std::string("Material ") + std::to_string(i);
-					ImGui::Text(slot.c_str());
+					SIByLEditor::DrawMeshRendererMaterialSocket(slot, component, i);
 				}
 			});
 

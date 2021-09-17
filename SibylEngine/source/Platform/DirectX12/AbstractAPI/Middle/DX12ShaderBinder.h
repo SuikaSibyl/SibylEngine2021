@@ -33,6 +33,8 @@ namespace SIByL
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 		virtual void SetDirty() override;
 
+	protected:
+		virtual void InitConstant() override;
 
 	private:
 		friend class DX12ShaderBinder;

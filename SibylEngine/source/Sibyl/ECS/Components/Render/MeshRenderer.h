@@ -14,5 +14,6 @@ namespace SIByL
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(const MeshRendererComponent&) = default;
+		void SetMaterialNums(int num);
 	};
 }

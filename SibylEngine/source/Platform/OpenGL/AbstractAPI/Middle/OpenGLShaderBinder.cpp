@@ -11,6 +11,8 @@ namespace SIByL
 	{
 		m_CpuBuffer = new byte[desc->Size];
 		m_ConstantsMapper = &desc->Mapper;
+
+		InitConstant();
 	}
 
 	OpenGLShaderConstantsBuffer::~OpenGLShaderConstantsBuffer()
@@ -179,6 +181,25 @@ namespace SIByL
 	void OpenGLShaderConstantsBuffer::SetDirty()
 	{
 		m_IsDirty = true;
+	}
+
+	void OpenGLShaderConstantsBuffer::InitConstant()
+	{
+		for each (auto & constant in *m_ConstantsMapper)
+		{
+			switch (constant.second.Type)
+			{
+			case ShaderDataType::RGBA:
+				SetFloat4(constant.first, { 0, 0, 0, 1 });
+				break;
+			case ShaderDataType::Float4:
+				SetFloat4(constant.first, { 0, 0, 0, 0 });
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 
 	void OpenGLShaderConstantsBuffer::CopyMemoryToConstantsBuffer

@@ -108,6 +108,9 @@ namespace SIByL
 
 		virtual void UploadDataIfDirty(ShaderBinder* m_ShaderBinder) = 0;
 		virtual void SetDirty() = 0;
+
+	protected:
+		virtual void InitConstant() = 0;
 	};
 	//////////////////////////////////////////////
 

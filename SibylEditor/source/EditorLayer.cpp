@@ -141,11 +141,11 @@ namespace SIByLEditor
 		FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
 
 		camera->SetCamera();
-		Renderer2D::GetMaterial()->SetPass();
 
 		DrawItemPool& diPool = m_ActiveScene->GetDrawItems();
 		for (Ref<DrawItem> drawItem : diPool)
 		{
+			drawItem->m_Material->SetPass();
 			Graphic::CurrentCamera->OnDrawCall();
 			Graphic::CurrentMaterial->OnDrawCall();
 			drawItem->OnDrawCall();

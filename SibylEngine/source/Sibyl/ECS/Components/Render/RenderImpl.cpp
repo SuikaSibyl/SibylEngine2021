@@ -5,6 +5,7 @@
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
 
 namespace SIByL
 {
@@ -63,6 +64,15 @@ namespace SIByL
 	UINT MeshFilterComponent::GetSubmeshNum()
 	{
 		return Mesh->GetSubmesh();
+	}
+
+	void MeshRendererComponent::SetMaterialNums(int num)
+	{
+		MaterialNum = num;
+		for (int i = 0; i < num; i++)
+		{
+			Materials.emplace_back(Renderer2D::GetMaterial());
+		}
 	}
 
 }

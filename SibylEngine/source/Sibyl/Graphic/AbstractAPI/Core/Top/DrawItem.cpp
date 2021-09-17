@@ -6,6 +6,7 @@
 #include <Sibyl/Graphic/AbstractAPI/Core/Top/Material.h>
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByL
 {

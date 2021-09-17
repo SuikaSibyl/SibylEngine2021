@@ -8,6 +8,9 @@
 #include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/Core/Geometry/MeshLoader.h"
+#include "Sibyl/ECS/Asset/AssetUtility.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
+#include "EditorLayer.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -126,43 +129,33 @@ namespace SIByLEditor
 		ImGui::PopID();
 	}
 
-	void DrawShaderSlot(const std::string& label, SIByL::Ref<SIByL::Shader>* shader)
+	void DrawMeshRendererMaterialSocket(const std::string& label, SIByL::MeshRendererComponent& meshRenderer, int i)
+	{
+		ImGui::PushID(label.c_str());
+
+		ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f));
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				std::filesystem::path materialPath = path;
+				SIByL::Ref<SIByL::Material> mat = SIByL::GetAssetByPath<SIByL::Material>(materialPath.string());
+				meshRenderer.Materials[i] = mat;
+			}
+			ImGui::EndDragDropTarget();
+		}
+
+		ImGui::PopID();
+	}
+
+	void DrawShaderSlot(const std::string& label, SIByL::Material& material)
 	{
 		if (ImGui::Button("Select Shader"))
 			ImGui::OpenPopup("Shaders Library");
 
 		if (ImGui::BeginPopup("Shaders Library"))
 		{
-			//if (ImGui::MenuItem("Transform"))
-			//{
-			//	m_SelectContext.AddComponent<TransformComponent>();
-			//	ImGui::CloseCurrentPopup();
-			//}
-
-			//if (ImGui::MenuItem("SpriteRenderer"))
-			//{
-			//	m_SelectContext.AddComponent<SpriteRendererComponent>();
-			//	ImGui::CloseCurrentPopup();
-			//}
-
-			//if (ImGui::MenuItem("MeshFilter"))
-			//{
-			//	m_SelectContext.AddComponent<MeshFilterComponent>();
-			//	ImGui::CloseCurrentPopup();
-			//}
-
-			//if (ImGui::MenuItem("MeshRenderer"))
-			//{
-			//	if (m_SelectContext.HasComponent<MeshFilterComponent>())
-			//	{
-			//		MeshFilterComponent& meshFilter = m_SelectContext.GetComponent<MeshFilterComponent>();
-			//		UINT matNum = meshFilter.GetSubmeshNum();
-			//		MeshRendererComponent& meshRenderer = m_SelectContext.AddComponent<MeshRendererComponent>();
-			//		meshRenderer.MaterialNum = matNum;
-			//	}
-			//	ImGui::CloseCurrentPopup();
-			//}
-
 			static int selected = -1;
 			int index = 0;
 			for (auto& iter : SIByL::Library<SIByL::Shader>::Mapper)
@@ -170,25 +163,13 @@ namespace SIByLEditor
 				if (ImGui::Selectable(iter.first.c_str(), selected == index))
 				{
 					selected = index;
-					*shader = iter.second;
+					material.UseShader(iter.second);
 					ImGui::CloseCurrentPopup();
 				}
 				index++;
 			}
 
-			//for (int n = 0; n < 5; n++)
-			//{
-			//	char buf[32];
-			//	sprintf(buf, "Object %d", n);
-			//	if (ImGui::Selectable(buf, selected == n))
-			//		selected = n;
-			//}
-
 			ImGui::EndPopup();
-		}
-		for (auto& iter : SIByL::Library<SIByL::Shader>::Mapper)
-		{
-
 		}
 	}
 
@@ -206,32 +187,35 @@ namespace SIByLEditor
 			// If Material Already Exist
 			if (&material != nullptr)
 			{
-				DrawShaderSlot("Shader", &material.m_Shader);
+				DrawShaderSlot("Shader", material);
 
 				// ================================================================
 				// Draw constants
 				SIByL::ShaderConstantsDesc* constant = material.GetConstantsDesc();
 
-				for (auto iter : *constant)
+				if (constant != nullptr)
 				{
-					SIByL::ShaderConstantItem& item = iter.second;
-
-					ImGui::Text(item.Name.c_str());
-					ImGui::SameLine();
-
-					if (item.Type == SIByL::ShaderDataType::RGB)
+					for (auto iter : *constant)
 					{
+						SIByL::ShaderConstantItem& item = iter.second;
 
-					}
-					else if (item.Type == SIByL::ShaderDataType::RGBA)
-					{
-						ImGui::PushID(item.Name.c_str());
-						float* color = material.PtrFloat4(item.Name);
-						if (ImGui::ColorEdit4(" ", color))
+						ImGui::Text(item.Name.c_str());
+						ImGui::SameLine();
+
+						if (item.Type == SIByL::ShaderDataType::RGB)
 						{
-							material.SetDirty();
+
 						}
-						ImGui::PopID();
+						else if (item.Type == SIByL::ShaderDataType::RGBA)
+						{
+							ImGui::PushID(item.Name.c_str());
+							float* color = material.PtrFloat4(item.Name);
+							if (ImGui::ColorEdit4(" ", color))
+							{
+								material.SetDirty();
+							}
+							ImGui::PopID();
+						}
 					}
 				}
 
@@ -239,11 +223,14 @@ namespace SIByLEditor
 				// Draw resources
 				SIByL::ShaderResourcesDesc* resources = material.GetResourcesDesc();
 
-				for (auto iter : *resources)
+				if (resources != nullptr)
 				{
-					SIByL::ShaderResourceItem& item = iter.second;
+					for (auto iter : *resources)
+					{
+						SIByL::ShaderResourceItem& item = iter.second;
 
-					DrawTexture2D(material, item);
+						DrawTexture2D(material, item);
+					}
 				}
 			}
 			// If Material Not Exist Yet

@@ -30,6 +30,9 @@ namespace SIByL
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 		virtual void SetDirty() override;
 
+	protected:
+		virtual void InitConstant() override;
+
 	private:
 		void CopyMemoryToConstantsBuffer(void* data, uint32_t offset, uint32_t length);
 		void CopyMemoryFromConstantsBuffer(void* data, uint32_t offset, uint32_t length);
