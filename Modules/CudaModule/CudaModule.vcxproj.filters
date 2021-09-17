@@ -21,12 +21,18 @@
     <ClInclude Include="source\CudaModulePCH.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\CudaModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\core\CudaContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\core\CudaModulePCH.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

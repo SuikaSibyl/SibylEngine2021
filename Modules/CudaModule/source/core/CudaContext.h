@@ -4,6 +4,7 @@ namespace SIByL
 {
 	class CudaContext
 	{
+	public:
 		static void Init();
 
 

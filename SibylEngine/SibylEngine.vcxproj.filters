@@ -330,7 +330,7 @@
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\Cuda\Common\CudaContext.cpp">
+    <ClCompile Include="source\Platform\Cuda\Common\SCudaContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1400,7 +1400,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\Cuda\Common\CudaContext.h">
+    <ClInclude Include="source\Platform\Cuda\Common\SCudaContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h">
@@ -1623,6 +1623,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SIByLCompile.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugCuda|x64">
+      <Configuration>DebugCuda</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseCuda|x64">
+      <Configuration>ReleaseCuda</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
@@ -24,12 +32,21 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='ReleaseCuda|x64'">
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -39,11 +56,20 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
+    <LibraryPath>$(SolutionDir)SibylEngine\vendor\glfw\lib;$(SolutionDir)vendor\assimp\library\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
@@ -61,7 +87,28 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -84,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -102,7 +149,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\Platform\Cuda\Common\CudaContext.cpp" />
+    <ClCompile Include="source\Platform\Cuda\Common\SCudaContext.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12CommonResource.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Resource.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.cpp" />
@@ -159,6 +206,7 @@
     <ClCompile Include="source\Sibyl\Core\Input.cpp" />
     <ClCompile Include="source\Sibyl\Core\SIByLpch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugCuda|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Core\Application.cpp" />
@@ -213,7 +261,8 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Platform\Cuda\Common\CudaContext.h" />
+    <ClInclude Include="source\Platform\Cuda\Common\SCudaContext.h" />
+    <ClInclude Include="source\SIByLCompile.h" />
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandQueue.h" />
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12CommonResource.h" />
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Resource.h" />
@@ -784,6 +833,11 @@
     <None Include="vendor\glm\glm\gtx\vector_angle.inl" />
     <None Include="vendor\glm\glm\gtx\vector_query.inl" />
     <None Include="vendor\glm\glm\gtx\wrap.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\CudaModule\CudaModule.vcxproj">
+      <Project>{ad31191e-887b-4a13-8960-7dcfefcadc39}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

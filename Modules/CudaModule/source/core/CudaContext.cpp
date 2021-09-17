@@ -1,6 +1,9 @@
 #include "CudaModulePCH.h"
 #include "CudaContext.h"
 
+#include <cuda_runtime.h>
+#include <helper_cuda.h>
+
 namespace SIByL
 {
 	CudaContext::CudaDeviceInfo CudaContext::s_DeviceInfo;

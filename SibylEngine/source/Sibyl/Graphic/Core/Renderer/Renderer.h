@@ -21,7 +21,7 @@ namespace SIByL
 	{
 	public:
 		static inline void SetRaster(RasterRenderer raster) { s_Raster = raster; }
-		static inline void SetRayTracer(RayTracerRenderer rayTracer) { s_RayTracer = rayTracer; }
+		static void SetRayTracer(RayTracerRenderer rayTracer);
 
 		static inline RasterRenderer GetRaster() { return s_Raster; }
 		static inline RayTracerRenderer GetRayTracer() { return s_RayTracer; }
