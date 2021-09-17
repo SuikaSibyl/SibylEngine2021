@@ -95,10 +95,13 @@ namespace SIByL
         Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
         Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
         
-        DX12Context::SetInFlightSCmdList(cmdList);
+        if (cmdList != nullptr)
+        {
+            DX12Context::SetInFlightSCmdList(cmdList);
 
-        uint64_t fence = cmdQueue->Signal();
-        cmdQueue->WaitForFenceValue(fence);
+            uint64_t fence = cmdQueue->Signal();
+            cmdQueue->WaitForFenceValue(fence);
+        }
     }
 
     void DX12Resource::SetD3D12Resource(ComPtr<ID3D12Resource> d3d12Resource, const D3D12_CLEAR_VALUE* clearValue)

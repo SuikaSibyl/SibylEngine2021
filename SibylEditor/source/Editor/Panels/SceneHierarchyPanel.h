@@ -8,13 +8,14 @@ namespace SIByL
 	class SceneHierarchyPanel
 	{
 	public:
+		SceneHierarchyPanel() {}
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 
 		void SetContext(const Ref<Scene>& scene);
 		
 		void OnImGuiRender();
 
-		Entity GetSelectedEntity() const { return m_SelectContext; }
+		Entity GetSelectedEntity() const;
 
 	private:
 		void DrawEntityNode(Entity entity);
@@ -22,7 +23,6 @@ namespace SIByL
 
 	private:
 		Ref<Scene> m_Context;
-		Entity m_SelectContext;
 		friend class Scene;
 	};
 }

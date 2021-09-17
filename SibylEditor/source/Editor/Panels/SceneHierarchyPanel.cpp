@@ -10,6 +10,7 @@
 #include "imgui_internal.h"
 
 #include "Editor/Utility/DrawProperty.h"
+#include "EditorLayer.h"
 
 namespace SIByL
 {
@@ -21,7 +22,6 @@ namespace SIByL
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
-		m_SelectContext = {};
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
@@ -37,7 +37,7 @@ namespace SIByL
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			{
-				m_SelectContext = {};
+				SIByLEditor::EditorLayer::s_InspectorPanel.m_SelectEntity = {};
 			}
 
 			// Right-click on blank space
@@ -50,29 +50,21 @@ namespace SIByL
 			}
 			ImGui::End();
 		}
-
-
-		{
-			ImGui::Begin("Inspector");
-			if (m_SelectContext)
-			{
-				DrawComponents(m_SelectContext);
-			}
-			ImGui::End();
-		}
 	}
+
+	Entity SceneHierarchyPanel::GetSelectedEntity() const { return SIByLEditor::EditorLayer::s_InspectorPanel.m_SelectEntity; }
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
 		TagComponent& tag = entity.GetComponent<TagComponent>();
 
-		ImGuiTreeNodeFlags flags = ((m_SelectContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		ImGuiTreeNodeFlags flags = ((SIByLEditor::EditorLayer::s_InspectorPanel.m_SelectEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.Tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
-			m_SelectContext = entity;
+			SIByLEditor::EditorLayer::s_InspectorPanel.SetSelectedEntity(entity);
 		}
 
 		bool entityDeleted = false;
@@ -87,7 +79,7 @@ namespace SIByL
 
 		if (opened)
 		{
-			ImGuiTreeNodeFlags flags = ((m_SelectContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+			ImGuiTreeNodeFlags flags = ((SIByLEditor::EditorLayer::s_InspectorPanel.m_SelectEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 			bool opened = ImGui::TreeNodeEx((void*)1000, flags, tag.Tag.c_str());
 			if (opened)
 				ImGui::TreePop();
@@ -97,141 +89,11 @@ namespace SIByL
 		if (entityDeleted)
 		{
 			m_Context->DestroyEntity(entity);
-			if (m_SelectContext == entity)
+			if (SIByLEditor::EditorLayer::s_InspectorPanel.m_SelectEntity == entity)
 			{
-				m_SelectContext = {};
+				SIByLEditor::EditorLayer::s_InspectorPanel.SetSelectedEntity({});
 			}
 		}
 	}
 
-	template<typename T, typename UIFunction>
-	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
-	{
-		const ImGuiTreeNodeFlags treeNodeFlags = 
-			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding | 
-			ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
-
-		if (entity.HasComponent<T>())
-		{
-			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
-
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImGui::Separator();
-			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-			ImGui::PopStyleVar();
-			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5);
-			if (ImGui::Button("+", ImVec2{ lineHeight, lineHeight }))
-			{
-				ImGui::OpenPopup("ComponentSettings");
-			}
-
-			bool removeComponent = false;
-			if (ImGui::BeginPopup("ComponentSettings"))
-			{
-				if (ImGui::MenuItem("Remove Component"))
-					removeComponent = true;
-				ImGui::EndPopup();
-			}
-			if (open)
-			{
-				T& component = entity.GetComponent<T>();
-				uiFunction(component);
-				ImGui::TreePop();
-			}
-
-
-			if (removeComponent)
-				entity.RemoveComponent<T>();
-		}
-	}
-
-	void SceneHierarchyPanel::DrawComponents(Entity entity)
-	{
-		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap;
-
-		if (entity.HasComponent<TagComponent>())
-		{
-			std::string& tag = entity.GetComponent<TagComponent>().Tag;
-
-			char buffer[256];
-			memset(buffer, 0, sizeof(buffer));
-			strcpy_s(buffer, tag.c_str());
-			if (ImGui::InputText(" ", buffer, sizeof(buffer)))
-			{
-				tag = std::string(buffer);
-			}
-		}
-
-		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
-			{
-				SIByLEditor::DrawVec3Control("Translation", component.Translation);
-				SIByLEditor::DrawVec3Control("Scale", component.Scale);
-				SIByLEditor::DrawVec3Control("Rotation", component.EulerAngles);
-			});
-
-		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
-			{
-				SIByLEditor::DrawMaterial("Material", *component.Material);
-			});
-
-		DrawComponent<MeshFilterComponent>("Mesh Filter", entity, [](auto& component)
-			{
-				SIByLEditor::DrawTriangleMeshSocket("Mesh", component);
-			});
-
-		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
-			{
-				for (int i = 0; i < component.MaterialNum; i++)
-				{
-					std::string slot = std::string("Material ") + std::to_string(i);
-					ImGui::Text(slot.c_str());
-				}
-			});
-
-		{			
-			ImGui::Separator();
-			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
-			ImVec2 buttonSize(200, 30);
-
-			ImGui::SetCursorPosX(contentRegionAvailable.x / 2 - 100);
-			if (ImGui::Button("Add Component", buttonSize))
-				ImGui::OpenPopup("AddComponent");
-
-			if (ImGui::BeginPopup("AddComponent"))
-			{
-				if (ImGui::MenuItem("Transform"))
-				{
-					m_SelectContext.AddComponent<TransformComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("SpriteRenderer"))
-				{
-					m_SelectContext.AddComponent<SpriteRendererComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("MeshFilter"))
-				{
-					m_SelectContext.AddComponent<MeshFilterComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("MeshRenderer"))
-				{
-					if (m_SelectContext.HasComponent<MeshFilterComponent>())
-					{
-						MeshFilterComponent& meshFilter = m_SelectContext.GetComponent<MeshFilterComponent>();
-						UINT matNum = meshFilter.GetSubmeshNum();
-						MeshRendererComponent& meshRenderer = m_SelectContext.AddComponent<MeshRendererComponent>();
-						meshRenderer.MaterialNum = matNum;
-					}
-					ImGui::CloseCurrentPopup();
-				}
-
-				ImGui::EndPopup();
-			}
-		}
-	}
 }

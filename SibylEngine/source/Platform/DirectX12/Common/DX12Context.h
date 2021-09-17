@@ -70,7 +70,7 @@ namespace SIByL
 		// ====================================================================
 	public:
 		static ID3D12CommandQueue* GetCommandQueue();
-		static Ref<DX12CommandQueue> GetSCommandQueue() { return Main->m_SGraphicQueue; }
+		static Ref<DX12CommandQueue> GetSCommandQueue();
 		static ID3D12GraphicsCommandList* GetInFlightDXGraphicCommandList();
 		static Ref<DX12CommandList> GetInFlightSCmdList() { return Main->m_InFlightSCmdList; }
 		static void SetInFlightSCmdList(Ref<DX12CommandList> cmdList) { Main->m_InFlightSCmdList = cmdList; }

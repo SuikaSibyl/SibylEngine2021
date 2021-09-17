@@ -218,6 +218,12 @@ namespace SIByL
 		return Main->m_SGraphicQueue->GetD3D12CommandQueue().Get();
 	}
 
+	Ref<DX12CommandQueue> DX12Context::GetSCommandQueue()
+	{
+		//Main->m_SGraphicQueue==empty
+		return (Main->m_SGraphicQueue != nullptr) ? Main->m_SGraphicQueue : nullptr;
+	}
+
 	ID3D12GraphicsCommandList* DX12Context::GetInFlightDXGraphicCommandList()
 	{
 		return GetInFlightSCmdList()->GetGraphicsCommandList().Get();

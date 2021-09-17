@@ -2,6 +2,7 @@
 #include <SIByL.h>
 #include "Editor/Panels/SceneHierarchyPanel.h"
 #include "Editor/Panels/ContentBrowserPanel.h"
+#include "Editor/Panels/InspectorPanel.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 
 #include "Sibyl/Graphic/AbstractAPI/Library/FrameBufferLibrary.h"
@@ -49,8 +50,9 @@ namespace SIByLEditor
 		Ref<FrameBuffer> m_FrameBuffer;
 		Ref<Scene> m_ActiveScene;
 
-		Ref<SceneHierarchyPanel> m_SceneHierarchyPanel;
-		ContentBrowserPanel m_ContentBrowserPanel;
+		static SceneHierarchyPanel	s_SceneHierarchyPanel;
+		static ContentBrowserPanel	s_ContentBrowserPanel;
+		static InspectorPanel		s_InspectorPanel;
 
 		Entity m_SqureTest;
 		/////////////////////

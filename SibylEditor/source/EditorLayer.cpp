@@ -22,6 +22,10 @@
 
 namespace SIByLEditor
 {
+	SceneHierarchyPanel EditorLayer::s_SceneHierarchyPanel;
+	ContentBrowserPanel EditorLayer::s_ContentBrowserPanel;
+	InspectorPanel		EditorLayer::s_InspectorPanel;
+
 	Ref<Texture2D> EditorLayer::IconFolder = nullptr;
 	Ref<Texture2D> EditorLayer::IconImage  = nullptr;
 	Ref<Texture2D> EditorLayer::IconMesh   = nullptr;
@@ -53,7 +57,7 @@ namespace SIByLEditor
 	void EditorLayer::OnAttach()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		m_SceneHierarchyPanel = CreateRef<SceneHierarchyPanel>(m_ActiveScene);
+		s_SceneHierarchyPanel = SceneHierarchyPanel(m_ActiveScene);
 
 		Image image(8, 8, 4, { 0.1,0.2,0.3,1 });
 
@@ -79,6 +83,14 @@ namespace SIByLEditor
 		IconFolder = nullptr;
 		IconImage = nullptr;
 		IconMesh = nullptr;
+		IconScene = nullptr;
+		IconFile = nullptr;
+		IconMaterial = nullptr;
+		IconShader = nullptr;
+
+		s_SceneHierarchyPanel = SceneHierarchyPanel();
+		s_ContentBrowserPanel = ContentBrowserPanel();
+		s_InspectorPanel = InspectorPanel();
 	}
 
 	void EditorLayer::OnInitResource()
@@ -206,7 +218,7 @@ namespace SIByLEditor
 		m_ActiveScene = CreateRef<Scene>();
 		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 		camera->Resize(m_ViewportSize.x, m_ViewportSize.y);
-		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+		s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 	void EditorLayer::OpenScene()
 	{
@@ -216,7 +228,7 @@ namespace SIByLEditor
 			m_ActiveScene = CreateRef<Scene>();
 			m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
 			camera->Resize(m_ViewportSize.x, m_ViewportSize.y);
-			m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+			s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serialzier(m_ActiveScene);
 			serialzier.Deserialize(filepath);
@@ -345,7 +357,7 @@ namespace SIByLEditor
 				viewportPanelSize.x,
 				viewportPanelSize.y });
 
-			Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
+			Entity selectedEntity = s_SceneHierarchyPanel.GetSelectedEntity();
 			if (selectedEntity && GizmoType != -1)
 			{
 				ImGuizmo::SetOrthographic(false);
@@ -401,8 +413,9 @@ namespace SIByLEditor
 		//////////////////////////////////////////////
 		// Scene Hierarchy
 		//////////////////////////////////////////////
-		m_SceneHierarchyPanel->OnImGuiRender();
-		m_ContentBrowserPanel.OnImGuiRender();
+		s_SceneHierarchyPanel.OnImGuiRender();
+		s_ContentBrowserPanel.OnImGuiRender();
+		s_InspectorPanel.OnImGuiRender();
 
 		ImGui::End();
 	}
