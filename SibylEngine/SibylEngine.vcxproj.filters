@@ -330,6 +330,9 @@
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Platform\Cuda\Common\CudaContext.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">

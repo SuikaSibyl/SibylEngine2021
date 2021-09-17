@@ -102,6 +102,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\Platform\Cuda\Common\CudaContext.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12CommonResource.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Resource.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.cpp" />
