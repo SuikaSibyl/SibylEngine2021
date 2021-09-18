@@ -12,6 +12,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 #include "EditorLayer.h"
 
+#include "Sibyl/ECS/Asset/AssetUtility.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -93,7 +94,7 @@ namespace SIByLEditor
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
 				std::filesystem::path texturePath = std::filesystem::path("../Assets/") / path;
-				SIByL::Ref<SIByL::Texture2D> texture = SIByL::Texture2D::Create(texturePath.string());
+				SIByL::Ref<SIByL::Texture2D> texture = SIByL::Library<SIByL::Texture2D>::Fetch(PathToIdentifier(texturePath.string()));
 				material.SetTexture2D(item.Name, texture);
 			}
 			ImGui::EndDragDropTarget();
