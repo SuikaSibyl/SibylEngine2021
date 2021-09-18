@@ -192,6 +192,7 @@ namespace SIByL
 		{
 			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
 			m_SrvDynamicDescriptorHeap->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
+			m_ResourcesMapper->SetTextureID(name, texture->Identifer);
 		}
 	}
 

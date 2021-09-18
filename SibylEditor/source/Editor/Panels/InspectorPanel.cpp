@@ -78,7 +78,6 @@ namespace SIByL
 				ImGui::TreePop();
 			}
 
-
 			if (removeComponent)
 				entity.RemoveComponent<T>();
 		}
@@ -163,7 +162,7 @@ namespace SIByL
 						MeshFilterComponent& meshFilter = m_SelectEntity.GetComponent<MeshFilterComponent>();
 						UINT matNum = meshFilter.GetSubmeshNum();
 						MeshRendererComponent& meshRenderer = m_SelectEntity.AddComponent<MeshRendererComponent>();
-						meshRenderer.MaterialNum = matNum;
+						meshRenderer.SetMaterialNums(matNum);
 					}
 					ImGui::CloseCurrentPopup();
 				}

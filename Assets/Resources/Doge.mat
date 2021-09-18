@@ -1,3 +1,13 @@
-Material: Unamed
+Material: Untitled
+Shader: Shaders/SIByL/Texture
 Constants Buffer:
-  []
+  - CONSTANT: 0
+    INFO:
+      Type: 13
+      Name: Color
+      Value: [1, 0.999989986, 0.999989986, 1]
+Textures:
+  - TEXTURE: 0
+    INFO:
+      Name: Main
+      ID: FILE=..\Assets\Resources\Textures\doge4.png

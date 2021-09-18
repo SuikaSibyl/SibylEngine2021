@@ -57,17 +57,19 @@ namespace SIByL
 		ShaderResourceType Type;
 		int SRTIndex;
 		int Offset;
+		std::string TextureID;
 	};
 	class ResourcesMapper
 	{
 	public:
 		void InsertResource(const ShaderResourceItem& element);
 		bool FetchResource(std::string name, ShaderResourceItem& buffer);
+		bool SetTextureID(std::string name, std::string ID);
 		//m_Mapper.begin()
 		using iterator = std::unordered_map<std::string, ShaderResourceItem>::iterator;
 		iterator begin() { return m_Mapper.begin(); }
 		iterator end() { return m_Mapper.end(); }
-
+		
 	private:
 		std::unordered_map<std::string, ShaderResourceItem> m_Mapper;
 	};

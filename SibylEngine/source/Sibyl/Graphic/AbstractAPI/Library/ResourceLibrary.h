@@ -42,7 +42,9 @@ namespace SIByL
 			return Mapper[id];
 		}
 		else
+		{
 			return nullptr;
+		}
 	}
 
 	template<class T>
@@ -63,4 +65,7 @@ namespace SIByL
 	template<class T>
 	std::unordered_map<std::string, Ref<T>> Library<T>::Mapper;
 
+	class Texture2D;
+	template< >
+	Ref<Texture2D> Library<Texture2D>::Fetch(const std::string& id);
 }

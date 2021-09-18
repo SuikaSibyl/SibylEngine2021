@@ -180,8 +180,29 @@ namespace SIByLEditor
 
 	void DrawMaterial(const std::string& label, SIByL::Material& material)
 	{
-		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-		bool opened = ImGui::TreeNodeEx((void*)1000, flags, "Material");
+		const ImGuiTreeNodeFlags treeNodeFlags =
+			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding |
+			ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
+
+		std::string title = "Material : " + label;
+		if (material.IsAssetDirty)
+		{
+			title += "*";
+		}
+
+		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4,4 });
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImGui::Separator();
+		bool opened = ImGui::TreeNodeEx((void*)1000, treeNodeFlags, title.c_str());
+		ImGui::PopStyleVar();
+		if (material.IsAssetDirty)
+		{
+			ImGui::SameLine(contentRegionAvailable.x - lineHeight * 1);
+			if (ImGui::Button("Save"))
+				material.SaveAsset();
+		}
+
 		if (opened)
 		{
 			// If Material Already Exist
@@ -213,6 +234,7 @@ namespace SIByLEditor
 							if (ImGui::ColorEdit4(" ", color))
 							{
 								material.SetDirty();
+								material.SetAssetDirty();
 							}
 							ImGui::PopID();
 						}

@@ -239,6 +239,7 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
     <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Asset\AssetUtility.cpp" />
+    <ClCompile Include="source\Sibyl\ECS\Asset\CustomAsset.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Common\CommonUnity.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Render\RenderImpl.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\ViewCameraController.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h" />
     <ClInclude Include="source\Sibyl\Basic\Utils\PlatformUtils.h" />
     <ClInclude Include="source\Sibyl\ECS\Asset\AssetUtility.h" />
+    <ClInclude Include="source\Sibyl\ECS\Asset\CustomAsset.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Camera.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Tag.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Components.h" />

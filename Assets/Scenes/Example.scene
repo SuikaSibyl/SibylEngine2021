@@ -10,7 +10,16 @@ Entities:
     MeshFilterComponent:
       Mesh: Resources\Meshes\1.FBX
     MeshRendererComponent:
-      {}
+      Materials:
+        - Material: 0
+          INFO:
+            Path: Resources\Doge.mat
+        - Material: 1
+          INFO:
+            Path: Resources\Doge.mat
+        - Material: 2
+          INFO:
+            Path: Resources\Doge.mat
   - Entity: 124531623461
     TagComponent:
       Tag: Little Girl
@@ -21,4 +30,13 @@ Entities:
     MeshFilterComponent:
       Mesh: Resources\Meshes\Little.fbx
     MeshRendererComponent:
-      {}
+      Materials:
+        - Material: 0
+          INFO:
+            Path: NONE
+        - Material: 1
+          INFO:
+            Path: NONE
+        - Material: 2
+          INFO:
+            Path: NONE

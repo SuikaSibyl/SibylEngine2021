@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Sibyl/ECS/Asset/CustomAsset.h"
 
 namespace SIByL
 {
@@ -21,7 +22,7 @@ namespace SIByL
 	class ShaderConstantsDesc;
 	class ShaderResourcesDesc;
 
-	class Material
+	class Material :public CustomAsset
 	{
 	public:
 		void SetPass();
@@ -57,6 +58,11 @@ namespace SIByL
 		///							Fetcher								 ///
 		ShaderConstantsDesc* GetConstantsDesc();
 		ShaderResourcesDesc* GetResourcesDesc();
+		Ref<Shader> GetShaderUsed() { return m_Shader; }
+
+		////////////////////////////////////////////////////////////////////
+		///						Custom Asset							 ///
+		virtual void SaveAsset() override;
 
 	private:
 		Ref<Shader> m_Shader = nullptr;

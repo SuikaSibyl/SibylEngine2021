@@ -13,36 +13,44 @@ namespace SIByL
 	Ref<Texture2D> Texture2D::Create(const std::string& path)
 	{
 		std::string id = GetPathID(path);
+		
+		Ref<Texture2D> image = nullptr;
 
-		Ref<Texture2D> image = Library<Texture2D>::Fetch(id);
-
-		if (image == nullptr)
+		switch (Renderer::GetRaster())
 		{
-			switch (Renderer::GetRaster())
-			{
-			case RasterRenderer::OpenGL: image = std::make_shared<OpenGLTexture2D>(AssetRoot + path); break;
-			case RasterRenderer::DirectX12: image = std::make_shared<DX12Texture2D>(AssetRoot + path); break;
-			case RasterRenderer::CpuSoftware: image = nullptr; break;
-			case RasterRenderer::GpuSoftware: image = nullptr; break;
-			default: image = nullptr; break;
-			}
-
-			Library<Texture2D>::Push(id, image);
+		case RasterRenderer::OpenGL: image = std::make_shared<OpenGLTexture2D>(AssetRoot + path); break;
+		case RasterRenderer::DirectX12: image = std::make_shared<DX12Texture2D>(AssetRoot + path); break;
+		case RasterRenderer::CpuSoftware: image = nullptr; break;
+		case RasterRenderer::GpuSoftware: image = nullptr; break;
+		default: image = nullptr; break;
 		}
+
+		image->Identifer = id;
+		Library<Texture2D>::Push(id, image);
 
 		return image;
 	}
 
-	Ref<Texture2D> Texture2D::Create(Ref<Image> image)
+	Ref<Texture2D> Texture2D::Create(Ref<Image> image, const std::string ID)
 	{
-		switch (Renderer::GetRaster())
+		std::string id = "PROCEDURE=" + ID;
+		Ref<Texture2D> texture = Library<Texture2D>::Fetch(id);
+
+		if (texture == nullptr)
 		{
-		case RasterRenderer::OpenGL: return std::make_shared<OpenGLTexture2D>(image); break;
-		case RasterRenderer::DirectX12: return std::make_shared<DX12Texture2D>(image); break;
-		case RasterRenderer::CpuSoftware: return nullptr; break;
-		case RasterRenderer::GpuSoftware: return nullptr; break;
-		default: return nullptr; break;
+			switch (Renderer::GetRaster())
+			{
+			case RasterRenderer::OpenGL: texture = std::make_shared<OpenGLTexture2D>(image); break;
+			case RasterRenderer::DirectX12: texture = std::make_shared<DX12Texture2D>(image); break;
+			case RasterRenderer::CpuSoftware: texture = nullptr; break;
+			case RasterRenderer::GpuSoftware: texture = nullptr; break;
+			default: texture = nullptr; break;
+			}
+
+			texture->Identifer = id;
+			Library<Texture2D>::Push(id, texture);
 		}
-		return nullptr;
+
+		return texture;
 	}
 }

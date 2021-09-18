@@ -82,7 +82,7 @@ namespace SIByL
 			innerIndex = 0;
 			for (auto bufferElement : resourceBuffer)
 			{
-				m_ShaderResourceDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
+				m_ShaderResourceDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex, "PROCEDURE=White"});
 				m_ResourcesMapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
 				innerIndex++;
 			}
@@ -136,6 +136,21 @@ namespace SIByL
 		else
 		{
 			buffer = m_Mapper[name];
+			return true;
+		}
+	}
+
+	bool ResourcesMapper::SetTextureID(std::string name, std::string ID)
+	{
+		// If the name already exists
+		if (m_Mapper.find(name) == m_Mapper.end())
+		{
+			SIByL_CORE_ERROR("Shader Resource \'{0}\'Not Found!", name);
+			return false;
+		}
+		else
+		{
+			m_Mapper[name].TextureID = ID;
 			return true;
 		}
 	}

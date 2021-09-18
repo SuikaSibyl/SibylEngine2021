@@ -2,12 +2,15 @@
 #include "SceneSerializer.h"
 
 #include "yaml-cpp/yaml.h"
+#include "yaml-cpp/node/node.h"
 #include "Sibyl/ECS/Core/SerializeUtility.h"
 
 #include "Sibyl/ECS/Core/Entity.h"
 #include "Sibyl/ECS/Components/Components.h"
 
+#include "Sibyl/ECS/Asset/AssetUtility.h"
 #include "Sibyl/Graphic/Core/Geometry/MeshLoader.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByL
 {
@@ -62,9 +65,25 @@ namespace SIByL
 			out << YAML::Key << "MeshRendererComponent";
 			out << YAML::BeginMap;
 
-			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
-			//out << YAML::Key << "Mesh" << YAML::Value << meshFilter.Mesh;
+			out << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
 
+			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
+
+			int i = 0;
+			for (auto subMaterial : meshRenderer.Materials)
+			{
+				out << YAML::BeginMap;
+				out << YAML::Key << "Material" << YAML::Value << i++;
+				
+				out << YAML::Key << "INFO";
+				out << YAML::BeginMap;
+				out << YAML::Key << "Path" << YAML::Value << subMaterial->GetSavePath();
+				out << YAML::EndMap;
+
+				out << YAML::EndMap;
+			}
+
+			out << YAML::EndSeq;
 			out << YAML::EndMap;
 		}
 
@@ -157,7 +176,20 @@ namespace SIByL
 				auto meshRendererComponent = entity["MeshRendererComponent"];
 				if (meshRendererComponent)
 				{
-					auto& tc = deserializedEntity.AddComponent<MeshRendererComponent>();
+					auto& mrc = deserializedEntity.AddComponent<MeshRendererComponent>();
+					YAML::Node materials = meshRendererComponent["Materials"];
+					if (materials)
+					{
+						mrc.SetMaterialNums(materials.size());
+						int materialInd = 0;
+						for (auto material : materials)
+						{
+							auto info = material["INFO"];
+							std::string relativePathString = info["Path"].as<std::string>();
+							if (relativePathString != "NONE")
+								mrc.Materials[materialInd++] = GetAssetByPath<Material>(relativePathString);
+						}
+					}
 				}
 			}
 		}

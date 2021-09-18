@@ -13,6 +13,9 @@ namespace SIByL
 
 	std::string GetSuffix(const std::string& path);
 	AssetType GetAssetType(const std::string& path);
+	std::string PathToIdentifier(std::string path);
+	std::string IdentifierToPath(std::string path);
+	bool IsIdentifierFromPath(std::string id);
 
 	template<class T>
 	Ref<T> GetAssetByPath(std::string path)
@@ -21,6 +24,7 @@ namespace SIByL
 		if (ref == nullptr)
 		{
 			Ref<Material> mat = CreateRef<Material>();
+			mat->SetSavePath(path);
 			MaterialSerializer serializer(mat);
 			serializer.Deserialize(path);
 			Library<T>::Push(path, mat);

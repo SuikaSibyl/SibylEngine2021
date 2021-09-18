@@ -42,10 +42,12 @@ namespace SIByL
 	public:
 		virtual ~Texture2D() = default;
 		static Ref<Texture2D> Create(const std::string & path);
-		static Ref<Texture2D> Create(Ref<Image> image);
+		static Ref<Texture2D> Create(Ref<Image> image, const std::string ID);
 
 		virtual void RegisterImGui() {}
 		virtual void* GetImGuiHandle() = 0;
+
+		std::string Identifer;
 
 	public:
 		//virtual uint32_t GetImGuiIdentifier() = 0;

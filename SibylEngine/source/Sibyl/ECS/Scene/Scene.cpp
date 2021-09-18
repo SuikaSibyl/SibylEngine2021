@@ -62,7 +62,7 @@ namespace SIByL
 					//std::filesystem::path texturePath = path;
 					SIByL::MeshLoader meshLoader(meshFilter.Path, layout);
 					meshFilter.Mesh = meshLoader.GetTriangleMesh();
-					meshRenderer.SetMaterialNums(meshFilter.GetSubmeshNum());
+					//meshRenderer.SetMaterialNums(meshFilter.GetSubmeshNum());
 				}
 
 				int submeshIndex = 0;

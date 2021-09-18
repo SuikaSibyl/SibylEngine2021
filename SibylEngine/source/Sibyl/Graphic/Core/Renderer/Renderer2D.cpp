@@ -91,7 +91,7 @@ namespace SIByL
 		s_Data->QuadMesh = TriangleMesh::Create((float*)vertices, 4, indices, 6, layout);
 
 		s_Data->WhiteImage = CreateRef<Image>(16, 16, 4, glm::vec4{ 1,1,1,1 });
-		s_Data->TexWhite = Texture2D::Create(s_Data->WhiteImage);
+		s_Data->TexWhite = Texture2D::Create(s_Data->WhiteImage, "White");
 		s_Data->DefaultMaterial = CreateRef<Material>(s_Data->TextureShader);
 
 		s_Data->DefaultMaterial->SetFloat4("Color", { 1,0,0,1 });
