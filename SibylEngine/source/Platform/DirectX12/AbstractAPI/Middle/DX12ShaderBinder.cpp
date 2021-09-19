@@ -196,7 +196,7 @@ namespace SIByL
 		}
 	}
 
-	void DX12ShaderResourcesBuffer::UploadDataIfDirty()
+	void DX12ShaderResourcesBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
 	{
 		if (m_IsDirty)
 		{

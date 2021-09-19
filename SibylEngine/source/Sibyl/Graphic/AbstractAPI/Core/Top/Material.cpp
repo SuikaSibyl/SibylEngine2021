@@ -31,7 +31,7 @@ namespace SIByL
 		// Upload Per-Material parameters to GPU
 		m_ConstantsBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
 
-		m_ResourcesBuffer->UploadDataIfDirty();
+		m_ResourcesBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
 	}
 
 	////////////////////////////////////////////////////////////////////

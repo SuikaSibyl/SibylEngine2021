@@ -136,7 +136,7 @@ namespace SIByL
 
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
 
-		virtual void UploadDataIfDirty() = 0;
+		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
 	};
 
 	//////////////////////////////////////////////

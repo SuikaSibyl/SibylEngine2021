@@ -9,6 +9,7 @@ namespace SIByL
 	Image::Image(std::string path)
 	{
 		stbi_set_flip_vertically_on_load(1);
+
 		m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_Channel, 0);
 		SIByL_CORE_ASSERT(m_Data, "Image Loaded from Path Falied!");
 	}

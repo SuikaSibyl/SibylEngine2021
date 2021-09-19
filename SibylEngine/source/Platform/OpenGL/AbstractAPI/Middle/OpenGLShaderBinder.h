@@ -50,10 +50,10 @@ namespace SIByL
 
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
 
-		virtual void UploadDataIfDirty() override;
+		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 
 	private:
-		ResourcesMapper* m_ResourcesMapper;
+		ResourcesMapper m_ResourcesMapper;
 		bool m_IsDirty = true;
 	};
 

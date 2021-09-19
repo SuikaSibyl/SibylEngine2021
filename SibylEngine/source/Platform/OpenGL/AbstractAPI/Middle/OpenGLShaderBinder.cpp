@@ -5,6 +5,10 @@
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
 
+#include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
+#include "Sibyl/ECS/Core/SerializeUtility.h"
+#include "Sibyl/ECS/Asset/AssetUtility.h"
+
 namespace SIByL
 {
 	OpenGLShaderConstantsBuffer::OpenGLShaderConstantsBuffer(ShaderConstantsDesc* desc)
@@ -228,17 +232,34 @@ namespace SIByL
 
 	OpenGLShaderResourcesBuffer::OpenGLShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rs)
 	{
-
+		m_ResourcesMapper = (desc->Mapper);
 	}
 
 	void OpenGLShaderResourcesBuffer::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
 	{
+		m_IsDirty = true;
 
+		ShaderResourceItem item;
+		if (m_ResourcesMapper.FetchResource(name, item))
+		{
+			m_ResourcesMapper.SetTextureID(name, texture->Identifer);
+		}
 	}
 
-	void OpenGLShaderResourcesBuffer::UploadDataIfDirty()
+	void OpenGLShaderResourcesBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
 	{
+		if (true)
+		{
+			m_IsDirty = false;
 
+			OpenGLShaderBinder* m_ShaderBinder = dynamic_cast<OpenGLShaderBinder*>(shaderBinder);
+
+			for each (auto & resource in m_ResourcesMapper)
+			{
+				Ref<Texture2D> refTex = Library<Texture2D>::Fetch(resource.second.TextureID);
+				m_ShaderBinder->SetTexture2D(resource.first, refTex);
+			}
+		}
 	}
 
 	OpenGLShaderBinder::~OpenGLShaderBinder()

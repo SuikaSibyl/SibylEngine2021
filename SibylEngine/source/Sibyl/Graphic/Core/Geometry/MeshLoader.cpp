@@ -20,7 +20,7 @@ namespace SIByL
 	{
 		Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, 
-            ((Renderer::GetRaster() == RasterRenderer::OpenGL) ? aiProcess_FlipUVs : 0) | 
+            ((Renderer::GetRaster() == RasterRenderer::OpenGL) ? 0 : 0) | 
             aiProcess_Triangulate | aiProcess_GenNormals);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)

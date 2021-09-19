@@ -142,6 +142,8 @@ namespace SIByL
 
 	void OpenGLShader::Use()
 	{
+		glEnable(GL_DEPTH_TEST);
+
 		if (m_Descriptor.useAlphaBlending == true)
 		{
 			glEnable(GL_BLEND);
