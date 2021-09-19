@@ -50,21 +50,6 @@ namespace SIByL
 
 				meshFilter.PerObjectBuffer->SetMatrix4x4("Model", transform.GetTransform());
 
-				if (meshFilter.Mesh == nullptr)
-				{
-					SIByL::VertexBufferLayout layout =
-					{
-						{SIByL::ShaderDataType::Float3, "POSITION"},
-						{SIByL::ShaderDataType::Float2, "TEXCOORD"},
-					};
-
-					//const wchar_t* path = (const wchar_t*)payload->Data;
-					//std::filesystem::path texturePath = path;
-					SIByL::MeshLoader meshLoader(meshFilter.Path, layout);
-					meshFilter.Mesh = meshLoader.GetTriangleMesh();
-					//meshRenderer.SetMaterialNums(meshFilter.GetSubmeshNum());
-				}
-
 				int submeshIndex = 0;
 
 				for (auto& submesh : *(meshFilter.Mesh))

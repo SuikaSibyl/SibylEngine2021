@@ -2,6 +2,9 @@
 #include "DX12Utility.h"
 #include "DX12Context.h"
 
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
+
 DxException::DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber) :
 	ErrorCode(hr),
 	FunctionName(functionName),
@@ -29,8 +32,11 @@ namespace SIByL
 			IID_PPV_ARGS(&defaultBuffer)));
 
 		// Set defualt buffer to copy dest
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
-		cmdList->ResourceBarrier(1,
+		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
+		ComPtr<ID3D12GraphicsCommandList> dxcmdList = cmdList->GetGraphicsCommandList();
+
+		dxcmdList->ResourceBarrier(1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer.Get(),
 				D3D12_RESOURCE_STATE_COMMON,
 				D3D12_RESOURCE_STATE_COPY_DEST));
@@ -42,13 +48,15 @@ namespace SIByL
 		subResourceData.SlicePitch = subResourceData.RowPitch;
 		// UpdateSubresources£¬Upload data from CPU to Upload Buffer,and then upload to Default Buffer
 		// 1 is the sub-index of the largest subresource
-		UpdateSubresources<1>(cmdList, defaultBuffer.Get(), allocation.Page, allocation.Offset, 0, 1, &subResourceData);
+		UpdateSubresources<1>(dxcmdList.Get(), defaultBuffer.Get(), allocation.Page, allocation.Offset, 0, 1, &subResourceData);
 
 		// Change the reosurce from COPY_DEST to GENERIC_READ
-		cmdList->ResourceBarrier(1,
+		dxcmdList->ResourceBarrier(1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(defaultBuffer.Get(),
 				D3D12_RESOURCE_STATE_COPY_DEST,
 				D3D12_RESOURCE_STATE_GENERIC_READ));
+
+		cmdQueue->ExecuteCommandList(cmdList);
 
 		return defaultBuffer;
 	}

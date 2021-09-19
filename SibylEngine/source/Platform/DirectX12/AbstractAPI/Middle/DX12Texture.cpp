@@ -6,6 +6,8 @@
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
 
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
+#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
 
 namespace SIByL
 {
@@ -93,8 +95,12 @@ namespace SIByL
 		));
 
 		// Set defualt buffer to copy dest
-		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
-		cmdList->ResourceBarrier(1,
+
+		Ref<DX12CommandQueue> cmdQueue = DX12Context::GetSCommandQueue();
+		Ref<DX12CommandList> cmdList = cmdQueue->GetCommandList();
+		ComPtr<ID3D12GraphicsCommandList> dxcmdList = cmdList->GetGraphicsCommandList();
+
+		dxcmdList->ResourceBarrier(1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(m_Resource.Get(),
 				D3D12_RESOURCE_STATE_COMMON,
 				D3D12_RESOURCE_STATE_COPY_DEST));
@@ -105,10 +111,10 @@ namespace SIByL
 		subResourceData.SlicePitch = total_bytes;
 
 		// Copy Data from default buffer to Upload Buffer
-		UpdateSubresources<1>(cmdList, m_Resource.Get(), m_Uploader.Get(), 0, 0, 1, &subResourceData);
+		UpdateSubresources<1>(dxcmdList.Get(), m_Resource.Get(), m_Uploader.Get(), 0, 0, 1, &subResourceData);
 
 		// Change the reosurce from COPY_DEST to GENERIC_READ
-		cmdList->ResourceBarrier(1,
+		dxcmdList->ResourceBarrier(1,
 			&CD3DX12_RESOURCE_BARRIER::Transition(m_Resource.Get(),
 				D3D12_RESOURCE_STATE_COPY_DEST,
 				D3D12_RESOURCE_STATE_GENERIC_READ));
@@ -116,6 +122,7 @@ namespace SIByL
 		Ref<DescriptorAllocator> srvAllocator = DX12Context::GetSrvDescriptorAllocator();
 		m_DescriptorAllocation = srvAllocator->Allocate(1);
 
+		cmdQueue->ExecuteCommandList(cmdList);
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;

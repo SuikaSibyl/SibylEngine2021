@@ -18,7 +18,6 @@ namespace SIByL
 			if (IsIdentifierFromPath(id))
 			{
 				Ref<Texture2D> texture = Texture2D::Create(IdentifierToPath(id));
-				Mapper[id] = texture;
 				return texture;
 			}
 		}
