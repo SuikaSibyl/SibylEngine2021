@@ -133,7 +133,7 @@ namespace SIByL
 	public:
 		static Ref<ShaderResourcesBuffer> Create(ShaderResourcesDesc* desc, RootSignature* rs);
 		virtual ~ShaderResourcesBuffer() = default;
-
+		virtual ShaderResourcesDesc* GetShaderResourceDesc() = 0;
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
 
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;

@@ -127,7 +127,10 @@ namespace SIByL
 
 	ShaderResourcesDesc* Material::GetResourcesDesc()
 	{
-		return m_ResourcesDesc;
+		if (m_ResourcesBuffer != nullptr)
+			return m_ResourcesBuffer->GetShaderResourceDesc();
+		else
+			return nullptr;
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -137,7 +140,6 @@ namespace SIByL
 		if (IsAssetDirty)
 		{
 			IsAssetDirty = false;
-			SavePath = "Resources\\Doge.mat";
 			Ref<Material> ref = Library<Material>::Fetch(SavePath);
 			MaterialSerializer serializer(ref);
 			serializer.Serialize("..\\Assets\\" + SavePath);
@@ -154,6 +156,8 @@ namespace SIByL
 		m_ResourcesBuffer = ShaderResourcesBuffer::Create
 			(shader->GetBinder()->GetShaderResourcesDesc(), 
 			 shader->GetBinder()->GetRootSignature());
+
+		// Reset
 
 		SetAssetDirty();
 	}

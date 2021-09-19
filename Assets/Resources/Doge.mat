@@ -10,4 +10,4 @@ Textures:
   - TEXTURE: 0
     INFO:
       Name: Main
-      ID: PROCEDURE=White
+      ID: FILE=..\Assets\Resources\Textures\doge4.png

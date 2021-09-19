@@ -232,7 +232,12 @@ namespace SIByL
 
 	OpenGLShaderResourcesBuffer::OpenGLShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rs)
 	{
-		m_ResourcesMapper = (desc->Mapper);
+		m_ShaderResourcesDesc = *desc;
+	}
+	
+	ShaderResourcesDesc* OpenGLShaderResourcesBuffer::GetShaderResourceDesc()
+	{
+		return &m_ShaderResourcesDesc;
 	}
 
 	void OpenGLShaderResourcesBuffer::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
@@ -240,9 +245,9 @@ namespace SIByL
 		m_IsDirty = true;
 
 		ShaderResourceItem item;
-		if (m_ResourcesMapper.FetchResource(name, item))
+		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
 		{
-			m_ResourcesMapper.SetTextureID(name, texture->Identifer);
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, texture->Identifer);
 		}
 	}
 
@@ -254,7 +259,7 @@ namespace SIByL
 
 			OpenGLShaderBinder* m_ShaderBinder = dynamic_cast<OpenGLShaderBinder*>(shaderBinder);
 
-			for each (auto & resource in m_ResourcesMapper)
+			for each (auto & resource in m_ShaderResourcesDesc.Mapper)
 			{
 				Ref<Texture2D> refTex = Library<Texture2D>::Fetch(resource.second.TextureID);
 				m_ShaderBinder->SetTexture2D(resource.first, refTex);

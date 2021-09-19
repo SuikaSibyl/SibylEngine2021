@@ -54,6 +54,7 @@ namespace SIByL
 		DX12ShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rootsignature);
 		
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
+		virtual ShaderResourcesDesc* GetShaderResourceDesc() override;
 
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 
@@ -61,6 +62,7 @@ namespace SIByL
 		friend class DX12ShaderBinder;
 
 		ResourcesMapper* m_ResourcesMapper;
+		ShaderResourcesDesc* m_Desc;
 		Ref<DX12DynamicDescriptorHeap> m_SrvDynamicDescriptorHeap;
 		Ref<DX12DynamicDescriptorHeap> m_SamplerDynamicDescriptorHeap;
 

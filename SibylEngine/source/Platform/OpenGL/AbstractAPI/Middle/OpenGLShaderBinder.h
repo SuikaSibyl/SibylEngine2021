@@ -49,11 +49,11 @@ namespace SIByL
 		OpenGLShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rs);
 
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
-
+		virtual ShaderResourcesDesc* GetShaderResourceDesc() override;
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 
 	private:
-		ResourcesMapper m_ResourcesMapper;
+		ShaderResourcesDesc m_ShaderResourcesDesc;
 		bool m_IsDirty = true;
 	};
 

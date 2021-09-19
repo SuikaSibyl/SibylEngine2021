@@ -173,6 +173,7 @@ namespace SIByL
 	///////////////////////////////////////////////////////////////////////////////
 	DX12ShaderResourcesBuffer::DX12ShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rootsignature)
 	{
+		m_Desc = desc;
 		m_ResourcesMapper = &desc->Mapper;
 
 		// Init Shader Resource Buffer
@@ -194,6 +195,11 @@ namespace SIByL
 			m_SrvDynamicDescriptorHeap->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
 			m_ResourcesMapper->SetTextureID(name, texture->Identifer);
 		}
+	}
+
+	ShaderResourcesDesc* DX12ShaderResourcesBuffer::GetShaderResourceDesc()
+	{
+		return m_Desc;
 	}
 
 	void DX12ShaderResourcesBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
