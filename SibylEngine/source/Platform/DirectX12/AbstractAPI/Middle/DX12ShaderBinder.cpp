@@ -173,8 +173,7 @@ namespace SIByL
 	///////////////////////////////////////////////////////////////////////////////
 	DX12ShaderResourcesBuffer::DX12ShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rootsignature)
 	{
-		m_Desc = desc;
-		m_ResourcesMapper = &desc->Mapper;
+		m_ShaderResourcesDesc = *desc;
 
 		// Init Shader Resource Buffer
 		m_SrvDynamicDescriptorHeap = std::make_shared<DX12DynamicDescriptorHeap>(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -189,17 +188,17 @@ namespace SIByL
 		m_IsDirty = true;
 
 		ShaderResourceItem item;
-		if (m_ResourcesMapper->FetchResource(name, item))
+		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
 		{
 			DX12Texture2D* dxTexture = dynamic_cast<DX12Texture2D*>(texture.get());
 			m_SrvDynamicDescriptorHeap->StageDescriptors(item.SRTIndex, item.Offset, 1, dxTexture->GetSRVHandle());
-			m_ResourcesMapper->SetTextureID(name, texture->Identifer);
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, texture->Identifer);
 		}
 	}
 
 	ShaderResourcesDesc* DX12ShaderResourcesBuffer::GetShaderResourceDesc()
 	{
-		return m_Desc;
+		return &m_ShaderResourcesDesc;
 	}
 
 	void DX12ShaderResourcesBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)

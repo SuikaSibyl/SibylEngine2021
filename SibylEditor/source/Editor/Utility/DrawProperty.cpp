@@ -87,7 +87,8 @@ namespace SIByLEditor
 		ImGui::Text(item.Name.c_str());
 		ImGui::SameLine();
 
-		ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+		std::string Textname = GetShort(item.TextureID);
+		ImGui::Button(Textname.c_str(), ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
@@ -108,8 +109,10 @@ namespace SIByLEditor
 		ImGui::PushID(label.c_str());
 		ImGui::Text(name.c_str());
 		ImGui::SameLine();
+		
+		std::string savePath = GetShort(mesh.Mesh->m_Path);
 
-		ImGui::Button("Mesh", ImVec2(100.0f, 0.0f));
+		ImGui::Button(savePath.c_str(), ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
@@ -132,9 +135,14 @@ namespace SIByLEditor
 
 	void DrawMeshRendererMaterialSocket(const std::string& label, SIByL::MeshRendererComponent& meshRenderer, int i)
 	{
+		ImGui::Text(label.c_str());
+		ImGui::SameLine();
+
 		ImGui::PushID(label.c_str());
 
-		ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f));
+		std::string savePath = GetShort(meshRenderer.Materials[i]->GetSavePath());
+
+		ImGui::Button(savePath.c_str(), ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
@@ -151,8 +159,16 @@ namespace SIByLEditor
 	}
 
 	void DrawShaderSlot(const std::string& label, SIByL::Material& material)
-	{
-		if (ImGui::Button("Select Shader"))
+	{		
+		std::string ShaderName = "Fallback";
+		Ref<Shader> shaderUsed = material.GetShaderUsed();
+		if (shaderUsed != nullptr)
+			ShaderName = shaderUsed->ShaderID;
+
+		ImGui::Text("Shader: ");
+		ImGui::SameLine();
+
+		if (ImGui::Button(ShaderName.c_str()))
 			ImGui::OpenPopup("Shaders Library");
 
 		if (ImGui::BeginPopup("Shaders Library"))
@@ -185,7 +201,7 @@ namespace SIByLEditor
 			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding |
 			ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
 
-		std::string title = "Material : " + label;
+		std::string title = "Material : " + GetShort(material.SavePath);
 		if (material.IsAssetDirty)
 		{
 			title += "*";

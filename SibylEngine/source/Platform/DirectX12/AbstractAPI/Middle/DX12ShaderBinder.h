@@ -61,8 +61,7 @@ namespace SIByL
 	private:
 		friend class DX12ShaderBinder;
 
-		ResourcesMapper* m_ResourcesMapper;
-		ShaderResourcesDesc* m_Desc;
+		ShaderResourcesDesc m_ShaderResourcesDesc;
 		Ref<DX12DynamicDescriptorHeap> m_SrvDynamicDescriptorHeap;
 		Ref<DX12DynamicDescriptorHeap> m_SamplerDynamicDescriptorHeap;
 

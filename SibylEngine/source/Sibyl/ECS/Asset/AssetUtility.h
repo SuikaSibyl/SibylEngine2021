@@ -12,6 +12,7 @@ namespace SIByL
 	};
 
 	std::string GetSuffix(const std::string& path);
+	std::string GetShort(const std::string& path);
 	AssetType GetAssetType(const std::string& path);
 	std::string PathToIdentifier(std::string path);
 	std::string IdentifierToPath(std::string path);
