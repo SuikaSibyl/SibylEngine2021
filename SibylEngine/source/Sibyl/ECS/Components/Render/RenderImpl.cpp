@@ -5,7 +5,7 @@
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
-#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
+#include "Sibyl/Module/ShaderModule/ShaderModule.h"
 
 namespace SIByL
 {
@@ -71,7 +71,7 @@ namespace SIByL
 		MaterialNum = num;
 		for (int i = 0; i < num; i++)
 		{
-			Materials.emplace_back(Renderer2D::GetMaterial());
+			Materials.emplace_back(ShaderModule::GetDefaultMaterial());
 		}
 	}
 

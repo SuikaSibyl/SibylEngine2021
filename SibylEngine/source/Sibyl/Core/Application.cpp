@@ -5,7 +5,6 @@
 #include "Sibyl/Core/Input.h"
 #include "glad/glad.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
-#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
 #include "Sibyl/Graphic/Core/Geometry/Vertex.h"
 #include "Sibyl/Module/ModuleManager.h"
 
@@ -47,7 +46,6 @@ namespace SIByL
 		PROFILE_SCOPE_FUNCTION();
 		m_Window->GetGraphicContext()->GetSynchronizer()->ForceSynchronize();
 		Input::Destroy();
-		Renderer2D::Shutdown();
 	}
 
 	void Application::OnAwake()
@@ -58,10 +56,6 @@ namespace SIByL
 		m_Window->GetGraphicContext()->StartCommandList();
 
 		// ---------------------------------------
-
-		// Init::Renderer2D
-		// --------------------------------
-		Renderer2D::Init();
 		// Init::All Layers
 		// --------------------------------
 		for (Layer* layer : m_LayerStack)

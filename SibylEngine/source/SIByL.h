@@ -34,7 +34,6 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Shader.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
-#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 
 // Components

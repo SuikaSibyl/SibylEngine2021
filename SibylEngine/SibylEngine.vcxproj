@@ -288,12 +288,13 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\IndexBuffer.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiUtility.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Renderer\Renderer.cpp" />
-    <ClCompile Include="source\Sibyl\Graphic\Core\Renderer\Renderer2D.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Shader.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderBinder.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\Scene.cpp" />
     <ClCompile Include="source\Sibyl\Module\ModuleManager.cpp" />
+    <ClCompile Include="source\Sibyl\Module\ShaderModule\DefaultShaders\ShaderRegister.cpp" />
+    <ClCompile Include="source\Sibyl\Module\ShaderModule\ShaderModule.cpp" />
     <ClCompile Include="vendor\glad\src\glad.cpp" />
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp" />
     <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp" />
@@ -434,7 +435,6 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\GraphicContext.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\IndexBuffer.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Renderer\Renderer.h" />
-    <ClInclude Include="source\Sibyl\Graphic\Core\Renderer\Renderer2D.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Shader.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderBinder.h" />
@@ -444,6 +444,8 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\Scene.h" />
     <ClInclude Include="source\Sibyl\Module\ModuleManager.h" />
+    <ClInclude Include="source\Sibyl\Module\ShaderModule\DefaultShaders\ShaderRegister.h" />
+    <ClInclude Include="source\Sibyl\Module\ShaderModule\ShaderModule.h" />
     <ClInclude Include="vendor\entt\entt.hpp" />
     <ClInclude Include="vendor\glad\include\glad\glad.h" />
     <ClInclude Include="vendor\glad\include\KHR\khrplatform.h" />

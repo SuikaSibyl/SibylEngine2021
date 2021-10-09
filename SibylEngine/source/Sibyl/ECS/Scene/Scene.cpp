@@ -9,7 +9,6 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
-#include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
 #include "Sibyl/ECS/UniqueID/UniqueID.h"
 
 namespace SIByL

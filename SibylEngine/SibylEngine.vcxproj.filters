@@ -219,9 +219,6 @@
     <ClCompile Include="source\Sibyl\ECS\Components\ViewCameraController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\Core\Renderer\Renderer2D.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -346,6 +343,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Module\ModuleManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Module\ShaderModule\ShaderModule.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Module\ShaderModule\DefaultShaders\ShaderRegister.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1478,9 +1481,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\Core\Renderer\Renderer2D.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12RootSignature.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -1656,6 +1656,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Module\ModuleManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Module\ShaderModule\ShaderModule.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Module\ShaderModule\DefaultShaders\ShaderRegister.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
