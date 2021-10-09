@@ -38,5 +38,19 @@ namespace SIByL
 		ComPtr<ID3D12Resource> m_Uploader;
 		DX12DescriptorAllocation m_DescriptorAllocation;
 		ImGuiLayerDX12::ImGuiAllocation m_ImGuiAllocation;
+
+
+		////////////////////////////////////////////////////
+		//					CUDA Interface				  //
+		////////////////////////////////////////////////////
+	public:
+		virtual Ref<PtrCudaTexture> GetPtrCudaTexture() override;
+		virtual Ref<PtrCudaSurface> GetPtrCudaSurface() override;
+		virtual void ResizePtrCudaTexuture() override;
+		virtual void ResizePtrCudaSurface() override;
+
+	protected:
+		virtual void CreatePtrCudaTexutre() override;
+		virtual void CreatePtrCudaSurface() override;
 	};
 }

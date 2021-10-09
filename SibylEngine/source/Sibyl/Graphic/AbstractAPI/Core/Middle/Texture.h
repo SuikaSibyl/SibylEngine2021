@@ -2,6 +2,9 @@
 
 namespace SIByL
 {
+	class PtrCudaTexture;
+	class PtrCudaSurface;
+
 	enum class TextureFormat
 	{
 		None = 0,
@@ -49,7 +52,20 @@ namespace SIByL
 
 		std::string Identifer;
 
+	////////////////////////////////////////////////////
+	//					CUDA Interface				  //
+	////////////////////////////////////////////////////
 	public:
-		//virtual uint32_t GetImGuiIdentifier() = 0;
+		virtual Ref<PtrCudaTexture> GetPtrCudaTexture() = 0;
+		virtual Ref<PtrCudaSurface> GetPtrCudaSurface() = 0;
+		virtual void ResizePtrCudaTexuture() = 0;
+		virtual void ResizePtrCudaSurface() = 0;
+
+	protected:
+		virtual void CreatePtrCudaTexutre() = 0;
+		virtual void CreatePtrCudaSurface() = 0;
+
+		Ref<PtrCudaTexture> mPtrCudaTexture = nullptr;
+		Ref<PtrCudaSurface> mPtrCudaSurface = nullptr;
 	};
 }

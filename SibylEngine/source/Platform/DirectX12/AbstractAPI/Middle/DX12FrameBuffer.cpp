@@ -165,4 +165,58 @@ namespace SIByL
 		scissorRect.bottom = height;
 	}
 
+	////////////////////////////////////////////////////
+	//					CUDA Interface				  //
+	////////////////////////////////////////////////////
+
+	Ref<PtrCudaTexture> DX12FrameBuffer::GetPtrCudaTexture()
+	{
+		if (mPtrCudaTexture == nullptr)
+		{
+
+		}
+
+		return mPtrCudaTexture;
+	}
+
+	Ref<PtrCudaSurface> DX12FrameBuffer::GetPtrCudaSurface()
+	{
+		if (mPtrCudaSurface == nullptr)
+		{
+#ifdef SIBYL_PLATFORM_CUDA
+			//mPtrCudaSurface = CreateRef<PtrCudaSurface>();
+			//mPtrCudaSurface->RegisterByOpenGLTexture(m_TextureObject, m_Desc.Width, m_Desc.Height);
+#endif // SIBYL_PLATFORM_CUDA
+		}
+
+		return mPtrCudaSurface;
+	}
+
+	void DX12FrameBuffer::ResizePtrCudaTexuture()
+	{
+
+	}
+
+	void DX12FrameBuffer::ResizePtrCudaSurface()
+	{
+		if (mPtrCudaSurface != nullptr)
+		{
+#ifdef SIBYL_PLATFORM_CUDA
+			//mPtrCudaSurface->RegisterByOpenGLTexture(m_TextureObject, m_Desc.Width, m_Desc.Height);
+#endif // SIBYL_PLATFORM_CUDA
+		}
+	}
+
+	void DX12FrameBuffer::CreatePtrCudaTexutre()
+	{
+		if (mPtrCudaTexture != nullptr)
+		{
+
+		}
+	}
+
+	void DX12FrameBuffer::CreatePtrCudaSurface()
+	{
+
+	}
 }

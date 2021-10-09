@@ -7,11 +7,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/GraphicContext.h"
 #include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
 #include "Sibyl/Graphic/Core/Geometry/Vertex.h"
-
-#include "Platform/DirectX12/Common/DX12Context.h"
-#include "Platform/DirectX12/Common/DX12Utility.h"
-#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandList.h"
-#include "Platform/DirectX12/AbstractAPI/Middle/DX12CommandQueue.h"
+#include "Sibyl/Module/ModuleManager.h"
 
 namespace SIByL
 {
@@ -42,6 +38,8 @@ namespace SIByL
 		// --------------------------------
 		m_FrameTimer.reset(FrameTimer::Create());
 		m_FrameTimer->Reset();
+
+		ModuleManager::Init();
 	}
 
 	Application::~Application()

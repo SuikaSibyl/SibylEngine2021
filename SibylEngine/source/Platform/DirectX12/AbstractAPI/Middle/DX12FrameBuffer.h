@@ -44,5 +44,20 @@ namespace SIByL
 
 		D3D12_VIEWPORT viewPort;
 		D3D12_RECT scissorRect;
+
+
+		////////////////////////////////////////////////////
+		//					CUDA Interface				  //
+		////////////////////////////////////////////////////
+	public:
+		virtual Ref<PtrCudaTexture> GetPtrCudaTexture() override;
+		virtual Ref<PtrCudaSurface> GetPtrCudaSurface() override;
+		virtual void ResizePtrCudaTexuture() override;
+		virtual void ResizePtrCudaSurface() override;
+
+	protected:
+		virtual void CreatePtrCudaTexutre() override;
+		virtual void CreatePtrCudaSurface() override;
+
 	};
 }

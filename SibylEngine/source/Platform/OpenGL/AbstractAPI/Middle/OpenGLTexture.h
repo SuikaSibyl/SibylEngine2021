@@ -33,5 +33,19 @@ namespace SIByL
 
 		uint32_t m_TexID;
 		std::string m_Path;
+
+		////////////////////////////////////////////////////
+		//					CUDA Interface				  //
+		////////////////////////////////////////////////////
+	public:
+		virtual Ref<PtrCudaTexture> GetPtrCudaTexture() override;
+		virtual Ref<PtrCudaSurface> GetPtrCudaSurface() override;
+		virtual void ResizePtrCudaTexuture() override;
+		virtual void ResizePtrCudaSurface() override;
+
+	protected:
+		virtual void CreatePtrCudaTexutre() override;
+		virtual void CreatePtrCudaSurface() override;
+
 	};
 }

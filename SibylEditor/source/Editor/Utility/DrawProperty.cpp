@@ -110,7 +110,7 @@ namespace SIByLEditor
 		ImGui::Text(name.c_str());
 		ImGui::SameLine();
 		
-		std::string savePath = GetShort(mesh.Mesh->m_Path);
+		std::string savePath = (mesh.Mesh != nullptr) ? GetShort(mesh.Mesh->m_Path) : "empty";
 
 		ImGui::Button(savePath.c_str(), ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget())

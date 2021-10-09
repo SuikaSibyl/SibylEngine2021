@@ -3,6 +3,7 @@
 #include "Editor/Panels/SceneHierarchyPanel.h"
 #include "Editor/Panels/ContentBrowserPanel.h"
 #include "Editor/Panels/InspectorPanel.h"
+#include "Editor/Panels/ViewportPanel.h"
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 
 #include "Sibyl/Graphic/AbstractAPI/Library/FrameBufferLibrary.h"
@@ -11,6 +12,7 @@ using namespace SIByL;
 
 namespace SIByLEditor
 {
+	
 	class EditorLayer :public SIByL::Layer
 	{
 	public:
@@ -53,6 +55,7 @@ namespace SIByLEditor
 		static SceneHierarchyPanel	s_SceneHierarchyPanel;
 		static ContentBrowserPanel	s_ContentBrowserPanel;
 		static InspectorPanel		s_InspectorPanel;
+		static std::vector<ViewportPanel> s_ViewportPanels;
 
 		Entity m_SqureTest;
 		/////////////////////
@@ -79,6 +82,13 @@ namespace SIByLEditor
 		void NewScene();
 		void OpenScene();
 		void SaveScene();
+
+		enum class RenderType
+		{
+			Rasterizer,
+			RayTracer,
+		};
+		RenderType mRenderType = RenderType::Rasterizer;
 	};
 
 }

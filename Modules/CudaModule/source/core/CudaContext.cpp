@@ -12,6 +12,7 @@ namespace SIByL
 	void CudaContext::Init()
 	{
         DeviceQuery();
+        Julia();
 	}
 
     void CudaContext::DeviceQuery()
@@ -280,4 +281,5 @@ namespace SIByL
 
         printf("Result = PASS\n");
     }
+
 }

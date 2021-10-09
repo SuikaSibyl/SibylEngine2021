@@ -24,6 +24,45 @@
     <ClInclude Include="source\CudaModule.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\core\CudaUtility.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\cu\Julia.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utility\GLHelper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\utility\CpuBitmap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GraphicInterop\CudaTexture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GraphicInterop\CudaSurface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GraphicInterop\TextureInterface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RayTracer\RayTracerInterface.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RayTracer\RayTracer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RayTracer\Core\Primitive.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RayTracer\Core\Ray.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RayTracer\Core\Material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\RayTracer\Primitives\Sphere.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\core\CudaContext.cpp">
@@ -32,5 +71,24 @@
     <ClCompile Include="source\core\CudaModulePCH.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\GraphicInterop\TextureInterface.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RayTracer\RayTracerInterface.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\RayTracer\Primitives\Sphere.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="source\cu\Julia.cu">
+      <Filter>头文件</Filter>
+    </CudaCompile>
+    <CudaCompile Include="source\GraphicInterop\CudaTexture.cu" />
+    <CudaCompile Include="source\GraphicInterop\CudaSurface.cu" />
+    <CudaCompile Include="source\RayTracer\RayTracer.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -174,4 +174,38 @@ namespace SIByL
 		return *(void**)(handle); 
 	}
 
+	////////////////////////////////////////////////////
+	//					CUDA Interface				  //
+	////////////////////////////////////////////////////
+
+	Ref<PtrCudaTexture> DX12Texture2D::GetPtrCudaTexture()
+	{
+		return nullptr;
+	}
+
+	Ref<PtrCudaSurface> DX12Texture2D::GetPtrCudaSurface()
+	{
+		return nullptr;
+	}
+
+	void DX12Texture2D::ResizePtrCudaTexuture()
+	{
+
+	}
+
+	void DX12Texture2D::ResizePtrCudaSurface()
+	{
+
+	}
+
+	void DX12Texture2D::CreatePtrCudaTexutre()
+	{
+
+	}
+
+	void DX12Texture2D::CreatePtrCudaSurface()
+	{
+
+	}
+
 }

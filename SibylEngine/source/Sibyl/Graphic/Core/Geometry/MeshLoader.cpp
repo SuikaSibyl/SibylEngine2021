@@ -65,8 +65,16 @@ namespace SIByL
                 }
                 else if (element.Name == "TEXCOORD" || element.Name == "TEXCO0RD0")
                 {
-                    vertices.push_back(mesh->mTextureCoords[0][i].x);
-                    vertices.push_back(mesh->mTextureCoords[0][i].y);
+                    if (mesh->HasTextureCoords(0))
+                    {
+                        vertices.push_back(mesh->mTextureCoords[0][i].x);
+                        vertices.push_back(mesh->mTextureCoords[0][i].y);
+                    }
+                    else
+                    {
+                        vertices.push_back(0);
+                        vertices.push_back(0);
+                    }
                 }
                 else if (element.Name == "NORMAL")
                 {

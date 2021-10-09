@@ -32,5 +32,19 @@ namespace SIByL
 		unsigned int m_FrameBufferObject = 0;
 		unsigned int m_DepthStencilObject = 0;
 		unsigned int m_TextureObject = 0;
+
+
+		////////////////////////////////////////////////////
+		//					CUDA Interface				  //
+		////////////////////////////////////////////////////
+	public:
+		virtual Ref<PtrCudaTexture> GetPtrCudaTexture() override;
+		virtual Ref<PtrCudaSurface> GetPtrCudaSurface() override;
+		virtual void ResizePtrCudaTexuture() override;
+		virtual void ResizePtrCudaSurface() override;
+
+	protected:
+		virtual void CreatePtrCudaTexutre() override;
+		virtual void CreatePtrCudaSurface() override;
 	};
 }

@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_CUDA;SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;SIBYL_ENABLE_ASSETS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;$(CudaPath)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -169,7 +169,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SIBYL_PLATFORM_CUDA;SIBYL_PLATFORM_WINDOWS;SIBYL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SibylEngine\source\;$(SolutionDir)SibylEngine\vendor\glm;$(SolutionDir)SibylEngine\vendor\spdlog\include;$(SolutionDir)SibylEngine\vendor\imgui;$(SolutionDir)SibylEngine\vendor\glad\include;$(SolutionDir)SibylEngine\vendor\glfw\include;$(SolutionDir)SibylEngine\vendor\ImGuizmo;$(SolutionDir)SibylEngine\vendor\stb_image;$(SolutionDir)SibylEngine\vendor\entt;$(SolutionDir)vendor\yaml\include;$(SolutionDir)vendor\assimp\include;$(SolutionDir)Modules;$(CudaPath)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>SIByLpch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -260,6 +260,7 @@
     <ClCompile Include="source\Sibyl\ECS\Core\SerializeUtility.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\DrawItemPool.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp" />
+    <ClCompile Include="source\Sibyl\ECS\UniqueID\UniqueID.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.cpp" />
@@ -278,6 +279,7 @@
     <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\MeshLoader.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Core\Lighting\Light.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Texture\Image.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp" />
@@ -291,6 +293,7 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderBinder.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\Scene.cpp" />
+    <ClCompile Include="source\Sibyl\Module\ModuleManager.cpp" />
     <ClCompile Include="vendor\glad\src\glad.cpp" />
     <ClCompile Include="vendor\glm\glm\detail\glm.cpp" />
     <ClCompile Include="vendor\ImGuizmo\ImGuizmo.cpp" />
@@ -394,6 +397,7 @@
     <ClInclude Include="source\Sibyl\ECS\Core\SerializeUtility.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\DrawItemPool.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\SceneSerializer.h" />
+    <ClInclude Include="source\Sibyl\ECS\UniqueID\UniqueID.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\RootSignature.h" />
@@ -418,6 +422,7 @@
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Primitive.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Vertex.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Core\Lighting\Light.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Material\Color.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Texture\Image.h" />
@@ -438,6 +443,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Synchronizer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\Scene.h" />
+    <ClInclude Include="source\Sibyl\Module\ModuleManager.h" />
     <ClInclude Include="vendor\entt\entt.hpp" />
     <ClInclude Include="vendor\glad\include\glad\glad.h" />
     <ClInclude Include="vendor\glad\include\KHR\khrplatform.h" />

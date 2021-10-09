@@ -12,7 +12,8 @@ namespace SIByL
 		Entity() = default;
 		Entity(const Entity& entt);
 		Entity(entt::entity handle, Scene* scene);
-		 
+		Entity(const uint64_t& uid, Scene* scene);
+
 		template<typename T, typename ... Args>
 		T& AddComponent(Args&&... args)
 		{
@@ -45,6 +46,7 @@ namespace SIByL
 		operator bool() const { return m_EntityHandle != entt::null; }
 		operator entt::entity() const { return m_EntityHandle; }
 		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
+		operator Scene*() const { return m_Scene; }
 
 		bool operator==(const Entity& other) const {
 			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;
@@ -54,6 +56,9 @@ namespace SIByL
 			return !(*this == other);
 		}
 		
+		uint64_t GetUid();
+		void SetUid(const uint64_t& u);
+
 	private:
 		entt::entity m_EntityHandle = entt::null;
 		Scene* m_Scene = nullptr;

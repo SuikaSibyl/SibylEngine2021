@@ -13,6 +13,8 @@ namespace SIByL
 		bool SwapChainTarget = false;
 	};
 
+	class PtrCudaTexture;
+	class PtrCudaSurface;
 	class FrameBuffer
 	{
 	public:
@@ -35,5 +37,21 @@ namespace SIByL
 		// Fetcher
 		// -------------------------------------------------
 		virtual const FrameBufferDesc& GetDesc() const = 0;
+
+		////////////////////////////////////////////////////
+		//					CUDA Interface				  //
+		////////////////////////////////////////////////////
+	public:
+		virtual Ref<PtrCudaTexture> GetPtrCudaTexture() = 0;
+		virtual Ref<PtrCudaSurface> GetPtrCudaSurface() = 0;
+		virtual void ResizePtrCudaTexuture() = 0;
+		virtual void ResizePtrCudaSurface() = 0;
+
+	protected:
+		virtual void CreatePtrCudaTexutre() = 0;
+		virtual void CreatePtrCudaSurface() = 0;
+
+		Ref<PtrCudaTexture> mPtrCudaTexture = nullptr;
+		Ref<PtrCudaSurface> mPtrCudaSurface = nullptr;
 	};
 }

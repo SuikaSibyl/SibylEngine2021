@@ -10,16 +10,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <vector>
+
 namespace SIByL
 {
 	struct TransformComponent
 	{
 	public:
+		friend class Scene;
+
+	public:
 		glm::vec3 Translation = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 EulerAngles = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 Scale = { 1.0f, 1.0f, 1.0f };
 
-		//TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;
 		TransformComponent(
 			const glm::vec3& translation = {0,0,0}, 
@@ -35,5 +39,21 @@ namespace SIByL
 				* rotation
 				* glm::scale(glm::mat4(1.0f), Scale);
 		}
+
+		void SetParent(const uint64_t& p);
+		const uint64_t& GetParent() { return parent; }
+		uint64_t GetUid() { return uid; }
+		void SetUid(const uint64_t& u) { uid = u; }
+		std::vector<uint64_t>& GetChildren() { return children; }
+
+	private:
+		void AddChild(const uint64_t& c);
+		void RemoveChild(const uint64_t& c);
+
+	private:
+		uint64_t parent = 0;
+		uint64_t uid = 0;
+		Scene* scene = nullptr;
+		std::vector<uint64_t> children;
 	};
 }

@@ -5,6 +5,10 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#ifdef SIBYL_PLATFORM_CUDA
+#include <CudaModule/source/CudaModule.h>
+#endif // SIBYL_PLATFORM_CUDA
+
 namespace SIByL
 {
 	///////////////////////////////////////////////////////////////////////////
@@ -95,5 +99,62 @@ namespace SIByL
 	{
 		return (void*)m_TexID;
 	}
+
+
+	////////////////////////////////////////////////////
+	//					CUDA Interface				  //
+	////////////////////////////////////////////////////
+
+	Ref<PtrCudaTexture> OpenGLTexture2D::GetPtrCudaTexture()
+	{
+		if (mPtrCudaTexture == nullptr)
+		{
+
+		}
+
+		return mPtrCudaTexture;
+	}
+
+	Ref<PtrCudaSurface> OpenGLTexture2D::GetPtrCudaSurface()
+	{
+		if (mPtrCudaSurface == nullptr)
+		{
+#ifdef SIBYL_PLATFORM_CUDA
+			mPtrCudaSurface = CreateRef<PtrCudaSurface>();
+			mPtrCudaSurface->RegisterByOpenGLTexture(m_TexID, m_Width, m_Height);
+#endif // SIBYL_PLATFORM_CUDA
+		}
+
+		return mPtrCudaSurface;
+	}
+
+	void OpenGLTexture2D::ResizePtrCudaTexuture()
+	{
+
+	}
+
+	void OpenGLTexture2D::ResizePtrCudaSurface()
+	{
+		if (mPtrCudaSurface != nullptr)
+		{
+#ifdef SIBYL_PLATFORM_CUDA
+			mPtrCudaSurface->RegisterByOpenGLTexture(m_TexID, m_Width, m_Height);
+#endif // SIBYL_PLATFORM_CUDA
+		}
+	}
+
+	void OpenGLTexture2D::CreatePtrCudaTexutre()
+	{
+		if (mPtrCudaTexture != nullptr)
+		{
+
+		}
+	}
+
+	void OpenGLTexture2D::CreatePtrCudaSurface()
+	{
+
+	}
+
 
 }

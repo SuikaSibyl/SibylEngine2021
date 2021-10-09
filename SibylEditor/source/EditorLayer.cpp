@@ -1,4 +1,3 @@
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -20,11 +19,19 @@
 #include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/Events/ApplicationEvent.h"
 
+#ifdef SIBYL_PLATFORM_CUDA
+#include <CudaModule/source/CudaModule.h>
+#endif // SIBYL_PLATFORM_CUDA
+#include <NetworkModule/include/NetworkModule.h>
+
+#include "Sibyl/ECS/UniqueID/UniqueID.h"
+
 namespace SIByLEditor
 {
 	SceneHierarchyPanel EditorLayer::s_SceneHierarchyPanel;
 	ContentBrowserPanel EditorLayer::s_ContentBrowserPanel;
 	InspectorPanel		EditorLayer::s_InspectorPanel;
+	std::vector<ViewportPanel> EditorLayer::s_ViewportPanels;
 
 	Ref<Texture2D> EditorLayer::IconFolder = nullptr;
 	Ref<Texture2D> EditorLayer::IconImage  = nullptr;
@@ -56,6 +63,7 @@ namespace SIByLEditor
 
 	void EditorLayer::OnAttach()
 	{
+		uint64_t uuid = UniqueID::RequestUniqueID();
 		m_ActiveScene = CreateRef<Scene>();
 		s_SceneHierarchyPanel = SceneHierarchyPanel(m_ActiveScene);
 
@@ -113,7 +121,7 @@ namespace SIByLEditor
 		desc.Height = 720;
 		desc.Channel = 4;
 		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
-
+		
 		VertexBufferLayout layout =
 		{
 			{ShaderDataType::Float3, "POSITION"},
@@ -137,8 +145,14 @@ namespace SIByLEditor
 
 	void EditorLayer::OnDraw()
 	{
-		FrameBufferLibrary::Fetch("SceneView")->Bind();
-		FrameBufferLibrary::Fetch("SceneView")->ClearBuffer();
+		// -------------------------------------------------------
+		//Ref<PtrCudaSurface> surface = viewportBuffer->GetPtrCudaSurface();
+		//CUDARayTracerInterface::RenderPtrCudaSurface(surface.get(), Application::Get().GetFrameTimer()->DeltaTime());
+		// -------------------------------------------------------
+
+		Ref<FrameBuffer> viewportBuffer = FrameBufferLibrary::Fetch("SceneView");
+		viewportBuffer->Bind();
+		viewportBuffer->ClearBuffer();
 
 		camera->SetCamera();
 
@@ -151,7 +165,7 @@ namespace SIByLEditor
 			drawItem->OnDrawCall();
 		}
 
-		FrameBufferLibrary::Fetch("SceneView")->Unbind();
+		viewportBuffer->Unbind();
 	}
 
 	void EditorLayer::OnEvent(SIByL::Event& event)
@@ -352,10 +366,13 @@ namespace SIByLEditor
 			}
 
 			//unsigned int textureID = m_FrameBuffer->GetColorAttachment();
-
 			ImGui::DrawImage((void*)m_FrameBuffer->GetColorAttachment(), ImVec2{
 				viewportPanelSize.x,
 				viewportPanelSize.y });
+
+			//ImGui::DrawImage((void*)m_RayTracerTexture->GetImGuiHandle(), ImVec2{
+			//	viewportPanelSize.x,
+			//	viewportPanelSize.y });
 
 			Entity selectedEntity = s_SceneHierarchyPanel.GetSelectedEntity();
 			if (selectedEntity && GizmoType != -1)

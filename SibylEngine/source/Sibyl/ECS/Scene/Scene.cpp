@@ -10,6 +10,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/Core/Renderer/Renderer2D.h"
+#include "Sibyl/ECS/UniqueID/UniqueID.h"
 
 namespace SIByL
 {
@@ -70,6 +71,9 @@ namespace SIByL
 		Entity entity { m_Registry.create(),this };
 		entity.AddComponent<TagComponent>(name);
 		entity.AddComponent<TransformComponent>();
+		uint64_t uid = UniqueID::RequestUniqueID();
+		entity.SetUid(uid);
+		UniqueID::InsertUidEidPair(uid, entity);
 		return entity;
 	}
 
@@ -84,6 +88,11 @@ namespace SIByL
 
 	}
 
+	template<>
+	void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component)
+	{
+		component.scene = entity;
+	}
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)

@@ -4,6 +4,10 @@
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
 
+#ifdef SIBYL_PLATFORM_CUDA
+#include <CudaModule/source/CudaModule.h>
+#endif // SIBYL_PLATFORM_CUDA
+
 namespace SIByL
 {
 	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferDesc& desc)
@@ -87,6 +91,7 @@ namespace SIByL
 		m_Desc.Width = width;
 		m_Desc.Height = height;
 		Invalidate();
+		ResizePtrCudaSurface();
 	}
 
 	void OpenGLFrameBuffer::ClearBuffer()
@@ -122,4 +127,58 @@ namespace SIByL
 		return texture;
 	}
 
+	////////////////////////////////////////////////////
+	//					CUDA Interface				  //
+	////////////////////////////////////////////////////
+
+	Ref<PtrCudaTexture> OpenGLFrameBuffer::GetPtrCudaTexture()
+	{
+		if (mPtrCudaTexture == nullptr)
+		{
+
+		}
+
+		return mPtrCudaTexture;
+	}
+
+	Ref<PtrCudaSurface> OpenGLFrameBuffer::GetPtrCudaSurface()
+	{
+		if (mPtrCudaSurface == nullptr)
+		{
+#ifdef SIBYL_PLATFORM_CUDA
+			mPtrCudaSurface = CreateRef<PtrCudaSurface>();
+			mPtrCudaSurface->RegisterByOpenGLTexture(m_TextureObject, m_Desc.Width, m_Desc.Height);
+#endif // SIBYL_PLATFORM_CUDA
+		}
+
+		return mPtrCudaSurface;
+	}
+
+	void OpenGLFrameBuffer::ResizePtrCudaTexuture()
+	{
+
+	}
+
+	void OpenGLFrameBuffer::ResizePtrCudaSurface()
+	{
+		if (mPtrCudaSurface != nullptr)
+		{
+#ifdef SIBYL_PLATFORM_CUDA
+			mPtrCudaSurface->RegisterByOpenGLTexture(m_TextureObject, m_Desc.Width, m_Desc.Height);
+#endif // SIBYL_PLATFORM_CUDA
+		}
+	}
+
+	void OpenGLFrameBuffer::CreatePtrCudaTexutre()
+	{
+		if (mPtrCudaTexture != nullptr)
+		{
+
+		}
+	}
+
+	void OpenGLFrameBuffer::CreatePtrCudaSurface()
+	{
+
+	}
 }
