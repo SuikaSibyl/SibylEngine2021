@@ -42,7 +42,7 @@ namespace SIByL
 		};
 
 		Shader::Create("Shaders/SIByL/Texture",
-			ShaderDesc({ true,layout }),
+			ShaderDesc({ true,layout, 2 }),
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 	}
 

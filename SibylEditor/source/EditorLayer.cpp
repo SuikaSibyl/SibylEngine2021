@@ -14,7 +14,9 @@
 #include "Sibyl/ECS/Scene/SceneSerializer.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
+#include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
 #include "Sibyl/Core/Events/KeyEvent.h"
 #include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/Events/ApplicationEvent.h"
@@ -31,7 +33,7 @@ namespace SIByLEditor
 	SceneHierarchyPanel EditorLayer::s_SceneHierarchyPanel;
 	ContentBrowserPanel EditorLayer::s_ContentBrowserPanel;
 	InspectorPanel		EditorLayer::s_InspectorPanel;
-	std::vector<ViewportPanel> EditorLayer::s_ViewportPanels;
+	ViewportPanel		EditorLayer::s_ViewportPanels;
 
 	Ref<Texture2D> EditorLayer::IconFolder = nullptr;
 	Ref<Texture2D> EditorLayer::IconImage  = nullptr;
@@ -119,9 +121,15 @@ namespace SIByLEditor
 		FrameBufferDesc desc;
 		desc.Width = 1280;
 		desc.Height = 720;
-		desc.Channel = 4;
+		desc.Formats = { 
+			FrameBufferTextureFormat::RGB8, 
+			FrameBufferTextureFormat::RGB8, 
+			FrameBufferTextureFormat::DEPTH24STENCIL8 };
 		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
 		
+		s_ViewportPanels.SetCamera(camera);
+		s_ViewportPanels.SetFrameBuffer(m_FrameBuffer);
+
 		VertexBufferLayout layout =
 		{
 			{ShaderDataType::Float3, "POSITION"},
@@ -139,7 +147,7 @@ namespace SIByLEditor
 		//	Application::Get().GetFrameTimer()->GetFPS(),
 		//	Application::Get().GetFrameTimer()->GetMsPF());
 
-		if (m_ViewportFocused)
+		if (s_ViewportPanels.IsViewportFocusd())
 			viewCameraController->OnUpdate();
 	}
 
@@ -150,7 +158,7 @@ namespace SIByLEditor
 		//CUDARayTracerInterface::RenderPtrCudaSurface(surface.get(), Application::Get().GetFrameTimer()->DeltaTime());
 		// -------------------------------------------------------
 
-		Ref<FrameBuffer> viewportBuffer = FrameBufferLibrary::Fetch("SceneView");
+		Ref<FrameBuffer> viewportBuffer = Library<FrameBuffer>::Fetch("SceneView");
 		viewportBuffer->Bind();
 		viewportBuffer->ClearBuffer();
 
@@ -206,42 +214,25 @@ namespace SIByLEditor
 				SaveScene();
 			}
 		}
-		else if (e.GetKeyCode() == SIByL_KEY_Q)
-		{
-			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
-				GizmoType = -1;
-		}
-		else if (e.GetKeyCode() == SIByL_KEY_W)
-		{
-			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
-				GizmoType = 0;
-		}
-		else if (e.GetKeyCode() == SIByL_KEY_E)
-		{
-			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
-				GizmoType = 1;
-		}
-		else if (e.GetKeyCode() == SIByL_KEY_R)
-		{
-			if (!Input::IsMouseButtonPressed(SIByL_MOUSE_BUTTON_RIGHT))
-				GizmoType = 2;
-		}
+		s_ViewportPanels.OnKeyPressed(e);
 	}
+
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-		camera->Resize(m_ViewportSize.x, m_ViewportSize.y);
+		m_FrameBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
+		camera->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 		s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
+
 	void EditorLayer::OpenScene()
 	{
 		std::string filepath = FileDialogs::OpenFile("SIByL Scene (*.scene)\0*.scene\0");
 		if (!filepath.empty())
 		{
 			m_ActiveScene = CreateRef<Scene>();
-			m_FrameBuffer->Resize(m_ViewportSize.x, m_ViewportSize.y);
-			camera->Resize(m_ViewportSize.x, m_ViewportSize.y);
+			m_FrameBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
+			camera->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 			s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serialzier(m_ActiveScene);
@@ -348,84 +339,7 @@ namespace SIByLEditor
 		//////////////////////////////////////////////
 		// View Ports
 		//////////////////////////////////////////////
-		{
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2({ 0,0 }));
-			ImGui::Begin("Viewport");
-
-			m_ViewportFocused = ImGui::IsWindowFocused();
-			m_ViewportHoverd = ImGui::IsWindowHovered();
-			Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHoverd);
-
-			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-			if (m_ViewportSize != *((glm::vec2*)&viewportPanelSize))
-			{
-				// Viewport Change Size
-				m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-				m_FrameBuffer->Resize(viewportPanelSize.x, viewportPanelSize.y);
-				camera->Resize(viewportPanelSize.x, viewportPanelSize.y);
-			}
-
-			//unsigned int textureID = m_FrameBuffer->GetColorAttachment();
-			ImGui::DrawImage((void*)m_FrameBuffer->GetColorAttachment(), ImVec2{
-				viewportPanelSize.x,
-				viewportPanelSize.y });
-
-			//ImGui::DrawImage((void*)m_RayTracerTexture->GetImGuiHandle(), ImVec2{
-			//	viewportPanelSize.x,
-			//	viewportPanelSize.y });
-
-			Entity selectedEntity = s_SceneHierarchyPanel.GetSelectedEntity();
-			if (selectedEntity && GizmoType != -1)
-			{
-				ImGuizmo::SetOrthographic(false);
-				ImGuizmo::SetDrawlist();
-
-				float windowWidth = (float)ImGui::GetWindowWidth();
-				float windowHeight = (float)ImGui::GetWindowHeight();
-				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-				glm::mat4 cameraView = camera->GetViewMatrix();
-				glm::mat4 cameraProj = camera->GetProjectionMatrix();
-
-				// Entity transform
-				auto& tc = selectedEntity.GetComponent<TransformComponent>();
-				glm::mat4 transform = tc.GetTransform();
-
-				// Snapping 
-				bool snap = Input::IsKeyPressed(SIByL_KEY_LEFT_CONTROL);
-				float snapValue = 0.5f;
-				if (GizmoType == ImGuizmo::OPERATION::ROTATE)
-					snapValue = 45.0f;
-
-				float snapValues[3] = { snapValue, snapValue ,snapValue };
-
-
-				ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj),
-					ImGuizmo::OPERATION(GizmoType), ImGuizmo::LOCAL, glm::value_ptr(transform), 
-					nullptr, snap ? snapValues : nullptr);
-				
-				if (ImGuizmo::IsUsing())
-				{
-					glm::vec3 translation, rotation, scale;
-					DecomposeTransform(transform, translation, rotation, scale);
-					glm::vec3 deltaRotation = rotation - tc.EulerAngles;
-					tc.Translation = translation;
-					tc.Scale = scale;
-					tc.EulerAngles += deltaRotation;
-					transform = tc.GetTransform();
-				}
-			}
-
-			if (ImGui::BeginDragDropTarget())
-			{
-				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE");
-
-				ImGui::EndDragDropTarget();
-			}
-
-			ImGui::End();
-			ImGui::PopStyleVar();
-		}
+		s_ViewportPanels.OnImGuiRender();
 
 		//////////////////////////////////////////////
 		// Scene Hierarchy

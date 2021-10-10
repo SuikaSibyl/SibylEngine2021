@@ -7,7 +7,7 @@ namespace SIByL
 {
 	FrameBufferLibrary::FrameBufferMap FrameBufferLibrary::m_Mapper;
 	
-	void FrameBufferLibrary::Register(const std::string& name, Ref<FrameBuffer> buffer)
+	void FrameBufferLibrary::Register(const std::string& name, Ref<FrameBuffer_v1> buffer)
 	{
 		if (m_Mapper.find(name) == m_Mapper.end())
 		{
@@ -36,7 +36,7 @@ namespace SIByL
 		m_Mapper.clear();
 	}
 
-	Ref<FrameBuffer> FrameBufferLibrary::Fetch(const std::string& name)
+	Ref<FrameBuffer_v1> FrameBufferLibrary::Fetch(const std::string& name)
 	{
 		if (m_Mapper.find(name) != m_Mapper.end())
 		{

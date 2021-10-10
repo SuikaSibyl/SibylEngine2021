@@ -9,7 +9,7 @@ namespace SIByL
 	class OpenGLTexture2D :public Texture2D
 	{
 	public:
-		friend class OpenGLFrameBuffer;
+		friend class OpenGLFrameBuffer_v1;
 		OpenGLTexture2D(const std::string& path);
 		OpenGLTexture2D(Ref<Image> image);
 		void InitFromImage(Image* img);

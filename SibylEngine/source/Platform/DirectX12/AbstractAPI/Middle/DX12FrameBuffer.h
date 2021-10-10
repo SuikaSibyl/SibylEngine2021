@@ -7,13 +7,13 @@ namespace SIByL
 	class DX12DepthStencilResource;
 	class DX12RenderTargetResource;
 
-	class DX12FrameBuffer :public FrameBuffer
+	class DX12FrameBuffer_v1 :public FrameBuffer_v1
 	{
 	public:
 		/////////////////////////////////////////////////////////
 		///				    	Constructors		          ///
-		DX12FrameBuffer(const FrameBufferDesc& desc);
-		virtual ~DX12FrameBuffer();
+		DX12FrameBuffer_v1(const FrameBufferDesc_v1& desc);
+		virtual ~DX12FrameBuffer_v1();
 
 		/////////////////////////////////////////////////////////
 		///				        Manipulator     	          ///
@@ -26,7 +26,7 @@ namespace SIByL
 
 		/////////////////////////////////////////////////////////
 		///				     Fetcher / Setter		          ///
-		virtual const FrameBufferDesc& GetDesc() const override { return m_Desc; }
+		virtual const FrameBufferDesc_v1& GetDesc() const override { return m_Desc; }
 		virtual void* GetColorAttachment() override;
 
 		/////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ namespace SIByL
 		void SetViewportRect(int width, int height);
 
 	private:
-		FrameBufferDesc m_Desc;
+		FrameBufferDesc_v1 m_Desc;
 		Ref<DX12DepthStencilResource> m_DepthStencilResource;
 		Ref<DX12RenderTargetResource> m_RenderTargetResource;
 
@@ -59,5 +59,29 @@ namespace SIByL
 		virtual void CreatePtrCudaTexutre() override;
 		virtual void CreatePtrCudaSurface() override;
 
+	};
+
+
+	class DX12RenderTarget;
+	class DX12StencilDepth;
+	class DX12FrameBuffer :public FrameBuffer
+	{
+	public:
+		DX12FrameBuffer(const FrameBufferDesc& desc);
+
+		virtual void Bind() override;
+		virtual void Unbind() override;
+		virtual void ClearBuffer() override;
+		virtual unsigned int CountColorAttachment() override;
+		virtual void Resize(uint32_t width, uint32_t height) override;
+		virtual void* GetColorAttachment(unsigned int index) override;
+		virtual void* GetDepthStencilAttachment() override;
+
+	private:
+		std::vector<Ref<DX12RenderTarget>> RenderTargets;
+		Ref<DX12StencilDepth> DepthStencil;
+
+		unsigned int Width, Height;
+		unsigned int m_FrameBufferObject = 0;
 	};
 }

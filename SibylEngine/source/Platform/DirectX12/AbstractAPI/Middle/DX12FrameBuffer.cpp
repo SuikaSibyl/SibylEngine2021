@@ -17,7 +17,7 @@ namespace SIByL
 	
 	// Create From Descriptor
 	// ----------------------------------------------------------
-	DX12FrameBuffer::DX12FrameBuffer(const FrameBufferDesc& desc)
+	DX12FrameBuffer_v1::DX12FrameBuffer_v1(const FrameBufferDesc_v1& desc)
 		:m_Desc(desc)
 	{
 		m_RenderTargetResource = CreateRef<DX12RenderTargetResource>
@@ -29,7 +29,7 @@ namespace SIByL
 		SetViewportRect(m_Desc.Width, m_Desc.Height);
 	}
 
-	DX12FrameBuffer::~DX12FrameBuffer()
+	DX12FrameBuffer_v1::~DX12FrameBuffer_v1()
 	{
 
 	}
@@ -37,7 +37,7 @@ namespace SIByL
 	///////////////////////////////////////////////////////////////////////////
 	///						        Manipulator		                        ///
 	///////////////////////////////////////////////////////////////////////////
-	void DX12FrameBuffer::Bind()
+	void DX12FrameBuffer_v1::Bind()
 	{
 		Ref<DX12CommandList> cmdList = DX12Context::GetInFlightSCmdList();
 
@@ -54,7 +54,7 @@ namespace SIByL
 			&m_DepthStencilResource->GetDSVCpuHandle());
 	}
 
-	void DX12FrameBuffer::Unbind()
+	void DX12FrameBuffer_v1::Unbind()
 	{
 		SwapChain* swapChain = DX12Context::GetSwapChain();
 		swapChain->SetRenderTarget();
@@ -68,7 +68,7 @@ namespace SIByL
 
 	}
 
-	void DX12FrameBuffer::Resize(uint32_t width, uint32_t height)
+	void DX12FrameBuffer_v1::Resize(uint32_t width, uint32_t height)
 	{
 		if (width <= 0 || height <= 0)
 		{
@@ -93,7 +93,7 @@ namespace SIByL
 		cmdQueue->ExecuteCommandList(cmdList);
 	}
 
-	void DX12FrameBuffer::ClearBuffer()
+	void DX12FrameBuffer_v1::ClearBuffer()
 	{
 		Ref<DX12CommandList> sCmdList = DX12Context::GetInFlightSCmdList();
 		ID3D12GraphicsCommandList* cmdList = DX12Context::GetInFlightDXGraphicCommandList();
@@ -112,17 +112,17 @@ namespace SIByL
 
 	}
 
-	void DX12FrameBuffer::ClearRgba()
+	void DX12FrameBuffer_v1::ClearRgba()
 	{
 
 	}
 
-	void DX12FrameBuffer::ClearDepthStencil()
+	void DX12FrameBuffer_v1::ClearDepthStencil()
 	{
 
 	}
 
-	void* DX12FrameBuffer::GetColorAttachment()
+	void* DX12FrameBuffer_v1::GetColorAttachment()
 	{
 		D3D12_GPU_DESCRIPTOR_HANDLE* handle = &m_RenderTargetResource->GetImGuiGpuHandle();
 		return *(void**)(handle);
@@ -132,7 +132,7 @@ namespace SIByL
 	///                                Caster                               ///
 	///////////////////////////////////////////////////////////////////////////
 
-	Ref<Texture2D> DX12FrameBuffer::ColorAsTexutre()
+	Ref<Texture2D> DX12FrameBuffer_v1::ColorAsTexutre()
 	{
 		Ref<Texture2D> texture = nullptr;
 		//texture.reset(new OpenGLTexture2D(m_TextureObject, m_Desc.Width,
@@ -140,7 +140,7 @@ namespace SIByL
 		return texture;
 	}
 
-	Ref<Texture2D> DX12FrameBuffer::DepthStencilAsTexutre()
+	Ref<Texture2D> DX12FrameBuffer_v1::DepthStencilAsTexutre()
 	{
 		Ref<Texture2D> texture = nullptr;
 		//texture.reset(new OpenGLTexture2D(m_TextureObject, m_Desc.Width,
@@ -148,7 +148,7 @@ namespace SIByL
 		return texture;
 	}
 
-	void DX12FrameBuffer::SetViewportRect(int width, int height)
+	void DX12FrameBuffer_v1::SetViewportRect(int width, int height)
 	{
 		// Set Viewport
 		viewPort.TopLeftX = 0;
@@ -169,7 +169,7 @@ namespace SIByL
 	//					CUDA Interface				  //
 	////////////////////////////////////////////////////
 
-	Ref<PtrCudaTexture> DX12FrameBuffer::GetPtrCudaTexture()
+	Ref<PtrCudaTexture> DX12FrameBuffer_v1::GetPtrCudaTexture()
 	{
 		if (mPtrCudaTexture == nullptr)
 		{
@@ -179,7 +179,7 @@ namespace SIByL
 		return mPtrCudaTexture;
 	}
 
-	Ref<PtrCudaSurface> DX12FrameBuffer::GetPtrCudaSurface()
+	Ref<PtrCudaSurface> DX12FrameBuffer_v1::GetPtrCudaSurface()
 	{
 		if (mPtrCudaSurface == nullptr)
 		{
@@ -192,12 +192,12 @@ namespace SIByL
 		return mPtrCudaSurface;
 	}
 
-	void DX12FrameBuffer::ResizePtrCudaTexuture()
+	void DX12FrameBuffer_v1::ResizePtrCudaTexuture()
 	{
 
 	}
 
-	void DX12FrameBuffer::ResizePtrCudaSurface()
+	void DX12FrameBuffer_v1::ResizePtrCudaSurface()
 	{
 		if (mPtrCudaSurface != nullptr)
 		{
@@ -207,7 +207,7 @@ namespace SIByL
 		}
 	}
 
-	void DX12FrameBuffer::CreatePtrCudaTexutre()
+	void DX12FrameBuffer_v1::CreatePtrCudaTexutre()
 	{
 		if (mPtrCudaTexture != nullptr)
 		{
@@ -215,8 +215,54 @@ namespace SIByL
 		}
 	}
 
-	void DX12FrameBuffer::CreatePtrCudaSurface()
+	void DX12FrameBuffer_v1::CreatePtrCudaSurface()
 	{
 
 	}
+
+	////////////////////////////////////////////////////
+	//					DX12FrameBuffer				  //
+	////////////////////////////////////////////////////
+
+	DX12FrameBuffer::DX12FrameBuffer(const FrameBufferDesc& desc)
+		:Width(desc.Width), Height(desc.Height)
+	{
+
+	}
+
+	void DX12FrameBuffer::Bind()
+	{
+
+	}
+
+	void DX12FrameBuffer::Unbind()
+	{
+
+	}
+
+	void DX12FrameBuffer::ClearBuffer()
+	{
+
+	}
+
+	unsigned int DX12FrameBuffer::CountColorAttachment()
+	{
+		return RenderTargets.size();
+	}
+
+	void DX12FrameBuffer::Resize(uint32_t width, uint32_t height)
+	{
+
+	}
+
+	void* DX12FrameBuffer::GetColorAttachment(unsigned int index)
+	{
+		return nullptr;
+	}
+
+	void* DX12FrameBuffer::GetDepthStencilAttachment()
+	{
+		return nullptr;
+	}
+
 }

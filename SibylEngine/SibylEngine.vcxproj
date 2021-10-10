@@ -192,7 +192,7 @@
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12Resource.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12ResourceStateTracker.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandQueue.cpp" />
-    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12RenderTarget.cpp" />
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBufferTexture.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Common\DX12Context.cpp" />
     <ClCompile Include="source\Platform\DirectX12\Common\DX12Utility.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocation.cpp" />
@@ -216,7 +216,7 @@
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12SwapChain.cpp" />
     <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12VertexBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLCommonResource.cpp" />
-    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.cpp" />
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBufferTexture.cpp" />
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLTexture.cpp" />
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBuffer.cpp" />
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLIndexBuffer.cpp" />
@@ -261,7 +261,7 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\DrawItemPool.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp" />
     <ClCompile Include="source\Sibyl\ECS\UniqueID\UniqueID.cpp" />
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBufferTexture.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderData.cpp" />
@@ -315,7 +315,7 @@
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocation.h" />
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocator.h" />
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Bottom\DX12DescriptorAllocatorPage.h" />
-    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12RenderTarget.h" />
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBufferTexture.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Context.h" />
     <ClInclude Include="source\Platform\DirectX12\Common\DX12Utility.h" />
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12CommandList.h" />
@@ -338,7 +338,7 @@
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12VertexBuffer.h" />
     <ClInclude Include="source\Platform\OpenCL\Common\OpenCLContext.h" />
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLCommonResource.h" />
-    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.h" />
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBufferTexture.h" />
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLTexture.h" />
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLCommandList.h" />
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBuffer.h" />
@@ -402,7 +402,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\RootSignature.h" />
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBufferTexture.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderItem.h" />
@@ -443,6 +443,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Synchronizer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\VertexBuffer.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\Scene.h" />
+    <ClInclude Include="source\Sibyl\Module\GraphicModule\GraphicModule.h" />
     <ClInclude Include="source\Sibyl\Module\ModuleManager.h" />
     <ClInclude Include="source\Sibyl\Module\ShaderModule\DefaultShaders\ShaderRegister.h" />
     <ClInclude Include="source\Sibyl\Module\ShaderModule\ShaderModule.h" />

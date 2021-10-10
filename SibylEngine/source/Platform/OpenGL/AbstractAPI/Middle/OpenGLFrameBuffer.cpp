@@ -1,6 +1,7 @@
 #include "SIByLpch.h"
 #include "OpenGLFrameBuffer.h"
 
+#include "OpenGLFrameBufferTexture.h"
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
 
@@ -10,20 +11,20 @@
 
 namespace SIByL
 {
-	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferDesc& desc)
+	OpenGLFrameBuffer_v1::OpenGLFrameBuffer_v1(const FrameBufferDesc_v1& desc)
 		:m_Desc(desc)
 	{
 		Invalidate();
 	}
 
-	OpenGLFrameBuffer::~OpenGLFrameBuffer()
+	OpenGLFrameBuffer_v1::~OpenGLFrameBuffer_v1()
 	{
 		glDeleteFramebuffers(1, &m_FrameBufferObject);
 		glDeleteTextures(1, &m_TextureObject);
 		glDeleteTextures(1, &m_DepthStencilObject);
 	}
 
-	void OpenGLFrameBuffer::Invalidate()
+	void OpenGLFrameBuffer_v1::Invalidate()
 	{
 		if (m_FrameBufferObject)
 		{
@@ -65,23 +66,23 @@ namespace SIByL
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFrameBuffer::Bind()
+	void OpenGLFrameBuffer_v1::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferObject);
 		glViewport(0, 0, m_Desc.Width, m_Desc.Height);
 	}
 
-	void OpenGLFrameBuffer::Unbind()
+	void OpenGLFrameBuffer_v1::Unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void* OpenGLFrameBuffer::GetColorAttachment()
+	void* OpenGLFrameBuffer_v1::GetColorAttachment()
 	{
 		return (void*)m_TextureObject;
 	}
 
-	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
+	void OpenGLFrameBuffer_v1::Resize(uint32_t width, uint32_t height)
 	{
 		if (width <= 0 || height <= 0)
 		{
@@ -94,24 +95,24 @@ namespace SIByL
 		ResizePtrCudaSurface();
 	}
 
-	void OpenGLFrameBuffer::ClearBuffer()
+	void OpenGLFrameBuffer_v1::ClearBuffer()
 	{
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLFrameBuffer::ClearRgba()
+	void OpenGLFrameBuffer_v1::ClearRgba()
 	{
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
-	void OpenGLFrameBuffer::ClearDepthStencil()
+	void OpenGLFrameBuffer_v1::ClearDepthStencil()
 	{
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 
-	Ref<Texture2D> OpenGLFrameBuffer::ColorAsTexutre()
+	Ref<Texture2D> OpenGLFrameBuffer_v1::ColorAsTexutre()
 	{
 		Ref<Texture2D> texture;
 		texture.reset(new OpenGLTexture2D(m_TextureObject, m_Desc.Width, 
@@ -119,7 +120,7 @@ namespace SIByL
 		return texture;
 	}
 
-	Ref<Texture2D> OpenGLFrameBuffer::DepthStencilAsTexutre()
+	Ref<Texture2D> OpenGLFrameBuffer_v1::DepthStencilAsTexutre()
 	{
 		Ref<Texture2D> texture;
 		texture.reset(new OpenGLTexture2D(m_TextureObject, m_Desc.Width,
@@ -131,7 +132,7 @@ namespace SIByL
 	//					CUDA Interface				  //
 	////////////////////////////////////////////////////
 
-	Ref<PtrCudaTexture> OpenGLFrameBuffer::GetPtrCudaTexture()
+	Ref<PtrCudaTexture> OpenGLFrameBuffer_v1::GetPtrCudaTexture()
 	{
 		if (mPtrCudaTexture == nullptr)
 		{
@@ -141,7 +142,7 @@ namespace SIByL
 		return mPtrCudaTexture;
 	}
 
-	Ref<PtrCudaSurface> OpenGLFrameBuffer::GetPtrCudaSurface()
+	Ref<PtrCudaSurface> OpenGLFrameBuffer_v1::GetPtrCudaSurface()
 	{
 		if (mPtrCudaSurface == nullptr)
 		{
@@ -154,12 +155,12 @@ namespace SIByL
 		return mPtrCudaSurface;
 	}
 
-	void OpenGLFrameBuffer::ResizePtrCudaTexuture()
+	void OpenGLFrameBuffer_v1::ResizePtrCudaTexuture()
 	{
 
 	}
 
-	void OpenGLFrameBuffer::ResizePtrCudaSurface()
+	void OpenGLFrameBuffer_v1::ResizePtrCudaSurface()
 	{
 		if (mPtrCudaSurface != nullptr)
 		{
@@ -169,7 +170,7 @@ namespace SIByL
 		}
 	}
 
-	void OpenGLFrameBuffer::CreatePtrCudaTexutre()
+	void OpenGLFrameBuffer_v1::CreatePtrCudaTexutre()
 	{
 		if (mPtrCudaTexture != nullptr)
 		{
@@ -177,8 +178,125 @@ namespace SIByL
 		}
 	}
 
-	void OpenGLFrameBuffer::CreatePtrCudaSurface()
+	void OpenGLFrameBuffer_v1::CreatePtrCudaSurface()
 	{
 
 	}
+
+	////////////////////////////////////////////////////////////////
+	// 					 OpenGL Frame Buffer					  //
+	////////////////////////////////////////////////////////////////
+	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferDesc& desc)
+		:Width(desc.Width), Height(desc.Height)
+	{
+		for (FrameBufferTextureFormat format : desc.Formats.Formats)
+		{
+			if (IsDepthFormat(format))
+			{
+				DepthStencil = CreateRef<OpenGLStencilDepth>(FrameBufferTextureDesc{ format,desc.Width,desc.Height });
+			}
+			else
+			{
+				RenderTargets.push_back(CreateRef<OpenGLRenderTarget>(FrameBufferTextureDesc{ format,desc.Width,desc.Height }));
+			}
+		}
+
+		Invalidate();
+	}
+
+	void OpenGLFrameBuffer::Bind()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferObject);
+		glViewport(0, 0, Width, Height);
+	}
+
+	void OpenGLFrameBuffer::Unbind()
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void OpenGLFrameBuffer::ClearBuffer()
+	{
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	unsigned int OpenGLFrameBuffer::CountColorAttachment()
+	{
+		return RenderTargets.size();
+	}
+
+	void OpenGLFrameBuffer::Resize(uint32_t width, uint32_t height)
+	{
+		if (width <= 0 || height <= 0)
+		{
+			return;
+		}
+		Width = width;
+		Height = height;
+		for (int i = 0; i < RenderTargets.size(); i++)
+			RenderTargets[i]->Resize(width, height);
+		DepthStencil->Resize(width, height);
+
+		Invalidate();
+	}
+
+	void* OpenGLFrameBuffer::GetColorAttachment(unsigned int index)
+	{
+		return (void*)*RenderTargets[index]->GetPtrTextureObject();
+
+	}
+
+	void* OpenGLFrameBuffer::GetDepthStencilAttachment()
+	{
+		return (void*)DepthStencil->GetTextureObject();
+	}
+
+	void OpenGLFrameBuffer::Invalidate()
+	{
+		if (m_FrameBufferObject)
+		{
+			glDeleteFramebuffers(1, &m_FrameBufferObject);
+			// Delete all frame buffers
+			for (int i = 0; i < RenderTargets.size(); i++)
+				RenderTargets[i]->DeleteObject();
+			DepthStencil->DeleteObject();
+		}
+
+		glGenFramebuffers(1, &m_FrameBufferObject);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBufferObject);
+
+		// Create RGBA Texture and Bind the Framebuffer to it
+		// -------------------------------------------------------
+		for (int i = 0; i < RenderTargets.size(); i++)
+		{
+			RenderTargets[i]->Invalid();
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RenderTargets[i]->GetTextureObject(), 0);
+		}
+
+		// Create Depth Texture and Bind the Framebuffer to it
+		// -------------------------------------------------------
+		DepthStencil->Invalid();
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthStencil->GetTextureObject(), 0);
+
+
+		// Test multi-render-targets situations
+		// -------------------------------------------------------
+		if (RenderTargets.size() > 1)
+		{
+			SIByL_CORE_ASSERT((RenderTargets.size() <= 4), "Render Targets is more than 4");
+			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1 ,GL_COLOR_ATTACHMENT2 ,GL_COLOR_ATTACHMENT3 };
+			glDrawBuffers(RenderTargets.size(), buffers);
+		}
+		else if (RenderTargets.size() == 0)
+		{
+			glDrawBuffer(GL_NONE);
+		}
+
+		// End Creation
+		// -------------------------------------------------------
+		SIByL_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Frame Buffer is Incomplete");
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
 }

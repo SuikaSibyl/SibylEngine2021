@@ -315,16 +315,16 @@
     <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBufferTexture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLCommonResource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12RenderTarget.cpp">
+    <ClCompile Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBufferTexture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.cpp">
+    <ClCompile Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBufferTexture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Platform\Cuda\Common\SCudaContext.cpp">
@@ -1628,16 +1628,16 @@
     <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderTarget.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBufferTexture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Bottom\OpenGLCommonResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12RenderTarget.h">
+    <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Middle\DX12FrameBufferTexture.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLRenderTarget.h">
+    <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Middle\OpenGLFrameBufferTexture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\SIByLCompile.h">
@@ -1662,6 +1662,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Module\ShaderModule\DefaultShaders\ShaderRegister.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Module\GraphicModule\GraphicModule.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

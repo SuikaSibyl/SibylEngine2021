@@ -9,6 +9,7 @@ namespace SIByL
 	{
 		bool useAlphaBlending = false;
 		VertexBufferLayout inputLayout;
+		int NumRenderTarget = 1;
 	};
 
 	class Shader

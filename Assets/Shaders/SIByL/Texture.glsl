@@ -34,7 +34,8 @@ void main()
 in vec3 v_Color;
 in vec2 v_TexCoord;
 // Fragment outputs
-out vec4 FragColor;  
+layout(location = 0) out vec4 FragColor;  
+layout(location = 1) out vec4 FragColor2;  
 // Uniform items
 uniform vec4 Color;
 uniform sampler2D u_Texture;
@@ -42,4 +43,5 @@ uniform sampler2D u_Texture;
 void main()
 {
     FragColor = Color * texture(u_Texture, v_TexCoord);
+    FragColor2 = vec4(1,0,0,1);
 }

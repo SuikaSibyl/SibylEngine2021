@@ -7,10 +7,42 @@ namespace SIByL
 	/////////////////////////////////////////////////////////////
 	//					 Frame Buffer Texture		    	   //
 	/////////////////////////////////////////////////////////////
+
+	enum class FrameBufferTextureFormat
+	{
+		None,
+		RGB8,
+		RGBA16,
+		DEPTH24STENCIL8,
+		DEPTH32F,
+	};
+
+	static bool IsDepthFormat(FrameBufferTextureFormat format)
+	{
+		if (format == FrameBufferTextureFormat::DEPTH24STENCIL8)
+			return true;
+		return false;
+	}
+
+	struct FrameBufferTextureDesc
+	{
+		FrameBufferTextureFormat Format;
+		unsigned int Width, Height;
+	};
+
+	struct FrameBufferTexturesFormats
+	{
+		FrameBufferTexturesFormats() = default;
+		FrameBufferTexturesFormats(const std::initializer_list<FrameBufferTextureFormat> formats)
+			:Formats(formats) {}
+
+		std::vector<FrameBufferTextureFormat> Formats;
+	};
+
 	class FrameBufferTexture
 	{
 	public:
-		TextureDesc Descriptor;
+		FrameBufferTextureDesc Descriptor;
 
 	public:
 		virtual ~FrameBufferTexture() = default;
@@ -23,7 +55,7 @@ namespace SIByL
 	class RenderTarget :public FrameBufferTexture
 	{
 	public:
-		static Ref<RenderTarget> Create(TextureDesc desc);
+		static Ref<RenderTarget> Create(FrameBufferTextureDesc desc);
 		virtual ~RenderTarget() = default;
 	};
 
@@ -33,7 +65,7 @@ namespace SIByL
 	class StencilDepth :public FrameBufferTexture
 	{
 	public:
-		static Ref<StencilDepth> Create(TextureDesc desc);
+		static Ref<StencilDepth> Create(FrameBufferTextureDesc desc);
 		virtual ~StencilDepth() = default;
 	};
 }

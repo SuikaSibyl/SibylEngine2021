@@ -55,16 +55,13 @@ namespace SIByLEditor
 		static SceneHierarchyPanel	s_SceneHierarchyPanel;
 		static ContentBrowserPanel	s_ContentBrowserPanel;
 		static InspectorPanel		s_InspectorPanel;
-		static std::vector<ViewportPanel> s_ViewportPanels;
+		static ViewportPanel		s_ViewportPanels;
 
 		Entity m_SqureTest;
-		/////////////////////
-		////   Viewport  ////
-		/////////////////////
-		glm::vec2 m_ViewportSize;
-		bool m_ViewportFocused;
-		bool m_ViewportHoverd;
 
+		/////////////////////
+		////   Icons  ////
+		/////////////////////
 		static Ref<Texture2D> IconFolder;
 		static Ref<Texture2D> IconImage;
 		static Ref<Texture2D> IconMesh;
@@ -73,8 +70,6 @@ namespace SIByLEditor
 		static Ref<Texture2D> IconMaterial;
 		static Ref<Texture2D> IconShader;
 		static Ref<Texture2D> GetIcon(const std::string& path);
-
-		int GizmoType = -1;
 
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);

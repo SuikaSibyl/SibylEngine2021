@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Core/Middle/RenderTarget.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBufferTexture.h"
 
 namespace SIByL
 {
@@ -10,12 +10,16 @@ namespace SIByL
 	class DX12RenderTarget :public RenderTarget
 	{
 	public:
+		DX12RenderTarget(const FrameBufferTextureDesc& descriptor);
+
 		Ref<DX12DepthStencilResource> m_DepthStencilResource;
 	};
 
 	class DX12StencilDepth :public StencilDepth
 	{
 	public:
+		DX12StencilDepth(const FrameBufferTextureDesc& descriptor);
+
 		Ref<DX12RenderTargetResource> m_RenderTargetResource;
 	};
 }

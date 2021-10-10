@@ -4,11 +4,11 @@
 
 namespace SIByL
 {
-	class OpenGLFrameBuffer :public FrameBuffer
+	class OpenGLFrameBuffer_v1 :public FrameBuffer_v1
 	{
 	public:
-		OpenGLFrameBuffer(const FrameBufferDesc& desc);
-		virtual ~OpenGLFrameBuffer();
+		OpenGLFrameBuffer_v1(const FrameBufferDesc_v1& desc);
+		virtual ~OpenGLFrameBuffer_v1();
 
 		void Invalidate();
 
@@ -24,10 +24,10 @@ namespace SIByL
 		virtual Ref<Texture2D> ColorAsTexutre() override;
 		virtual Ref<Texture2D> DepthStencilAsTexutre() override;
 
-		virtual const FrameBufferDesc& GetDesc() const override { return m_Desc; }
+		virtual const FrameBufferDesc_v1& GetDesc() const override { return m_Desc; }
 
 	private:
-		FrameBufferDesc m_Desc;
+		FrameBufferDesc_v1 m_Desc;
 
 		unsigned int m_FrameBufferObject = 0;
 		unsigned int m_DepthStencilObject = 0;
@@ -46,5 +46,31 @@ namespace SIByL
 	protected:
 		virtual void CreatePtrCudaTexutre() override;
 		virtual void CreatePtrCudaSurface() override;
+	};
+
+	class OpenGLRenderTarget;
+	class OpenGLStencilDepth;
+	class OpenGLFrameBuffer :public FrameBuffer
+	{
+	public:
+		OpenGLFrameBuffer(const FrameBufferDesc& desc);
+
+		virtual void Bind() override;
+		virtual void Unbind() override;
+		virtual void ClearBuffer() override;
+		virtual unsigned int CountColorAttachment() override;
+		virtual void Resize(uint32_t width, uint32_t height) override;
+		virtual void* GetColorAttachment(unsigned int index) override;
+		virtual void* GetDepthStencilAttachment() override;
+
+	private:
+		void Invalidate();
+
+	private:
+		std::vector<Ref<OpenGLRenderTarget>> RenderTargets;
+		Ref<OpenGLStencilDepth> DepthStencil;
+
+		unsigned int Width, Height;
+		unsigned int m_FrameBufferObject = 0;
 	};
 }
