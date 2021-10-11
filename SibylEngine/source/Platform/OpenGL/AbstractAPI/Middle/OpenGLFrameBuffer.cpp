@@ -236,7 +236,8 @@ namespace SIByL
 		Height = height;
 		for (int i = 0; i < RenderTargets.size(); i++)
 			RenderTargets[i]->Resize(width, height);
-		DepthStencil->Resize(width, height);
+		if (DepthStencil != nullptr)
+			DepthStencil->Resize(width, height);
 
 		Invalidate();
 	}
@@ -252,6 +253,11 @@ namespace SIByL
 		return (void*)DepthStencil->GetTextureObject();
 	}
 
+	RenderTarget* OpenGLFrameBuffer::GetRenderTarget(unsigned int index)
+	{
+		return (RenderTarget*)(RenderTargets[index].get());
+	}
+
 	void OpenGLFrameBuffer::Invalidate()
 	{
 		if (m_FrameBufferObject)
@@ -260,7 +266,8 @@ namespace SIByL
 			// Delete all frame buffers
 			for (int i = 0; i < RenderTargets.size(); i++)
 				RenderTargets[i]->DeleteObject();
-			DepthStencil->DeleteObject();
+			if (DepthStencil != nullptr)
+				DepthStencil->DeleteObject();
 		}
 
 		glGenFramebuffers(1, &m_FrameBufferObject);
@@ -276,8 +283,11 @@ namespace SIByL
 
 		// Create Depth Texture and Bind the Framebuffer to it
 		// -------------------------------------------------------
-		DepthStencil->Invalid();
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthStencil->GetTextureObject(), 0);
+		if (DepthStencil != nullptr)
+		{
+			DepthStencil->Invalid();
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthStencil->GetTextureObject(), 0);
+		}
 
 
 		// Test multi-render-targets situations

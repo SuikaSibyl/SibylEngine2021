@@ -52,6 +52,7 @@ namespace SIByL
 	{
 	public:
 		DX12DepthStencilResource(const uint32_t& width, const uint32_t& height, Ref<DX12CommandList> pSCommandList);
+		DX12DepthStencilResource(const uint32_t& width, const uint32_t& height, DXGI_FORMAT format, Ref<DX12CommandList> pSCommandList);
 
 		/////////////////////////////////////////////////////////
 		///				        Manipulator     	          ///
@@ -71,6 +72,7 @@ namespace SIByL
 	protected:
 		Scope<DX12Resource> m_Resource;
 		uint32_t m_Width, m_Height;
+		DXGI_FORMAT m_Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		DX12DescriptorAllocation m_DSVDescriptorAllocation;
 	};
 
@@ -86,6 +88,7 @@ namespace SIByL
 	{
 	public:
 		DX12RenderTargetResource(const uint32_t& width, const uint32_t& height, Ref<DX12CommandList> pSCommandList);
+		DX12RenderTargetResource(const uint32_t& width, const uint32_t& height, DXGI_FORMAT format, Ref<DX12CommandList> pSCommandList);
 
 		/////////////////////////////////////////////////////////
 		///				        Manipulator     	          ///
@@ -108,6 +111,7 @@ namespace SIByL
 	protected:
 		Scope<DX12Resource> m_Resource;
 		uint32_t m_Width, m_Height;
+		DXGI_FORMAT m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DX12DescriptorAllocation m_RTVDescriptorAllocation;
 		DX12DescriptorAllocation m_SRVDescriptorAllocationCpu;
 		DX12DescriptorAllocation m_SRVDescriptorAllocationGpu;

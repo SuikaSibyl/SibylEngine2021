@@ -220,4 +220,95 @@ namespace SIByL
 		CompileFromString(vShaderCode, fShaderCode);
 
 	}
+
+
+	////////////////////////////////////////////////////////////////
+	//						Compute Shader						 ///
+	////////////////////////////////////////////////////////////////
+
+	OpenGLComputeShader::OpenGLComputeShader(std::string file, const ShaderBinderDesc& binderDesc)
+	{
+		m_BinderDescriptor = binderDesc;
+		CompileFromFile(file);
+	}
+
+	void OpenGLComputeShader::Dispatch(unsigned int x, unsigned int y, unsigned int z)
+	{
+		// launch compute shaders!
+		glUseProgram(m_ShaderProgram);
+		glDispatchCompute((GLuint)x, (GLuint)y, (GLuint)z);
+
+		// make sure writing to image has finished before read
+		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+	}
+
+	void OpenGLComputeShader::CreateBinder()
+	{
+		m_ShaderBinder = ShaderBinder::Create(m_BinderDescriptor);
+		OpenGLShaderBinder* shaderBinder = dynamic_cast<OpenGLShaderBinder*>(m_ShaderBinder.get());
+		shaderBinder->SetOpenGLShaderId(m_ShaderProgram);
+	}
+
+	void OpenGLComputeShader::CompileFromFile(std::string shaderPath)
+	{
+		// 1. Get VERTEX/FRAGMENT From File Path
+		std::string computeCode;
+		std::ifstream ShaderFile;
+		// Make sure exceptions could work properly
+		ShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+		try
+		{
+			// Open the file
+			ShaderFile.open(shaderPath);
+			std::stringstream cShaderStream;
+			// Load the content from the File
+			cShaderStream << ShaderFile.rdbuf();
+			// Close File dealers
+			ShaderFile.close();
+			// Change datastream to string
+			computeCode = cShaderStream.str();
+		}
+		catch (std::ifstream::failure e)
+		{
+			SIByL_CORE_ERROR("Shader File Failed to Load");
+		}
+		const char* cShaderCode = computeCode.c_str();
+		CompileFromString(cShaderCode);
+	}
+
+	void OpenGLComputeShader::CompileFromString(const char* shaderString)
+	{
+		// ----------------------------
+		// Create Compuite Shader
+		// ----------------------------
+		unsigned int computeShader;
+		computeShader = glCreateShader(GL_COMPUTE_SHADER);
+		glShaderSource(computeShader, 1, &shaderString, NULL);
+		glCompileShader(computeShader);
+
+		// Check Compiling Results
+		int  success;
+		char infoLog[512];
+		glGetShaderiv(computeShader, GL_COMPILE_STATUS, &success);
+		if (!success)
+		{
+			glGetShaderInfoLog(computeShader, 512, NULL, infoLog);
+			SIByL_CORE_ERROR("Compute Shader Compilation Failed : {0}", infoLog);
+		}
+
+		// ----------------------------
+		// Create Shader Program
+		// ----------------------------
+		m_ShaderProgram = glCreateProgram();
+		glAttachShader(m_ShaderProgram, computeShader);
+		glLinkProgram(m_ShaderProgram);
+
+		glGetProgramiv(m_ShaderProgram, GL_LINK_STATUS, &success);
+		if (!success) {
+			glGetProgramInfoLog(m_ShaderProgram, 512, NULL, infoLog);
+			SIByL_CORE_ERROR("Shader Link Failed : {0}", infoLog);
+		}
+
+		glDeleteShader(computeShader);
+	}
 }

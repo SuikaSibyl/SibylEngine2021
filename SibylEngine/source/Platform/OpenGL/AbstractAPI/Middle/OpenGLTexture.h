@@ -16,6 +16,8 @@ namespace SIByL
 		OpenGLTexture2D(const uint32_t& id, const uint32_t& width, 
 			const uint32_t& height, const uint32_t& channel, const Format& type);
 
+		uint32_t GetID() { return m_TexID; }
+
 		virtual ~OpenGLTexture2D();
 
 		virtual uint32_t GetWidth() const override;

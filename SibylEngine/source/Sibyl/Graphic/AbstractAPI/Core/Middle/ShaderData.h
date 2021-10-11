@@ -156,4 +156,36 @@ namespace SIByL
 	private:
 		std::vector<TextureTableElement> m_Elements;
 	};
+
+	////////////////////////////////////////////////////////////////////////////
+	//						  Compute Resource Layout						  //
+	////////////////////////////////////////////////////////////////////////////
+	struct ComputeOutputElement
+	{
+		ShaderResourceType Type;
+		std::string Name;
+	};
+
+	class ComputeOutputLayout
+	{
+	public:
+		ComputeOutputLayout() {}
+		ComputeOutputLayout(const std::initializer_list<ComputeOutputElement>& elements)
+			:m_Elements(elements)
+		{
+		}
+
+		size_t SrvCount()
+		{
+			return m_Elements.size();
+		}
+
+		inline const std::vector<ComputeOutputElement>& GetElements() const { return m_Elements; }
+
+		std::vector<ComputeOutputElement>::iterator begin() { return m_Elements.begin(); }
+		std::vector<ComputeOutputElement>::iterator end() { return m_Elements.end(); }
+
+	private:
+		std::vector<ComputeOutputElement> m_Elements;
+	};
 }

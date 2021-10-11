@@ -35,7 +35,24 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: return CreateRef<OpenGLShaderResourcesBuffer>(desc, rs); break;
-		case RasterRenderer::DirectX12: return CreateRef<DX12ShaderResourcesBuffer>(desc, rs); break;
+		case RasterRenderer::DirectX12: return nullptr; break;
+		case RasterRenderer::CpuSoftware: return nullptr; break;
+		case RasterRenderer::GpuSoftware: return nullptr; break;
+		default: return nullptr; break;
+		}
+		return nullptr;
+	}
+
+	//////////////////////////////////////////////
+	///			Unordered Access Buffer			//
+	//////////////////////////////////////////////
+
+	Ref<UnorderedAccessBuffer> UnorderedAccessBuffer::Create(ShaderResourcesDesc* desc, RootSignature* rs)
+	{
+		switch (Renderer::GetRaster())
+		{
+		case RasterRenderer::OpenGL: return CreateRef<OpenGLUnorderedAccessBuffer>(desc, rs); break;
+		case RasterRenderer::DirectX12: return nullptr; break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;
@@ -84,6 +101,18 @@ namespace SIByL
 			{
 				m_ShaderResourceDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex, "PROCEDURE=White"});
 				m_ResourcesMapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
+				innerIndex++;
+			}
+			srIndex++; paraIndex++;
+		}
+
+		for (auto resourceBuffer : desc.m_ComputeOutputLayouts)
+		{
+			innerIndex = 0;
+			for (auto bufferElement : resourceBuffer)
+			{
+				m_UnorderedAccessDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex, "PROCEDURE=White"});
+				m_UnorderedAccessMapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
 				innerIndex++;
 			}
 			srIndex++; paraIndex++;

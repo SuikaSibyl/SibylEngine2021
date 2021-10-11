@@ -76,6 +76,10 @@ namespace SIByL
 		virtual void Resize(uint32_t width, uint32_t height) override;
 		virtual void* GetColorAttachment(unsigned int index) override;
 		virtual void* GetDepthStencilAttachment() override;
+		virtual RenderTarget* GetRenderTarget(unsigned int index) override;
+
+	private:
+		void SetViewportRect(int width, int height);
 
 	private:
 		std::vector<Ref<DX12RenderTarget>> RenderTargets;
@@ -83,5 +87,8 @@ namespace SIByL
 
 		unsigned int Width, Height;
 		unsigned int m_FrameBufferObject = 0;
+
+		D3D12_VIEWPORT viewPort;
+		D3D12_RECT scissorRect;
 	};
 }

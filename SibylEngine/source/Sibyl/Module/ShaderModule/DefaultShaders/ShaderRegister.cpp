@@ -8,6 +8,8 @@ namespace SIByL
 	void ShaderRegister::RegisterAll()
 	{
 		RegisterUnlitTexture();
+
+		RegisterACES();
 	}
 
 	void ShaderRegister::RegisterUnlitTexture()
@@ -46,4 +48,25 @@ namespace SIByL
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 	}
 
+
+	void ShaderRegister::RegisterACES()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::RGBA, "Color"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "Main"},
+			},
+		};
+
+		ComputeShader::Create("Shaders/Compute/ACES",
+			ShaderBinderDesc(CBlayouts, SRlayouts));
+	}
 }

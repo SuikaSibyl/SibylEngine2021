@@ -30,7 +30,7 @@ namespace SIByL
 		switch (Renderer::GetRaster())
 		{
 		case RasterRenderer::OpenGL: result = std::make_shared<OpenGLFrameBuffer>(desc); Library<FrameBuffer>::Push(key, result); break;
-		case RasterRenderer::DirectX12: return nullptr; break;
+		case RasterRenderer::DirectX12: result = std::make_shared<DX12FrameBuffer>(desc); Library<FrameBuffer>::Push(key, result); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;

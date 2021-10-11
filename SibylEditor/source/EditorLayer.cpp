@@ -28,6 +28,8 @@
 
 #include "Sibyl/ECS/UniqueID/UniqueID.h"
 
+#include "Platform/OpenGL/AbstractAPI/Middle/OpenGLFrameBufferTexture.h"
+
 namespace SIByLEditor
 {
 	SceneHierarchyPanel EditorLayer::s_SceneHierarchyPanel;
@@ -127,8 +129,14 @@ namespace SIByLEditor
 			FrameBufferTextureFormat::DEPTH24STENCIL8 };
 		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
 		
+		desc.Formats = {
+			FrameBufferTextureFormat::RGB8};
+		m_PostProcessBuffer = FrameBuffer::Create(desc, "POST1");
+
 		s_ViewportPanels.SetCamera(camera);
 		s_ViewportPanels.SetFrameBuffer(m_FrameBuffer);
+
+		acesShader = Library<ComputeShader>::Fetch("FILE=Shaders\\Compute\\ACES");
 
 		VertexBufferLayout layout =
 		{
@@ -174,6 +182,15 @@ namespace SIByLEditor
 		}
 
 		viewportBuffer->Unbind();
+
+		// =========================================
+		RenderTarget* procrt = m_FrameBuffer->GetRenderTarget(0);
+		OpenGLRenderTarget* oglprocrt = dynamic_cast<OpenGLRenderTarget*>(procrt);
+		oglprocrt->SetShaderResource(0);
+		RenderTarget* postrt = m_PostProcessBuffer->GetRenderTarget(0);
+		OpenGLRenderTarget* oglpostrt = dynamic_cast<OpenGLRenderTarget*>(postrt);
+		oglpostrt->SetComputeRenderTarget(0);
+		acesShader->Dispatch(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y, 1);
 	}
 
 	void EditorLayer::OnEvent(SIByL::Event& event)
@@ -221,6 +238,7 @@ namespace SIByLEditor
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_FrameBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
+		m_PostProcessBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 		camera->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 		s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
@@ -232,6 +250,7 @@ namespace SIByLEditor
 		{
 			m_ActiveScene = CreateRef<Scene>();
 			m_FrameBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
+			m_PostProcessBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 			camera->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 			s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 

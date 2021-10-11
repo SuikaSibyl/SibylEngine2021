@@ -14,8 +14,11 @@ namespace SIByL
 		void DeleteObject();
 		unsigned int& GetTextureObject() { return m_TextureObject; }
 		unsigned int* GetPtrTextureObject() { return &m_TextureObject; }
-
+		unsigned int GetGLType() { return GLType; }
 		virtual void Resize(uint32_t width, uint32_t height) override;
+
+		void SetComputeRenderTarget(unsigned int i);
+		void SetShaderResource(unsigned int i);
 
 	private:
 		unsigned int GLType = 0;

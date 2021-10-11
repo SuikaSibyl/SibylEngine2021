@@ -6,8 +6,10 @@ namespace SIByL
 	{
 	public:
 		static void RegisterAll();
+
 		static void RegisterUnlitTexture();
 
+		static void RegisterACES();
 
 	};
 }

@@ -13,15 +13,18 @@ namespace SIByL
 
 		ShaderBinderDesc(
 			const std::vector<ConstantBufferLayout>& cbLayouts,
-			const std::vector<ShaderResourceLayout>& srLayouts ) 
+			const std::vector<ShaderResourceLayout>& srLayouts,
+			const std::vector<ComputeOutputLayout>&  coLayouts = std::vector<ComputeOutputLayout>())
 			: m_ConstantBufferLayouts(cbLayouts)
-			, m_TextureBufferLayouts(srLayouts) {}
+			, m_TextureBufferLayouts(srLayouts)
+			, m_ComputeOutputLayouts(coLayouts){}
 
 		~ShaderBinderDesc() {};
 		size_t ConstantBufferCount()const { return m_ConstantBufferLayouts.size(); }
 		size_t TextureBufferCount()const { return m_TextureBufferLayouts.size(); }
 		std::vector<ConstantBufferLayout> m_ConstantBufferLayouts;
 		std::vector<ShaderResourceLayout> m_TextureBufferLayouts;
+		std::vector<ComputeOutputLayout>  m_ComputeOutputLayouts;
 	};
 
 	/// <summary>
@@ -65,7 +68,7 @@ namespace SIByL
 		void InsertResource(const ShaderResourceItem& element);
 		bool FetchResource(std::string name, ShaderResourceItem& buffer);
 		bool SetTextureID(std::string name, std::string ID);
-		//m_Mapper.begin()
+
 		using iterator = std::unordered_map<std::string, ShaderResourceItem>::iterator;
 		iterator begin() { return m_Mapper.begin(); }
 		iterator end() { return m_Mapper.end(); }
@@ -139,6 +142,19 @@ namespace SIByL
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
 	};
 
+	class RenderTarget;
+	class UnorderedAccessBuffer
+	{
+	public:
+		static Ref<UnorderedAccessBuffer> Create(ShaderResourcesDesc* desc, RootSignature* rs);
+		virtual ~UnorderedAccessBuffer() = default;
+		virtual ShaderResourcesDesc* GetShaderResourceDesc() = 0;
+		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
+		virtual void SetRenderTarget2D(const std::string& name, Ref<RenderTarget> rendertarget) = 0;
+
+		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
+	};
+
 	//////////////////////////////////////////////
 
 	//////////////////////////////////////////////
@@ -154,11 +170,11 @@ namespace SIByL
 	public:
 		static Ref<ShaderBinder> Create(const ShaderBinderDesc& desc);
 		virtual ~ShaderBinder() { delete[] m_ShaderConstantDescs; }
-
-
+		
 		virtual void BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer) = 0;
 		virtual ShaderConstantsDesc* GetShaderConstantsDesc(unsigned int slot) { return &m_ShaderConstantDescs[slot]; }
 		virtual ShaderResourcesDesc* GetShaderResourcesDesc() { return &m_ShaderResourceDescs; }
+		virtual ShaderResourcesDesc* GetUnorderedAccessDesc() { return &m_UnorderedAccessDescs; }
 		virtual RootSignature* GetRootSignature() { return nullptr; }
 
 		virtual void Bind() = 0;
@@ -167,8 +183,10 @@ namespace SIByL
 		void InitMappers(const ShaderBinderDesc& desc);
 		ConstantsMapper m_ConstantsMapper;
 		ResourcesMapper m_ResourcesMapper;
+		ResourcesMapper m_UnorderedAccessMapper;
 		ShaderConstantsDesc* m_ShaderConstantDescs;
 		ShaderResourcesDesc m_ShaderResourceDescs;
+		ShaderResourcesDesc m_UnorderedAccessDescs;
 	};
 	//////////////////////////////////////////////
 }

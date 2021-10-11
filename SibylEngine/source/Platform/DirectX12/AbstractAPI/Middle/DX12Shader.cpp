@@ -151,7 +151,8 @@ namespace SIByL
 		psoDesc.SampleMask = UINT_MAX;	//0xffffffff, No Sampling Mask
 		psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		psoDesc.NumRenderTargets = m_Descriptor.NumRenderTarget;
-		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;	// Normalized Unsigned Int
+		for (int i = 0; i < m_Descriptor.NumRenderTarget; i++)
+			psoDesc.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		psoDesc.SampleDesc.Count = 1;	// No 4XMSAA
 		psoDesc.SampleDesc.Quality = 0;	////No 4XMSAA

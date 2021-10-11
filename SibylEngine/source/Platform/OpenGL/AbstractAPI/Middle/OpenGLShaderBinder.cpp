@@ -4,6 +4,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
+#include "Platform/OpenGL/AbstractAPI/Middle/OpenGLFrameBufferTexture.h"
 
 #include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
 #include "Sibyl/ECS/Core/SerializeUtility.h"
@@ -267,6 +268,44 @@ namespace SIByL
 		}
 	}
 
+	OpenGLUnorderedAccessBuffer::OpenGLUnorderedAccessBuffer(ShaderResourcesDesc* desc, RootSignature* rs)
+	{
+		m_ShaderResourcesDesc = *desc;
+	}
+
+	void OpenGLUnorderedAccessBuffer::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
+	{
+		m_IsDirty = true;
+
+		ShaderResourceItem item;
+		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
+		{
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, texture->Identifer);
+		}
+	}
+
+	void OpenGLUnorderedAccessBuffer::SetRenderTarget2D(const std::string& name, Ref<RenderTarget> rendertarget)
+	{
+		m_IsDirty = true;
+
+		ShaderResourceItem item;
+		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
+		{
+			//m_ShaderResourcesDesc.Mapper.SetTextureID(name, rendertarget->Identifer);
+		}
+	}
+
+	ShaderResourcesDesc* OpenGLUnorderedAccessBuffer::GetShaderResourceDesc()
+	{
+		return nullptr;
+	}
+
+	void OpenGLUnorderedAccessBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
+	{
+
+	}
+
+
 	OpenGLShaderBinder::~OpenGLShaderBinder()
 	{
 
@@ -315,6 +354,16 @@ namespace SIByL
 		{
 			OpenGLTexture2D* oglTexture = dynamic_cast<OpenGLTexture2D*>(texture.get());
 			oglTexture->Bind(item.Offset);
+		}
+	}
+
+	void OpenGLShaderBinder::SetRenderTarget2D(const std::string& name, RenderTarget* rendertarget)
+	{
+		ShaderResourceItem item;
+		if (m_ResourcesMapper.FetchResource(name, item))
+		{
+			OpenGLRenderTarget* rt = dynamic_cast<OpenGLRenderTarget*>(rendertarget);
+			glBindImageTexture(0, rt->GetTextureObject(), 0, GL_FALSE, 0, GL_WRITE_ONLY, rt->GetGLType());
 		}
 	}
 }

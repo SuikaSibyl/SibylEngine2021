@@ -43,6 +43,7 @@ namespace SIByLEditor
 		void OnEvent(SIByL::Event& event) override;
 
 		Ref<Shader> shader;
+		Ref<ComputeShader> acesShader;
 		Ref<ViewCameraController> viewCameraController;
 		Ref<TriangleMesh> triangle;
 		Ref<Texture2D> texture;
@@ -50,6 +51,7 @@ namespace SIByLEditor
 		Ref<Camera> camera;
 		Ref<Camera> orthoCamera;
 		Ref<FrameBuffer> m_FrameBuffer;
+		Ref<FrameBuffer> m_PostProcessBuffer;
 		Ref<Scene> m_ActiveScene;
 
 		static SceneHierarchyPanel	s_SceneHierarchyPanel;

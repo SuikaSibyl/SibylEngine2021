@@ -262,6 +262,7 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp" />
     <ClCompile Include="source\Sibyl\ECS\UniqueID\UniqueID.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBufferTexture.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ComputeInstance.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderData.cpp" />
@@ -280,6 +281,7 @@
     <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Lighting\Light.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Core\PostProcessing\Core\PostProcessing.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Texture\Image.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.cpp" />
     <ClCompile Include="source\Sibyl\ImGui\ImGuiBuild.cpp" />
@@ -403,6 +405,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\RootSignature.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\FrameBufferTexture.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ComputeInstance.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderItem.h" />
@@ -426,6 +429,7 @@
     <ClInclude Include="source\Sibyl\Graphic\Core\Lighting\Light.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Material\Color.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Core\PostProcessing\Core\PostProcessing.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Texture\Image.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.h" />
     <ClInclude Include="source\Sibyl\ImGui\ImGuiUtility.h" />

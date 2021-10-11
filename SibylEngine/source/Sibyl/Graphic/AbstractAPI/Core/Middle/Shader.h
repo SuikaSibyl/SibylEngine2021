@@ -32,4 +32,20 @@ namespace SIByL
 		ShaderDesc m_Descriptor;
 		ShaderBinderDesc m_BinderDescriptor;
 	};
+
+	class ComputeShader
+	{
+	public:
+		static Ref<ComputeShader> Create(std::string file, const ShaderBinderDesc& binderDesc);
+
+		virtual void Dispatch(unsigned int x, unsigned int y, unsigned int z) = 0;
+		virtual void CreateBinder() = 0;
+
+		Ref<ShaderBinder> GetBinder() { return m_ShaderBinder; }
+		std::string ShaderID;
+
+	protected:
+		Ref<ShaderBinder> m_ShaderBinder;
+		ShaderBinderDesc m_BinderDescriptor;
+	};
 }

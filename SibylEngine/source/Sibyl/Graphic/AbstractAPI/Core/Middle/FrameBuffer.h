@@ -74,5 +74,6 @@ namespace SIByL
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 		virtual void* GetColorAttachment(unsigned int index) = 0;
 		virtual void* GetDepthStencilAttachment() = 0;
+		virtual RenderTarget* GetRenderTarget(unsigned int index) = 0;
 	};
 }

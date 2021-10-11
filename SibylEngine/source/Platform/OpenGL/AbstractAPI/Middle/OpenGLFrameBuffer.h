@@ -62,6 +62,7 @@ namespace SIByL
 		virtual void Resize(uint32_t width, uint32_t height) override;
 		virtual void* GetColorAttachment(unsigned int index) override;
 		virtual void* GetDepthStencilAttachment() override;
+		virtual RenderTarget* GetRenderTarget(unsigned int index) override;
 
 	private:
 		void Invalidate();

@@ -43,12 +43,30 @@ namespace SIByL
 		bool m_IsDirty = true;
 	};
 
+	class RenderTarget;
 	class OpenGLShaderResourcesBuffer :public ShaderResourcesBuffer
 	{
 	public:
 		OpenGLShaderResourcesBuffer(ShaderResourcesDesc* desc, RootSignature* rs);
 
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
+
+		virtual ShaderResourcesDesc* GetShaderResourceDesc() override;
+		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
+
+	private:
+		ShaderResourcesDesc m_ShaderResourcesDesc;
+		bool m_IsDirty = true;
+	};
+
+	class OpenGLUnorderedAccessBuffer :public UnorderedAccessBuffer
+	{
+	public:
+		OpenGLUnorderedAccessBuffer(ShaderResourcesDesc* desc, RootSignature* rs);
+
+		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
+		virtual void SetRenderTarget2D(const std::string& name, Ref<RenderTarget> rendertarget) override;
+
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() override;
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
 
@@ -65,6 +83,7 @@ namespace SIByL
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value);
 		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value);
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture);
+		virtual void SetRenderTarget2D(const std::string& name, RenderTarget* texture);
 
 		virtual void BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer) {}
 

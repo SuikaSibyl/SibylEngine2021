@@ -4,6 +4,7 @@
 
 namespace SIByL
 {
+	class DX12Resource;
 	class DX12DepthStencilResource;
 	class DX12RenderTargetResource;
 
@@ -12,7 +13,11 @@ namespace SIByL
 	public:
 		DX12RenderTarget(const FrameBufferTextureDesc& descriptor);
 
-		Ref<DX12DepthStencilResource> m_DepthStencilResource;
+		virtual void Resize(uint32_t width, uint32_t height) override;
+
+		DX12Resource* GetResource();
+
+		Ref<DX12RenderTargetResource> m_RenderTargetResource;
 	};
 
 	class DX12StencilDepth :public StencilDepth
@@ -20,6 +25,10 @@ namespace SIByL
 	public:
 		DX12StencilDepth(const FrameBufferTextureDesc& descriptor);
 
-		Ref<DX12RenderTargetResource> m_RenderTargetResource;
+		virtual void Resize(uint32_t width, uint32_t height) override;
+
+		DX12Resource* GetResource();
+
+		Ref<DX12DepthStencilResource> m_DepthStencilResource;
 	};
 }

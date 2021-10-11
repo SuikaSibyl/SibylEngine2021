@@ -76,6 +76,19 @@ namespace SIByL
 		CreateResource(pSCommandList);
 	}
 
+    DX12DepthStencilResource::DX12DepthStencilResource(const uint32_t& width, const uint32_t& height, DXGI_FORMAT format, Ref<DX12CommandList> pSCommandList)
+        :m_Width(width), m_Height(height)
+    {
+        m_Format = format;
+
+        // Allocate a descriptor from HeapAllocator
+        Ref<DescriptorAllocator> dsvDespAllocator = DX12Context::GetDsvDescriptorAllocator();
+        m_DSVDescriptorAllocation = dsvDespAllocator->Allocate(1);
+
+        // Create the actual buffer
+        CreateResource(pSCommandList);
+    }
+
     void DX12DepthStencilResource::Reset()
     {
         m_Resource->Reset();
@@ -101,12 +114,12 @@ namespace SIByL
         dsvResourceDesc.MipLevels = 1;
         dsvResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         dsvResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-        dsvResourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        dsvResourceDesc.Format = m_Format;
         dsvResourceDesc.SampleDesc.Count = 1;
         dsvResourceDesc.SampleDesc.Quality = 0;
 
         CD3DX12_CLEAR_VALUE optClear;
-        optClear.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        optClear.Format = m_Format;
         optClear.DepthStencil.Depth = 1.0f;
         optClear.DepthStencil.Stencil = 0;
 
@@ -157,6 +170,24 @@ namespace SIByL
         CreateResource(pSCommandList);
     }
 
+    DX12RenderTargetResource::DX12RenderTargetResource(const uint32_t& width, const uint32_t& height, DXGI_FORMAT format, Ref<DX12CommandList> pSCommandList)
+        :m_Width(width), m_Height(height)
+    {
+        m_Format = format;
+
+        // Allocate a descriptor from HeapAllocator
+        Ref<DescriptorAllocator> rtvDespAllocator = DX12Context::GetRtvDescriptorAllocator();
+        Ref<DescriptorAllocator> srvDespAllocator = DX12Context::GetSrvDescriptorAllocator();
+        Ref<DescriptorAllocator> srvDespAllocatorGpu = DX12Context::GetSrvDescriptorAllocatorGpu();
+        m_RTVDescriptorAllocation = rtvDespAllocator->Allocate(1);
+        m_SRVDescriptorAllocationCpu = srvDespAllocator->Allocate(1);
+        m_SRVDescriptorAllocationGpu = srvDespAllocatorGpu->Allocate(1);
+        m_ImGuiAllocation = ImGuiLayerDX12::Get()->RegistShaderResource();
+
+        // Create the actual buffer
+        CreateResource(pSCommandList);
+    }
+
     void DX12RenderTargetResource::Reset()
     {
         m_Resource->Reset();
@@ -182,12 +213,12 @@ namespace SIByL
         rtvResourceDesc.MipLevels = 1;
         rtvResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
         rtvResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-        rtvResourceDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        rtvResourceDesc.Format = m_Format;
         rtvResourceDesc.SampleDesc.Count = 1;
         rtvResourceDesc.SampleDesc.Quality = 0;
 
         CD3DX12_CLEAR_VALUE optClear;
-        optClear.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        optClear.Format = m_Format;
         memcpy(optClear.Color, DirectX::Colors::Transparent, 4 * sizeof(float));
 
         ComPtr<ID3D12Resource> resource;

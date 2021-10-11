@@ -26,4 +26,20 @@ namespace SIByL
 		VertexBufferLayout m_VertexBufferLayout;
 		ShaderBinderDesc m_BinderDescriptor;
 	};
+
+	class OpenGLComputeShader :public ComputeShader
+	{
+	public:
+		OpenGLComputeShader(std::string file, const ShaderBinderDesc& binderDesc);
+
+		virtual void Dispatch(unsigned int x, unsigned int y, unsigned int z) override;
+		virtual void CreateBinder() override;
+
+	private:
+		void CompileFromFile(std::string shaderPath);
+		void CompileFromString(const char* shaderString);
+
+	private:
+		unsigned int m_ShaderProgram;
+	};
 }

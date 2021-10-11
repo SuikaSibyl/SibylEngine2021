@@ -59,4 +59,30 @@ namespace SIByL
 		return nullptr;
 	}
 
+	////////////////////////////////////////////////////////////////
+	//						Compute Shader						 ///
+	////////////////////////////////////////////////////////////////
+	Ref<ComputeShader> ComputeShader::Create(std::string file, const ShaderBinderDesc& binderDesc)
+	{
+		std::string id = GetPathID(file);
+		Ref<ComputeShader> shader = Library<ComputeShader>::Fetch(id);
+
+		if (shader == nullptr)
+		{
+			switch (Renderer::GetRaster())
+			{
+			case RasterRenderer::OpenGL: shader = std::make_shared<OpenGLComputeShader>(AssetRoot + file + ".glsl", binderDesc); break;
+			case RasterRenderer::DirectX12: shader = nullptr; break;
+			case RasterRenderer::CpuSoftware: shader = nullptr; break;
+			case RasterRenderer::GpuSoftware: shader = nullptr; break;
+			default: shader = nullptr; break;
+			}
+
+			Library<ComputeShader>::Push(id, shader);
+		}
+
+		shader->ShaderID = file;
+		return shader;
+	}
+
 }

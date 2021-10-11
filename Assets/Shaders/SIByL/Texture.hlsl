@@ -54,8 +54,17 @@ VertexOut VS(VertexIn vin)
     return vout;
 }
 
-float4 PS(VertexOut pin) : SV_Target
+struct PS_OUTPUT
 {
+    float4 Color: SV_Target0;
+    float4 Normal: SV_Target1;
+};
+
+PS_OUTPUT PS(VertexOut pin) : SV_Target
+{
+	PS_OUTPUT output;
 	float4 color = gDiffuseMap.Sample(gSamLinearWarp, pin.UV);
-    return pin.Color * color;
+	output.Color = pin.Color * color;
+	output.Normal = float4(1,0,0,1);
+    return output;
 }

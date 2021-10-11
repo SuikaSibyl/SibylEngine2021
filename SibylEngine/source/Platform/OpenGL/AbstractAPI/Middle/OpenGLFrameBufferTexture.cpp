@@ -57,6 +57,15 @@ namespace SIByL
 		Descriptor.Height = height;
 	}
 
+	void OpenGLRenderTarget::SetComputeRenderTarget(unsigned int i)
+	{
+		glBindImageTexture(0, m_TextureObject, 0, GL_FALSE, 0, GL_WRITE_ONLY, GLType);
+	}
+	void OpenGLRenderTarget::SetShaderResource(unsigned int i)
+	{
+		glBindTexture(GL_TEXTURE_2D, m_TextureObject);
+	}
+
 	// ==========================================================
 	// 	   OpenGL Depth Stencil API
 	// ==========================================================
