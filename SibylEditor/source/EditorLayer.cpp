@@ -16,6 +16,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/DrawItem.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/ComputeInstance.h"
 #include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
 #include "Sibyl/Core/Events/KeyEvent.h"
 #include "Sibyl/Core/Events/MouseEvent.h"
@@ -120,29 +121,44 @@ namespace SIByLEditor
 
 		viewCameraController = std::make_shared<ViewCameraController>(camera);
 
+		m_FrameConstants = CreateRef<FrameConstantsManager>();
+		m_FrameConstants->SetFrame();
+
 		FrameBufferDesc desc;
 		desc.Width = 1280;
 		desc.Height = 720;
 		desc.Formats = { 
 			FrameBufferTextureFormat::RGB8, 
-			FrameBufferTextureFormat::RGB8, 
+			FrameBufferTextureFormat::R16G16F,
 			FrameBufferTextureFormat::DEPTH24STENCIL8 };
+		// Frame Buffer 0: Main Render Buffer
 		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
 		
-		desc.Formats = {
-			FrameBufferTextureFormat::RGB8};
-		m_PostProcessBuffer = FrameBuffer::Create(desc, "POST1");
+		desc.Formats = {FrameBufferTextureFormat::RGB8};
 
 		s_ViewportPanels.SetCamera(camera);
 		s_ViewportPanels.SetFrameBuffer(m_FrameBuffer);
 
-		acesShader = Library<ComputeShader>::Fetch("FILE=Shaders\\Compute\\ACES");
+		// ===================================================================
+		// Frame Buffer 1: ACES
+		Ref<FrameBuffer> m_PostProcessBuffer_1 = FrameBuffer::Create(desc, "POST1");
+		Ref<ComputeInstance> ACESInstance = CreateRef<ComputeInstance>(Library<ComputeShader>::Fetch("FILE=Shaders\\Compute\\ACES"));
+		Library<ComputeInstance>::Push("ACES", ACESInstance);
+		ACESInstance->SetRenderTarget2D("ACESResult", m_PostProcessBuffer_1, 0);
+		ACESInstance->SetTexture2D("Input", m_FrameBuffer->GetRenderTarget(0));
+		ACESInstance->SetFloat("Para", 0.5);
 
-		VertexBufferLayout layout =
-		{
-			{ShaderDataType::Float3, "POSITION"},
-			{ShaderDataType::Float2, "TEXCOORD"},
-		};
+		// ===================================================================
+		// Frame Buffer 2/3: TAA
+		m_FrameBuffer_TAA[0] = FrameBuffer::Create(desc, "TAA1");
+		m_FrameBuffer_TAA[1] = FrameBuffer::Create(desc, "TAA2");
+		Ref<ComputeInstance> TAAInstance = CreateRef<ComputeInstance>(Library<ComputeShader>::Fetch("FILE=Shaders\\Compute\\TAA"));
+		Library<ComputeInstance>::Push("TAA", TAAInstance);
+		TAAInstance->SetRenderTarget2D("TAAResult", m_FrameBuffer_TAA[1], 0);
+		TAAInstance->SetTexture2D("u_PreviousFrame", m_FrameBuffer_TAA[0]->GetRenderTarget(0));
+		TAAInstance->SetTexture2D("u_CurrentFrame", m_PostProcessBuffer_1->GetRenderTarget(0));
+		TAAInstance->SetTexture2D("u_Offset", m_FrameBuffer->GetRenderTarget(1));
+		TAAInstance->SetFloat("Alpha", 0.5);
 	}
 
 	void EditorLayer::OnUpdate()
@@ -159,11 +175,13 @@ namespace SIByLEditor
 			viewCameraController->OnUpdate();
 	}
 
+	static bool NextFrame = false;
 	void EditorLayer::OnDraw()
 	{
-		// -------------------------------------------------------
-		//Ref<PtrCudaSurface> surface = viewportBuffer->GetPtrCudaSurface();
-		//CUDARayTracerInterface::RenderPtrCudaSurface(surface.get(), Application::Get().GetFrameTimer()->DeltaTime());
+		//if (NextFrame == false)
+		//	return;
+
+		//NextFrame = false;
 		// -------------------------------------------------------
 
 		Ref<FrameBuffer> viewportBuffer = Library<FrameBuffer>::Fetch("SceneView");
@@ -171,6 +189,10 @@ namespace SIByLEditor
 		viewportBuffer->ClearBuffer();
 
 		camera->SetCamera();
+		camera->RecordVPMatrix();
+		static unsigned int HaltonIndex = 0;
+		auto [x, y] = Halton::Halton23(HaltonIndex++);
+		camera->Dither(x, y);
 
 		DrawItemPool& diPool = m_ActiveScene->GetDrawItems();
 		for (Ref<DrawItem> drawItem : diPool)
@@ -178,19 +200,22 @@ namespace SIByLEditor
 			drawItem->m_Material->SetPass();
 			Graphic::CurrentCamera->OnDrawCall();
 			Graphic::CurrentMaterial->OnDrawCall();
+			Graphic::CurrentFrameConstantsManager->OnDrawCall();
 			drawItem->OnDrawCall();
 		}
 
 		viewportBuffer->Unbind();
 
-		// =========================================
-		RenderTarget* procrt = m_FrameBuffer->GetRenderTarget(0);
-		OpenGLRenderTarget* oglprocrt = dynamic_cast<OpenGLRenderTarget*>(procrt);
-		oglprocrt->SetShaderResource(0);
-		RenderTarget* postrt = m_PostProcessBuffer->GetRenderTarget(0);
-		OpenGLRenderTarget* oglpostrt = dynamic_cast<OpenGLRenderTarget*>(postrt);
-		oglpostrt->SetComputeRenderTarget(0);
-		acesShader->Dispatch(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y, 1);
+		Ref<ComputeInstance> ACESInstance = Library<ComputeInstance>::Fetch("ACES");
+		ACESInstance->Dispatch(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y, 1);
+
+		static int taaBufferIdx = 0;
+		Ref<ComputeInstance> TAAInstance = Library<ComputeInstance>::Fetch("TAA");
+		TAAInstance->SetRenderTarget2D("TAAResult", m_FrameBuffer_TAA[taaBufferIdx], 0);
+		TAAInstance->SetTexture2D("u_PreviousFrame", m_FrameBuffer_TAA[(taaBufferIdx + 1) % 2]->GetRenderTarget(0));
+		TAAInstance->SetTexture2D("u_CurrentFrame", FrameBufferLibrary::GetRenderTarget("POST10"));
+		taaBufferIdx++; if (taaBufferIdx == 2) taaBufferIdx = 0;
+		TAAInstance->Dispatch(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y, 1);
 	}
 
 	void EditorLayer::OnEvent(SIByL::Event& event)
@@ -231,14 +256,17 @@ namespace SIByLEditor
 				SaveScene();
 			}
 		}
+		else if (e.GetKeyCode() == SIByL_KEY_T)
+		{
+			NextFrame = true;
+		}
 		s_ViewportPanels.OnKeyPressed(e);
 	}
 
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		m_FrameBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
-		m_PostProcessBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
+		FrameBufferLibrary::ResizeAll(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 		camera->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 		s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
@@ -249,8 +277,7 @@ namespace SIByLEditor
 		if (!filepath.empty())
 		{
 			m_ActiveScene = CreateRef<Scene>();
-			m_FrameBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
-			m_PostProcessBuffer->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
+			FrameBufferLibrary::ResizeAll(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 			camera->Resize(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y);
 			s_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
@@ -367,6 +394,16 @@ namespace SIByLEditor
 		s_ContentBrowserPanel.OnImGuiRender();
 		s_InspectorPanel.OnImGuiRender();
 
+		ImGui::End();
+
+		ImGui::Begin("Post Processing");
+		static float ACESPara = 0.5;
+		if (ImGui::DragFloat("ACES Para", &ACESPara, 0.1, 0, 10))
+		{
+			std::cout << "Para: " << ACESPara << std::endl;
+			Ref<ComputeInstance> ACESInstance = Library<ComputeInstance>::Fetch("ACES");
+			ACESInstance->SetFloat("Para", ACESPara);
+		}
 		ImGui::End();
 	}
 }

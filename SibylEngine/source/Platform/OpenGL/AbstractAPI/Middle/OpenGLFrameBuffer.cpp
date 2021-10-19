@@ -186,18 +186,21 @@ namespace SIByL
 	////////////////////////////////////////////////////////////////
 	// 					 OpenGL Frame Buffer					  //
 	////////////////////////////////////////////////////////////////
-	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferDesc& desc)
+	OpenGLFrameBuffer::OpenGLFrameBuffer(const FrameBufferDesc& desc, std::string identifier)
 		:Width(desc.Width), Height(desc.Height)
 	{
+		int RenderTargetIdx = 0;
 		for (FrameBufferTextureFormat format : desc.Formats.Formats)
 		{
 			if (IsDepthFormat(format))
 			{
 				DepthStencil = CreateRef<OpenGLStencilDepth>(FrameBufferTextureDesc{ format,desc.Width,desc.Height });
+				DepthStencil->SetIdentifier(identifier + "d");
 			}
 			else
 			{
 				RenderTargets.push_back(CreateRef<OpenGLRenderTarget>(FrameBufferTextureDesc{ format,desc.Width,desc.Height }));
+				RenderTargets[RenderTargets.size() - 1]->SetIdentifier(identifier + std::to_string(RenderTargetIdx++));
 			}
 		}
 
@@ -217,7 +220,7 @@ namespace SIByL
 
 	void OpenGLFrameBuffer::ClearBuffer()
 	{
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 

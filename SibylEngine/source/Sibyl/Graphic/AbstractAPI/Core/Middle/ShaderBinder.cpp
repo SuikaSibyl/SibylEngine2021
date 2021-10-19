@@ -13,11 +13,11 @@ namespace SIByL
 	///			Shader Constants Buffer			//
 	//////////////////////////////////////////////
 
-	Ref<ShaderConstantsBuffer> ShaderConstantsBuffer::Create(ShaderConstantsDesc* desc)
+	Ref<ShaderConstantsBuffer> ShaderConstantsBuffer::Create(ShaderConstantsDesc* desc, bool isCS)
 	{
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: return CreateRef<OpenGLShaderConstantsBuffer>(desc);; break;
+		case RasterRenderer::OpenGL: return CreateRef<OpenGLShaderConstantsBuffer>(desc, isCS); break;
 		case RasterRenderer::DirectX12: return CreateRef<DX12ShaderConstantsBuffer>(desc); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
@@ -169,7 +169,7 @@ namespace SIByL
 		}
 	}
 
-	bool ResourcesMapper::SetTextureID(std::string name, std::string ID)
+	bool ResourcesMapper::SetTextureID(std::string name, std::string ID, ShaderResourceType type)
 	{
 		// If the name already exists
 		if (m_Mapper.find(name) == m_Mapper.end())
@@ -180,6 +180,7 @@ namespace SIByL
 		else
 		{
 			m_Mapper[name].TextureID = ID;
+			m_Mapper[name].Type = type;
 			return true;
 		}
 	}

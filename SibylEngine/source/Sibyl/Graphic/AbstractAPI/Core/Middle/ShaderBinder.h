@@ -67,7 +67,7 @@ namespace SIByL
 	public:
 		void InsertResource(const ShaderResourceItem& element);
 		bool FetchResource(std::string name, ShaderResourceItem& buffer);
-		bool SetTextureID(std::string name, std::string ID);
+		bool SetTextureID(std::string name, std::string ID, ShaderResourceType type = ShaderResourceType::Texture2D);
 
 		using iterator = std::unordered_map<std::string, ShaderResourceItem>::iterator;
 		iterator begin() { return m_Mapper.begin(); }
@@ -92,14 +92,16 @@ namespace SIByL
 	class ShaderConstantsBuffer
 	{
 	public:
-		static Ref<ShaderConstantsBuffer> Create(ShaderConstantsDesc* desc);
+		static Ref<ShaderConstantsBuffer> Create(ShaderConstantsDesc* desc, bool isCS = false);
 		virtual ~ShaderConstantsBuffer() = default;
 
+		virtual void SetInt(const std::string& name, const int& value) =0;
 		virtual void SetFloat(const std::string& name, const float& value) = 0;
 		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
 		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) = 0;
 
+		virtual void GetInt(const std::string& name, int& value) = 0;
 		virtual void GetFloat(const std::string& name, float& value) = 0;
 		virtual void GetFloat3(const std::string& name, glm::vec3& value) = 0;
 		virtual void GetFloat4(const std::string& name, glm::vec4& value) = 0;
@@ -131,6 +133,7 @@ namespace SIByL
 		ResourcesMapper::iterator end() { return Mapper.end(); }
 	};
 	class RootSignature;
+	class RenderTarget;
 	class ShaderResourcesBuffer
 	{
 	public:
@@ -138,11 +141,13 @@ namespace SIByL
 		virtual ~ShaderResourcesBuffer() = default;
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() = 0;
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
+		virtual void SetTexture2D(const std::string& name, RenderTarget* texture) = 0;
 
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
 	};
 
 	class RenderTarget;
+	class FrameBuffer;
 	class UnorderedAccessBuffer
 	{
 	public:
@@ -150,7 +155,7 @@ namespace SIByL
 		virtual ~UnorderedAccessBuffer() = default;
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() = 0;
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
-		virtual void SetRenderTarget2D(const std::string& name, Ref<RenderTarget> rendertarget) = 0;
+		virtual void SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx) = 0;
 
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
 	};

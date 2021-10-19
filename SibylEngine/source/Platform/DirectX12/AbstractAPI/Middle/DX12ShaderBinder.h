@@ -14,12 +14,14 @@ namespace SIByL
 	{
 	public:
 		DX12ShaderConstantsBuffer(ShaderConstantsDesc* desc);
-		
+
+		virtual void SetInt(const std::string& name, const int& value) override;
 		virtual void SetFloat(const std::string& name, const float& value) override;
 		virtual void SetFloat3(const std::string& name, const glm::vec3& value) override;
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value) override;
 
+		virtual void GetInt(const std::string& name, int& value) override;
 		virtual void GetFloat(const std::string& name, float& value) override;
 		virtual void GetFloat3(const std::string& name, glm::vec3& value) override;
 		virtual void GetFloat4(const std::string& name, glm::vec4& value) override;

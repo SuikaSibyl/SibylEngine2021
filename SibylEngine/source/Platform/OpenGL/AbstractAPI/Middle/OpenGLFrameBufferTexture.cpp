@@ -19,8 +19,11 @@ namespace SIByL
 		case FrameBufferTextureFormat::RGB8:
 			GLType = GL_RGBA8;
 			break;
-		case FrameBufferTextureFormat::RGBA16:
-			GLType = GL_RGB16;
+		case FrameBufferTextureFormat::RGB16F:
+			GLType = GL_RGB16F;
+			break;
+		case FrameBufferTextureFormat::R16G16F:
+			GLType = GL_RG16F;
 			break;
 		case FrameBufferTextureFormat::DEPTH24STENCIL8:
 			GLType = GL_DEPTH24_STENCIL8;
@@ -39,8 +42,23 @@ namespace SIByL
 	{
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_TextureObject);
 		glBindTexture(GL_TEXTURE_2D, m_TextureObject);
+		
+		switch (Descriptor.Format)
+		{
+		case FrameBufferTextureFormat::RGB8:
+			glTexImage2D(GL_TEXTURE_2D, 0, GLType, Descriptor.Width, Descriptor.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			break;
+		case FrameBufferTextureFormat::R16G16F:
+			glTexImage2D(GL_TEXTURE_2D, 0, GLType, Descriptor.Width, Descriptor.Height, 0, GL_RG, GL_FLOAT, 0);
+			break;
+		case FrameBufferTextureFormat::RGB16F:
+			glTexImage2D(GL_TEXTURE_2D, 0, GLType, Descriptor.Width, Descriptor.Height, 0, GL_RGB, GL_FLOAT, 0);
+			break;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GLType, Descriptor.Width, Descriptor.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -61,8 +79,10 @@ namespace SIByL
 	{
 		glBindImageTexture(0, m_TextureObject, 0, GL_FALSE, 0, GL_WRITE_ONLY, GLType);
 	}
+
 	void OpenGLRenderTarget::SetShaderResource(unsigned int i)
 	{
+		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, m_TextureObject);
 	}
 
@@ -79,7 +99,7 @@ namespace SIByL
 		case FrameBufferTextureFormat::RGB8:
 			GLType = GL_RGBA8;
 			break;
-		case FrameBufferTextureFormat::RGBA16:
+		case FrameBufferTextureFormat::RGB16F:
 			GLType = GL_RGB16;
 			break;
 		case FrameBufferTextureFormat::DEPTH24STENCIL8:

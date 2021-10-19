@@ -1,5 +1,7 @@
 #include "SIByLpch.h"
 
+#include <glm/glm.hpp>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -21,7 +23,7 @@ namespace SIByL
 		Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(path, 
             ((Renderer::GetRaster() == RasterRenderer::OpenGL) ? 0 : 0) | 
-            aiProcess_Triangulate | aiProcess_GenNormals);
+            aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
@@ -81,6 +83,31 @@ namespace SIByL
                     vertices.push_back(mesh->mNormals[i].x);
                     vertices.push_back(mesh->mNormals[i].y);
                     vertices.push_back(mesh->mNormals[i].z);
+                }
+                else if (element.Name == "TANGENT")
+                {
+                    if (mesh->HasTangentsAndBitangents())
+                    {
+                        vertices.push_back(mesh->mTangents[i].x);
+                        vertices.push_back(mesh->mTangents[i].y);
+                        vertices.push_back(mesh->mTangents[i].z);
+
+                        glm::vec3 Normal(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+                        glm::vec3 Tangent(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+                        glm::vec3 Bitangent = glm::cross(Normal, Tangent);
+                        if (Bitangent.x * mesh->mBitangents[i].x)
+                            vertices.push_back(1);
+                        else
+                            vertices.push_back(0);
+                    }
+                    else
+                    {
+                        //SIByL_CORE_ERROR("Mesh Process Error: NO TANGENT");
+                        vertices.push_back(0);
+                        vertices.push_back(0);
+                        vertices.push_back(0);
+                        vertices.push_back(0);
+                    }                      
                 }
                 else
                 {

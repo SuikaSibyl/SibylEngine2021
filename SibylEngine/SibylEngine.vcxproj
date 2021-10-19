@@ -237,6 +237,7 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
+    <ClCompile Include="source\Sibyl\Basic\Random\LowDiscrepancySeq\LowDiscrepancySequence.cpp" />
     <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Asset\AssetUtility.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Asset\CustomAsset.cpp" />
@@ -266,6 +267,7 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\ShaderData.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\DefaultRenderPipeline.cpp" />
@@ -281,6 +283,7 @@
     <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Lighting\Light.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\Core\Lighting\LightManager.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\PostProcessing\Core\PostProcessing.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\Core\Texture\Image.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\Texture.cpp" />
@@ -365,6 +368,7 @@
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />
     <ClInclude Include="source\SIByLsettings.h" />
+    <ClInclude Include="source\Sibyl\Basic\Random\LowDiscrepancySeq\LowDiscrepancySequence.h" />
     <ClInclude Include="source\Sibyl\Basic\ThreadSafeQueue.h" />
     <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h" />
     <ClInclude Include="source\Sibyl\Basic\Utils\PlatformUtils.h" />
@@ -409,6 +413,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\DrawItem.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\PSO.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Middle\RenderItem.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Mesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.h" />
@@ -427,6 +432,7 @@
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\TriangleMesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\Vertex.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Lighting\Light.h" />
+    <ClInclude Include="source\Sibyl\Graphic\Core\Lighting\LightManager.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\Material\Color.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Material.h" />
     <ClInclude Include="source\Sibyl\Graphic\Core\PostProcessing\Core\PostProcessing.h" />

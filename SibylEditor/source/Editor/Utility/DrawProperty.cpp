@@ -117,15 +117,9 @@ namespace SIByLEditor
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
 			{
-				SIByL::VertexBufferLayout layout =
-				{
-					{SIByL::ShaderDataType::Float3, "POSITION"},
-					{SIByL::ShaderDataType::Float2, "TEXCOORD"},
-				};
-
 				const wchar_t* path = (const wchar_t*)payload->Data;
 				std::filesystem::path texturePath = path;
-				SIByL::MeshLoader meshLoader(texturePath.string(), layout);
+				SIByL::MeshLoader meshLoader(texturePath.string(), SIByL::VertexBufferLayout::StandardVertexBufferLayout);
 				mesh.Mesh = meshLoader.GetTriangleMesh();
 			}
 			ImGui::EndDragDropTarget();
@@ -190,6 +184,37 @@ namespace SIByLEditor
 		}
 	}
 
+	void DrawPipelineState(const std::string& label, SIByL::Material& material)
+	{
+		ImGui::Text("Pipeline State");
+
+		// ===================================
+		// Alpha State
+		ImGui::Text("Alpha State: ");
+		ImGui::SameLine();
+
+		if (ImGui::Button(GetAlphaStateString(material.pipelineStateDesc.alphaState).c_str()))
+			ImGui::OpenPopup("Alpha State");
+
+		if (ImGui::BeginPopup("Alpha State"))
+		{
+			static int selected = -1;
+			for (int i = 0; i < 3; i++)
+			{
+				AlphaState state = AlphaState(i);
+				if (ImGui::Selectable(GetAlphaStateString(state).c_str(), selected == i))
+				{
+					selected = i;
+					material.pipelineStateDesc.alphaState = state;
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			ImGui::EndPopup();
+		}
+		//material.pipelineStateDesc;
+	}
+
 	void DrawMaterialSlot(const std::string& label)
 	{
 
@@ -219,14 +244,19 @@ namespace SIByLEditor
 			if (ImGui::Button("Save"))
 				material.SaveAsset();
 		}
-
 		if (opened)
 		{
 			// If Material Already Exist
 			if (&material != nullptr)
 			{
+				// Draw All Property
+				// ================================================================
 				DrawShaderSlot("Shader", material);
 
+				// Draw Pipeline State
+				// ================================================================
+				DrawPipelineState("Pipeline State", material);
+				
 				// ================================================================
 				// Draw constants
 				SIByL::ShaderConstantsDesc* constant = material.GetConstantsDesc();

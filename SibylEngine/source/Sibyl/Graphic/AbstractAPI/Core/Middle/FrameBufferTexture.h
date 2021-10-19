@@ -12,7 +12,8 @@ namespace SIByL
 	{
 		None,
 		RGB8,
-		RGBA16,
+		RGB16F,
+		R16G16F,
 		DEPTH24STENCIL8,
 		DEPTH32F,
 	};
@@ -57,6 +58,12 @@ namespace SIByL
 	public:
 		static Ref<RenderTarget> Create(FrameBufferTextureDesc desc);
 		virtual ~RenderTarget() = default;
+
+	public:
+		const std::string& GetIdentifier() { return Identifier; }
+		void SetIdentifier(const std::string& id) { Identifier = id; }
+	private:
+		std::string Identifier;
 	};
 
 	/////////////////////////////////////////////////////////////
@@ -67,5 +74,11 @@ namespace SIByL
 	public:
 		static Ref<StencilDepth> Create(FrameBufferTextureDesc desc);
 		virtual ~StencilDepth() = default;
+
+	public:
+		const std::string& GetIdentifier() { return Identifier; }
+		void SetIdentifier(const std::string& id) { Identifier = id; }
+	private:
+		std::string Identifier;
 	};
 }

@@ -1,51 +1,27 @@
 #include "SIByLpch.h"
 #include "FrameBufferLibrary.h"
 
+#include "ResourceLibrary.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 
 namespace SIByL
 {
-	FrameBufferLibrary::FrameBufferMap FrameBufferLibrary::m_Mapper;
-	
-	void FrameBufferLibrary::Register(const std::string& name, Ref<FrameBuffer_v1> buffer)
+	void FrameBufferLibrary::ResizeAll(unsigned int width, unsigned int height)
 	{
-		if (m_Mapper.find(name) == m_Mapper.end())
+		std::unordered_map<std::string, Ref<FrameBuffer>> frameBuffers = Library<FrameBuffer>::Mapper;
+		for (auto iter : frameBuffers)
 		{
-			m_Mapper[name] = buffer;
-		}
-		else
-		{
-			SIByL_CORE_ERROR("Duplicate Frame Buffer Key!");
+			iter.second->Resize(width, height);
 		}
 	}
 
-	void FrameBufferLibrary::Remove(const std::string& name)
+	RenderTarget* FrameBufferLibrary::GetRenderTarget(std::string Identifier)
 	{
-		if (m_Mapper.find(name) != m_Mapper.end())
-		{
-			m_Mapper.erase(name);
-		}
-		else
-		{
-			SIByL_CORE_ERROR("Frame Buffer Key Not Exist!");
-		}
+		std::string name = Identifier.substr(0, Identifier.length() - 1);
+		unsigned int index = atoi(Identifier.substr(Identifier.length() - 1, 1).c_str());
+		Ref<FrameBuffer> frameBuffer = Library<FrameBuffer>::Fetch(name);
+		RenderTarget* rendertarget = frameBuffer->GetRenderTarget(index);
+		return rendertarget;
 	}
 
-	void FrameBufferLibrary::Reset()
-	{
-		m_Mapper.clear();
-	}
-
-	Ref<FrameBuffer_v1> FrameBufferLibrary::Fetch(const std::string& name)
-	{
-		if (m_Mapper.find(name) != m_Mapper.end())
-		{
-			return m_Mapper[name];
-		}
-		else
-		{
-			SIByL_CORE_ERROR("Frame Buffer Key Not Exist!");
-			return nullptr;
-		}
-	}
 }

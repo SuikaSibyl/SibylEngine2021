@@ -357,6 +357,15 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ComputeInstance.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Random\LowDiscrepancySeq\LowDiscrepancySequence.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\Core\Lighting\LightManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1677,6 +1686,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\ComputeInstance.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Random\LowDiscrepancySeq\LowDiscrepancySequence.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Core\Lighting\LightManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

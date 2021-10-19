@@ -4,6 +4,12 @@
 #version 450 core
 layout (local_size_x = 1, local_size_y = 1) in;
 layout(rgba8, binding = 0) uniform image2D img_output;
+
+layout(std430, binding=0) buffer Input
+{
+    float Para;
+};
+
 uniform sampler2D u_Texture;
 
 vec3 ACESToneMapping(vec3 color, float adapted_lum)
@@ -29,7 +35,7 @@ void main(void)
     float v =1.0f * (gl_GlobalInvocationID.y + 0.5f)/gl_NumWorkGroups.y;
 
     vec4 textCol = texture(u_Texture, vec2(u,v));
-    // textCol.xyz = ACESToneMapping(textCol.xyz,0.5);
+    textCol.xyz = ACESToneMapping(textCol.xyz, Para);
     pixel= textCol;
 
     // output to a specific pixel in the image

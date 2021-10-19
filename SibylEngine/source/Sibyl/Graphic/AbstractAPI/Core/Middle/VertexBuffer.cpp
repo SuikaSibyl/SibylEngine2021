@@ -20,4 +20,11 @@ namespace SIByL
 		return nullptr;
 	}
 
+	SIByL::VertexBufferLayout VertexBufferLayout::StandardVertexBufferLayout =
+	{
+		{SIByL::ShaderDataType::Float3, "POSITION"},
+		{SIByL::ShaderDataType::Float3, "NORMAL"},
+		{SIByL::ShaderDataType::Float4, "TANGENT"},
+		{SIByL::ShaderDataType::Float2, "TEXCOORD"},
+	};
 }

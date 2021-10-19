@@ -53,7 +53,7 @@ namespace SIByL
 	class OpenGLFrameBuffer :public FrameBuffer
 	{
 	public:
-		OpenGLFrameBuffer(const FrameBufferDesc& desc);
+		OpenGLFrameBuffer(const FrameBufferDesc& desc, std::string identifier);
 
 		virtual void Bind() override;
 		virtual void Unbind() override;

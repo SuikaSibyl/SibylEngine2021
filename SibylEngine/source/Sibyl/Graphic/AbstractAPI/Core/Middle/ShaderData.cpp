@@ -12,11 +12,30 @@ namespace SIByL
 	{
 		{ShaderDataType::Mat4, "View"},
 		{ShaderDataType::Mat4, "Projection" },
+		{ShaderDataType::Mat4, "PreviousPV" },
+		{ShaderDataType::Mat4, "CurrentPV" },
 
 	};
 
 	ConstantBufferLayout ConstantBufferLayout::PerFrameConstants =
 	{
-		{ShaderDataType::Float4, "LightColor"},
+		{ShaderDataType::Int, "DirectionalLightNum"},
+		{ShaderDataType::Int, "PointLightNum"},
+
+		{ShaderDataType::Float3, "directionalLights[0].direction"},
+		{ShaderDataType::Float,  "directionalLights[0].intensity"},
+		{ShaderDataType::Float3, "directionalLights[0].color"},
+
+		{ShaderDataType::Float3, "directionalLights[1].direction"},
+		{ShaderDataType::Float,  "directionalLights[1].intensity"},
+		{ShaderDataType::Float3, "directionalLights[1].color"},
+		
+		{ShaderDataType::Float3, "directionalLights[2].direction"},
+		{ShaderDataType::Float,  "directionalLights[2].intensity"},
+		{ShaderDataType::Float3, "directionalLights[2].color"},
+
+		{ShaderDataType::Float3, "directionalLights[3].direction"},
+		{ShaderDataType::Float,  "directionalLights[3].intensity"},
+		{ShaderDataType::Float3, "directionalLights[3].color"},
 	};
 }

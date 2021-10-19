@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sibyl/ECS/Components/Common/Transform.h"
+#include "Sibyl/Basic/Random/LowDiscrepancySeq/LowDiscrepancySequence.h"
 
 namespace SIByL
 {
@@ -53,6 +54,7 @@ namespace SIByL
 			RecalculateViewMatrix(); 
 		}
 
+		virtual void Dither(double x, double y) {}
 		virtual void RecalculateProjectionMatrix() = 0;
 		void Resize(float width, float height)
 		{
@@ -66,7 +68,7 @@ namespace SIByL
 
 		const glm::mat4& GetProjectionMatrix() const { return m_Projection; }
 		const glm::mat4& GetViewMatrix() const { return m_View; }
-		const glm::mat4& GetViewProjectionMatrix() const { return m_ViewProjection; }
+		const glm::mat4& GetProjectionViewMatrix() const { return m_ProjectionView; }
 
 		virtual bool TryGetCullingParameters(ScriptableCullingParameters& p) { return true; }
 
@@ -75,7 +77,7 @@ namespace SIByL
 		{
 			glm::vec3 center = m_Posistion + m_Front;
 			m_View = glm::lookAtLH(m_Posistion, center, m_Up);
-			m_ViewProjection = m_View * m_Projection;
+			m_ProjectionView = m_Projection * m_View;
 
 			UpdateViewConstant();
 		}
@@ -92,20 +94,26 @@ namespace SIByL
 
 		glm::mat4 m_Projection;
 		glm::mat4 m_View;
-		glm::mat4 m_ViewProjection;
+		glm::mat4 m_ProjectionView;
+		glm::mat4 m_PreviousProjectionView;
+		glm::mat4 m_CurrentProjectionView;
 
 		Ref<TransformComponent> m_Transform;
 
 		float m_Width;
 		float m_Height;
-
+		bool m_ApplyDither = false;
 	public:
 		void SetCamera();
+		void RecordVPMatrix();
+		void SetApplyDither(bool dither) { m_ApplyDither = dither; }
 		void OnDrawCall();
 		ShaderConstantsBuffer& GetConstantsBuffer();
 	protected:
 		void UpdateProjectionConstant();
+		void UpdatePreviousViewProjectionConstant();
 		void UpdateViewConstant();
+		virtual glm::mat4 GetPreciseProjectionMatrix() = 0;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 	};
 
@@ -121,10 +129,15 @@ namespace SIByL
 		}
 
 	protected:
+		virtual glm::mat4 GetPreciseProjectionMatrix() override
+		{
+			return glm::orthoLH_NO(-1.0f, 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
+		}
 		virtual void RecalculateProjectionMatrix() override
 		{
 			m_Projection = glm::orthoLH_NO(-1.0f, 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
 			UpdateProjectionConstant();
+			m_ProjectionView = m_Projection * m_View;
 		}
 	};
 
@@ -144,6 +157,20 @@ namespace SIByL
 		{
 			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
 			UpdateProjectionConstant();
+		}
+
+		virtual glm::mat4 GetPreciseProjectionMatrix() override
+		{
+			return glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
+		}
+
+		virtual void Dither(double x, double y) override 
+		{
+			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
+			m_Projection[2][0] += (x * 2 - 1) / m_Width;
+			m_Projection[2][1] += (y * 2 - 1) / m_Height;
+			UpdateProjectionConstant();
+			m_ProjectionView = m_Projection * m_View;
 		}
 
 	private:

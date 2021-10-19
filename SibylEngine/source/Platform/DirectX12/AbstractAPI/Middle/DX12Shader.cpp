@@ -11,6 +11,7 @@
 #include "Platform/DirectX12/Common/DX12Utility.h"
 #include "Platform/DirectX12/Common/DX12Context.h"
 #include "Platform/DirectX12/AbstractAPI/Middle/DX12ShaderBinder.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByL
 {
@@ -94,6 +95,11 @@ namespace SIByL
 				ShaderDataTypeToDXGIFormat(element.Type) , 0, element.Offset,
 				D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 });
 		}
+	}
+
+	void DX12Shader::UsePipelineState(const PipelineStateDesc& desc)
+	{
+
 	}
 
 	ComPtr<ID3DBlob> DX12Shader::CompileFromFile(

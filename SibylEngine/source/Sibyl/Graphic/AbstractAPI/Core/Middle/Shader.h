@@ -12,6 +12,7 @@ namespace SIByL
 		int NumRenderTarget = 1;
 	};
 
+	struct PipelineStateDesc;
 	class Shader
 	{
 	public:
@@ -23,6 +24,7 @@ namespace SIByL
 		virtual void Use() = 0;
 		virtual void CreateBinder() = 0;
 		virtual void SetVertexBufferLayout() = 0;
+		virtual void UsePipelineState(const PipelineStateDesc& desc) = 0;
 
 		Ref<ShaderBinder> GetBinder() { return m_ShaderBinder; }
 		std::string ShaderID;

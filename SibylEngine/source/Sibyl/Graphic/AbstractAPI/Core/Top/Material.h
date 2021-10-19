@@ -11,6 +11,7 @@ namespace SIByL
 namespace SIByLEditor
 {
 	extern void DrawMaterial(const std::string& label, SIByL::Material& material);
+	extern void DrawPipelineState(const std::string& label, SIByL::Material& material);
 }
 
 namespace SIByL
@@ -21,6 +22,35 @@ namespace SIByL
 	class ShaderResourcesBuffer;
 	class ShaderConstantsDesc;
 	class ShaderResourcesDesc;
+
+	enum class AlphaState
+	{
+		Opaque,
+		AlphaTest,
+		AlphaBlend,
+	};
+	static std::string GetAlphaStateString(AlphaState alphaState)
+	{
+		switch (alphaState)
+		{
+		case SIByL::AlphaState::Opaque:
+			return "Opaque";
+			break;
+		case SIByL::AlphaState::AlphaTest:
+			return "AlphaTest";
+			break;
+		case SIByL::AlphaState::AlphaBlend:
+			return "AlphaBlend";
+			break;
+		default:
+			return "?";
+			break;
+		}
+	}
+	struct PipelineStateDesc
+	{
+		AlphaState alphaState;
+	};
 
 	class Material :public CustomAsset
 	{
@@ -68,13 +98,17 @@ namespace SIByL
 		Ref<Shader> m_Shader = nullptr;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 		Ref<ShaderResourcesBuffer> m_ResourcesBuffer = nullptr;
+		PipelineStateDesc pipelineStateDesc;
 
 		ShaderConstantsDesc* m_ConstantsDesc = nullptr;
 		ShaderResourcesDesc* m_ResourcesDesc = nullptr;
 
 		friend class DrawItem;
 		friend class Camera;
+		friend class FrameConstantsManager;
 		friend void SIByLEditor::DrawMaterial(const std::string& label, SIByL::Material& material);
+		friend void SIByLEditor::DrawPipelineState(const std::string& label, SIByL::Material& material);
+
 	};
 
 	class MaterialSerializer

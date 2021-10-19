@@ -24,6 +24,7 @@ namespace SIByL
 	{
 		Texture2D,
 		Cubemap,
+		RenderTarget,
 	};
 
 	static uint32_t ShaderDataTypeSize(ShaderDataType type)

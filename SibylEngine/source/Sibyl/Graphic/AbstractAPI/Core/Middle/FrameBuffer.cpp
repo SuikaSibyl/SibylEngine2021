@@ -15,8 +15,8 @@ namespace SIByL
 		Ref<FrameBuffer_v1> result = nullptr;
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: result = std::make_shared<OpenGLFrameBuffer_v1>(desc); FrameBufferLibrary::Register(key,result); break;
-		case RasterRenderer::DirectX12: result = std::make_shared<DX12FrameBuffer_v1>(desc); FrameBufferLibrary::Register(key, result); break;
+		case RasterRenderer::OpenGL: result = std::make_shared<OpenGLFrameBuffer_v1>(desc); break;
+		case RasterRenderer::DirectX12: result = std::make_shared<DX12FrameBuffer_v1>(desc); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;
@@ -29,12 +29,13 @@ namespace SIByL
 		Ref<FrameBuffer> result = nullptr;
 		switch (Renderer::GetRaster())
 		{
-		case RasterRenderer::OpenGL: result = std::make_shared<OpenGLFrameBuffer>(desc); Library<FrameBuffer>::Push(key, result); break;
+		case RasterRenderer::OpenGL: result = std::make_shared<OpenGLFrameBuffer>(desc, key); Library<FrameBuffer>::Push(key, result); break;
 		case RasterRenderer::DirectX12: result = std::make_shared<DX12FrameBuffer>(desc); Library<FrameBuffer>::Push(key, result); break;
 		case RasterRenderer::CpuSoftware: return nullptr; break;
 		case RasterRenderer::GpuSoftware: return nullptr; break;
 		default: return nullptr; break;
 		}
+		result->Identifier = key;
 		return result;
 	}
 }

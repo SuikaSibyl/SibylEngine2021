@@ -20,6 +20,16 @@ namespace SIByL
 		InitConstant();
 	}
 
+	void DX12ShaderConstantsBuffer::SetInt(const std::string& name, const int& value)
+	{
+		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
 	void DX12ShaderConstantsBuffer::SetFloat(const std::string& name, const float& value)
 	{
 		m_IsDirty = true;
@@ -57,6 +67,15 @@ namespace SIByL
 		if (m_ConstantsMapper->FetchConstant(name, item))
 		{
 			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value[0][0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
+	void DX12ShaderConstantsBuffer::GetInt(const std::string& name, int& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryFromConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
 		}
 	}
 

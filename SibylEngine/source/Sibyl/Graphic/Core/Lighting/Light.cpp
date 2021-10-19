@@ -3,5 +3,14 @@
 
 namespace SIByL
 {
+	void DirectionalLight::DrawImGui()
+	{
+
+	}
+
+	void PointLight::DrawImGui()
+	{
+
+	}
 
 }

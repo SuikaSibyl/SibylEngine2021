@@ -7,6 +7,7 @@
 #include "Sibyl/Graphic/Core/Texture/Image.h"
 
 #include "Sibyl/Graphic/AbstractAPI/Library/FrameBufferLibrary.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/FrameConstantsManager.h"
 
 using namespace SIByL;
 
@@ -51,7 +52,8 @@ namespace SIByLEditor
 		Ref<Camera> camera;
 		Ref<Camera> orthoCamera;
 		Ref<FrameBuffer> m_FrameBuffer;
-		Ref<FrameBuffer> m_PostProcessBuffer;
+		Ref<FrameBuffer> m_FrameBuffer_TAA[2];
+		Ref<FrameConstantsManager> m_FrameConstants;
 		Ref<Scene> m_ActiveScene;
 
 		static SceneHierarchyPanel	s_SceneHierarchyPanel;

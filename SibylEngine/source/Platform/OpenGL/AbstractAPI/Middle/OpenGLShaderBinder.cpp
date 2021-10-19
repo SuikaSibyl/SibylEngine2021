@@ -2,6 +2,10 @@
 #include "OpenGLShaderBinder.h"
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBufferTexture.h"
+#include "Sibyl/Graphic/AbstractAPI/Library/FrameBufferLibrary.h"
+
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLFrameBufferTexture.h"
@@ -12,12 +16,32 @@
 
 namespace SIByL
 {
-	OpenGLShaderConstantsBuffer::OpenGLShaderConstantsBuffer(ShaderConstantsDesc* desc)
+	OpenGLShaderConstantsBuffer::OpenGLShaderConstantsBuffer(ShaderConstantsDesc* desc, bool isSSBO)
 	{
 		m_CpuBuffer = new byte[desc->Size];
 		m_ConstantsMapper = &desc->Mapper;
-
+		m_IsSSBO = isSSBO;
 		InitConstant();
+		SSBOSize = sizeof(byte) * desc->Size;
+		if (m_IsSSBO)
+		{
+			glGenBuffers(1, &SSBO);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+			glBufferData(GL_SHADER_STORAGE_BUFFER, SSBOSize, m_CpuBuffer, GL_DYNAMIC_DRAW);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO);
+			glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		}
+	}
+	void OpenGLShaderConstantsBuffer::BindSSBO()
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, SSBO);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, SSBO);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, SSBOSize, m_CpuBuffer, GL_DYNAMIC_DRAW);
+	}
+
+	void OpenGLShaderConstantsBuffer::UnbindSSBO()
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	OpenGLShaderConstantsBuffer::~OpenGLShaderConstantsBuffer()
@@ -25,6 +49,21 @@ namespace SIByL
 		delete[] m_CpuBuffer;
 	}
 
+	void OpenGLShaderConstantsBuffer::SetInt(const std::string& name, const int& value)
+	{
+		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			CopyMemoryToConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
+			if (m_IsSSBO)
+			{
+				BindSSBO();
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, item.Offset, ShaderDataTypeSize(item.Type), (void*)&value);
+				UnbindSSBO();
+			}
+		}
+	}
 	void OpenGLShaderConstantsBuffer::SetFloat(const std::string& name, const float& value)
 	{
 		m_IsDirty = true;
@@ -32,6 +71,12 @@ namespace SIByL
 		if (m_ConstantsMapper->FetchConstant(name, item))
 		{
 			CopyMemoryToConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
+			if (m_IsSSBO)
+			{
+				BindSSBO();
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, item.Offset, ShaderDataTypeSize(item.Type), (void*)&value);
+				UnbindSSBO();
+			}
 		}
 	}
 
@@ -42,6 +87,12 @@ namespace SIByL
 		if (m_ConstantsMapper->FetchConstant(name, item))
 		{
 			CopyMemoryToConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+			if (m_IsSSBO)
+			{
+				BindSSBO();
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, item.Offset, ShaderDataTypeSize(item.Type), (void*)&value[0]);
+				UnbindSSBO();
+			}
 		}
 	}
 
@@ -52,6 +103,12 @@ namespace SIByL
 		if (m_ConstantsMapper->FetchConstant(name, item))
 		{
 			CopyMemoryToConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+			if (m_IsSSBO)
+			{
+				BindSSBO();
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, item.Offset, ShaderDataTypeSize(item.Type), (void*)&value[0]);
+				UnbindSSBO();
+			}
 		}
 	}
 
@@ -62,6 +119,21 @@ namespace SIByL
 		if (m_ConstantsMapper->FetchConstant(name, item))
 		{
 			CopyMemoryToConstantsBuffer((void*)&value[0][0], item.Offset, ShaderDataTypeSize(item.Type));
+			if (m_IsSSBO)
+			{
+				BindSSBO();
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, item.Offset, ShaderDataTypeSize(item.Type), (void*)&value[0][0]);
+				UnbindSSBO();
+			}
+		}
+	}
+
+	void OpenGLShaderConstantsBuffer::GetInt(const std::string& name, int& value)
+	{
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			CopyMemoryFromConstantsBuffer((void*)&value, item.Offset, ShaderDataTypeSize(item.Type));
 		}
 	}
 
@@ -148,6 +220,13 @@ namespace SIByL
 		{
 			switch (iter.second.Type)
 			{
+			case ShaderDataType::Int:
+			{
+				int value;
+				GetInt(iter.second.Name, value);
+				m_ShaderBinder->SetInt(iter.second.Name, value);
+				break;
+			}
 			case ShaderDataType::Float:
 			{
 				float value;
@@ -252,6 +331,17 @@ namespace SIByL
 		}
 	}
 
+	void OpenGLShaderResourcesBuffer::SetTexture2D(const std::string& name, RenderTarget* texture)
+	{
+		m_IsDirty = true;
+
+		ShaderResourceItem item;
+		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
+		{
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, texture->GetIdentifier(), ShaderResourceType::RenderTarget);
+		}
+	}
+
 	void OpenGLShaderResourcesBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
 	{
 		if (true)
@@ -262,8 +352,24 @@ namespace SIByL
 
 			for each (auto & resource in m_ShaderResourcesDesc.Mapper)
 			{
-				Ref<Texture2D> refTex = Library<Texture2D>::Fetch(resource.second.TextureID);
-				m_ShaderBinder->SetTexture2D(resource.first, refTex);
+				switch (resource.second.Type)
+				{
+				case ShaderResourceType::RenderTarget:
+				{
+					RenderTarget* rendertarget = FrameBufferLibrary::GetRenderTarget(resource.second.TextureID);
+					OpenGLRenderTarget* oglprocrt = dynamic_cast<OpenGLRenderTarget*>(rendertarget);
+					oglprocrt->SetShaderResource(resource.second.Offset);
+				}
+					break;
+				case ShaderResourceType::Texture2D:
+				{
+					Ref<Texture2D> refTex = Library<Texture2D>::Fetch(resource.second.TextureID);
+					m_ShaderBinder->SetTexture2D(resource.first, refTex);
+				}
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}
@@ -284,14 +390,14 @@ namespace SIByL
 		}
 	}
 
-	void OpenGLUnorderedAccessBuffer::SetRenderTarget2D(const std::string& name, Ref<RenderTarget> rendertarget)
+	void OpenGLUnorderedAccessBuffer::SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx)
 	{
 		m_IsDirty = true;
 
 		ShaderResourceItem item;
 		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
 		{
-			//m_ShaderResourcesDesc.Mapper.SetTextureID(name, rendertarget->Identifer);
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, framebuffer->GetIdentifier() + std::to_string(attachmentIdx));
 		}
 	}
 
@@ -302,7 +408,18 @@ namespace SIByL
 
 	void OpenGLUnorderedAccessBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
 	{
+		if (true)
+		{
+			m_IsDirty = false;
 
+			OpenGLShaderBinder* m_ShaderBinder = dynamic_cast<OpenGLShaderBinder*>(shaderBinder);
+
+			for each (auto & resource in m_ShaderResourcesDesc.Mapper)
+			{
+				RenderTarget* rendertarget = FrameBufferLibrary::GetRenderTarget(resource.second.TextureID);
+				m_ShaderBinder->SetRenderTarget2D(resource.first, rendertarget);
+			}
+		}
 	}
 
 
@@ -318,12 +435,18 @@ namespace SIByL
 		InitMappers(desc);
 	}
 
+	void OpenGLShaderBinder::SetInt(const std::string& name, const int& value)
+	{
+		glUniform1iv(glGetUniformLocation(m_ShderID, name.c_str()), 1, &value);
+	}
+
 	void OpenGLShaderBinder::SetFloat(const std::string& name, const float& value)
 	{
 		PROFILE_SCOPE_FUNCTION();
 
 		glUniform1fv(glGetUniformLocation(m_ShderID, name.c_str()), 1, &value);
 	}
+
 	void OpenGLShaderBinder::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		PROFILE_SCOPE_FUNCTION();
@@ -360,10 +483,10 @@ namespace SIByL
 	void OpenGLShaderBinder::SetRenderTarget2D(const std::string& name, RenderTarget* rendertarget)
 	{
 		ShaderResourceItem item;
-		if (m_ResourcesMapper.FetchResource(name, item))
+		if (m_UnorderedAccessMapper.FetchResource(name, item))
 		{
 			OpenGLRenderTarget* rt = dynamic_cast<OpenGLRenderTarget*>(rendertarget);
-			glBindImageTexture(0, rt->GetTextureObject(), 0, GL_FALSE, 0, GL_WRITE_ONLY, rt->GetGLType());
+			rt->SetComputeRenderTarget(item.Offset);
 		}
 	}
 }

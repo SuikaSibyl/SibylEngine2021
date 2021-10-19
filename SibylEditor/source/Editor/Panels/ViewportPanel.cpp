@@ -51,7 +51,7 @@ namespace SIByL
 		{
 			// Viewport Change Size
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-			m_FrameBuffer->Resize(viewportPanelSize.x, viewportPanelSize.y);
+			FrameBufferLibrary::ResizeAll(viewportPanelSize.x, viewportPanelSize.y);
 			m_Camera->Resize(viewportPanelSize.x, viewportPanelSize.y);
 		}
 

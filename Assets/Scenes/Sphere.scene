@@ -1,0 +1,16 @@
+Scene: Untitled
+Entities:
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\sphere.fbx
+    MeshRendererComponent:
+      Materials:
+        - Material: 0
+          INFO:
+            Path: Resources\Hair\TestLit.mat

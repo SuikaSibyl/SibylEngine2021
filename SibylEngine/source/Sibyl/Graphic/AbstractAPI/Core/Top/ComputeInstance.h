@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "Sibyl/ECS/Asset/CustomAsset.h"
 
 namespace SIByL
 {
@@ -12,10 +13,13 @@ namespace SIByL
 	class ShaderResourcesDesc;
 	class RenderTarget;
 	class Texture2D;
+	class FrameBuffer;
 
-	class ComputeInstance
+	class ComputeInstance :public CustomAsset
 	{
 	public:
+		void Dispatch(unsigned int x, unsigned int y, unsigned int z);
+
 		////////////////////////////////////////////////////////////////////
 		///					Parameter Setter / Getter					 ///
 		void SetFloat(const std::string& name, const float& value);
@@ -23,7 +27,8 @@ namespace SIByL
 		void SetFloat4(const std::string& name, const glm::vec4& value);
 		void SetMatrix4x4(const std::string& name, const glm::mat4& value);
 		void SetTexture2D(const std::string& name, Ref<Texture2D> texture);
-		void SetRenderTarget2D(const std::string& name, Ref<RenderTarget> rendertarget);
+		void SetTexture2D(const std::string& name, RenderTarget* texture);
+		void SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx);
 
 		////////////////////////////////////////////////////////////////////
 		///							Initializer							 ///
@@ -32,6 +37,9 @@ namespace SIByL
 		void UseShader(Ref<ComputeShader> shader);
 		void OnDrawCall();
 
+		////////////////////////////////////////////////////////////////////
+		///							Serializer							 ///
+		virtual void SaveAsset() override;
 
 	private:
 		Ref<ComputeShader> m_Shader = nullptr;

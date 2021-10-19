@@ -14,6 +14,7 @@ namespace SIByL
 		virtual void Use() override;
 		virtual void CreateBinder() override;
 		virtual void SetVertexBufferLayout() override;
+		virtual void UsePipelineState(const PipelineStateDesc& desc) override;
 
 	private:
 		ComPtr<ID3DBlob> CompileFromFile(

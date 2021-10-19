@@ -46,6 +46,19 @@ namespace SIByL
 		Graphic::CurrentCamera = this;
 	}
 
+	void Camera::RecordVPMatrix()
+	{
+		m_CurrentProjectionView = GetPreciseProjectionMatrix() * m_View;
+
+		if (m_ConstantsBuffer)
+		{
+			m_ConstantsBuffer->SetMatrix4x4("CurrentPV", m_CurrentProjectionView);
+			m_ConstantsBuffer->SetMatrix4x4("PreviousPV", m_PreviousProjectionView);
+		}
+
+		m_PreviousProjectionView = m_CurrentProjectionView;
+	}
+
 	void Camera::OnDrawCall()
 	{
 		// Upload Per-Material parameters to GPU
@@ -61,6 +74,12 @@ namespace SIByL
 	{
 		if (m_ConstantsBuffer)
 			m_ConstantsBuffer->SetMatrix4x4("Projection", m_Projection);
+	}
+	
+	void Camera::UpdatePreviousViewProjectionConstant()
+	{
+		if (m_ConstantsBuffer)
+			m_ConstantsBuffer->SetMatrix4x4("PreviousProjection", m_Projection);
 	}
 
 	void Camera::UpdateViewConstant()

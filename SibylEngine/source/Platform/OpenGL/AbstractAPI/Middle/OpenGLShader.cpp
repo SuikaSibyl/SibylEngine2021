@@ -5,6 +5,7 @@
 #include "OpenGLShaderBinder.h"
 
 #include "Platform/OpenGL/Common/OpenGLContext.h"
+#include "Sibyl/Graphic/AbstractAPI/Core/Top/Material.h"
 
 namespace SIByL
 {
@@ -166,6 +167,30 @@ namespace SIByL
 		//m_VertexBufferLayout = vertexBufferLayout;
 	}
 
+	void OpenGLShader::UsePipelineState(const PipelineStateDesc& desc)
+	{
+		switch (desc.alphaState)
+		{
+		case SIByL::AlphaState::Opaque:
+		{
+
+		}
+			break;
+		case SIByL::AlphaState::AlphaTest:
+		{
+
+		}
+			break;
+		case SIByL::AlphaState::AlphaBlend:
+		{
+
+		}
+			break;
+		default:
+			break;
+		}
+	}
+
 	void OpenGLShader::CompileFromSingleFile(std::string glslPath)
 	{
 		PROFILE_SCOPE_FUNCTION();
@@ -230,6 +255,7 @@ namespace SIByL
 	{
 		m_BinderDescriptor = binderDesc;
 		CompileFromFile(file);
+		CreateBinder();
 	}
 
 	void OpenGLComputeShader::Dispatch(unsigned int x, unsigned int y, unsigned int z)

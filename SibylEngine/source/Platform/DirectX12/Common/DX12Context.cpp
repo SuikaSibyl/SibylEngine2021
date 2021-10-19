@@ -59,8 +59,6 @@ namespace SIByL
 		//Application::Get().OnResourceDestroy();
 		m_Synchronizer->ForceSynchronize();
 
-		FrameBufferLibrary::Reset();
-
 		m_SwapChain = nullptr;
 		m_SGraphicQueue = nullptr;
 

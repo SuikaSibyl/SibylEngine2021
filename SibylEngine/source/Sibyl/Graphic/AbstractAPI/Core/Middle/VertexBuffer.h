@@ -46,6 +46,8 @@ namespace SIByL
 			CalculateOffsetsAndStride();
 		}
 
+		static VertexBufferLayout StandardVertexBufferLayout;
+
 		/////////////////////////////////////////////////////////
 		///				     Fetcher / Setter		          ///
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }

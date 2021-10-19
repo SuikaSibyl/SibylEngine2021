@@ -75,5 +75,11 @@ namespace SIByL
 		virtual void* GetColorAttachment(unsigned int index) = 0;
 		virtual void* GetDepthStencilAttachment() = 0;
 		virtual RenderTarget* GetRenderTarget(unsigned int index) = 0;
+
+		const std::string& GetIdentifier() { return Identifier; }
+		void SetIdentifier(const std::string& id) { Identifier = id; }
+
+	protected:
+		std::string Identifier;
 	};
 }

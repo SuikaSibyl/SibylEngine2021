@@ -9,7 +9,10 @@ namespace SIByL
 
 		static void RegisterUnlitTexture();
 
+		static void RegisterLit();
+
 		static void RegisterACES();
 
+		static void RegisterTAA();
 	};
 }
