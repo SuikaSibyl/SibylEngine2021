@@ -9,6 +9,7 @@ namespace SIByL
 		FrameConstantsManager();
 		void OnDrawCall();
 		void SetFrame();
+		ShaderConstantsBuffer* GetShaderConstantsBuffer();
 
 	private:
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;

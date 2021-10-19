@@ -24,6 +24,12 @@ vec3 ACESToneMapping(vec3 color, float adapted_lum)
 	return (color * (A * color + B)) / (color * (C * color + D) + E);
 }
 
+const float kRGBMRange = 8.0;
+vec3 DecodeRGBM(vec4 rgbm)
+{
+    return rgbm.xyz * rgbm.w * kRGBMRange;
+}
+
 void main(void)
 {
     // base pixel colour for image
@@ -35,8 +41,9 @@ void main(void)
     float v =1.0f * (gl_GlobalInvocationID.y + 0.5f)/gl_NumWorkGroups.y;
 
     vec4 textCol = texture(u_Texture, vec2(u,v));
-    textCol.xyz = ACESToneMapping(textCol.xyz, Para);
-    pixel= textCol;
+    vec3 hdrCol = DecodeRGBM(textCol);
+    hdrCol = ACESToneMapping(hdrCol, Para);
+    pixel= vec4(hdrCol, 1);
 
     // output to a specific pixel in the image
     imageStore(img_output, pixel_coords, pixel);

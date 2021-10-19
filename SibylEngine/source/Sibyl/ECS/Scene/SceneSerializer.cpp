@@ -87,6 +87,21 @@ namespace SIByL
 			out << YAML::EndMap;
 		}
 
+		if (entity.HasComponent<LightComponent>())
+		{
+			out << YAML::Key << "LightComponent";
+			out << YAML::BeginMap;
+
+			auto& lightFilter = entity.GetComponent<LightComponent>();
+			out << YAML::Key << "Type" << YAML::Value << (unsigned int)lightFilter.m_Type;
+			out << YAML::Key << "Position" << YAML::Value << lightFilter.m_Position;
+			out << YAML::Key << "Direction" << YAML::Value << lightFilter.m_Direction;
+			out << YAML::Key << "Color" << YAML::Value << lightFilter.m_Color;
+			out << YAML::Key << "Intensity" << YAML::Value << lightFilter.m_Intensity;
+
+			out << YAML::EndMap;
+		}
+
 		out << YAML::EndMap;
 	}
 
@@ -193,6 +208,20 @@ namespace SIByL
 								mrc.Materials[materialInd++] = GetAssetByPath<Material>(relativePathString);
 						}
 					}
+				}
+
+
+				// MeshFilter Component
+				// -----------------------------------------------
+				auto lightComponent = entity["LightComponent"];
+				if (lightComponent)
+				{
+					auto& lc = deserializedEntity.AddComponent<LightComponent>();
+					lc.m_Type = (LightType)lightComponent["Type"].as<unsigned int>();
+					lc.m_Position = lightComponent["Position"].as<glm::vec3>();
+					lc.m_Direction = lightComponent["Direction"].as<glm::vec3>();
+					lc.m_Color = lightComponent["Color"].as<glm::vec3>();
+					lc.m_Intensity = lightComponent["Intensity"].as<float>();
 				}
 			}
 		}

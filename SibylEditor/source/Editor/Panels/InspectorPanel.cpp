@@ -126,6 +126,11 @@ namespace SIByL
 				}
 			});
 
+		DrawComponent<LightComponent>("Light", entity, [](auto& component)
+			{
+				SIByLEditor::DrawLight("Light", component);
+			});
+
 		{
 			ImGui::Separator();
 			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
@@ -164,6 +169,12 @@ namespace SIByL
 						MeshRendererComponent& meshRenderer = m_SelectEntity.AddComponent<MeshRendererComponent>();
 						meshRenderer.SetMaterialNums(matNum);
 					}
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Light"))
+				{
+					m_SelectEntity.AddComponent<LightComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 

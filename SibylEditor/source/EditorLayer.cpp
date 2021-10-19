@@ -18,6 +18,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Graphic.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/ComputeInstance.h"
 #include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
+#include "Sibyl/Graphic/Core/Lighting/LightManager.h"
 #include "Sibyl/Core/Events/KeyEvent.h"
 #include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/Events/ApplicationEvent.h"
@@ -28,8 +29,6 @@
 #include <NetworkModule/include/NetworkModule.h>
 
 #include "Sibyl/ECS/UniqueID/UniqueID.h"
-
-#include "Platform/OpenGL/AbstractAPI/Middle/OpenGLFrameBufferTexture.h"
 
 namespace SIByLEditor
 {
@@ -89,6 +88,10 @@ namespace SIByLEditor
 		IconFile->RegisterImGui();
 		IconMaterial->RegisterImGui();
 		IconShader->RegisterImGui();
+
+		m_FrameConstants = CreateRef<FrameConstantsManager>();
+		m_FrameConstants->SetFrame();
+		LightManager::SetFrameConstantsManager(m_FrameConstants.get());
 	}
 
 	EditorLayer::~EditorLayer()
@@ -120,9 +123,6 @@ namespace SIByLEditor
 			Application::Get().GetWindow().GetHeight());
 
 		viewCameraController = std::make_shared<ViewCameraController>(camera);
-
-		m_FrameConstants = CreateRef<FrameConstantsManager>();
-		m_FrameConstants->SetFrame();
 
 		FrameBufferDesc desc;
 		desc.Width = 1280;

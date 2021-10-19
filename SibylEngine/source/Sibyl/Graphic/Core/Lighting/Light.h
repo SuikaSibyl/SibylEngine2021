@@ -4,6 +4,13 @@
 
 namespace SIByL
 {
+	enum class LightType
+	{
+		None,
+		Directional,
+		Point,
+	};
+
 	class Light
 	{
 	public:

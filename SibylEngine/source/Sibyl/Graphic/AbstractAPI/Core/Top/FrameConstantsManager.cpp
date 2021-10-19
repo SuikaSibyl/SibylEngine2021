@@ -32,10 +32,11 @@ namespace SIByL
 	{
 		ShaderConstantsDesc* desc = GetPerFrameConstantsDesc();
 		m_ConstantsBuffer = ShaderConstantsBuffer::Create(desc);
-		m_ConstantsBuffer->SetFloat3("directionalLights[0].direction", glm::vec3(0, -1, 0));
-		m_ConstantsBuffer->SetFloat3("directionalLights[0].color", glm::vec3(1, 1, 1));
-		m_ConstantsBuffer->SetFloat("directionalLights[0].intensity", 1);
-		m_ConstantsBuffer->SetInt("DirectionalLightNum", 1);
+	}
+
+	ShaderConstantsBuffer* FrameConstantsManager::GetShaderConstantsBuffer()
+	{
+		return m_ConstantsBuffer.get();
 	}
 
 	void FrameConstantsManager::SetFrame()

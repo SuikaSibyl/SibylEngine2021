@@ -2,6 +2,19 @@ Scene: Untitled
 Entities:
   - Entity: 124531623461
     TagComponent:
+      Tag: Light_2
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [-0.00846165419, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0, 0.00846155453, 0.999964297]
+      Color: [0, 0, 0]
+      Intensity: 1
+  - Entity: 124531623461
+    TagComponent:
       Tag: Empty Entity
     TransformComponent:
       Translation: [0, 0, 0]
@@ -14,3 +27,16 @@ Entities:
         - Material: 0
           INFO:
             Path: Resources\Hair\TestLit.mat
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Light_1
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [1.51190472, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0, -0.998266399, 0.0588575602]
+      Color: [0, 0, 0]
+      Intensity: 1

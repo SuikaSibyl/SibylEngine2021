@@ -150,6 +150,16 @@ vec3 GetWorldNormal()
     return gl_FrontFacing ? -wNormal : wNormal;
 }
 
+const float kRGBMRange = 2.0;
+vec4 EncodeRGBM(vec3 color)
+{
+    color *= 1.0 / kRGBMRange;
+    float m = max(max(color.x, color.y), max(color.z, 1e-5));
+    m = ceil(m * 255) / 255;
+    return vec4(color / m, m);
+}
+
+
 void main()
 {
     FragColor = vec4(0,0,0,1);
@@ -163,11 +173,12 @@ void main()
     Light[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX] Lights = PrepareLights();
     for(int i=0;i<DirectionalLightNum;i++)
     {
-        float cos = dot(normal, -Lights[0].direction);
+        float cos = dot(normal, -Lights[i].direction);
         if(cos<0) cos=0;
         FragColor.xyz += Color.xyz * tex.xyz * cos;
     }
-
+    FragColor = EncodeRGBM(FragColor.xyz);
+    
     vec2 offset = v_currPos.xy/v_currPos.w - v_prevPos.xy/v_prevPos.w;
     UVOffset = vec4(offset * 0.5,1.0,1.0);
 }

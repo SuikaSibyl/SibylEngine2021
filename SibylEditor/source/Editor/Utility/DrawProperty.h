@@ -12,6 +12,7 @@ namespace SIByL
 	class Material;
 	class Texture2D;
 	class TriangleMesh;
+	class LightComponent;
 	class ShaderConstantItem;
 	class MeshRendererComponent;
 }
@@ -21,6 +22,7 @@ namespace SIByLEditor
 	void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columeWidth = 100);
 	void DrawTriangleMeshSocket(const std::string& label, SIByL::MeshFilterComponent& mesh);
 	void DrawMeshRendererMaterialSocket(const std::string& label, SIByL::MeshRendererComponent& meshRenderer, int i);
+	void DrawLight(const std::string& label, SIByL::LightComponent& light);
 
 	void DrawTexture2D(SIByL::Material& material, SIByL::ShaderConstantItem& item);
 

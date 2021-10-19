@@ -169,6 +169,9 @@ namespace SIByL
 
 	void OpenGLShader::UsePipelineState(const PipelineStateDesc& desc)
 	{
+		glDisable(GL_BLEND);
+		glEnable(GL_DEPTH_TEST);
+
 		switch (desc.alphaState)
 		{
 		case SIByL::AlphaState::Opaque:

@@ -29,6 +29,8 @@ namespace SIByL
 	void Material::OnDrawCall()
 	{
 		// Upload Per-Material parameters to GPU
+		m_Shader->UsePipelineState(pipelineStateDesc);
+
 		m_ConstantsBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
 
 		m_ResourcesBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());

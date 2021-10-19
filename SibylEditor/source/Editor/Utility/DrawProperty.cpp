@@ -152,6 +152,11 @@ namespace SIByLEditor
 		ImGui::PopID();
 	}
 
+	void DrawLight(const std::string& label, SIByL::LightComponent& light)
+	{
+
+	}
+
 	void DrawShaderSlot(const std::string& label, SIByL::Material& material)
 	{		
 		std::string ShaderName = "Fallback";

@@ -1715,6 +1715,9 @@
     <ClInclude Include="source\Sibyl\Basic\Utils\StringUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\Sibyl\ECS\Components\Environment\Light.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="vendor\glm\glm\detail\func_common.inl">
