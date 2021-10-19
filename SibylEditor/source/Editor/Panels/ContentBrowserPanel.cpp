@@ -52,6 +52,9 @@ namespace SIByL
 			std::string relativePathString = relativePath.string();
 			std::string filenameString = relativePath.filename().string();
 
+			// Omit cache file folder
+			if (filenameString == "Cache") continue;
+
 			ImGui::PushID(filenameString.c_str());
 			// If is directory
 			Ref<Texture2D> icon = directoryEntry.is_directory() ? SIByLEditor::EditorLayer::IconFolder : SIByLEditor::EditorLayer::GetIcon(filenameString);

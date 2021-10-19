@@ -366,6 +366,15 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Asset\SAsset.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Asset\SCacheAsset.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Utils\StringUtils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1695,6 +1704,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Asset\SAsset.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Asset\SCacheAsset.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Utils\StringUtils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

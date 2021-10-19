@@ -13,9 +13,13 @@
 namespace SIByL
 {
     MeshLoader::MeshLoader(const std::string& path, const VertexBufferLayout& layout)
-        :m_Layout(layout), m_Path(path)
+        :m_Layout(layout), m_Path(path), m_MeshCacheAsset(path)
     {
-        LoadFile("../Assets/" + path);
+        m_Directory = path.substr(0, path.find_last_of('/'));
+        if (!m_MeshCacheAsset.LoadCache())
+        {
+            LoadFile("../Assets/" + path);
+        }
     }
 
 	void MeshLoader::LoadFile(const std::string& path)
@@ -31,9 +35,8 @@ namespace SIByL
             return;
         }
 
-        m_Directory = path.substr(0, path.find_last_of('/'));
-
         ProcessNode(scene->mRootNode, scene);
+        m_MeshCacheAsset.SaveCache();
 	}
 
     void MeshLoader::ProcessNode(aiNode* node, const aiScene* scene)
@@ -41,7 +44,7 @@ namespace SIByL
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            m_Meshes.push_back(ProcessMesh(mesh, scene));
+            m_MeshCacheAsset.m_Meshes.push_back(ProcessMesh(mesh, scene));
         }
         // Iteratorly Process Child Node
         for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -129,6 +132,37 @@ namespace SIByL
 
     Ref<TriangleMesh> MeshLoader::GetTriangleMesh()
     {
-        return TriangleMesh::Create(m_Meshes, m_Layout, m_Path);
+        return TriangleMesh::Create(m_MeshCacheAsset.m_Meshes, m_Layout, m_Path);
     }
+
+    SMeshCacheAsset::SMeshCacheAsset(const std::string& assetpath)
+        :SCacheAsset(assetpath)
+    {
+
+    }
+
+    void SMeshCacheAsset::LoadDataToBuffers()
+    {
+        Buffers.resize(m_Meshes.size() * 2);
+        int i = 0;
+        for (auto& mesh : m_Meshes)
+        {
+            Buffers[i].LoadFromVector(mesh.vertices);
+            Buffers[i++].SetExtraHead(mesh.vNum);
+            Buffers[i++].LoadFromVector(mesh.indices);
+        }
+    }
+    void SMeshCacheAsset::LoadDataFromBuffers()
+    {
+        m_Meshes.resize(Buffers.size() / 2);
+        int i = 0;
+        for (auto& mesh : m_Meshes)
+        {
+            Buffers[i].LoadToVector(mesh.vertices);
+            Buffers[i++].LoadExtraHead(mesh.vNum);
+            Buffers[i++].LoadToVector(mesh.indices);
+            mesh.vNum = mesh.indices.size();
+        }
+    }
+
 }

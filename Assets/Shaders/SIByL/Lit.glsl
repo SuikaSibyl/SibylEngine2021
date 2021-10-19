@@ -167,7 +167,7 @@ void main()
         if(cos<0) cos=0;
         FragColor.xyz += Color.xyz * tex.xyz * cos;
     }
-    FragColor=vec4(normalize(normal),1);
+
     vec2 offset = v_currPos.xy/v_currPos.w - v_prevPos.xy/v_prevPos.w;
     UVOffset = vec4(offset * 0.5,1.0,1.0);
 }

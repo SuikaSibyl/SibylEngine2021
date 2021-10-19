@@ -237,8 +237,11 @@
     <ClCompile Include="source\Platform\Windows\Window\WindowsInput.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsFrameTimer.cpp" />
     <ClCompile Include="source\Platform\Windows\Window\WindowsWindow.cpp" />
+    <ClCompile Include="source\Sibyl\Basic\Asset\SAsset.cpp" />
+    <ClCompile Include="source\Sibyl\Basic\Asset\SCacheAsset.cpp" />
     <ClCompile Include="source\Sibyl\Basic\Random\LowDiscrepancySeq\LowDiscrepancySequence.cpp" />
     <ClCompile Include="source\Sibyl\Basic\Utils\MathUtils.cpp" />
+    <ClCompile Include="source\Sibyl\Basic\Utils\StringUtils.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Asset\AssetUtility.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Asset\CustomAsset.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Common\CommonUnity.cpp" />
@@ -368,10 +371,13 @@
     <ClInclude Include="source\SIByL.h" />
     <ClInclude Include="source\SIByLpch.h" />
     <ClInclude Include="source\SIByLsettings.h" />
+    <ClInclude Include="source\Sibyl\Basic\Asset\SAsset.h" />
+    <ClInclude Include="source\Sibyl\Basic\Asset\SCacheAsset.h" />
     <ClInclude Include="source\Sibyl\Basic\Random\LowDiscrepancySeq\LowDiscrepancySequence.h" />
     <ClInclude Include="source\Sibyl\Basic\ThreadSafeQueue.h" />
     <ClInclude Include="source\Sibyl\Basic\Utils\MathUtils.h" />
     <ClInclude Include="source\Sibyl\Basic\Utils\PlatformUtils.h" />
+    <ClInclude Include="source\Sibyl\Basic\Utils\StringUtils.h" />
     <ClInclude Include="source\Sibyl\ECS\Asset\AssetUtility.h" />
     <ClInclude Include="source\Sibyl\ECS\Asset\CustomAsset.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Camera.h" />
