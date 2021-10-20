@@ -42,6 +42,7 @@ namespace SIByL
 	public:
 		MeshLoader(const std::string& path, const VertexBufferLayout& layout);
 		Ref<TriangleMesh> GetTriangleMesh();
+		SMeshCacheAsset* GetSMeshCache() { return &m_MeshCacheAsset; }
 
 	private:
 		void LoadFile(const std::string& path);

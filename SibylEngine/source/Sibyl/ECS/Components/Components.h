@@ -9,3 +9,5 @@
 #include "Render/SpriteRenderer.h"
 
 #include "Environment/Light.h"
+
+#include "Physics/SelfCollisionDetector.h"

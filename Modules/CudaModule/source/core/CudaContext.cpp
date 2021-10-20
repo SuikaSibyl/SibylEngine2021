@@ -12,7 +12,6 @@ namespace SIByL
 	void CudaContext::Init()
 	{
         DeviceQuery();
-        Julia();
 	}
 
     void CudaContext::DeviceQuery()

@@ -178,6 +178,17 @@ namespace SIByL
 					ImGui::CloseCurrentPopup();
 				}
 
+				if (ImGui::MenuItem("SelfCollisionDetector"))
+				{
+					if (m_SelectEntity.HasComponent<MeshFilterComponent>())
+					{
+						MeshFilterComponent& meshFilter = m_SelectEntity.GetComponent<MeshFilterComponent>();
+						SelfCollisionDetectorComponent& sc = m_SelectEntity.AddComponent<SelfCollisionDetectorComponent>();
+						sc.Init(meshFilter);
+					}
+					ImGui::CloseCurrentPopup();
+				}
+
 				ImGui::EndPopup();
 			}
 		}

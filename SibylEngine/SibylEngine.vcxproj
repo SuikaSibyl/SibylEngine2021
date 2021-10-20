@@ -245,6 +245,7 @@
     <ClCompile Include="source\Sibyl\ECS\Asset\AssetUtility.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Asset\CustomAsset.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Common\CommonUnity.cpp" />
+    <ClCompile Include="source\Sibyl\ECS\Components\Physics\SelfCollisionDetector.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\Render\RenderImpl.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Components\ViewCameraController.cpp" />
     <ClCompile Include="source\Sibyl\Core\Input.cpp" />
@@ -384,6 +385,7 @@
     <ClInclude Include="source\Sibyl\ECS\Components\Common\Tag.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Components.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Environment\Light.h" />
+    <ClInclude Include="source\Sibyl\ECS\Components\Physics\SelfCollisionDetector.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Render\MeshFilter.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Render\MeshRenderer.h" />
     <ClInclude Include="source\Sibyl\ECS\Components\Render\SpriteRenderer.h" />

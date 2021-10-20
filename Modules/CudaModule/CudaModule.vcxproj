@@ -304,6 +304,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="source\Algorithms\TreeConstruction\BVH\CuBVH.h" />
+    <ClInclude Include="source\Algorithms\TreeConstruction\BVH\CuBVHInterface.h" />
     <ClInclude Include="source\core\CudaContext.h" />
     <ClInclude Include="source\core\CudaUtility.h" />
     <ClInclude Include="source\CudaModule.h" />
@@ -319,14 +321,12 @@
     <ClInclude Include="source\RayTracer\RayTracerInterface.h" />
     <ClInclude Include="source\utility\CpuBitmap.h" />
     <ClInclude Include="source\utility\GLHelper.h" />
-    <CudaCompile Include="source\cu\Julia.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
-    <ClInclude Include="source\cu\Julia.h" />
+    <CudaCompile Include="source\Algorithms\TreeConstruction\BVH\CuBVH.cu" />
     <CudaCompile Include="source\GraphicInterop\CudaSurface.cu" />
     <CudaCompile Include="source\GraphicInterop\CudaTexture.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\Algorithms\TreeConstruction\BVH\CuBVHInterface.cpp" />
     <ClCompile Include="source\core\CudaContext.cpp" />
     <ClCompile Include="source\core\CudaModulePCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

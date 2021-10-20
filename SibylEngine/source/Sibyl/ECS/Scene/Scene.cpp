@@ -108,6 +108,12 @@ namespace SIByL
 		LightManager::AddLight(&component);
 	}
 
+	template<>
+	void Scene::OnComponentAdded<SelfCollisionDetectorComponent>(Entity entity, SelfCollisionDetectorComponent& component)
+	{
+		
+	}
+
 	template<typename T>
 	void Scene::OnComponentRemoved(Entity entity, T& component)
 	{
@@ -118,6 +124,7 @@ namespace SIByL
 	DEFAULT_ONCOMPONENTREMOVE(SpriteRendererComponent);
 	DEFAULT_ONCOMPONENTREMOVE(MeshFilterComponent);
 	DEFAULT_ONCOMPONENTREMOVE(MeshRendererComponent);
+	DEFAULT_ONCOMPONENTREMOVE(SelfCollisionDetectorComponent);
 
 	template<>
 	void Scene::OnComponentRemoved<LightComponent>(Entity entity, LightComponent& component)

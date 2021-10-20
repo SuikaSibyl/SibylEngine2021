@@ -21,7 +21,6 @@ namespace SIByL
 
 	private:
 		static void DeviceQuery();
-		static void Julia();
 		static bool CUDASupport;
 	};
 }
