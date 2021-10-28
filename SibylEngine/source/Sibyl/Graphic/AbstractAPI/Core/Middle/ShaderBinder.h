@@ -61,13 +61,14 @@ namespace SIByL
 		int SRTIndex;
 		int Offset;
 		std::string TextureID;
+		int SelectedMip = 0;
 	};
 	class ResourcesMapper
 	{
 	public:
 		void InsertResource(const ShaderResourceItem& element);
 		bool FetchResource(std::string name, ShaderResourceItem& buffer);
-		bool SetTextureID(std::string name, std::string ID, ShaderResourceType type = ShaderResourceType::Texture2D);
+		bool SetTextureID(std::string name, std::string ID, ShaderResourceType type = ShaderResourceType::Texture2D, unsigned int mip = 0);
 
 		using iterator = std::unordered_map<std::string, ShaderResourceItem>::iterator;
 		iterator begin() { return m_Mapper.begin(); }
@@ -142,6 +143,7 @@ namespace SIByL
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() = 0;
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
 		virtual void SetTexture2D(const std::string& name, RenderTarget* texture) = 0;
+		virtual void SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture) = 0;
 
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
 	};
@@ -155,7 +157,7 @@ namespace SIByL
 		virtual ~UnorderedAccessBuffer() = default;
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() = 0;
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) = 0;
-		virtual void SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx) = 0;
+		virtual void SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx, unsigned int mip = 0) = 0;
 
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) = 0;
 	};
@@ -179,6 +181,7 @@ namespace SIByL
 		virtual void BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer) = 0;
 		virtual ShaderConstantsDesc* GetShaderConstantsDesc(unsigned int slot) { return &m_ShaderConstantDescs[slot]; }
 		virtual ShaderResourcesDesc* GetShaderResourcesDesc() { return &m_ShaderResourceDescs; }
+		virtual ShaderResourcesDesc* GetCubeShaderResourcesDesc() { return &m_CubeShaderResourceDescs; }
 		virtual ShaderResourcesDesc* GetUnorderedAccessDesc() { return &m_UnorderedAccessDescs; }
 		virtual RootSignature* GetRootSignature() { return nullptr; }
 
@@ -188,9 +191,12 @@ namespace SIByL
 		void InitMappers(const ShaderBinderDesc& desc);
 		ConstantsMapper m_ConstantsMapper;
 		ResourcesMapper m_ResourcesMapper;
+		ResourcesMapper m_CubeResourcesMapper;
+
 		ResourcesMapper m_UnorderedAccessMapper;
 		ShaderConstantsDesc* m_ShaderConstantDescs;
 		ShaderResourcesDesc m_ShaderResourceDescs;
+		ShaderResourcesDesc m_CubeShaderResourceDescs;
 		ShaderResourcesDesc m_UnorderedAccessDescs;
 	};
 	//////////////////////////////////////////////

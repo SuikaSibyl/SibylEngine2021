@@ -75,9 +75,9 @@ namespace SIByL
 		Descriptor.Height = height;
 	}
 
-	void OpenGLRenderTarget::SetComputeRenderTarget(unsigned int i)
+	void OpenGLRenderTarget::SetComputeRenderTarget(unsigned int i, unsigned int miplevel)
 	{
-		glBindImageTexture(0, m_TextureObject, 0, GL_FALSE, 0, GL_WRITE_ONLY, GLType);
+		glBindImageTexture(0, m_TextureObject, 0, GL_FALSE, miplevel, GL_WRITE_ONLY, GLType);
 	}
 
 	void OpenGLRenderTarget::SetShaderResource(unsigned int i)

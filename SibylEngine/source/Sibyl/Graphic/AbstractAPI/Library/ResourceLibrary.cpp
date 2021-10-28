@@ -24,4 +24,24 @@ namespace SIByL
 
 		return nullptr;
 	}
+
+
+	template< >
+	Ref<TextureCubemap> Library<TextureCubemap>::Fetch(const std::string& id)
+	{
+		if (Mapper.find(id) != Mapper.end())
+		{
+			return Mapper[id];
+		}
+		else
+		{
+			if (IsIdentifierFromPath(id))
+			{
+				Ref<TextureCubemap> texture = TextureCubemap::Create(IdentifierToPath(id));
+				return texture;
+			}
+		}
+
+		return nullptr;
+	}
 }

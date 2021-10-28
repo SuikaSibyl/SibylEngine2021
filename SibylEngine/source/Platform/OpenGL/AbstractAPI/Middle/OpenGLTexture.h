@@ -50,4 +50,32 @@ namespace SIByL
 		virtual void CreatePtrCudaSurface() override;
 
 	};
+
+
+	class OpenGLTextureCubemap :public TextureCubemap
+	{
+	public:
+		OpenGLTextureCubemap(const std::string& path);
+		void InitFromImage(const std::string& path);
+
+		uint32_t GetID() { return m_TexID; }
+
+		virtual ~OpenGLTextureCubemap();
+
+		virtual uint32_t GetWidth() const override;
+		virtual uint32_t GetHeight() const override;
+
+		virtual void Bind(uint32_t slot) const override;
+
+		virtual void* GetImGuiHandle() override;
+
+	private:
+		uint32_t m_Width;
+		uint32_t m_Height;
+		uint32_t m_Channel;
+		Format	 m_Type;
+
+		uint32_t m_TexID;
+		std::string m_Path;
+	};
 }

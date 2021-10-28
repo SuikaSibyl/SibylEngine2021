@@ -46,11 +46,11 @@ namespace SIByL
 			if ((*iter)->m_Type == LightType::Directional)
 			{
 				frameBuffer->SetFloat3("directionalLights[" + std::to_string(DirectionalLightCount) + "].direction", (*iter)->m_Direction);
-				frameBuffer->SetFloat3("directionalLights[" + std::to_string(DirectionalLightCount) + "].color", glm::vec3(1, 1, 1));
+				frameBuffer->SetFloat3("directionalLights[" + std::to_string(DirectionalLightCount) + "].color", (*iter)->m_Color);
 				frameBuffer->SetFloat("directionalLights[" + std::to_string(DirectionalLightCount) + "].intensity", 1);
 				DirectionalLightCount++;
 			}
-			else if ((*iter)->m_Type == LightType::Directional)
+			else if ((*iter)->m_Type == LightType::Point)
 			{
 
 			}

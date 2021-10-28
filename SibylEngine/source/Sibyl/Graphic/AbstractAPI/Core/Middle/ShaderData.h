@@ -63,6 +63,15 @@ namespace SIByL
 
 		}
 
+		bool operator==(const BufferElement& other) const
+		{
+			return (Name == other.Name) && (Type == other.Type);
+		}
+		bool operator!=(const BufferElement& other) const
+		{
+			return !(*this == other);
+		}
+
 		uint32_t GetComponentCount() const
 		{
 			switch (Type)

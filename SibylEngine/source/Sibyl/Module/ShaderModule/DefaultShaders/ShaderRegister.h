@@ -10,6 +10,7 @@ namespace SIByL
 		static void RegisterUnlitTexture();
 
 		static void RegisterLit();
+		static void RegisterLitHair();
 
 		static void RegisterACES();
 

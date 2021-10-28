@@ -53,4 +53,28 @@ namespace SIByL
 
 		return texture;
 	}
+
+	Ref<TextureCubemap> TextureCubemap::Create(const std::string& path)
+	{
+		std::string id = GetPathID(path);
+		Ref<TextureCubemap> texture = nullptr;
+
+		if (texture == nullptr)
+		{
+			switch (Renderer::GetRaster())
+			{
+			case RasterRenderer::OpenGL: texture = std::make_shared<OpenGLTextureCubemap>(path); break;
+			case RasterRenderer::DirectX12: texture = nullptr; break;
+			case RasterRenderer::CpuSoftware: texture = nullptr; break;
+			case RasterRenderer::GpuSoftware: texture = nullptr; break;
+			default: texture = nullptr; break;
+			}
+
+			texture->Identifer = id;
+			Library<TextureCubemap>::Push(id, texture);
+		}
+
+		return texture;
+	}
+
 }

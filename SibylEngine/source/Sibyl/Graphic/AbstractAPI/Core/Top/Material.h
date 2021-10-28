@@ -18,6 +18,7 @@ namespace SIByL
 {
 	class Shader;
 	class Texture2D;
+	class TextureCubemap;
 	class ShaderConstantsBuffer;
 	class ShaderResourcesBuffer;
 	class ShaderConstantsDesc;
@@ -64,6 +65,7 @@ namespace SIByL
 		void SetFloat4(const std::string& name, const glm::vec4& value);
 		void SetMatrix4x4(const std::string& name, const glm::mat4& value);
 		void SetTexture2D(const std::string& name, Ref<Texture2D> texture);
+		void SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture);
 
 		void GetFloat(const std::string& name, float& value);
 		void GetFloat3(const std::string& name, glm::vec3& value);
@@ -88,6 +90,7 @@ namespace SIByL
 		///							Fetcher								 ///
 		ShaderConstantsDesc* GetConstantsDesc();
 		ShaderResourcesDesc* GetResourcesDesc();
+		ShaderResourcesDesc* GetCubeResourcesDesc();
 		Ref<Shader> GetShaderUsed() { return m_Shader; }
 
 		////////////////////////////////////////////////////////////////////
@@ -98,10 +101,12 @@ namespace SIByL
 		Ref<Shader> m_Shader = nullptr;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 		Ref<ShaderResourcesBuffer> m_ResourcesBuffer = nullptr;
+		Ref<ShaderResourcesBuffer> m_CubeResourcesBuffer = nullptr;
 		PipelineStateDesc pipelineStateDesc;
 
 		ShaderConstantsDesc* m_ConstantsDesc = nullptr;
 		ShaderResourcesDesc* m_ResourcesDesc = nullptr;
+		ShaderResourcesDesc* m_CubeResourcesDesc = nullptr;
 
 		friend class DrawItem;
 		friend class Camera;

@@ -92,7 +92,8 @@ namespace SIByL
 	///////////////////////////////////////////////////////////////////////////
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
-		glBindTextureUnit(slot, m_TexID);
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_2D, m_TexID);
 	}
 	
 	void* OpenGLTexture2D::GetImGuiHandle()
@@ -156,5 +157,101 @@ namespace SIByL
 
 	}
 
+
+	///////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+	///										Cubemap									///
+	///////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////
+
+	// Create from local file path
+	// --------------------------------
+	OpenGLTextureCubemap::OpenGLTextureCubemap(const std::string& path)
+		:m_Path(path)
+	{
+		PROFILE_SCOPE_FUNCTION();
+		InitFromImage(path);
+	}
+
+	void OpenGLTextureCubemap::InitFromImage(const std::string& path)
+	{
+		static std::string tails[6] = {
+			"_pos_x.png",
+			"_neg_x.png",
+			"_pos_y.png",
+			"_neg_y.png",
+			"_pos_z.png",
+			"_neg_z.png"};
+
+		// Generate Texture
+		glGenTextures(1, &m_TexID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_TexID);
+
+		std::string head = path.substr(0, path.find_last_of("."));
+		for (unsigned int i = 0; i < 6; i++)
+		{
+			Image image(head + tails[i]);
+			if (i == 0)
+			{
+				m_Width = image.GetWidth();
+				m_Height = image.GetHeight();
+				m_Channel = image.GetChannel();
+			}
+			if (image.GetChannel() == 3)
+			{
+				glTexImage2D(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+					0, GL_RGB, image.GetWidth(), image.GetHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, image.GetData());
+			}
+			else if (image.GetChannel() == 4)
+			{
+				glTexImage2D(
+					GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 
+					0, GL_RGBA, image.GetWidth(), image.GetHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, image.GetData());
+			}
+
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+			// generate mipmaps for the cubemap so OpenGL automatically allocates the required memory.
+			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		}
+
+	}
+
+	OpenGLTextureCubemap::~OpenGLTextureCubemap()
+	{
+		glDeleteTextures(1, &m_TexID);
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	///                               Fetcher                               ///
+	///////////////////////////////////////////////////////////////////////////
+	uint32_t OpenGLTextureCubemap::GetWidth() const
+	{
+		return m_Width;
+	}
+
+	uint32_t OpenGLTextureCubemap::GetHeight() const
+	{
+		return m_Height;
+	}
+
+	///////////////////////////////////////////////////////////////////////////
+	///                                   ?                                 ///
+	///////////////////////////////////////////////////////////////////////////
+	void OpenGLTextureCubemap::Bind(uint32_t slot) const
+	{
+		glActiveTexture(GL_TEXTURE0 + slot);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_TexID);
+	}
+
+	void* OpenGLTextureCubemap::GetImGuiHandle()
+	{
+		return (void*)m_TexID;
+	}
 
 }

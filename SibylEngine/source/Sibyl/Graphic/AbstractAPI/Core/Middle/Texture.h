@@ -55,4 +55,23 @@ namespace SIByL
 		Ref<PtrCudaTexture> mPtrCudaTexture = nullptr;
 		Ref<PtrCudaSurface> mPtrCudaSurface = nullptr;
 	};
+
+	class TextureCubemap :public Texture
+	{
+	public:
+		enum class Format
+		{
+			R8G8B8,
+			R8G8B8A8,
+		};
+
+	public:
+		virtual ~TextureCubemap() = default;
+		static Ref<TextureCubemap> Create(const std::string& path);
+
+		virtual void RegisterImGui() {}
+		virtual void* GetImGuiHandle() = 0;
+
+		std::string Identifer;
+	};
 }

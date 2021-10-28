@@ -68,4 +68,9 @@ namespace SIByL
 	class Texture2D;
 	template< >
 	Ref<Texture2D> Library<Texture2D>::Fetch(const std::string& id);
+
+	class TextureCubemap;
+	template< >
+	Ref<TextureCubemap> Library<TextureCubemap>::Fetch(const std::string& id);
+
 }

@@ -94,13 +94,26 @@ namespace SIByL
 
 		int srIndex = 0;
 		int innerIndex = 0;
-		for (auto resourceBuffer : desc.m_TextureBufferLayouts)
+		if (desc.m_TextureBufferLayouts.size() >= 1)
 		{
 			innerIndex = 0;
+			auto resourceBuffer = desc.m_TextureBufferLayouts[0];
 			for (auto bufferElement : resourceBuffer)
 			{
 				m_ShaderResourceDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex, "PROCEDURE=White"});
 				m_ResourcesMapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
+				innerIndex++;
+			}
+			srIndex++; paraIndex++;
+		}
+
+		if (desc.m_TextureBufferLayouts.size() >= 2)
+		{
+			auto resourceBuffer = desc.m_TextureBufferLayouts[1];
+			for (auto bufferElement : resourceBuffer)
+			{
+				m_CubeShaderResourceDescs.Mapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex, "PROCEDURE=White" });
+				m_CubeResourcesMapper.InsertResource({ bufferElement.Name,bufferElement.Type,paraIndex,innerIndex });
 				innerIndex++;
 			}
 			srIndex++; paraIndex++;
@@ -169,7 +182,7 @@ namespace SIByL
 		}
 	}
 
-	bool ResourcesMapper::SetTextureID(std::string name, std::string ID, ShaderResourceType type)
+	bool ResourcesMapper::SetTextureID(std::string name, std::string ID, ShaderResourceType type, unsigned int mip)
 	{
 		// If the name already exists
 		if (m_Mapper.find(name) == m_Mapper.end())
@@ -181,6 +194,7 @@ namespace SIByL
 		{
 			m_Mapper[name].TextureID = ID;
 			m_Mapper[name].Type = type;
+			m_Mapper[name].SelectedMip = mip;
 			return true;
 		}
 	}

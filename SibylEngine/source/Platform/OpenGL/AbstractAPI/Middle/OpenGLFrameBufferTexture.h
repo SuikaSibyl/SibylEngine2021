@@ -17,7 +17,7 @@ namespace SIByL
 		unsigned int GetGLType() { return GLType; }
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
-		void SetComputeRenderTarget(unsigned int i);
+		void SetComputeRenderTarget(unsigned int i, unsigned int miplevel = 0);
 		void SetShaderResource(unsigned int i);
 
 	private:

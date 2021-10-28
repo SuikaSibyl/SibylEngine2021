@@ -215,6 +215,11 @@ namespace SIByL
 		}
 	}
 
+	void DX12ShaderResourcesBuffer::SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture)
+	{
+
+	}
+
 	ShaderResourcesDesc* DX12ShaderResourcesBuffer::GetShaderResourceDesc()
 	{
 		return &m_ShaderResourcesDesc;

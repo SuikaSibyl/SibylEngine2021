@@ -1,0 +1,17 @@
+Material: Untitled
+Shader: Shaders/SIByL/Lit
+Constants Buffer:
+  - CONSTANT: 0
+    INFO:
+      Type: 13
+      Name: Color
+      Value: [1, 0.999989986, 0.999989986, 1]
+Textures:
+  - TEXTURE: 0
+    INFO:
+      Name: u_Main
+      ID: PROCEDURE=White
+  - TEXTURE: 1
+    INFO:
+      Name: u_Normal
+      ID: FILE=..\Assets\Resources\Textures\Normal.png

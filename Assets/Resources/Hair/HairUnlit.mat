@@ -9,5 +9,5 @@ Constants Buffer:
 Textures:
   - TEXTURE: 0
     INFO:
-      Name: Main
+      Name: u_Main
       ID: FILE=..\Assets\Resources\Hair\spec_opacity.png

@@ -34,6 +34,9 @@ namespace SIByL
 		m_ConstantsBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
 
 		m_ResourcesBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
+
+		m_CubeResourcesBuffer->UploadDataIfDirty(m_Shader->GetBinder().get());
+
 	}
 
 	////////////////////////////////////////////////////////////////////
@@ -65,6 +68,12 @@ namespace SIByL
 	void Material::SetTexture2D(const std::string& name, Ref<Texture2D> texture)
 	{
 		m_ResourcesBuffer->SetTexture2D(name, texture);
+		SetAssetDirty();
+	}
+
+	void Material::SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture)
+	{
+		m_CubeResourcesBuffer->SetTextureCubemap(name, texture);
 		SetAssetDirty();
 	}
 
@@ -135,6 +144,14 @@ namespace SIByL
 			return nullptr;
 	}
 
+	ShaderResourcesDesc* Material::GetCubeResourcesDesc()
+	{
+		if (m_CubeResourcesBuffer != nullptr)
+			return m_CubeResourcesBuffer->GetShaderResourceDesc();
+		else
+			return nullptr;
+	}
+
 	////////////////////////////////////////////////////////////////////
 	///							Custom Asset						 ///
 	void Material::SaveAsset()
@@ -153,11 +170,16 @@ namespace SIByL
 		m_Shader = shader;
 		m_ConstantsDesc = shader->GetBinder()->GetShaderConstantsDesc(1);
 		m_ResourcesDesc = shader->GetBinder()->GetShaderResourcesDesc();
+		m_CubeResourcesDesc = shader->GetBinder()->GetCubeShaderResourcesDesc();
+
 		m_ConstantsBuffer = ShaderConstantsBuffer::Create
 			(shader->GetBinder()->GetShaderConstantsDesc(1));
 		m_ResourcesBuffer = ShaderResourcesBuffer::Create
 			(shader->GetBinder()->GetShaderResourcesDesc(), 
 			 shader->GetBinder()->GetRootSignature());
+		m_CubeResourcesBuffer = ShaderResourcesBuffer::Create
+			(shader->GetBinder()->GetCubeShaderResourcesDesc(),
+			shader->GetBinder()->GetRootSignature());
 
 		// Reset
 
@@ -219,30 +241,20 @@ namespace SIByL
 		index = 0;
 		if (resourcesDesc != nullptr)
 		{
-			out << YAML::BeginMap;
 			for (auto& item : *resourcesDesc)
 			{
+				out << YAML::BeginMap;
+
 				out << YAML::Key << "TEXTURE" << YAML::Value << index++;
 				out << YAML::Key << "INFO";
 				out << YAML::BeginMap;
 				//out << YAML::Key << "Type" << YAML::Value << (unsigned int)item.second.Type;
 				out << YAML::Key << "Name" << YAML::Value << item.second.Name;
 				out << YAML::Key << "ID" << YAML::Value << item.second.TextureID;
-				//switch (item.second.Type)
-				//{
-				//case ShaderDataType::RGBA:
-				//{
-				//	glm::vec4 value;
-				//	m_Material->GetFloat4(item.second.Name, value);
-				//	out << YAML::Key << "Value" << YAML::Value << value;
-				//	break;
-				//}
-				//default:
-				//	break;
-				//}
+				out << YAML::EndMap;
+
 				out << YAML::EndMap;
 			}
-			out << YAML::EndMap;
 		}
 
 		out << YAML::EndSeq;

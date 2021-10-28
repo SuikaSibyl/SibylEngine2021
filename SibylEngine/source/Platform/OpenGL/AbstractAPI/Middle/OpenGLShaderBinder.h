@@ -60,6 +60,7 @@ namespace SIByL
 
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
 		virtual void SetTexture2D(const std::string& name, RenderTarget* texture) override;
+		virtual void SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture) override;
 
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() override;
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
@@ -76,7 +77,7 @@ namespace SIByL
 		OpenGLUnorderedAccessBuffer(ShaderResourcesDesc* desc, RootSignature* rs);
 
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture) override;
-		virtual void SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx) override;
+		virtual void SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx, unsigned int mip = 0) override;
 
 		virtual ShaderResourcesDesc* GetShaderResourceDesc() override;
 		virtual void UploadDataIfDirty(ShaderBinder* shaderBinder) override;
@@ -95,7 +96,8 @@ namespace SIByL
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value);
 		virtual void SetMatrix4x4(const std::string& name, const glm::mat4& value);
 		virtual void SetTexture2D(const std::string& name, Ref<Texture2D> texture);
-		virtual void SetRenderTarget2D(const std::string& name, RenderTarget* texture);
+		virtual void SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture);
+		virtual void SetRenderTarget2D(const std::string& name, RenderTarget* texture, unsigned int miplevel = 0);
 
 		virtual void BindConstantsBuffer(unsigned int slot, ShaderConstantsBuffer& buffer) {}
 
@@ -104,7 +106,7 @@ namespace SIByL
 		OpenGLShaderBinder(const ShaderBinderDesc& desc);
 		virtual void Bind() override {}
 
-		void SetOpenGLShaderId(int id) { m_ShderID = id; }
+		void SetOpenGLShaderId(int id);
 
 	private:
 		int m_ShderID;

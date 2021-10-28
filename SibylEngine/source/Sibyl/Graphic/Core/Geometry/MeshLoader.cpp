@@ -16,7 +16,7 @@ namespace SIByL
         :m_Layout(layout), m_Path(path), m_MeshCacheAsset(path)
     {
         m_Directory = path.substr(0, path.find_last_of('/'));
-        if (!m_MeshCacheAsset.LoadCache())
+        if (layout != VertexBufferLayout::StandardVertexBufferLayout || !m_MeshCacheAsset.LoadCache())
         {
             LoadFile("../Assets/" + path);
         }
@@ -25,9 +25,17 @@ namespace SIByL
 	void MeshLoader::LoadFile(const std::string& path)
 	{
 		Assimp::Importer importer;
-        const aiScene* scene = importer.ReadFile(path, 
-            ((Renderer::GetRaster() == RasterRenderer::OpenGL) ? 0 : 0) | 
-            aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+
+        unsigned int flag = aiProcess_Triangulate;
+        for (BufferElement& element : m_Layout)
+        {
+            if (element.Name == "NORMAL")
+                flag |= aiProcess_GenNormals;
+            if (element.Name == "TANGENT")
+                flag |= aiProcess_CalcTangentSpace;
+        }
+
+        const aiScene* scene = importer.ReadFile(path, flag);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {

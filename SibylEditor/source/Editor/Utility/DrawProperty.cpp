@@ -103,6 +103,28 @@ namespace SIByLEditor
 		ImGui::PopID();
 	}
 
+	void DrawTextureCubemap(SIByL::Material& material, SIByL::ShaderResourceItem& item)
+	{
+		ImGui::PushID(item.Name.c_str());
+		ImGui::Text(item.Name.c_str());
+		ImGui::SameLine();
+
+		std::string Textname = GetShort(item.TextureID);
+		ImGui::Button(Textname.c_str(), ImVec2(100.0f, 0.0f));
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				std::filesystem::path texturePath = std::filesystem::path("../Assets/") / path;
+				SIByL::Ref<SIByL::TextureCubemap> texture = SIByL::Library<SIByL::TextureCubemap>::Fetch(PathToIdentifier(texturePath.string()));
+				material.SetTextureCubemap(item.Name, texture);
+			}
+			ImGui::EndDragDropTarget();
+		}
+		ImGui::PopID();
+	}
+
 	void DrawTriangleMeshSocket(const std::string& label, SIByL::MeshFilterComponent& mesh)
 	{
 		static const std::string name = "Mesh";
@@ -154,6 +176,15 @@ namespace SIByLEditor
 
 	void DrawLight(const std::string& label, SIByL::LightComponent& light)
 	{
+
+		ImGui::Text("Alpha State: ");
+		ImGui::SameLine();
+
+		glm::vec3* color = &light.m_Color;
+		if (ImGui::ColorEdit4(" ", (float*)&(color[0])))
+		{
+
+		}
 
 	}
 
@@ -304,6 +335,20 @@ namespace SIByLEditor
 						SIByL::ShaderResourceItem& item = iter.second;
 
 						DrawTexture2D(material, item);
+					}
+				}
+
+				// ================================================================
+				// Draw resources
+				SIByL::ShaderResourcesDesc* cuberesources = material.GetCubeResourcesDesc();
+
+				if (cuberesources != nullptr)
+				{
+					for (auto iter : *cuberesources)
+					{
+						SIByL::ShaderResourceItem& item = iter.second;
+
+						DrawTextureCubemap(material, item);
 					}
 				}
 			}

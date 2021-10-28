@@ -341,6 +341,17 @@ namespace SIByL
 			m_ShaderResourcesDesc.Mapper.SetTextureID(name, texture->GetIdentifier(), ShaderResourceType::RenderTarget);
 		}
 	}
+	
+	void OpenGLShaderResourcesBuffer::SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture)
+	{
+		m_IsDirty = true;
+
+		ShaderResourceItem item;
+		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
+		{
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, texture->Identifer, ShaderResourceType::Cubemap);
+		}
+	}
 
 	void OpenGLShaderResourcesBuffer::UploadDataIfDirty(ShaderBinder* shaderBinder)
 	{
@@ -366,6 +377,13 @@ namespace SIByL
 					Ref<Texture2D> refTex = Library<Texture2D>::Fetch(resource.second.TextureID);
 					m_ShaderBinder->SetTexture2D(resource.first, refTex);
 				}
+				break;
+				case ShaderResourceType::Cubemap:
+				{
+					Ref<TextureCubemap> refTex = Library<TextureCubemap>::Fetch(resource.second.TextureID);
+					m_ShaderBinder->SetTextureCubemap(resource.first, refTex);
+
+				}
 					break;
 				default:
 					break;
@@ -390,14 +408,14 @@ namespace SIByL
 		}
 	}
 
-	void OpenGLUnorderedAccessBuffer::SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx)
+	void OpenGLUnorderedAccessBuffer::SetRenderTarget2D(const std::string& name, Ref<FrameBuffer> framebuffer, unsigned int attachmentIdx, unsigned int mip)
 	{
 		m_IsDirty = true;
 
 		ShaderResourceItem item;
 		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
 		{
-			m_ShaderResourcesDesc.Mapper.SetTextureID(name, framebuffer->GetIdentifier() + std::to_string(attachmentIdx));
+			m_ShaderResourcesDesc.Mapper.SetTextureID(name, framebuffer->GetIdentifier() + std::to_string(attachmentIdx), ShaderResourceType::RenderTarget, mip);
 		}
 	}
 
@@ -417,7 +435,7 @@ namespace SIByL
 			for each (auto & resource in m_ShaderResourcesDesc.Mapper)
 			{
 				RenderTarget* rendertarget = FrameBufferLibrary::GetRenderTarget(resource.second.TextureID);
-				m_ShaderBinder->SetRenderTarget2D(resource.first, rendertarget);
+				m_ShaderBinder->SetRenderTarget2D(resource.first, rendertarget, resource.second.SelectedMip);
 			}
 		}
 	}
@@ -433,6 +451,24 @@ namespace SIByL
 		PROFILE_SCOPE_FUNCTION();
 
 		InitMappers(desc);
+
+	}
+	void OpenGLShaderBinder::SetOpenGLShaderId(int id)
+	{
+		m_ShderID = id;
+
+		glUseProgram(m_ShderID);
+		for (auto& resourceSlot : m_ResourcesMapper)
+		{
+			unsigned int location = glGetUniformLocation(m_ShderID, resourceSlot.second.Name.c_str());
+			glUniform1i(location, resourceSlot.second.Offset);
+		}
+		for (auto& resourceSlot : m_CubeResourcesMapper)
+		{
+			unsigned int location = glGetUniformLocation(m_ShderID, resourceSlot.second.Name.c_str());
+			glUniform1i(location, resourceSlot.second.Offset);
+		}
+		glUseProgram(0);
 	}
 
 	void OpenGLShaderBinder::SetInt(const std::string& name, const int& value)
@@ -480,13 +516,24 @@ namespace SIByL
 		}
 	}
 
-	void OpenGLShaderBinder::SetRenderTarget2D(const std::string& name, RenderTarget* rendertarget)
+	void OpenGLShaderBinder::SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture)
+	{
+		ShaderResourceItem item;
+		if (m_CubeResourcesMapper.FetchResource(name, item))
+		{
+			OpenGLTextureCubemap* oglTexture = dynamic_cast<OpenGLTextureCubemap*>(texture.get());
+			if (oglTexture == nullptr) return;
+			oglTexture->Bind(item.Offset);
+		}
+	}
+
+	void OpenGLShaderBinder::SetRenderTarget2D(const std::string& name, RenderTarget* rendertarget, unsigned int miplevel)
 	{
 		ShaderResourceItem item;
 		if (m_UnorderedAccessMapper.FetchResource(name, item))
 		{
 			OpenGLRenderTarget* rt = dynamic_cast<OpenGLRenderTarget*>(rendertarget);
-			rt->SetComputeRenderTarget(item.Offset);
+			rt->SetComputeRenderTarget(item.Offset, miplevel);
 		}
 	}
 }

@@ -49,11 +49,11 @@ layout(location = 0) out vec4 FragColor;
 layout(location = 1) out vec4 UVOffset;  
 // Uniform items
 uniform vec4 Color;
-uniform sampler2D u_Texture;
+uniform sampler2D u_Main;
 
 void main()
 {
-    FragColor = Color * texture(u_Texture, v_TexCoord);
+    FragColor = Color * texture(u_Main, v_TexCoord);
 
     if(FragColor.a < 0.1)
         discard;

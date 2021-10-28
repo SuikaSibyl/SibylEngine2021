@@ -378,6 +378,27 @@
     <ClCompile Include="source\Sibyl\ECS\Components\Physics\SelfCollisionDetector.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphDataStructure.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphVirtualResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\ObjLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1722,6 +1743,27 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\ECS\Components\Physics\SelfCollisionDetector.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphDataStructure.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphVirtualResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\ObjLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

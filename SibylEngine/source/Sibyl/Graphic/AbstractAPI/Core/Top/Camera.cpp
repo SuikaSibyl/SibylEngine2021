@@ -54,6 +54,7 @@ namespace SIByL
 		{
 			m_ConstantsBuffer->SetMatrix4x4("CurrentPV", m_CurrentProjectionView);
 			m_ConstantsBuffer->SetMatrix4x4("PreviousPV", m_PreviousProjectionView);
+			m_ConstantsBuffer->SetFloat4("ViewPos", glm::vec4(m_Posistion, 1));
 		}
 
 		m_PreviousProjectionView = m_CurrentProjectionView;

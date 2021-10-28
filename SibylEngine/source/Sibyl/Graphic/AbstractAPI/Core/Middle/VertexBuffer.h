@@ -48,6 +48,16 @@ namespace SIByL
 
 		static VertexBufferLayout StandardVertexBufferLayout;
 
+		bool operator==(const VertexBufferLayout& other) const
+		{
+			return m_Elements == other.m_Elements;
+		}
+		bool operator!=(const VertexBufferLayout& other) const
+		{
+			return !(*this == other);
+		}
+
+
 		/////////////////////////////////////////////////////////
 		///				     Fetcher / Setter		          ///
 		inline const std::vector<BufferElement>& GetElements() const { return m_Elements; }

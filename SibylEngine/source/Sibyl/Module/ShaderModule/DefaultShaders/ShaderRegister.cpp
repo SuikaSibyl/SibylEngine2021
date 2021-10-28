@@ -9,6 +9,7 @@ namespace SIByL
 	{
 		RegisterUnlitTexture();
 		RegisterLit();
+		RegisterLitHair();
 
 		RegisterACES();
 
@@ -36,7 +37,7 @@ namespace SIByL
 		{
 			// ShaderResourceTable 1
 			{
-				{ShaderResourceType::Texture2D, "Main"},
+				{ShaderResourceType::Texture2D, "u_Main"},
 			},
 		};
 
@@ -66,11 +67,49 @@ namespace SIByL
 		{
 			// ShaderResourceTable 1
 			{
-				{ShaderResourceType::Texture2D, "Main"},
+				{ShaderResourceType::Texture2D, "u_Main"},
+				{ShaderResourceType::Texture2D, "u_Normal"},
 			},
 		};
 
 		Shader::Create("Shaders/SIByL/Lit",
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 2 }),
+			ShaderBinderDesc(CBlayouts, SRlayouts));
+	}
+	
+
+	void ShaderRegister::RegisterLitHair()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			// ConstantBuffer0 : Per Object
+			ConstantBufferLayout::PerObjectConstants,
+			// ConstantBuffer1 : Per Material
+			{
+				{ShaderDataType::RGBA, "Color"},
+			},
+			// ConstantBuffer2 : Per Camera
+			ConstantBufferLayout::PerCameraConstants,
+			// ConstantBuffer3 : Per Frame
+			ConstantBufferLayout::PerFrameConstants,
+		};
+
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Main"},
+				{ShaderResourceType::Texture2D, "u_Normal"},
+				{ShaderResourceType::Texture2D, "u_DiffuseAO"},
+				{ShaderResourceType::Texture2D, "u_IBLLUT"},
+			},
+			{
+				{ShaderResourceType::Cubemap, "u_SpecularCube"},
+			}
+		};
+
+		Shader::Create("Shaders/SIByL/LitHair",
 			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 2 }),
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 	}

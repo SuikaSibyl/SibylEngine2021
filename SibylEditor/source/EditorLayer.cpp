@@ -178,12 +178,6 @@ namespace SIByLEditor
 	static bool NextFrame = false;
 	void EditorLayer::OnDraw()
 	{
-		//if (NextFrame == false)
-		//	return;
-
-		//NextFrame = false;
-		// -------------------------------------------------------
-
 		Ref<FrameBuffer> viewportBuffer = Library<FrameBuffer>::Fetch("SceneView");
 		viewportBuffer->Bind();
 		viewportBuffer->ClearBuffer();

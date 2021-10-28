@@ -9,5 +9,9 @@ Constants Buffer:
 Textures:
   - TEXTURE: 0
     INFO:
-      Name: Main
+      Name: u_Main
       ID: PROCEDURE=White
+  - TEXTURE: 1
+    INFO:
+      Name: u_Normal
+      ID: FILE=..\Assets\Resources\Textures\Normal.png
