@@ -21,11 +21,11 @@ NodeBuilder::NodeBuilder()
 
 NodeBuilder::~NodeBuilder() = default;
 
-Node NodeBuilder::Root() {
+NodeAoS NodeBuilder::Root() {
   if (!m_pRoot)
-    return Node();
+    return NodeAoS();
 
-  return Node(*m_pRoot, m_pMemory);
+  return NodeAoS(*m_pRoot, m_pMemory);
 }
 
 void NodeBuilder::OnDocumentStart(const Mark&) {}

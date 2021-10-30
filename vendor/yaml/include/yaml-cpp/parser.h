@@ -14,7 +14,7 @@
 
 namespace YAML {
 class EventHandler;
-class Node;
+class NodeAoS;
 class Scanner;
 struct Directives;
 struct Token;

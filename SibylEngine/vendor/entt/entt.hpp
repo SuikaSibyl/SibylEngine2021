@@ -32483,8 +32483,8 @@ struct meta_type_node {
 };
 
 
-template<auto Member, typename Op, typename Node>
-auto meta_visit(const Op &op, const Node *node)
+template<auto Member, typename Op, typename NodeAoS>
+auto meta_visit(const Op &op, const NodeAoS *node)
 -> std::decay_t<decltype(node->*Member)> {
     for(auto *curr = node->*Member; curr; curr = curr->next) {
         if(op(curr)) {
@@ -32492,7 +32492,7 @@ auto meta_visit(const Op &op, const Node *node)
         }
     }
 
-    if constexpr(std::is_same_v<Node, meta_type_node>) {
+    if constexpr(std::is_same_v<NodeAoS, meta_type_node>) {
         for(auto *curr = node->base; curr; curr = curr->next) {
             if(auto *ret = meta_visit<Member>(op, curr->type()); ret) {
                 return ret;
@@ -32629,7 +32629,7 @@ namespace entt {
  * @tparam Format Format of meta objects returned.
  * @tparam Node Format of meta nodes iterated.
  */
-template<typename Type, typename Node = typename Type::node_type>
+template<typename Type, typename NodeAoS = typename Type::node_type>
 class meta_range {
     struct range_iterator {
         using difference_type = std::ptrdiff_t;
@@ -32637,7 +32637,7 @@ class meta_range {
         using pointer = void;
         using reference = value_type;
         using iterator_category = std::input_iterator_tag;
-        using node_type = Node;
+        using node_type = NodeAoS;
 
         range_iterator() ENTT_NOEXCEPT = default;
 
@@ -32672,7 +32672,7 @@ class meta_range {
 
 public:
     /*! @brief Node type. */
-    using node_type = Node;
+    using node_type = NodeAoS;
     /*! @brief Input iterator type. */
     using iterator = range_iterator;
 
@@ -33766,8 +33766,8 @@ class meta_type {
         return nullptr;
     }
 
-    template<auto... Member, typename Node>
-    void unregister_all(Node **curr) {
+    template<auto... Member, typename NodeAoS>
+    void unregister_all(NodeAoS **curr) {
         while(*curr) {
             (unregister_all(&((*curr)->*Member)), ...);
             *curr = std::exchange((*curr)->next, nullptr);
@@ -35306,14 +35306,14 @@ namespace entt {
 namespace internal {
 
 
-template<typename Node>
-[[nodiscard]] bool find_if(const Node *candidate, const Node *node) ENTT_NOEXCEPT {
+template<typename NodeAoS>
+[[nodiscard]] bool find_if(const NodeAoS *candidate, const NodeAoS *node) ENTT_NOEXCEPT {
     return node && (node == candidate || find_if(candidate, node->next));
 }
 
 
-template<typename Id, typename Node>
-[[nodiscard]] bool find_if_not(const Id id, Node *node, const Node *owner) ENTT_NOEXCEPT {
+template<typename Id, typename NodeAoS>
+[[nodiscard]] bool find_if_not(const Id id, NodeAoS *node, const NodeAoS *owner) ENTT_NOEXCEPT {
     if constexpr(std::is_pointer_v<Id>) {
         return node && ((*node->id == *id && node != owner) || find_if_not(id, node->next, owner));
     } else {

@@ -14,28 +14,28 @@
 #include "yaml-cpp/dll.h"
 
 namespace YAML {
-class Node;
+class NodeAoS;
 
 /**
  * Loads the input string as a single YAML document.
  *
  * @throws {@link ParserException} if it is malformed.
  */
-YAML_CPP_API Node Load(const std::string& input);
+YAML_CPP_API NodeAoS Load(const std::string& input);
 
 /**
  * Loads the input string as a single YAML document.
  *
  * @throws {@link ParserException} if it is malformed.
  */
-YAML_CPP_API Node Load(const char* input);
+YAML_CPP_API NodeAoS Load(const char* input);
 
 /**
  * Loads the input stream as a single YAML document.
  *
  * @throws {@link ParserException} if it is malformed.
  */
-YAML_CPP_API Node Load(std::istream& input);
+YAML_CPP_API NodeAoS Load(std::istream& input);
 
 /**
  * Loads the input file as a single YAML document.
@@ -43,28 +43,28 @@ YAML_CPP_API Node Load(std::istream& input);
  * @throws {@link ParserException} if it is malformed.
  * @throws {@link BadFile} if the file cannot be loaded.
  */
-YAML_CPP_API Node LoadFile(const std::string& filename);
+YAML_CPP_API NodeAoS LoadFile(const std::string& filename);
 
 /**
  * Loads the input string as a list of YAML documents.
  *
  * @throws {@link ParserException} if it is malformed.
  */
-YAML_CPP_API std::vector<Node> LoadAll(const std::string& input);
+YAML_CPP_API std::vector<NodeAoS> LoadAll(const std::string& input);
 
 /**
  * Loads the input string as a list of YAML documents.
  *
  * @throws {@link ParserException} if it is malformed.
  */
-YAML_CPP_API std::vector<Node> LoadAll(const char* input);
+YAML_CPP_API std::vector<NodeAoS> LoadAll(const char* input);
 
 /**
  * Loads the input stream as a list of YAML documents.
  *
  * @throws {@link ParserException} if it is malformed.
  */
-YAML_CPP_API std::vector<Node> LoadAll(std::istream& input);
+YAML_CPP_API std::vector<NodeAoS> LoadAll(std::istream& input);
 
 /**
  * Loads the input file as a list of YAML documents.
@@ -72,7 +72,7 @@ YAML_CPP_API std::vector<Node> LoadAll(std::istream& input);
  * @throws {@link ParserException} if it is malformed.
  * @throws {@link BadFile} if the file cannot be loaded.
  */
-YAML_CPP_API std::vector<Node> LoadAllFromFile(const std::string& filename);
+YAML_CPP_API std::vector<NodeAoS> LoadAllFromFile(const std::string& filename);
 }  // namespace YAML
 
 #endif  // VALUE_PARSE_H_62B23520_7C8E_11DE_8A39_0800200C9A66

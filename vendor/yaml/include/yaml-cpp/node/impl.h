@@ -16,10 +16,10 @@
 #include <string>
 
 namespace YAML {
-inline Node::Node()
+inline NodeAoS::NodeAoS()
     : m_isValid(true), m_invalidKey{}, m_pMemory(nullptr), m_pNode(nullptr) {}
 
-inline Node::Node(NodeType::value type)
+inline NodeAoS::NodeAoS(NodeType::value type)
     : m_isValid(true),
       m_invalidKey{},
       m_pMemory(new detail::memory_holder),
@@ -28,7 +28,7 @@ inline Node::Node(NodeType::value type)
 }
 
 template <typename T>
-inline Node::Node(const T& rhs)
+inline NodeAoS::NodeAoS(const T& rhs)
     : m_isValid(true),
       m_invalidKey{},
       m_pMemory(new detail::memory_holder),
@@ -36,26 +36,26 @@ inline Node::Node(const T& rhs)
   Assign(rhs);
 }
 
-inline Node::Node(const detail::iterator_value& rhs)
+inline NodeAoS::NodeAoS(const detail::iterator_value& rhs)
     : m_isValid(rhs.m_isValid),
       m_invalidKey(rhs.m_invalidKey),
       m_pMemory(rhs.m_pMemory),
       m_pNode(rhs.m_pNode) {}
 
-inline Node::Node(const Node& rhs) = default;
+inline NodeAoS::NodeAoS(const NodeAoS& rhs) = default;
 
-inline Node::Node(Zombie)
+inline NodeAoS::NodeAoS(Zombie)
     : m_isValid(false), m_invalidKey{}, m_pMemory{}, m_pNode(nullptr) {}
 
-inline Node::Node(Zombie, const std::string& key)
+inline NodeAoS::NodeAoS(Zombie, const std::string& key)
     : m_isValid(false), m_invalidKey(key), m_pMemory{}, m_pNode(nullptr) {}
 
-inline Node::Node(detail::node& node, detail::shared_memory_holder pMemory)
+inline NodeAoS::NodeAoS(detail::node& node, detail::shared_memory_holder pMemory)
     : m_isValid(true), m_invalidKey{}, m_pMemory(pMemory), m_pNode(&node) {}
 
-inline Node::~Node() = default;
+inline NodeAoS::~NodeAoS() = default;
 
-inline void Node::EnsureNodeExists() const {
+inline void NodeAoS::EnsureNodeExists() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   if (!m_pNode) {
@@ -65,21 +65,21 @@ inline void Node::EnsureNodeExists() const {
   }
 }
 
-inline bool Node::IsDefined() const {
+inline bool NodeAoS::IsDefined() const {
   if (!m_isValid) {
     return false;
   }
   return m_pNode ? m_pNode->is_defined() : true;
 }
 
-inline Mark Node::Mark() const {
+inline Mark NodeAoS::Mark() const {
   if (!m_isValid) {
     throw InvalidNode(m_invalidKey);
   }
   return m_pNode ? m_pNode->mark() : Mark::null_mark();
 }
 
-inline NodeType::value Node::Type() const {
+inline NodeType::value NodeAoS::Type() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   return m_pNode ? m_pNode->type() : NodeType::Null;
@@ -90,8 +90,8 @@ inline NodeType::value Node::Type() const {
 // template helpers
 template <typename T, typename S>
 struct as_if {
-  explicit as_if(const Node& node_) : node(node_) {}
-  const Node& node;
+  explicit as_if(const NodeAoS& node_) : node(node_) {}
+  const NodeAoS& node;
 
   T operator()(const S& fallback) const {
     if (!node.m_pNode)
@@ -106,8 +106,8 @@ struct as_if {
 
 template <typename S>
 struct as_if<std::string, S> {
-  explicit as_if(const Node& node_) : node(node_) {}
-  const Node& node;
+  explicit as_if(const NodeAoS& node_) : node(node_) {}
+  const NodeAoS& node;
 
   std::string operator()(const S& fallback) const {
     if (node.Type() == NodeType::Null)
@@ -120,8 +120,8 @@ struct as_if<std::string, S> {
 
 template <typename T>
 struct as_if<T, void> {
-  explicit as_if(const Node& node_) : node(node_) {}
-  const Node& node;
+  explicit as_if(const NodeAoS& node_) : node(node_) {}
+  const NodeAoS& node;
 
   T operator()() const {
     if (!node.m_pNode)
@@ -136,8 +136,8 @@ struct as_if<T, void> {
 
 template <>
 struct as_if<std::string, void> {
-  explicit as_if(const Node& node_) : node(node_) {}
-  const Node& node;
+  explicit as_if(const NodeAoS& node_) : node(node_) {}
+  const NodeAoS& node;
 
   std::string operator()() const {
     if (node.Type() == NodeType::Null)
@@ -150,49 +150,49 @@ struct as_if<std::string, void> {
 
 // access functions
 template <typename T>
-inline T Node::as() const {
+inline T NodeAoS::as() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   return as_if<T, void>(*this)();
 }
 
 template <typename T, typename S>
-inline T Node::as(const S& fallback) const {
+inline T NodeAoS::as(const S& fallback) const {
   if (!m_isValid)
     return fallback;
   return as_if<T, S>(*this)(fallback);
 }
 
-inline const std::string& Node::Scalar() const {
+inline const std::string& NodeAoS::Scalar() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   return m_pNode ? m_pNode->scalar() : detail::node_data::empty_scalar();
 }
 
-inline const std::string& Node::Tag() const {
+inline const std::string& NodeAoS::Tag() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   return m_pNode ? m_pNode->tag() : detail::node_data::empty_scalar();
 }
 
-inline void Node::SetTag(const std::string& tag) {
+inline void NodeAoS::SetTag(const std::string& tag) {
   EnsureNodeExists();
   m_pNode->set_tag(tag);
 }
 
-inline EmitterStyle::value Node::Style() const {
+inline EmitterStyle::value NodeAoS::Style() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   return m_pNode ? m_pNode->style() : EmitterStyle::Default;
 }
 
-inline void Node::SetStyle(EmitterStyle::value style) {
+inline void NodeAoS::SetStyle(EmitterStyle::value style) {
   EnsureNodeExists();
   m_pNode->set_style(style);
 }
 
 // assignment
-inline bool Node::is(const Node& rhs) const {
+inline bool NodeAoS::is(const NodeAoS& rhs) const {
   if (!m_isValid || !rhs.m_isValid)
     throw InvalidNode(m_invalidKey);
   if (!m_pNode || !rhs.m_pNode)
@@ -201,19 +201,19 @@ inline bool Node::is(const Node& rhs) const {
 }
 
 template <typename T>
-inline Node& Node::operator=(const T& rhs) {
+inline NodeAoS& NodeAoS::operator=(const T& rhs) {
   Assign(rhs);
   return *this;
 }
 
-inline Node& Node::operator=(const Node& rhs) {
+inline NodeAoS& NodeAoS::operator=(const NodeAoS& rhs) {
   if (is(rhs))
     return *this;
   AssignNode(rhs);
   return *this;
 }
 
-inline void Node::reset(const YAML::Node& rhs) {
+inline void NodeAoS::reset(const YAML::NodeAoS& rhs) {
   if (!m_isValid || !rhs.m_isValid)
     throw InvalidNode(m_invalidKey);
   m_pMemory = rhs.m_pMemory;
@@ -221,29 +221,29 @@ inline void Node::reset(const YAML::Node& rhs) {
 }
 
 template <typename T>
-inline void Node::Assign(const T& rhs) {
+inline void NodeAoS::Assign(const T& rhs) {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   AssignData(convert<T>::encode(rhs));
 }
 
 template <>
-inline void Node::Assign(const std::string& rhs) {
+inline void NodeAoS::Assign(const std::string& rhs) {
   EnsureNodeExists();
   m_pNode->set_scalar(rhs);
 }
 
-inline void Node::Assign(const char* rhs) {
+inline void NodeAoS::Assign(const char* rhs) {
   EnsureNodeExists();
   m_pNode->set_scalar(rhs);
 }
 
-inline void Node::Assign(char* rhs) {
+inline void NodeAoS::Assign(char* rhs) {
   EnsureNodeExists();
   m_pNode->set_scalar(rhs);
 }
 
-inline void Node::AssignData(const Node& rhs) {
+inline void NodeAoS::AssignData(const NodeAoS& rhs) {
   EnsureNodeExists();
   rhs.EnsureNodeExists();
 
@@ -251,7 +251,7 @@ inline void Node::AssignData(const Node& rhs) {
   m_pMemory->merge(*rhs.m_pMemory);
 }
 
-inline void Node::AssignNode(const Node& rhs) {
+inline void NodeAoS::AssignNode(const NodeAoS& rhs) {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   rhs.EnsureNodeExists();
@@ -268,32 +268,32 @@ inline void Node::AssignNode(const Node& rhs) {
 }
 
 // size/iterator
-inline std::size_t Node::size() const {
+inline std::size_t NodeAoS::size() const {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
   return m_pNode ? m_pNode->size() : 0;
 }
 
-inline const_iterator Node::begin() const {
+inline const_iterator NodeAoS::begin() const {
   if (!m_isValid)
     return const_iterator();
   return m_pNode ? const_iterator(m_pNode->begin(), m_pMemory)
                  : const_iterator();
 }
 
-inline iterator Node::begin() {
+inline iterator NodeAoS::begin() {
   if (!m_isValid)
     return iterator();
   return m_pNode ? iterator(m_pNode->begin(), m_pMemory) : iterator();
 }
 
-inline const_iterator Node::end() const {
+inline const_iterator NodeAoS::end() const {
   if (!m_isValid)
     return const_iterator();
   return m_pNode ? const_iterator(m_pNode->end(), m_pMemory) : const_iterator();
 }
 
-inline iterator Node::end() {
+inline iterator NodeAoS::end() {
   if (!m_isValid)
     return iterator();
   return m_pNode ? iterator(m_pNode->end(), m_pMemory) : iterator();
@@ -301,13 +301,13 @@ inline iterator Node::end() {
 
 // sequence
 template <typename T>
-inline void Node::push_back(const T& rhs) {
+inline void NodeAoS::push_back(const T& rhs) {
   if (!m_isValid)
     throw InvalidNode(m_invalidKey);
-  push_back(Node(rhs));
+  push_back(NodeAoS(rhs));
 }
 
-inline void Node::push_back(const Node& rhs) {
+inline void NodeAoS::push_back(const NodeAoS& rhs) {
   EnsureNodeExists();
   rhs.EnsureNodeExists();
 
@@ -322,50 +322,50 @@ std::string key_to_string(const Key& key) {
 
 // indexing
 template <typename Key>
-inline const Node Node::operator[](const Key& key) const {
+inline const NodeAoS NodeAoS::operator[](const Key& key) const {
   EnsureNodeExists();
   detail::node* value =
       static_cast<const detail::node&>(*m_pNode).get(key, m_pMemory);
   if (!value) {
-    return Node(ZombieNode, key_to_string(key));
+    return NodeAoS(ZombieNode, key_to_string(key));
   }
-  return Node(*value, m_pMemory);
+  return NodeAoS(*value, m_pMemory);
 }
 
 template <typename Key>
-inline Node Node::operator[](const Key& key) {
+inline NodeAoS NodeAoS::operator[](const Key& key) {
   EnsureNodeExists();
   detail::node& value = m_pNode->get(key, m_pMemory);
-  return Node(value, m_pMemory);
+  return NodeAoS(value, m_pMemory);
 }
 
 template <typename Key>
-inline bool Node::remove(const Key& key) {
+inline bool NodeAoS::remove(const Key& key) {
   EnsureNodeExists();
   return m_pNode->remove(key, m_pMemory);
 }
 
-inline const Node Node::operator[](const Node& key) const {
+inline const NodeAoS NodeAoS::operator[](const NodeAoS& key) const {
   EnsureNodeExists();
   key.EnsureNodeExists();
   m_pMemory->merge(*key.m_pMemory);
   detail::node* value =
       static_cast<const detail::node&>(*m_pNode).get(*key.m_pNode, m_pMemory);
   if (!value) {
-    return Node(ZombieNode, key_to_string(key));
+    return NodeAoS(ZombieNode, key_to_string(key));
   }
-  return Node(*value, m_pMemory);
+  return NodeAoS(*value, m_pMemory);
 }
 
-inline Node Node::operator[](const Node& key) {
+inline NodeAoS NodeAoS::operator[](const NodeAoS& key) {
   EnsureNodeExists();
   key.EnsureNodeExists();
   m_pMemory->merge(*key.m_pMemory);
   detail::node& value = m_pNode->get(*key.m_pNode, m_pMemory);
-  return Node(value, m_pMemory);
+  return NodeAoS(value, m_pMemory);
 }
 
-inline bool Node::remove(const Node& key) {
+inline bool NodeAoS::remove(const NodeAoS& key) {
   EnsureNodeExists();
   key.EnsureNodeExists();
   return m_pNode->remove(*key.m_pNode, m_pMemory);
@@ -373,13 +373,13 @@ inline bool Node::remove(const Node& key) {
 
 // map
 template <typename Key, typename Value>
-inline void Node::force_insert(const Key& key, const Value& value) {
+inline void NodeAoS::force_insert(const Key& key, const Value& value) {
   EnsureNodeExists();
   m_pNode->force_insert(key, value, m_pMemory);
 }
 
 // free functions
-inline bool operator==(const Node& lhs, const Node& rhs) { return lhs.is(rhs); }
+inline bool operator==(const NodeAoS& lhs, const NodeAoS& rhs) { return lhs.is(rhs); }
 }  // namespace YAML
 
 #endif  // NODE_IMPL_H_62B23520_7C8E_11DE_8A39_0800200C9A66

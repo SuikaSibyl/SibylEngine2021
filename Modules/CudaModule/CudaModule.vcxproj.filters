@@ -66,6 +66,12 @@
     <ClInclude Include="source\Algorithms\TreeConstruction\BVH\CuBVH.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\Algorithms\Physics\CollisionDetection\SelfCollisionDetection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Algorithms\Physics\CollisionDetection\ICollisionDetection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\core\CudaContext.cpp">
@@ -86,6 +92,9 @@
     <ClCompile Include="source\Algorithms\TreeConstruction\BVH\CuBVHInterface.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Algorithms\Physics\CollisionDetection\ICollisionDetection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="source\GraphicInterop\CudaTexture.cu" />
@@ -94,5 +103,8 @@
       <Filter>源文件</Filter>
     </CudaCompile>
     <CudaCompile Include="source\Algorithms\TreeConstruction\BVH\CuBVH.cu" />
+    <CudaCompile Include="source\Algorithms\Physics\CollisionDetection\SelfCollisionDetection.cu">
+      <Filter>源文件</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@
 #include "nodeevents.h"
 
 namespace YAML {
-Node Clone(const Node& node) {
+NodeAoS Clone(const NodeAoS& node) {
   NodeEvents events(node);
   NodeBuilder builder;
   events.Emit(builder);

@@ -44,7 +44,7 @@ Thanks for his great tutorials, which really taught me to learn a lot.*
 
 ### Parallel Computing
 
-- **CUDA BVH construction** - *Maximizing Parallelism in the Construction of BVHs, Octrees, and k-d Trees (2012)*
+- **CUDA LBVH construction** - *Maximizing Parallelism in the Construction of BVHs, Octrees, and k-d Trees (2012)*
 
 - **Independent Traversal Collision Detection** - [Thinking Parallel, Part II: Tree Traversal on the GPU | NVIDIA Developer Blog](https://developer.nvidia.com/blog/thinking-parallel-part-ii-tree-traversal-gpu/)
 

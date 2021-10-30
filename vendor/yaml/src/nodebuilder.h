@@ -22,7 +22,7 @@ struct Mark;
 }  // namespace YAML
 
 namespace YAML {
-class Node;
+class NodeAoS;
 
 class NodeBuilder : public EventHandler {
  public:
@@ -33,7 +33,7 @@ class NodeBuilder : public EventHandler {
   NodeBuilder& operator=(NodeBuilder&&) = delete;
   ~NodeBuilder() override;
 
-  Node Root();
+  NodeAoS Root();
 
   void OnDocumentStart(const Mark& mark) override;
   void OnDocumentEnd() override;

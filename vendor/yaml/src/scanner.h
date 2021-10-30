@@ -21,7 +21,7 @@
 #include "yaml-cpp/mark.h"
 
 namespace YAML {
-class Node;
+class NodeAoS;
 class RegEx;
 
 /**

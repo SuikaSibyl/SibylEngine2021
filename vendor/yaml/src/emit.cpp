@@ -4,20 +4,20 @@
 #include "yaml-cpp/emitter.h"
 
 namespace YAML {
-Emitter& operator<<(Emitter& out, const Node& node) {
+Emitter& operator<<(Emitter& out, const NodeAoS& node) {
   EmitFromEvents emitFromEvents(out);
   NodeEvents events(node);
   events.Emit(emitFromEvents);
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const Node& node) {
+std::ostream& operator<<(std::ostream& out, const NodeAoS& node) {
   Emitter emitter(out);
   emitter << node;
   return out;
 }
 
-std::string Dump(const Node& node) {
+std::string Dump(const NodeAoS& node) {
   Emitter emitter;
   emitter << node;
   return emitter.c_str();

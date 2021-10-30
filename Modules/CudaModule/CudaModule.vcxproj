@@ -304,6 +304,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="source\Algorithms\Physics\CollisionDetection\ICollisionDetection.h" />
+    <ClInclude Include="source\Algorithms\Physics\CollisionDetection\SelfCollisionDetection.h" />
     <ClInclude Include="source\Algorithms\TreeConstruction\BVH\CuBVH.h" />
     <ClInclude Include="source\Algorithms\TreeConstruction\BVH\CuBVHInterface.h" />
     <ClInclude Include="source\core\CudaContext.h" />
@@ -326,6 +328,10 @@
     <CudaCompile Include="source\GraphicInterop\CudaTexture.cu" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="source\Algorithms\Physics\CollisionDetection\SelfCollisionDetection.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
+    <ClCompile Include="source\Algorithms\Physics\CollisionDetection\ICollisionDetection.cpp" />
     <ClCompile Include="source\Algorithms\TreeConstruction\BVH\CuBVHInterface.cpp" />
     <ClCompile Include="source\core\CudaContext.cpp" />
     <ClCompile Include="source\core\CudaModulePCH.cpp">

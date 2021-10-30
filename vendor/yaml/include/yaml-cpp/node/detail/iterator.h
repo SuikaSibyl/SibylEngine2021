@@ -78,9 +78,9 @@ class iterator_base {
   value_type operator*() const {
     const typename base_type::value_type& v = *m_iterator;
     if (v.pNode)
-      return value_type(Node(*v, m_pMemory));
+      return value_type(NodeAoS(*v, m_pMemory));
     if (v.first && v.second)
-      return value_type(Node(*v.first, m_pMemory), Node(*v.second, m_pMemory));
+      return value_type(NodeAoS(*v.first, m_pMemory), NodeAoS(*v.second, m_pMemory));
     return value_type();
   }
 

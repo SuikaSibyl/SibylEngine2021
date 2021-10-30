@@ -17,13 +17,13 @@
 
 namespace YAML {
 namespace detail {
-struct iterator_value : public Node, std::pair<Node, Node> {
+struct iterator_value : public NodeAoS, std::pair<NodeAoS, NodeAoS> {
   iterator_value() = default;
-  explicit iterator_value(const Node& rhs)
-      : Node(rhs),
-        std::pair<Node, Node>(Node(Node::ZombieNode), Node(Node::ZombieNode)) {}
-  explicit iterator_value(const Node& key, const Node& value)
-      : Node(Node::ZombieNode), std::pair<Node, Node>(key, value) {}
+  explicit iterator_value(const NodeAoS& rhs)
+      : NodeAoS(rhs),
+        std::pair<NodeAoS, NodeAoS>(NodeAoS(NodeAoS::ZombieNode), NodeAoS(NodeAoS::ZombieNode)) {}
+  explicit iterator_value(const NodeAoS& key, const NodeAoS& value)
+      : NodeAoS(NodeAoS::ZombieNode), std::pair<NodeAoS, NodeAoS>(key, value) {}
 };
 }
 }

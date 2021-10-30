@@ -4,3 +4,4 @@
 #include "GraphicInterop/TextureInterface.h"
 #include "RayTracer/RayTracerInterface.h"
 #include "Algorithms/TreeConstruction/BVH/CuBVHInterface.h"
+#include "Algorithms/Physics/CollisionDetection/ICollisionDetection.h"

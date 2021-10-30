@@ -14,13 +14,28 @@ namespace SIByL
 	struct MeshData
 	{
 		std::vector<float> vertices;
+		std::vector<unsigned int> indices;
+
+		unsigned int vNum;
+		unsigned int iNum;
+
+		MeshData() = default;
+		MeshData(const std::vector<float>& v,
+			const std::vector<unsigned int>& i,
+			const unsigned int& vn, const unsigned int& in)
+			:vertices(v), indices(i), vNum(vn), iNum(in) {}
+	};
+
+	struct MeshDataU32
+	{
+		std::vector<float> vertices;
 		std::vector<uint32_t> indices;
 
 		uint32_t vNum;
 		uint32_t iNum;
 
-		MeshData() = default;
-		MeshData(const std::vector<float>& v,
+		MeshDataU32() = default;
+		MeshDataU32(const std::vector<float>& v,
 			const std::vector<uint32_t>& i,
 			const uint32_t& vn, const uint32_t& in)
 			:vertices(v), indices(i), vNum(vn), iNum(in) {}

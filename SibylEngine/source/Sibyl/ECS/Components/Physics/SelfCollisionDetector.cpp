@@ -27,9 +27,14 @@ namespace SIByL
 		//MeshLoader meshLoader(mf.Path, SimpleLayout);
 		SMeshCacheAsset* meshCache = &objLoader.m_MeshCacheAsset;
 
-		ICuBVH bvh;
-		bvh.LoadData(meshCache->m_Meshes[0].vertices, meshCache->m_Meshes[0].indices, meshCache->m_Meshes[0].vertices.size() / 3);
-		//bvh.LoadData(objLoader->m_Meshes[0].vertices, objLoader.indices, objLoader.vertices.size() / 3);
+		std::vector<std::pair<int, int>> collided_pairs;
+		ICollisionDetection::SelfCollisionDetect(meshCache->m_Meshes[0].vertices, meshCache->m_Meshes[0].indices, collided_pairs);
+		//ICuBVH bvh;
+		//bvh.LoadData(meshCache->m_Meshes[0].vertices, meshCache->m_Meshes[0].indices, meshCache->m_Meshes[0].vertices.size() / 3);
+		for (auto& pair : collided_pairs)
+		{
+			std::cout << "pair detected: " << pair.first << ", " << pair.second << std::endl;
+		}
 
 #endif
 	}

@@ -10,61 +10,6 @@ namespace SIByL
 {
 	typedef unsigned int MortonType;
 
-	struct TriangleVertices
-	{
-		float v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, v3_x, v3_y, v3_z;
-	};
-
-	struct TriangleIndices
-	{
-		int p1, p2, p3;
-	};
-
-	struct BoundingBox
-	{
-		float xmin;
-		float xmax;
-		float ymin;
-		float ymax;
-		float zmin;
-		float zmax;
-	};
-
-	struct TrianglesSoA
-	{
-		TriangleVertices* vertices;
-		TriangleIndices* indices;
-	};
-
-	enum NodeType
-	{
-		LEAFNODE,
-		INTERNALNODE,
-	};
-
-	struct Node
-	{
-		unsigned int Index;
-		int ParentIndex;
-		NodeType Type;
-	};
-
-	struct InternalNodesSoA
-	{
-		Node* Nodes;
-		BoundingBox* BoundingBoxes;
-	};
-
-	struct LeafNodesSoA
-	{
-		Node* Nodes;
-		BoundingBox* BoundingBoxes;
-		
-		unsigned int* PrimitiveIdx;
-		TriangleVertices* Vertices;
-		TriangleIndices* Indices;
-	};
-
 	struct MortonRec {
 		float x, y, z;
 		float xx, yy, zz;
@@ -81,9 +26,6 @@ namespace SIByL
 
 	void CuBVH::LoadData(const std::vector<float>& vertices, const std::vector<uint32_t>& indices, unsigned int stepsize)
 	{
-		clock_t start, end;
-		start = std::clock();		//程序开始计时
-
 		std::vector<Triangle> triangles;
 		// step 9: v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, v3_x, v3_y, v3_z
 		std::vector<float> boundingboxes;
@@ -124,8 +66,8 @@ namespace SIByL
 			boundingboxes.push_back(fmax(fmax(v1y, v2y), v3y));
 			boundingboxes.push_back(fmin(fmin(v1z, v2z), v3z));
 			boundingboxes.push_back(fmax(fmax(v1z, v2z), v3z));
-		}
 
+		}
 		// must be bounded to unit cube
 		float bounds[6] = { FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX };
 		for (int i = 0; i < boundingboxes.size(); i += 6)
@@ -148,10 +90,6 @@ namespace SIByL
 			boundingboxes[i + 4] = fmax(0.01, fmin(0.99, (boundingboxes[i + 4] - bounds[4]) * _scale));
 			boundingboxes[i + 5] = fmax(0.01, fmin(0.99, (boundingboxes[i + 5] - bounds[4]) * _scale));
 		}
-
-		end = clock();		//程序结束用时
-		double endtime2 = (double)(end - start) / CLOCKS_PER_SEC;
-		std::cout << "Init data Cpu 2: " << endtime2 << std::endl;
 
 		BuildBVH(triangles, boundingboxes);
 	}
@@ -201,12 +139,27 @@ namespace SIByL
 	}
 
 #define THREADS_PER_BLOCK 512
+	enum NodeType
+	{
+		LEAFNODE,
+		INTERNALNODE,
+	};
 
-	struct NodeAoS
+	struct BBox
+	{
+		float xmin;
+		float xmax;
+		float ymin;
+		float ymax;
+		float zmin;
+		float zmax;
+	};
+
+	struct Node
 	{
 		unsigned int Index;
 		NodeType Type;
-		BoundingBox BoundingBox;
+		BBox BoundingBox;
 
 		int ParentIndex;
 
@@ -217,14 +170,14 @@ namespace SIByL
 		__device__ unsigned int getParent() { return ParentIndex; }
 	};
 
-	struct LeafNode : public NodeAoS
+	struct LeafNode : public Node
 	{
 		unsigned int primitiveIdx;
 		float v1_x, v1_y, v1_z, v2_x, v2_y, v2_z, v3_x, v3_y, v3_z;
 		int p1, p2, p3;
 	};
 
-	struct InternalNode : public NodeAoS
+	struct InternalNode : public Node
 	{
 		NodeType childTypeLeft;
 		NodeType childTypeRight;
@@ -384,7 +337,7 @@ namespace SIByL
 		int split = findSplit(sortedMortonCodes, first, last, triangleCount);
 
 		// Select childA.
-		NodeAoS* childA;
+		Node* childA;
 		int childAIdx;
 		NodeType childAType;
 		if (split == first)
@@ -400,7 +353,7 @@ namespace SIByL
 			childAType = INTERNALNODE;
 		}
 		// Select childB.
-		NodeAoS* childB;
+		Node* childB;
 		int childBIdx;
 		NodeType childBType;
 		if (split + 1 == last)
@@ -432,13 +385,13 @@ namespace SIByL
 		int idx = threadIdx.x + blockDim.x * blockIdx.x;
 		if (idx >= triangleCount) return;
 
-		NodeAoS* ptr = &leafNodes[idx];
+		Node* ptr = &leafNodes[idx];
 		unsigned int parentIdx = ptr->getParent();
 		InternalNode* parent = &internalNodes[parentIdx];
 
 		while (atomicCAS(&atom[parentIdx], 0, 1) == 1)
 		{
-			BoundingBox buf;
+			BBox buf;
 			float left, right;
 
 			left = parent->childTypeLeft == INTERNALNODE ? internalNodes[parent->childIndxLeft].BoundingBox.xmax : leafNodes[parent->childIndxLeft].BoundingBox.xmax;
@@ -501,7 +454,7 @@ namespace SIByL
 		//}
 	};
 
-	__host__ __device__ bool AABBTest(BoundingBox& a, BoundingBox& b)
+	__host__ __device__ bool AABBTest(BBox& a, BBox& b)
 	{
 		return !(a.xmin > b.xmax || b.xmin > a.xmax ||
 			a.ymin > b.ymax || b.ymin > a.ymax ||
@@ -534,11 +487,9 @@ namespace SIByL
 		InternalNode* node = &internalNodes[0];
 		do
 		{
-			if (queryNode.Index == 0) printf("stack[0]: %d\d", node->Index);
-
 			// Check each child node for overlap.
-			NodeAoS* childL = node->childTypeLeft == INTERNALNODE ? (NodeAoS*)&internalNodes[node->childIndxLeft] : (NodeAoS*)&leafNodes[node->childIndxLeft];
-			NodeAoS* childR = node->childTypeRight == INTERNALNODE ? (NodeAoS*)&internalNodes[node->childIndxRight] : (NodeAoS*)&leafNodes[node->childIndxRight];
+			Node* childL = node->childTypeLeft == INTERNALNODE ? (Node*)&internalNodes[node->childIndxLeft] : (Node*)&leafNodes[node->childIndxLeft];
+			Node* childR = node->childTypeRight == INTERNALNODE ? (Node*)&internalNodes[node->childIndxRight] : (Node*)&leafNodes[node->childIndxRight];
 
 			bool overlapL = (AABBTest(queryNode.BoundingBox, childL->BoundingBox));
 			bool overlapR = (AABBTest(queryNode.BoundingBox, childR->BoundingBox));
@@ -751,10 +702,13 @@ namespace SIByL
 
 	void CuBVH::BuildBVH(const std::vector<Triangle>& triangles, const std::vector<float>& bbs)
 	{
+		cudaFree(0);
+
 		clock_t start, end;
 		start = std::clock();		//程序开始计时
 
 		unsigned int triangleCount = triangles.size();
+		BeginEvent(DCD);
 
 		//BeginEvent(Alloc);
 		Triangle* d_triangles;
@@ -770,6 +724,12 @@ namespace SIByL
 		checkCudaErrors(cudaMemcpy(d_triangles, triangles.data(), sizeof(Triangle) * triangles.size(), cudaMemcpyHostToDevice));
 		checkCudaErrors(cudaMemcpy(d_boundingboxes, bbs.data(), sizeof(float) * bbs.size(), cudaMemcpyHostToDevice));
 		//EndEvent(Alloc, "It took me %f milliseconds to Alloc.\n");
+
+		end = clock();		//程序结束用时
+		double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+		std::cout << "Time period: " << endtime << std::endl;
+		start = std::clock();		//程序开始计时
+
 
 		//BeginEvent(Morton);
 		Morton3DKernel<<<(triangleCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >>>
@@ -814,132 +774,131 @@ namespace SIByL
 		h_internalNodes = (InternalNode*)malloc((triangleCount - 1) * sizeof(InternalNode));
 		checkCudaErrors(cudaMemcpy(h_leafNodes, d_leafNodes, triangleCount * sizeof(LeafNode), cudaMemcpyDeviceToHost));
 		checkCudaErrors(cudaMemcpy(h_internalNodes, d_internalNodes, (triangleCount - 1) * sizeof(InternalNode), cudaMemcpyDeviceToHost));
-		cudaThreadSynchronize();
+		cudaDeviceSynchronize();
+
 #pragma region CPU_SIMULTANEOUS_TRAVERSAL
 		//CollisionList list;
 		//BeginEvent(CullingBVH);
 		//BVHCullingKernel << <(triangleCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >
 		//	(&list, d_internalNodes, d_leafNodes, triangleCount);
-		start = std::clock();		//程序开始计时
 
 		//EndEvent(CullingBVH, "It took me %f milliseconds to CullingBVH.\n");
-		std::vector<std::pair<int, int>> possible_pairs;
-		std::queue<std::pair<NodeAoS*, NodeAoS*>> test_pairs_queue;
-		test_pairs_queue.push({ &h_internalNodes[0], &h_internalNodes[0] });
-		while (test_pairs_queue.size() != 0)
-		{
-			std::pair<NodeAoS*, NodeAoS*> pair = test_pairs_queue.front();
-			test_pairs_queue.pop();
+		//std::vector<std::pair<int, int>> possible_pairs;
+		//std::queue<std::pair<Node*, Node*>> test_pairs_queue;
+		//test_pairs_queue.push({ &h_internalNodes[0], &h_internalNodes[0] });
+		//while (test_pairs_queue.size() != 0)
+		//{
+		//	std::pair<Node*, Node*> pair = test_pairs_queue.front();
+		//	test_pairs_queue.pop();
 
-			if (pair.first == pair.second)
-			{
-				NodeAoS* lleft = h_internalNodes[pair.first->Index].childTypeLeft == INTERNALNODE ?
-					(NodeAoS*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxLeft] :
-					(NodeAoS*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxLeft];
+		//	if (pair.first == pair.second)
+		//	{
+		//		Node* lleft = h_internalNodes[pair.first->Index].childTypeLeft == INTERNALNODE ?
+		//			(Node*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxLeft] :
+		//			(Node*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxLeft];
 
-				NodeAoS* lright = h_internalNodes[pair.first->Index].childTypeRight == INTERNALNODE ?
-					(NodeAoS*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxRight] :
-					(NodeAoS*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxRight];
-				
-				if(lleft->Type== INTERNALNODE)
-					test_pairs_queue.push({ lleft, lleft });
-				test_pairs_queue.push({ lleft, lright });
-				if (lright->Type == INTERNALNODE)
-					test_pairs_queue.push({ lright, lright });
-			}
-			else if (AABBTest(pair.first->BoundingBox, pair.second->BoundingBox))
-			{
-				if (pair.first->Type == LEAFNODE && pair.second->Type == LEAFNODE)
-				{
-					// ToDo: Cull adjacent triangle
-					LeafNode* left = &h_leafNodes[pair.first->Index];
-					LeafNode* right = &h_leafNodes[pair.second->Index];
-					if (left->p1 == right->p1 || left->p1 == right->p2 || left->p1 == right->p3 || left->p2 == right->p2 || left->p2 == right->p3 || left->p3 == right->p3)
-					{
+		//		Node* lright = h_internalNodes[pair.first->Index].childTypeRight == INTERNALNODE ?
+		//			(Node*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxRight] :
+		//			(Node*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxRight];
+		//		
+		//		if(lleft->Type== INTERNALNODE)
+		//			test_pairs_queue.push({ lleft, lleft });
+		//		test_pairs_queue.push({ lleft, lright });
+		//		if (lright->Type == INTERNALNODE)
+		//			test_pairs_queue.push({ lright, lright });
+		//	}
+		//	else if (AABBTest(pair.first->BoundingBox, pair.second->BoundingBox))
+		//	{
+		//		if (pair.first->Type == LEAFNODE && pair.second->Type == LEAFNODE)
+		//		{
+		//			// ToDo: Cull adjacent triangle
+		//			LeafNode* left = &h_leafNodes[pair.first->Index];
+		//			LeafNode* right = &h_leafNodes[pair.second->Index];
+		//			if (left->p1 == right->p1 || left->p1 == right->p2 || left->p1 == right->p3 || left->p2 == right->p2 || left->p2 == right->p3 || left->p3 == right->p3)
+		//			{
 
-					}
-					else
-					{
-						if (left->primitiveIdx == 120914 || right->primitiveIdx == 120914)
-						{
-							std::cout << left->primitiveIdx << " " << right->primitiveIdx << std::endl;
-						}
-						possible_pairs.push_back({ pair.first->Index, pair.second->Index });
-					}
-				}
-				else if (pair.first->Type == LEAFNODE)
-				{
-					NodeAoS* left = h_internalNodes[pair.second->Index].childTypeLeft == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxLeft] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxLeft];
+		//			}
+		//			else
+		//			{
+		//				if (left->primitiveIdx == 120914 || right->primitiveIdx == 120914)
+		//				{
+		//					std::cout << left->primitiveIdx << " " << right->primitiveIdx << std::endl;
+		//				}
+		//				possible_pairs.push_back({ pair.first->Index, pair.second->Index });
+		//			}
+		//		}
+		//		else if (pair.first->Type == LEAFNODE)
+		//		{
+		//			Node* left = h_internalNodes[pair.second->Index].childTypeLeft == INTERNALNODE ? 
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxLeft] : 
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxLeft];
 
-					NodeAoS* right = h_internalNodes[pair.second->Index].childTypeRight == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxRight] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxRight];
+		//			Node* right = h_internalNodes[pair.second->Index].childTypeRight == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxRight] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxRight];
 
-					test_pairs_queue.push({ left, pair.first });
-					test_pairs_queue.push({ right, pair.first });
-				}
-				else if (pair.second->Type == LEAFNODE)
-				{
-					NodeAoS* left = h_internalNodes[pair.first->Index].childTypeLeft == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxLeft] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxLeft];
+		//			test_pairs_queue.push({ left, pair.first });
+		//			test_pairs_queue.push({ right, pair.first });
+		//		}
+		//		else if (pair.second->Type == LEAFNODE)
+		//		{
+		//			Node* left = h_internalNodes[pair.first->Index].childTypeLeft == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxLeft] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxLeft];
 
-					NodeAoS* right = h_internalNodes[pair.first->Index].childTypeRight == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxRight] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxRight];
+		//			Node* right = h_internalNodes[pair.first->Index].childTypeRight == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxRight] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxRight];
 
-					test_pairs_queue.push({ left, pair.second });
-					test_pairs_queue.push({ right, pair.second });
+		//			test_pairs_queue.push({ left, pair.second });
+		//			test_pairs_queue.push({ right, pair.second });
 
-				}
-				else
-				{
-					// All internal node
-					NodeAoS* lleft = h_internalNodes[pair.second->Index].childTypeLeft == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxLeft] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxLeft];
+		//		}
+		//		else
+		//		{
+		//			// All internal node
+		//			Node* lleft = h_internalNodes[pair.second->Index].childTypeLeft == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxLeft] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxLeft];
 
-					NodeAoS* lright = h_internalNodes[pair.second->Index].childTypeRight == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxRight] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxRight];
+		//			Node* lright = h_internalNodes[pair.second->Index].childTypeRight == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.second->Index].childIndxRight] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.second->Index].childIndxRight];
 
-					NodeAoS* rleft = h_internalNodes[pair.first->Index].childTypeLeft == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxLeft] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxLeft];
+		//			Node* rleft = h_internalNodes[pair.first->Index].childTypeLeft == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxLeft] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxLeft];
 
-					NodeAoS* rright = h_internalNodes[pair.first->Index].childTypeRight == INTERNALNODE ?
-						(NodeAoS*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxRight] :
-						(NodeAoS*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxRight];
+		//			Node* rright = h_internalNodes[pair.first->Index].childTypeRight == INTERNALNODE ?
+		//				(Node*)&h_internalNodes[h_internalNodes[pair.first->Index].childIndxRight] :
+		//				(Node*)&h_leafNodes[h_internalNodes[pair.first->Index].childIndxRight];
 
-					test_pairs_queue.push({ lleft, rleft });
-					test_pairs_queue.push({ lleft, rright });
-					test_pairs_queue.push({ lright, rleft });
-					test_pairs_queue.push({ lright, rright });
-				}
-			}
-			static bool first1 = true, first2 = true;
-			if (first1 && test_pairs_queue.size() > 16384)
-			{
-				first1 = false;
-				end = clock();		//程序结束用时
-				double endtime = (double)(end - start) / CLOCKS_PER_SEC;
-				std::cout << test_pairs_queue.size() << ": " << endtime << std::endl;
-			}
-			if (first2 &&  test_pairs_queue.size() > 131072)
-			{
-				first2 = false;
-				end = clock();		//程序结束用时
-				double endtime = (double)(end - start) / CLOCKS_PER_SEC;
-				std::cout << test_pairs_queue.size() << ": " << endtime << std::endl;
-			}
-		}
-		end = clock();		//程序结束用时
-		double endtime = (double)(end - start) / CLOCKS_PER_SEC;
-		std::cout << test_pairs_queue.size() << ": " << endtime << std::endl;
+		//			test_pairs_queue.push({ lleft, rleft });
+		//			test_pairs_queue.push({ lleft, rright });
+		//			test_pairs_queue.push({ lright, rleft });
+		//			test_pairs_queue.push({ lright, rright });
+		//		}
+		//	}
+		//	static bool first1 = true, first2 = true;
+		//	if (first1 && test_pairs_queue.size() > 16384)
+		//	{
+		//		first1 = false;
+		//		end = clock();		//程序结束用时
+		//		double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+		//		std::cout << test_pairs_queue.size() << ": " << endtime << std::endl;
+		//	}
+		//	if (first2 &&  test_pairs_queue.size() > 131072)
+		//	{
+		//		first2 = false;
+		//		end = clock();		//程序结束用时
+		//		double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+		//		std::cout << test_pairs_queue.size() << ": " << endtime << std::endl;
+		//	}
+		//}
+		//end = clock();		//程序结束用时
+		//double endtime = (double)(end - start) / CLOCKS_PER_SEC;
+		//std::cout << test_pairs_queue.size() << ": " << endtime << std::endl;
 #pragma endregion
-		BeginEvent(DCD);
 
 		//BeginEvent(CullingBVH);
 		int* d_possible_pair_list;
@@ -948,7 +907,6 @@ namespace SIByL
 		findPotentialCollisions << <(triangleCount + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK, THREADS_PER_BLOCK >> >
 			(d_possible_pair_list, d_internalNodes, d_leafNodes, triangleCount);
 		//EndEvent(CullingBVH, "It took me %f milliseconds to CullingBVH.\n");
-		EndEvent(DCD, "It took me %f milliseconds to DCD.\n");
 
 		//BeginEvent(CullingMinusOne);
 		int* d_filtered_pair_list;
@@ -959,7 +917,6 @@ namespace SIByL
 		unsigned int num_filter_pair_list = thrust::raw_pointer_cast(filter_res) - d_filtered_pair_list;
 		num_filter_pair_list /= 2;
 		//EndEvent(CullingMinusOne, "It took me %f milliseconds to CullingMinusOne.\n");
-		cudaDeviceSynchronize();
 
 		//BeginEvent(FinalCheck);
 		int* d_collided_pair_list;
@@ -984,6 +941,7 @@ namespace SIByL
 
 		free(h_leafNodes);
 		free(h_internalNodes);
+		EndEvent(DCD, "It took me %f milliseconds to DCD.\n");
 
 		end = clock();		//程序结束用时
 		double endtime2 = (double)(end - start) / CLOCKS_PER_SEC;

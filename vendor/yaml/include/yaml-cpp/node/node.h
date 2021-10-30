@@ -26,7 +26,7 @@ struct iterator_value;
 }  // namespace YAML
 
 namespace YAML {
-class YAML_CPP_API Node {
+class YAML_CPP_API NodeAoS {
  public:
   friend class NodeBuilder;
   friend class NodeEvents;
@@ -41,13 +41,13 @@ class YAML_CPP_API Node {
   using iterator = YAML::iterator;
   using const_iterator = YAML::const_iterator;
 
-  Node();
-  explicit Node(NodeType::value type);
+  NodeAoS();
+  explicit NodeAoS(NodeType::value type);
   template <typename T>
-  explicit Node(const T& rhs);
-  explicit Node(const detail::iterator_value& rhs);
-  Node(const Node& rhs);
-  ~Node();
+  explicit NodeAoS(const T& rhs);
+  explicit NodeAoS(const detail::iterator_value& rhs);
+  NodeAoS(const NodeAoS& rhs);
+  ~NodeAoS();
 
   YAML::Mark Mark() const;
   NodeType::value Type() const;
@@ -77,11 +77,11 @@ class YAML_CPP_API Node {
   void SetStyle(EmitterStyle::value style);
 
   // assignment
-  bool is(const Node& rhs) const;
+  bool is(const NodeAoS& rhs) const;
   template <typename T>
-  Node& operator=(const T& rhs);
-  Node& operator=(const Node& rhs);
-  void reset(const Node& rhs = Node());
+  NodeAoS& operator=(const T& rhs);
+  NodeAoS& operator=(const NodeAoS& rhs);
+  void reset(const NodeAoS& rhs = NodeAoS());
 
   // size/iterator
   std::size_t size() const;
@@ -95,19 +95,19 @@ class YAML_CPP_API Node {
   // sequence
   template <typename T>
   void push_back(const T& rhs);
-  void push_back(const Node& rhs);
+  void push_back(const NodeAoS& rhs);
 
   // indexing
   template <typename Key>
-  const Node operator[](const Key& key) const;
+  const NodeAoS operator[](const Key& key) const;
   template <typename Key>
-  Node operator[](const Key& key);
+  NodeAoS operator[](const Key& key);
   template <typename Key>
   bool remove(const Key& key);
 
-  const Node operator[](const Node& key) const;
-  Node operator[](const Node& key);
-  bool remove(const Node& key);
+  const NodeAoS operator[](const NodeAoS& key) const;
+  NodeAoS operator[](const NodeAoS& key);
+  bool remove(const NodeAoS& key);
 
   // map
   template <typename Key, typename Value>
@@ -115,9 +115,9 @@ class YAML_CPP_API Node {
 
  private:
   enum Zombie { ZombieNode };
-  explicit Node(Zombie);
-  explicit Node(Zombie, const std::string&);
-  explicit Node(detail::node& node, detail::shared_memory_holder pMemory);
+  explicit NodeAoS(Zombie);
+  explicit NodeAoS(Zombie, const std::string&);
+  explicit NodeAoS(detail::node& node, detail::shared_memory_holder pMemory);
 
   void EnsureNodeExists() const;
 
@@ -126,8 +126,8 @@ class YAML_CPP_API Node {
   void Assign(const char* rhs);
   void Assign(char* rhs);
 
-  void AssignData(const Node& rhs);
-  void AssignNode(const Node& rhs);
+  void AssignData(const NodeAoS& rhs);
+  void AssignNode(const NodeAoS& rhs);
 
  private:
   bool m_isValid;
@@ -137,9 +137,9 @@ class YAML_CPP_API Node {
   mutable detail::node* m_pNode;
 };
 
-YAML_CPP_API bool operator==(const Node& lhs, const Node& rhs);
+YAML_CPP_API bool operator==(const NodeAoS& lhs, const NodeAoS& rhs);
 
-YAML_CPP_API Node Clone(const Node& node);
+YAML_CPP_API NodeAoS Clone(const NodeAoS& node);
 
 template <typename T>
 struct convert;

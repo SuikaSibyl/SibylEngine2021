@@ -278,7 +278,7 @@ namespace SIByL
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 
-		YAML::Node data = YAML::Load(strStream.str());
+		YAML::NodeAoS data = YAML::Load(strStream.str());
 		if (!data["Material"])
 			return false;
 

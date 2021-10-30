@@ -68,14 +68,14 @@ class GraphBuilderInterface {
 template <class Impl>
 class GraphBuilder : public GraphBuilderInterface {
  public:
-  typedef typename Impl::Node Node;
+  typedef typename Impl::NodeAoS NodeAoS;
   typedef typename Impl::Sequence Sequence;
   typedef typename Impl::Map Map;
 
   GraphBuilder(Impl &impl) : m_impl(impl) {
     Map *pMap = nullptr;
     Sequence *pSeq = nullptr;
-    Node *pNode = nullptr;
+    NodeAoS *pNode = nullptr;
 
     // Type consistency checks
     pNode = pMap;
@@ -85,12 +85,12 @@ class GraphBuilder : public GraphBuilderInterface {
   GraphBuilderInterface &AsBuilderInterface() { return *this; }
 
   virtual void *NewNull(const Mark &mark, void *pParentNode) {
-    return CheckType<Node>(m_impl.NewNull(mark, AsNode(pParentNode)));
+    return CheckType<NodeAoS>(m_impl.NewNull(mark, AsNode(pParentNode)));
   }
 
   virtual void *NewScalar(const Mark &mark, const std::string &tag,
                           void *pParentNode, const std::string &value) {
-    return CheckType<Node>(
+    return CheckType<NodeAoS>(
         m_impl.NewScalar(mark, tag, AsNode(pParentNode), value));
   }
 
@@ -116,7 +116,7 @@ class GraphBuilder : public GraphBuilderInterface {
   virtual void MapComplete(void *pMap) { m_impl.MapComplete(AsMap(pMap)); }
 
   virtual void *AnchorReference(const Mark &mark, void *pNode) {
-    return CheckType<Node>(m_impl.AnchorReference(mark, AsNode(pNode)));
+    return CheckType<NodeAoS>(m_impl.AnchorReference(mark, AsNode(pNode)));
   }
 
  private:
@@ -128,7 +128,7 @@ class GraphBuilder : public GraphBuilderInterface {
     return p;
   }
 
-  static Node *AsNode(void *pNode) { return static_cast<Node *>(pNode); }
+  static NodeAoS *AsNode(void *pNode) { return static_cast<NodeAoS *>(pNode); }
   static Sequence *AsSequence(void *pSeq) {
     return static_cast<Sequence *>(pSeq);
   }
@@ -139,9 +139,9 @@ void *BuildGraphOfNextDocument(Parser &parser,
                                GraphBuilderInterface &graphBuilder);
 
 template <class Impl>
-typename Impl::Node *BuildGraphOfNextDocument(Parser &parser, Impl &impl) {
+typename Impl::NodeAoS *BuildGraphOfNextDocument(Parser &parser, Impl &impl) {
   GraphBuilder<Impl> graphBuilder(impl);
-  return static_cast<typename Impl::Node *>(
+  return static_cast<typename Impl::NodeAoS *>(
       BuildGraphOfNextDocument(parser, graphBuilder));
 }
 }

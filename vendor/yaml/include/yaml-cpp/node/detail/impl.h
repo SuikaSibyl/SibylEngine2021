@@ -99,7 +99,7 @@ struct remove_idx<Key,
 template <typename T>
 inline bool node::equals(const T& rhs, shared_memory_holder pMemory) {
   T lhs;
-  if (convert<T>::decode(Node(*this, pMemory), lhs)) {
+  if (convert<T>::decode(NodeAoS(*this, pMemory), lhs)) {
     return lhs == rhs;
   }
   return false;
@@ -107,7 +107,7 @@ inline bool node::equals(const T& rhs, shared_memory_holder pMemory) {
 
 inline bool node::equals(const char* rhs, shared_memory_holder pMemory) {
   std::string lhs;
-  if (convert<std::string>::decode(Node(*this, std::move(pMemory)), lhs)) {
+  if (convert<std::string>::decode(NodeAoS(*this, std::move(pMemory)), lhs)) {
     return lhs == rhs;
   }
   return false;
@@ -224,7 +224,7 @@ inline void node_data::force_insert(const Key& key, const Value& value,
 template <typename T>
 inline node& node_data::convert_to_node(const T& rhs,
                                         shared_memory_holder pMemory) {
-  Node value = convert<T>::encode(rhs);
+  NodeAoS value = convert<T>::encode(rhs);
   value.EnsureNodeExists();
   pMemory->merge(*value.m_pMemory);
   return *value.m_pNode;

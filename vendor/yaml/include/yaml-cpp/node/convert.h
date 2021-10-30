@@ -49,10 +49,10 @@ inline bool IsNaN(const std::string& input) {
 
 // Node
 template <>
-struct convert<Node> {
-  static Node encode(const Node& rhs) { return rhs; }
+struct convert<NodeAoS> {
+  static NodeAoS encode(const NodeAoS& rhs) { return rhs; }
 
-  static bool decode(const Node& node, Node& rhs) {
+  static bool decode(const NodeAoS& node, NodeAoS& rhs) {
     rhs.reset(node);
     return true;
   }
@@ -61,9 +61,9 @@ struct convert<Node> {
 // std::string
 template <>
 struct convert<std::string> {
-  static Node encode(const std::string& rhs) { return Node(rhs); }
+  static NodeAoS encode(const std::string& rhs) { return NodeAoS(rhs); }
 
-  static bool decode(const Node& node, std::string& rhs) {
+  static bool decode(const NodeAoS& node, std::string& rhs) {
     if (!node.IsScalar())
       return false;
     rhs = node.Scalar();
@@ -74,24 +74,24 @@ struct convert<std::string> {
 // C-strings can only be encoded
 template <>
 struct convert<const char*> {
-  static Node encode(const char* rhs) { return Node(rhs); }
+  static NodeAoS encode(const char* rhs) { return NodeAoS(rhs); }
 };
 
 template <>
 struct convert<char*> {
-  static Node encode(const char* rhs) { return Node(rhs); }
+  static NodeAoS encode(const char* rhs) { return NodeAoS(rhs); }
 };
 
 template <std::size_t N>
 struct convert<char[N]> {
-  static Node encode(const char* rhs) { return Node(rhs); }
+  static NodeAoS encode(const char* rhs) { return NodeAoS(rhs); }
 };
 
 template <>
 struct convert<_Null> {
-  static Node encode(const _Null& /* rhs */) { return Node(); }
+  static NodeAoS encode(const _Null& /* rhs */) { return NodeAoS(); }
 
-  static bool decode(const Node& node, _Null& /* rhs */) {
+  static bool decode(const NodeAoS& node, _Null& /* rhs */) {
     return node.IsNull();
   }
 };
@@ -149,14 +149,14 @@ ConvertStreamTo(std::stringstream& stream, T& rhs) {
   template <>                                                              \
   struct convert<type> {                                                   \
                                                                            \
-    static Node encode(const type& rhs) {                                  \
+    static NodeAoS encode(const type& rhs) {                                  \
       std::stringstream stream;                                            \
       stream.precision(std::numeric_limits<type>::max_digits10);           \
       conversion::inner_encode(rhs, stream);                               \
-      return Node(stream.str());                                           \
+      return NodeAoS(stream.str());                                           \
     }                                                                      \
                                                                            \
-    static bool decode(const Node& node, type& rhs) {                      \
+    static bool decode(const NodeAoS& node, type& rhs) {                      \
       if (node.Type() != NodeType::Scalar) {                               \
         return false;                                                      \
       }                                                                    \
@@ -220,22 +220,22 @@ YAML_DEFINE_CONVERT_STREAMABLE_SIGNED(long double);
 // bool
 template <>
 struct convert<bool> {
-  static Node encode(bool rhs) { return rhs ? Node("true") : Node("false"); }
+  static NodeAoS encode(bool rhs) { return rhs ? NodeAoS("true") : NodeAoS("false"); }
 
-  YAML_CPP_API static bool decode(const Node& node, bool& rhs);
+  YAML_CPP_API static bool decode(const NodeAoS& node, bool& rhs);
 };
 
 // std::map
 template <typename K, typename V, typename C, typename A>
 struct convert<std::map<K, V, C, A>> {
-  static Node encode(const std::map<K, V, C, A>& rhs) {
-    Node node(NodeType::Map);
+  static NodeAoS encode(const std::map<K, V, C, A>& rhs) {
+    NodeAoS node(NodeType::Map);
     for (const auto& element : rhs)
       node.force_insert(element.first, element.second);
     return node;
   }
 
-  static bool decode(const Node& node, std::map<K, V, C, A>& rhs) {
+  static bool decode(const NodeAoS& node, std::map<K, V, C, A>& rhs) {
     if (!node.IsMap())
       return false;
 
@@ -254,14 +254,14 @@ struct convert<std::map<K, V, C, A>> {
 // std::vector
 template <typename T, typename A>
 struct convert<std::vector<T, A>> {
-  static Node encode(const std::vector<T, A>& rhs) {
-    Node node(NodeType::Sequence);
+  static NodeAoS encode(const std::vector<T, A>& rhs) {
+    NodeAoS node(NodeType::Sequence);
     for (const auto& element : rhs)
       node.push_back(element);
     return node;
   }
 
-  static bool decode(const Node& node, std::vector<T, A>& rhs) {
+  static bool decode(const NodeAoS& node, std::vector<T, A>& rhs) {
     if (!node.IsSequence())
       return false;
 
@@ -280,14 +280,14 @@ struct convert<std::vector<T, A>> {
 // std::list
 template <typename T, typename A>
 struct convert<std::list<T,A>> {
-  static Node encode(const std::list<T,A>& rhs) {
-    Node node(NodeType::Sequence);
+  static NodeAoS encode(const std::list<T,A>& rhs) {
+    NodeAoS node(NodeType::Sequence);
     for (const auto& element : rhs)
       node.push_back(element);
     return node;
   }
 
-  static bool decode(const Node& node, std::list<T,A>& rhs) {
+  static bool decode(const NodeAoS& node, std::list<T,A>& rhs) {
     if (!node.IsSequence())
       return false;
 
@@ -306,15 +306,15 @@ struct convert<std::list<T,A>> {
 // std::array
 template <typename T, std::size_t N>
 struct convert<std::array<T, N>> {
-  static Node encode(const std::array<T, N>& rhs) {
-    Node node(NodeType::Sequence);
+  static NodeAoS encode(const std::array<T, N>& rhs) {
+    NodeAoS node(NodeType::Sequence);
     for (const auto& element : rhs) {
       node.push_back(element);
     }
     return node;
   }
 
-  static bool decode(const Node& node, std::array<T, N>& rhs) {
+  static bool decode(const NodeAoS& node, std::array<T, N>& rhs) {
     if (!isNodeValid(node)) {
       return false;
     }
@@ -331,7 +331,7 @@ struct convert<std::array<T, N>> {
   }
 
  private:
-  static bool isNodeValid(const Node& node) {
+  static bool isNodeValid(const NodeAoS& node) {
     return node.IsSequence() && node.size() == N;
   }
 };
@@ -339,14 +339,14 @@ struct convert<std::array<T, N>> {
 // std::pair
 template <typename T, typename U>
 struct convert<std::pair<T, U>> {
-  static Node encode(const std::pair<T, U>& rhs) {
-    Node node(NodeType::Sequence);
+  static NodeAoS encode(const std::pair<T, U>& rhs) {
+    NodeAoS node(NodeType::Sequence);
     node.push_back(rhs.first);
     node.push_back(rhs.second);
     return node;
   }
 
-  static bool decode(const Node& node, std::pair<T, U>& rhs) {
+  static bool decode(const NodeAoS& node, std::pair<T, U>& rhs) {
     if (!node.IsSequence())
       return false;
     if (node.size() != 2)
@@ -371,11 +371,11 @@ struct convert<std::pair<T, U>> {
 // binary
 template <>
 struct convert<Binary> {
-  static Node encode(const Binary& rhs) {
-    return Node(EncodeBase64(rhs.data(), rhs.size()));
+  static NodeAoS encode(const Binary& rhs) {
+    return NodeAoS(EncodeBase64(rhs.data(), rhs.size()));
   }
 
-  static bool decode(const Node& node, Binary& rhs) {
+  static bool decode(const NodeAoS& node, Binary& rhs) {
     if (!node.IsScalar())
       return false;
 

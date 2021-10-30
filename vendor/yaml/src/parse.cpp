@@ -9,27 +9,27 @@
 #include "yaml-cpp/parser.h"
 
 namespace YAML {
-Node Load(const std::string& input) {
+NodeAoS Load(const std::string& input) {
   std::stringstream stream(input);
   return Load(stream);
 }
 
-Node Load(const char* input) {
+NodeAoS Load(const char* input) {
   std::stringstream stream(input);
   return Load(stream);
 }
 
-Node Load(std::istream& input) {
+NodeAoS Load(std::istream& input) {
   Parser parser(input);
   NodeBuilder builder;
   if (!parser.HandleNextDocument(builder)) {
-    return Node();
+    return NodeAoS();
   }
 
   return builder.Root();
 }
 
-Node LoadFile(const std::string& filename) {
+NodeAoS LoadFile(const std::string& filename) {
   std::ifstream fin(filename);
   if (!fin) {
     throw BadFile(filename);
@@ -37,18 +37,18 @@ Node LoadFile(const std::string& filename) {
   return Load(fin);
 }
 
-std::vector<Node> LoadAll(const std::string& input) {
+std::vector<NodeAoS> LoadAll(const std::string& input) {
   std::stringstream stream(input);
   return LoadAll(stream);
 }
 
-std::vector<Node> LoadAll(const char* input) {
+std::vector<NodeAoS> LoadAll(const char* input) {
   std::stringstream stream(input);
   return LoadAll(stream);
 }
 
-std::vector<Node> LoadAll(std::istream& input) {
-  std::vector<Node> docs;
+std::vector<NodeAoS> LoadAll(std::istream& input) {
+  std::vector<NodeAoS> docs;
 
   Parser parser(input);
   while (true) {
@@ -62,7 +62,7 @@ std::vector<Node> LoadAll(std::istream& input) {
   return docs;
 }
 
-std::vector<Node> LoadAllFromFile(const std::string& filename) {
+std::vector<NodeAoS> LoadAllFromFile(const std::string& filename) {
   std::ifstream fin(filename);
   if (!fin) {
     throw BadFile(filename);

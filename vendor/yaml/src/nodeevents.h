@@ -21,11 +21,11 @@ class node;
 
 namespace YAML {
 class EventHandler;
-class Node;
+class NodeAoS;
 
 class NodeEvents {
  public:
-  explicit NodeEvents(const Node& node);
+  explicit NodeEvents(const NodeAoS& node);
   NodeEvents(const NodeEvents&) = delete;
   NodeEvents(NodeEvents&&) = delete;
   NodeEvents& operator=(const NodeEvents&) = delete;

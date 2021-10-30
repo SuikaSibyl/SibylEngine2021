@@ -141,7 +141,7 @@ namespace SIByL
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
 
-		YAML::Node data = YAML::Load(strStream.str());
+		YAML::NodeAoS data = YAML::Load(strStream.str());
 		if (!data["Scene"])
 			return false;
 
@@ -195,7 +195,7 @@ namespace SIByL
 				if (meshRendererComponent)
 				{
 					auto& mrc = deserializedEntity.AddComponent<MeshRendererComponent>();
-					YAML::Node materials = meshRendererComponent["Materials"];
+					YAML::NodeAoS materials = meshRendererComponent["Materials"];
 					if (materials)
 					{
 						mrc.SetMaterialNums(materials.size());

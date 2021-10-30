@@ -19,3 +19,6 @@
 #include <vector>
 
 #include <core/CudaUtility.h>
+
+
+#define BLOCK_SIZE(x, THREADS_PER_BLOCK) ((x + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK)

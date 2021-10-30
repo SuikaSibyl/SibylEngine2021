@@ -14,19 +14,19 @@
 
 namespace YAML {
 class Emitter;
-class Node;
+class NodeAoS;
 
 /**
  * Emits the node to the given {@link Emitter}. If there is an error in writing,
  * {@link Emitter#good} will return false.
  */
-YAML_CPP_API Emitter& operator<<(Emitter& out, const Node& node);
+YAML_CPP_API Emitter& operator<<(Emitter& out, const NodeAoS& node);
 
 /** Emits the node to the given output stream. */
-YAML_CPP_API std::ostream& operator<<(std::ostream& out, const Node& node);
+YAML_CPP_API std::ostream& operator<<(std::ostream& out, const NodeAoS& node);
 
 /** Converts the node to a YAML string. */
-YAML_CPP_API std::string Dump(const Node& node);
+YAML_CPP_API std::string Dump(const NodeAoS& node);
 }  // namespace YAML
 
 #endif  // NODE_EMIT_H_62B23520_7C8E_11DE_8A39_0800200C9A66
