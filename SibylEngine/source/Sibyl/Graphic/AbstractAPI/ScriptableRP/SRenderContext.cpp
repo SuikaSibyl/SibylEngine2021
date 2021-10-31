@@ -1,0 +1,11 @@
+#include "SIByLpch.h"
+#include "SRenderContext.h"
+
+namespace SIByL
+{
+	namespace SRenderPipeline
+	{
+		unsigned int SRenderContext::ScreenWidth, SRenderContext::ScreenHeight;
+
+	}
+}

@@ -258,9 +258,6 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\ScriptableRenderContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -274,9 +271,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Library\FrameBufferLibrary.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderContextManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\GraphicContext.cpp">
@@ -378,25 +372,67 @@
     <ClCompile Include="source\Sibyl\ECS\Components\Physics\SelfCollisionDetector.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPass.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPipeline.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraph.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderGraph.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderResource.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderResource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphDataStructure.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderGraphDataStructure.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphVirtualResource.cpp">
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderGraphVirtualResource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\Core\Geometry\ObjLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\Resource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\Buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Algorithms\DirectedGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Utils\InternalDirectory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPassReflection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\ResourceView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Basic\Utils\Reflection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\SPipe.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\SRenderContext.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderContextManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\TAA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\SPipeline.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\ACES.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1418,9 +1454,6 @@
     <ClInclude Include="source\Platform\DirectX12\AbstractAPI\Top\DX12RenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="source\Platform\OpenGL\AbstractAPI\Top\OpenGLRenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -1568,7 +1601,7 @@
     <ClInclude Include="source\Sibyl\ECS\Components\Components.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\Resource.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Resource\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h">
@@ -1629,9 +1662,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Library\FrameBufferLibrary.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderContextManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Culling.h">
@@ -1745,25 +1775,64 @@
     <ClInclude Include="source\Sibyl\ECS\Components\Physics\SelfCollisionDetector.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPass.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPass.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderPipeline.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPipeline.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraph.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderGraph.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderResource.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphDataStructure.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderGraphDataStructure.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderGraph\SRenderGraphVirtualResource.h">
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderGraphVirtualResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\Core\Geometry\ObjLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Resource\Buffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Algorithms\DirectedGraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Utils\InternalDirectory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPassReflection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Resource\ResourceView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Basic\Utils\Reflection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\SPipe.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\SRenderContext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderContextManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\RenderPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\TAA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\SPipeline.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\ACES.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

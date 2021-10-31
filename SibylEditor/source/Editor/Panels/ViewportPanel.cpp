@@ -7,6 +7,7 @@
 #include "Sibyl/Graphic/AbstractAPI/Library/ResourceLibrary.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/FrameBuffer.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SRenderContext.h"
 
 namespace SIByL
 {
@@ -51,6 +52,7 @@ namespace SIByL
 		{
 			// Viewport Change Size
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+			SRenderPipeline::SRenderContext::SetScreenSize({ viewportPanelSize.x, viewportPanelSize.y });
 			FrameBufferLibrary::ResizeAll(viewportPanelSize.x, viewportPanelSize.y);
 			m_Camera->Resize(viewportPanelSize.x, viewportPanelSize.y);
 		}

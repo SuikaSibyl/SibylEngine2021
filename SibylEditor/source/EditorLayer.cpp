@@ -23,6 +23,11 @@
 #include "Sibyl/Core/Events/MouseEvent.h"
 #include "Sibyl/Core/Events/ApplicationEvent.h"
 
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SPipe.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SPipeline.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/ACES.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/TAA.h"
+
 #ifdef SIBYL_PLATFORM_CUDA
 #include <CudaModule/source/CudaModule.h>
 #endif // SIBYL_PLATFORM_CUDA
@@ -139,26 +144,15 @@ namespace SIByLEditor
 		s_ViewportPanels.SetCamera(camera);
 		s_ViewportPanels.SetFrameBuffer(m_FrameBuffer);
 
-		// ===================================================================
-		// Frame Buffer 1: ACES
-		Ref<FrameBuffer> m_PostProcessBuffer_1 = FrameBuffer::Create(desc, "POST1");
-		Ref<ComputeInstance> ACESInstance = CreateRef<ComputeInstance>(Library<ComputeShader>::Fetch("FILE=Shaders\\Compute\\ACES"));
-		Library<ComputeInstance>::Push("ACES", ACESInstance);
-		ACESInstance->SetRenderTarget2D("ACESResult", m_PostProcessBuffer_1, 0);
-		ACESInstance->SetTexture2D("Input", m_FrameBuffer->GetRenderTarget(0));
-		ACESInstance->SetFloat("Para", 0.5);
+		m_ScriptablePipeline = CreateRef<SRenderPipeline::SPipeline>();
+		Ref<SRenderPipeline::SPipe> ACES = SRenderPipeline::SRPPipeACES::Create();
+		Ref<SRenderPipeline::SPipe> TAA = SRenderPipeline::SRPPipeTAA::Create();
+		m_ScriptablePipeline->InsertPipe(ACES, "ACES");
+		m_ScriptablePipeline->InsertPipe(TAA, "TAA");
+		m_ScriptablePipeline->AttachPipes("ACES", "Output", "TAA", "Input");
 
-		// ===================================================================
-		// Frame Buffer 2/3: TAA
-		m_FrameBuffer_TAA[0] = FrameBuffer::Create(desc, "TAA1");
-		m_FrameBuffer_TAA[1] = FrameBuffer::Create(desc, "TAA2");
-		Ref<ComputeInstance> TAAInstance = CreateRef<ComputeInstance>(Library<ComputeShader>::Fetch("FILE=Shaders\\Compute\\TAA"));
-		Library<ComputeInstance>::Push("TAA", TAAInstance);
-		TAAInstance->SetRenderTarget2D("TAAResult", m_FrameBuffer_TAA[1], 0);
-		TAAInstance->SetTexture2D("u_PreviousFrame", m_FrameBuffer_TAA[0]->GetRenderTarget(0));
-		TAAInstance->SetTexture2D("u_CurrentFrame", m_PostProcessBuffer_1->GetRenderTarget(0));
-		TAAInstance->SetTexture2D("u_Offset", m_FrameBuffer->GetRenderTarget(1));
-		TAAInstance->SetFloat("Alpha", 0.5);
+		ACES->SetInput("Input", m_FrameBuffer->GetRenderTarget(0));
+		TAA->SetInput("MotionVector", m_FrameBuffer->GetRenderTarget(1));
 	}
 
 	void EditorLayer::OnUpdate()
@@ -200,16 +194,7 @@ namespace SIByLEditor
 
 		viewportBuffer->Unbind();
 
-		Ref<ComputeInstance> ACESInstance = Library<ComputeInstance>::Fetch("ACES");
-		ACESInstance->Dispatch(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y, 1);
-
-		static int taaBufferIdx = 0;
-		Ref<ComputeInstance> TAAInstance = Library<ComputeInstance>::Fetch("TAA");
-		TAAInstance->SetRenderTarget2D("TAAResult", m_FrameBuffer_TAA[taaBufferIdx], 0);
-		TAAInstance->SetTexture2D("u_PreviousFrame", m_FrameBuffer_TAA[(taaBufferIdx + 1) % 2]->GetRenderTarget(0));
-		TAAInstance->SetTexture2D("u_CurrentFrame", FrameBufferLibrary::GetRenderTarget("POST10"));
-		taaBufferIdx++; if (taaBufferIdx == 2) taaBufferIdx = 0;
-		TAAInstance->Dispatch(s_ViewportPanels.GetViewportSize().x, s_ViewportPanels.GetViewportSize().y, 1);
+		m_ScriptablePipeline->Run();
 	}
 
 	void EditorLayer::OnEvent(SIByL::Event& event)

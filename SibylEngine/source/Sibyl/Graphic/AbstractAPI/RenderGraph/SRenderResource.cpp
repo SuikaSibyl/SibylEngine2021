@@ -3,5 +3,8 @@
 
 namespace SIByL
 {
+	namespace SRG
+	{
 
+	}
 }

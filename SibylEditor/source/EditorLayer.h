@@ -11,9 +11,16 @@
 
 using namespace SIByL;
 
+namespace SIByL
+{
+	namespace SRenderPipeline
+	{
+		class SPipeline;
+	}
+}
+
 namespace SIByLEditor
 {
-	
 	class EditorLayer :public SIByL::Layer
 	{
 	public:
@@ -52,7 +59,7 @@ namespace SIByLEditor
 		Ref<Camera> camera;
 		Ref<Camera> orthoCamera;
 		Ref<FrameBuffer> m_FrameBuffer;
-		Ref<FrameBuffer> m_FrameBuffer_TAA[2];
+		Ref<SRenderPipeline::SPipeline> m_ScriptablePipeline;
 		Ref<FrameConstantsManager> m_FrameConstants;
 		Ref<Scene> m_ActiveScene;
 

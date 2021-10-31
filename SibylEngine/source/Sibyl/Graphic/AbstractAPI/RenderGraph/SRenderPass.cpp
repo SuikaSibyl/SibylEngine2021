@@ -3,9 +3,8 @@
 
 namespace SIByL
 {
-	const std::string& SRenderPipe::GetName()
+	namespace SRenderGraph
 	{
-		return m_Name;
-	}
 
+	}
 }

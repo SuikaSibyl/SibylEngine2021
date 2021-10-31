@@ -10,20 +10,6 @@
 
 namespace SIByL
 {
-	Ref<FrameBuffer_v1> FrameBuffer_v1::Create(const FrameBufferDesc_v1& desc, const std::string& key)
-	{
-		Ref<FrameBuffer_v1> result = nullptr;
-		switch (Renderer::GetRaster())
-		{
-		case RasterRenderer::OpenGL: result = std::make_shared<OpenGLFrameBuffer_v1>(desc); break;
-		case RasterRenderer::DirectX12: result = std::make_shared<DX12FrameBuffer_v1>(desc); break;
-		case RasterRenderer::CpuSoftware: return nullptr; break;
-		case RasterRenderer::GpuSoftware: return nullptr; break;
-		default: return nullptr; break;
-		}
-		return result;
-	}
-
 	Ref<FrameBuffer> FrameBuffer::Create(const FrameBufferDesc& desc, const std::string& key)
 	{
 		Ref<FrameBuffer> result = nullptr;

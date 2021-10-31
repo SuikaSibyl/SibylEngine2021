@@ -11,7 +11,8 @@ namespace SIByL
 		std::unordered_map<std::string, Ref<FrameBuffer>> frameBuffers = Library<FrameBuffer>::Mapper;
 		for (auto iter : frameBuffers)
 		{
-			iter.second->Resize(width, height);
+			auto& [x, y] = iter.second->GetScale();
+			iter.second->Resize(width * x, height * y);
 		}
 	}
 
