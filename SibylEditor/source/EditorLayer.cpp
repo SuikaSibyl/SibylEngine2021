@@ -28,6 +28,10 @@
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SRenderContext.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/ACES.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/TAA.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/FXAA.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Bloom.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Sharpen.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Vignette.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ForwardLit.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/EarlyZ.h"
 
@@ -135,23 +139,37 @@ namespace SIByLEditor
 		s_ViewportPanels.SetCamera(camera);
 
 		m_ScriptablePipeline = CreateRef<SRenderPipeline::SPipeline>();
+		Ref<SRenderPipeline::SPipe> Bloom = SRenderPipeline::SRPPipeBloom::Create();
 		Ref<SRenderPipeline::SPipe> ACES = SRenderPipeline::SRPPipeACES::Create();
 		Ref<SRenderPipeline::SPipe> TAA = SRenderPipeline::SRPPipeTAA::Create();
+		Ref<SRenderPipeline::SPipe> FXAA = SRenderPipeline::SRPPipeFXAA::Create();
 		Ref<SRenderPipeline::SPipe> EarlyZ = SRenderPipeline::SRPPipeEarlyZ::Create();
+		Ref<SRenderPipeline::SPipe> Vignette = SRenderPipeline::SRPPipeVignette::Create();
+		Ref<SRenderPipeline::SPipe> Sharpen = SRenderPipeline::SRPPipeSharpen::Create();
 		((SRenderPipeline::SRPPipeEarlyZ*)EarlyZ.get())->mCamera = camera;
 		Ref<SRenderPipeline::SPipe> ForwardLit = SRenderPipeline::SRPPipeForwardLit::Create();
 		((SRenderPipeline::SRPPipeForwardLit*)ForwardLit.get())->mCamera = camera;
 		
 		m_ScriptablePipeline->InsertPipe(EarlyZ, "EarlyZ");
 		m_ScriptablePipeline->InsertPipe(ForwardLit, "ForwardLit");
+		m_ScriptablePipeline->InsertPipe(Bloom, "Bloom");
 		m_ScriptablePipeline->InsertPipe(ACES, "ACES");
 		m_ScriptablePipeline->InsertPipe(TAA, "TAA");
+		m_ScriptablePipeline->InsertPipe(Vignette, "Vignette");
+		//m_ScriptablePipeline->InsertPipe(FXAA, "FXAA");
+		//m_ScriptablePipeline->InsertPipe(Sharpen, "Sharpen");
 
-		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "ACES", "Input");
 		m_ScriptablePipeline->AttachPipes("ForwardLit", "MotionVector", "TAA", "MotionVector");
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "Bloom", "Input");
+		m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "Bloom", "Depth");
+		m_ScriptablePipeline->AttachPipes("Bloom", "Output", "ACES", "Input");
 		m_ScriptablePipeline->AttachPipes("ACES", "Output", "TAA", "Input");
+		m_ScriptablePipeline->AttachPipes("TAA", "Output", "Vignette", "Input");
+		//m_ScriptablePipeline->AttachPipes("TAA", "Output", "FXAA", "Input");
+		//m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "Sharpen", "Depth");
+		//m_ScriptablePipeline->AttachPipes("FXAA", "Output", "Sharpen", "Input");
 
-		s_ViewportPanels.SetFrameBuffer(Library<FrameBuffer>::Fetch("TAA1"));
+		s_ViewportPanels.SetFrameBuffer(Library<FrameBuffer>::Fetch("Vignette"));
 
 		m_ScriptablePipeline->Build();
 		SRenderPipeline::SRenderContext::SetActiveRenderPipeline(m_ScriptablePipeline);
@@ -163,9 +181,10 @@ namespace SIByLEditor
 
 		m_ActiveScene->OnUpdate();
 
-		//SIByL_CORE_INFO("FPS: {0}, {1} ms",
-		//	Application::Get().GetFrameTimer()->GetFPS(),
-		//	Application::Get().GetFrameTimer()->GetMsPF());
+		SIByL_CORE_INFO("FPS: {0}, {1} ms",
+			Application::Get().GetFrameTimer()->GetFPS(),
+			Application::Get().GetFrameTimer()->GetMsPF());
+
 		static unsigned int HaltonIndex = 0;
 		auto [x, y] = Halton::Halton23(HaltonIndex++);
 		camera->Dither(x, y);

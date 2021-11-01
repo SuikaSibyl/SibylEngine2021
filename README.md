@@ -1,13 +1,31 @@
-# SibylEngine
+# SIByL Engine
 
-Personal game engine, which I would work on for a long time.
+Personal game engine, which I plan to work on for a long time in coming years.
+
+The engine is currently far from real production, and mass architecture change might happen in the future.
 
 
 
-**Post Scripts**
+***Post Scripts***
 
 *The Design and Basic Codes are heavily based on The Cherno's Hazel 2D Engine.
 Thanks for his great tutorials, which really taught me to learn a lot.*
+
+
+
+## Plans
+
+**Recent Plans**
+
+- [ ] Post Process Pipe: SSAO
+- [ ] Shadow System ( directed )
+- [ ] SSR
+
+**Future Plans**
+
+- [ ] CUDA Path Tracer
+- [ ] PBR probe system
+- [ ] Some GI system...
 
 
 
@@ -23,14 +41,36 @@ Thanks for his great tutorials, which really taught me to learn a lot.*
   - Material
   - Camera
   - Light (directional, point)
-  - Post Processing
-- **Graphic Pipeline**
-
+  - ScriptableRenderPipeline
+    - Original designed API
+    - Implementation of basic pipes:
+      - Draw Pipes
+        - EarlyZ
+        - LitForward
+      - Post Processing Pipes
+        - ACES
+        - Bloom
+        - FXAA
+        - Sharpen
+        - TAA
+        - Vignette
+- **ECS System**
+  - Based on *entt* : https://github.com/skypjack/entt
+  - Implemented Components:
+    - Tag
+    - Camera
+    - Transform
+    - Light
+    - Self-Collision Detector
+    - Mesh Filter
+    - Mesh Renderer (multi-pass supported!)
+    - Sprite Renderer
 - **Editor**
-  - Based on Dear ImGUI
+  - Based on *Dear ImGUI*: [ocornut/imgui: Dear ImGui](https://github.com/ocornut/imgui)
   - Scene / Material / Component Editing
 - **Physics**
-  - Self collision detection (based on CUDA)
+  - Self Collision Detection (based on CUDA)
+    - Performance: 1.2 million triangles flag testcase 0.06s (on RTX 2070S)
 
 
 

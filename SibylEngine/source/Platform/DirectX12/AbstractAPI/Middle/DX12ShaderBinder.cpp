@@ -40,6 +40,16 @@ namespace SIByL
 		}
 	}
 
+	void DX12ShaderConstantsBuffer::SetFloat2(const std::string& name, const glm::vec2& value)
+	{
+		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			m_ConstantsTableBuffer->CopyMemoryToConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+		}
+	}
+
 	void DX12ShaderConstantsBuffer::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 		m_IsDirty = true;

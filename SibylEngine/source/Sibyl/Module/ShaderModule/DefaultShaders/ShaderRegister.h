@@ -18,5 +18,12 @@ namespace SIByL
 		static void RegisterACES();
 
 		static void RegisterTAA();
+		static void RegisterFXAA();
+		static void RegisterSharpen();
+		static void RegisterVignette();
+
+		static void RegisterBloomExtract();
+		static void RegisterBloomCombine();
+		static void RegisterBlur();
 	};
 }

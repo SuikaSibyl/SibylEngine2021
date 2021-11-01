@@ -109,6 +109,7 @@ uniform mat4 View;
 
 uniform int DirectionalLightNum;
 uniform int PointLightNum;
+uniform vec4 ZNearFar;
 
 struct DirectionalLight {
     vec3 direction;
@@ -171,6 +172,19 @@ vec4 EncodeRGBM(vec3 color)
     float m = max(max(color.x, color.y), max(color.z, 1e-5));
     m = ceil(m * 255) / 255;
     return vec4(color / m, m);
+}
+
+float pseudoRandom(const in vec2 fragCoord) {
+    vec3 p3 = fract(vec3(fragCoord.xyx) * .1031);
+    p3 += dot(p3, p3.yzx + 19.19);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+void ditheringMaskingDiscard(
+const in vec4 fragCoord, const in int dithering, const in float alpha, const in float factor, const in vec2 halton) {
+    float rnd;
+    rnd = pseudoRandom(fragCoord.xy + halton * 1000.0 + fragCoord.z * 1000.0);
+    if ((alpha * factor) < rnd) discard;
 }
 
 vec4 precomputeGGX(const in vec3 normal, const in vec3 eyeVector, const in float roughness) {
@@ -371,14 +385,20 @@ const in float dotNL, const in float attenuation, const in float thicknessFactor
     return finalAttenuation * lightColor * diffuse * exp(-thickness / max(translucencyColor, vec3(0.001)));
 }
 
+vec3 sRGBToLinear(const in vec3 color) {
+    return vec3( color.r < 0.04045 ? color.r * (1.0 / 12.92) : pow((color.r + 0.055) * (1.0 / 1.055), 2.4), color.g < 0.04045 ? color.g * (1.0 / 12.92) : pow((color.g + 0.055) * (1.0 / 1.055), 2.4), color.b < 0.04045 ? color.b * (1.0 / 12.92) : pow((color.b + 0.055) * (1.0 / 1.055), 2.4));
+}
+
 void main()
 {
     FragColor = vec4(0,0,0,1);
 
     vec4 DiffuseAO = texture(u_DiffuseAO, v_TexCoord);
     vec4 SpecularOpacity = texture(u_Main, v_TexCoord);
-    if(SpecularOpacity.a < 0.1)
-        discard;
+
+    SpecularOpacity.rgb = sRGBToLinear(SpecularOpacity.rgb);
+    DiffuseAO.rgb = sRGBToLinear(DiffuseAO.rgb);
+    ditheringMaskingDiscard(gl_FragCoord, 1, SpecularOpacity.a, 1, ZNearFar.zw);
 
     float materialRoughness = 1 -0.5118;
     vec3 eyeVector = normalize(ViewPos.xyz - v_WSCurrPos.xyz);

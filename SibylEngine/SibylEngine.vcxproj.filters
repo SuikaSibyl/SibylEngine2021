@@ -441,6 +441,18 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\EarlyZ.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Bloom.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\FXAA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Sharpen.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Vignette.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Sibyl\Core\Core.h">
@@ -1845,6 +1857,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\EarlyZ.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Bloom.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\FXAA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Sharpen.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Vignette.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

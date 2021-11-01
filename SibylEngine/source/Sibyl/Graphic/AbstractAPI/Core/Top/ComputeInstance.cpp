@@ -26,6 +26,12 @@ namespace SIByL
 		SetAssetDirty();
 	}
 
+	void ComputeInstance::SetFloat2(const std::string& name, const glm::vec2& value)
+	{
+		m_ConstantsBuffer->SetFloat2(name, value);
+		SetAssetDirty();
+	}
+
 	void ComputeInstance::SetFloat3(const std::string& name, const glm::vec3& value)
 	{
 

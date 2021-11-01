@@ -2,6 +2,7 @@
 
 #include "FrameBufferTexture.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
+#include <glm/glm.hpp>
 
 namespace SIByL
 {	
@@ -20,6 +21,7 @@ namespace SIByL
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 		virtual void ClearBuffer() = 0;
+		virtual void SetClearColor(const glm::vec4& color) { ClearColor = color; };
 		virtual unsigned int CountColorAttachment() = 0;
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 		virtual void* GetColorAttachment(unsigned int index) = 0;
@@ -32,6 +34,7 @@ namespace SIByL
 		std::pair<float, float> GetScale() const { return std::pair<float, float>{ ScaleX, ScaleY }; }
 	protected:
 		std::string Identifier;
+		glm::vec4 ClearColor = glm::vec4(0, 0, 0, 0);
 		float ScaleX = 1, ScaleY = 1;
 	};
 }

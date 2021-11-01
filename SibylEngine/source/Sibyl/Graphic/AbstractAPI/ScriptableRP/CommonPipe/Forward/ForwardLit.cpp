@@ -26,6 +26,7 @@ namespace SIByL
 				FrameBufferTextureFormat::DEPTH24STENCIL8 };
 			// Frame Buffer 0: Main Render Buffer
 			mFrameBuffer = FrameBuffer::Create(desc, "ForwardLit");
+			mFrameBuffer->SetClearColor({ 0.1, 0.1, 0.1, 0.05 });
 		}
 
 		void SRPPipeForwardLit::Attach()

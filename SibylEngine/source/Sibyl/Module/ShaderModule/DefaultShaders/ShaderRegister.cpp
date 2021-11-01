@@ -17,6 +17,13 @@ namespace SIByL
 		RegisterACES();
 
 		RegisterTAA();
+		RegisterFXAA();
+		RegisterSharpen();
+		RegisterVignette();
+
+		RegisterBloomExtract();
+		RegisterBloomCombine();
+		RegisterBlur();
 	}
 
 	void ShaderRegister::RegisterUnlitTexture()
@@ -235,6 +242,203 @@ namespace SIByL
 
 
 		ComputeShader::Create("Shaders/Compute/TAA",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+	
+	void ShaderRegister::RegisterFXAA()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				//{ShaderDataType::Float, "Alpha"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Texture"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "FXAAResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/FXAA",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+	
+	void ShaderRegister::RegisterSharpen()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float, "uSharpFactor"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Texture"},
+				{ShaderResourceType::Texture2D, "u_Depth"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "SharpenResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/Sharpen",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+	
+	void ShaderRegister::RegisterVignette()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float2, "uLensRadius"},
+				{ShaderDataType::Float, "uFrameMod"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Texture"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "VignetteResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/Vignette",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+
+	void ShaderRegister::RegisterBloomExtract()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float, "uBloomThreshold"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Texture"},
+				{ShaderResourceType::Texture2D, "u_Depth"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "ExtractResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/BloomExtract",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+
+	void ShaderRegister::RegisterBloomCombine()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float, "uBloomFactor"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Texture"},
+				{ShaderResourceType::Texture2D, "TextureBloomBlur1"},
+				{ShaderResourceType::Texture2D, "TextureBloomBlur2"},
+				{ShaderResourceType::Texture2D, "TextureBloomBlur3"},
+				{ShaderResourceType::Texture2D, "TextureBloomBlur4"},
+				{ShaderResourceType::Texture2D, "TextureBloomBlur5"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "CombineResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/BloomCombine",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+
+	void ShaderRegister::RegisterBlur()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float2, "uGlobalTexSize"},
+				{ShaderDataType::Float2, "uTextureBlurInputSize"},
+				{ShaderDataType::Float2, "uBlurDir"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Input"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "BlurResult"},
+			},
+		};
+
+		ComputeShader::Create("Shaders/Compute/BlurLevel0",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+		ComputeShader::Create("Shaders/Compute/BlurLevel1",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+		ComputeShader::Create("Shaders/Compute/BlurLevel2",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+		ComputeShader::Create("Shaders/Compute/BlurLevel3",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+		ComputeShader::Create("Shaders/Compute/BlurLevel4",
 			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
 	}
 }

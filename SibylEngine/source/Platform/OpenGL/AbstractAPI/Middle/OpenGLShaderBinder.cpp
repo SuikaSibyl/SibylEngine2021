@@ -79,6 +79,22 @@ namespace SIByL
 			}
 		}
 	}
+	void OpenGLShaderConstantsBuffer::SetFloat2(const std::string& name, const glm::vec2& value)
+
+	{
+		m_IsDirty = true;
+		ShaderConstantItem item;
+		if (m_ConstantsMapper->FetchConstant(name, item))
+		{
+			CopyMemoryToConstantsBuffer((void*)&value[0], item.Offset, ShaderDataTypeSize(item.Type));
+			if (m_IsSSBO)
+			{
+				BindSSBO();
+				glBufferSubData(GL_SHADER_STORAGE_BUFFER, item.Offset, ShaderDataTypeSize(item.Type), (void*)&value[0]);
+				UnbindSSBO();
+			}
+		}
+	}
 
 	void OpenGLShaderConstantsBuffer::SetFloat3(const std::string& name, const glm::vec3& value)
 	{

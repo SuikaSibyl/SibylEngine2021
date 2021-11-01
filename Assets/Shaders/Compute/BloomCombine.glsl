@@ -7,11 +7,15 @@ layout(rgba8, binding = 0) uniform image2D img_output;
 
 layout(std430, binding=0) buffer Input
 {
-    float uBloomThreshold;
+    float uBloomFactor;
 };
 
 layout(binding = 0) uniform sampler2D u_Texture;
-layout(binding = 1) uniform sampler2D u_Depth;
+layout(binding = 1) uniform sampler2D TextureBloomBlur1;
+layout(binding = 2) uniform sampler2D TextureBloomBlur2;
+layout(binding = 3) uniform sampler2D TextureBloomBlur3;
+layout(binding = 4) uniform sampler2D TextureBloomBlur4;
+layout(binding = 5) uniform sampler2D TextureBloomBlur5;
 
 const float kRGBMRange = 8.0;
 
@@ -35,13 +39,25 @@ float getLuminance(const in vec3 color) {
     return dot(color, colorBright);
 }
 
-vec3 extractBright(const in vec3 color) {
-    return clamp(color * clamp(getLuminance(color) - uBloomThreshold, 0.0, 1.0), 0.0, 1.0);
+float getRadiusFactored(const float value, const float middle) {
+    return mix(value, middle * 2.0 - value, 1);
 }
 
-vec4 bloomExtract(vec4 texCol, float alpha) {
-    vec3 color = (vec4(DecodeRGBM(texCol), 1.0)).rgb;
-    return vec4(extractBright(color * alpha), 1.0);
+vec4 bloomCombine(vec2 uv) {
+    vec3 bloom = vec3(0.0);
+    const float midVal = 0.6;
+    const float factor1 = 1.1;
+    const float factor2 = 0.9;
+    const float factor3 = 0.6;
+    const float factor4 = 0.3;
+    const float factor5 = 0.1;
+    bloom += (DecodeRGBM(texture(TextureBloomBlur1, uv))) * getRadiusFactored(factor1, midVal);
+    bloom += (DecodeRGBM(texture(TextureBloomBlur2, uv))) * getRadiusFactored(factor2, midVal);
+    bloom += (DecodeRGBM(texture(TextureBloomBlur3, uv))) * getRadiusFactored(factor3, midVal);
+    bloom += (DecodeRGBM(texture(TextureBloomBlur4, uv))) * getRadiusFactored(factor4, midVal);
+    bloom += (DecodeRGBM(texture(TextureBloomBlur5, uv))) * getRadiusFactored(factor5, midVal);
+    vec3 color = DecodeRGBM(texture2D(u_Texture, uv));
+    return vec4(color + (bloom * uBloomFactor), 1.0);
 }
 
 void main(void)
@@ -54,9 +70,7 @@ void main(void)
     float u =1.0f * (gl_GlobalInvocationID.x + 0.5f)/gl_NumWorkGroups.x;
     float v =1.0f * (gl_GlobalInvocationID.y + 0.5f)/gl_NumWorkGroups.y;
 
-    vec4 texCol = texture(u_Texture, vec2(u,v));
-    float alpha = texture(u_Depth, vec2(u,v)).a;
-    vec4 col = bloomExtract(texCol, alpha);
+    vec4 col = bloomCombine(vec2(u,v));
     col = encodeRGBM(col.rgb, kRGBMRange);
     pixel= col;
     
