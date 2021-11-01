@@ -65,21 +65,34 @@ namespace SIByL
 			out << YAML::Key << "MeshRendererComponent";
 			out << YAML::BeginMap;
 
-			out << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
-
 			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
 
-			int i = 0;
-			for (auto subMaterial : meshRenderer.Materials["ForwardLit"])
+			out << YAML::Key << "SubmeshNum" << YAML::Value << meshRenderer.SubmeshNum;
+
+			out << YAML::Key << "Passes" << YAML::Value << YAML::BeginSeq;
+
+			for (auto& iter : meshRenderer.Materials)
 			{
 				out << YAML::BeginMap;
-				out << YAML::Key << "Material" << YAML::Value << i++;
-				
-				out << YAML::Key << "INFO";
-				out << YAML::BeginMap;
-				out << YAML::Key << "Path" << YAML::Value << subMaterial->GetSavePath();
-				out << YAML::EndMap;
+				out << YAML::Key << "Pass" << YAML::Value << iter.first;
+				out << YAML::Key << "Materials" << YAML::Value << YAML::BeginSeq;
 
+				{
+					int i = 0;
+					for (auto subMaterial : meshRenderer.Materials[iter.first])
+					{
+						out << YAML::BeginMap;
+						out << YAML::Key << "Material" << YAML::Value << i++;
+
+						out << YAML::Key << "INFO";
+						out << YAML::BeginMap;
+						out << YAML::Key << "Path" << YAML::Value << ((subMaterial == nullptr) ? "EMPTY" : subMaterial->GetSavePath());
+						out << YAML::EndMap;
+
+						out << YAML::EndMap;
+					}
+				}
+				out << YAML::EndSeq;
 				out << YAML::EndMap;
 			}
 
@@ -195,17 +208,39 @@ namespace SIByL
 				if (meshRendererComponent)
 				{
 					auto& mrc = deserializedEntity.AddComponent<MeshRendererComponent>();
-					YAML::NodeAoS materials = meshRendererComponent["Materials"];
-					if (materials)
+					unsigned int SubmeshNum = meshRendererComponent["SubmeshNum"].as<unsigned int>();
+					mrc.SetMaterialNums(SubmeshNum);
+
+					YAML::NodeAoS passes = meshRendererComponent["Passes"];
+					if (passes)
 					{
-						mrc.SetMaterialNums(materials.size());
-						int materialInd = 0;
-						for (auto material : materials)
+						int passIdx = 0;
+						for (auto pass : passes)
 						{
-							auto info = material["INFO"];
-							std::string relativePathString = info["Path"].as<std::string>();
-							if (relativePathString != "NONE")
-								mrc.Materials["ForwardLit"][materialInd++] = GetAssetByPath<Material>(relativePathString);
+							std::string PassName = pass["Pass"].as<std::string>();
+							YAML::NodeAoS materials = pass["Materials"];
+							if (materials)
+							{
+								std::vector<Ref<Material>>& mats = mrc.GetPassMaterials(PassName);
+								int materialInd = 0;
+								for (auto material : materials)
+								{
+									auto info = material["INFO"];
+									std::string relativePathString = info["Path"].as<std::string>();
+									if (relativePathString != "NONE")
+									{
+										if (relativePathString == "EMPTY")
+										{
+											mats[materialInd++] = nullptr;
+										}
+										else
+										{
+											mats[materialInd++] = GetAssetByPath<Material>(relativePathString);
+										}
+									}
+								}
+							}
+
 						}
 					}
 				}

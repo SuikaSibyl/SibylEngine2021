@@ -1,0 +1,44 @@
+Scene: Untitled
+Entities:
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Light_1
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [1.51190472, 0, 0]
+      Scale: [1, 1, 1]
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\sphere.fbx
+    MeshRendererComponent:
+      SubmeshNum: 1
+      Passes:
+        - Pass: ForwardLit
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\StandardLit.mat
+        - Pass: EarlyZ
+          Materials:
+            - Material: 0
+              INFO:
+                Path: EMPTY
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Light_2
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [0, 0.622029662, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.582685888, 0, 0.81269747]
+      Color: [1, 0.999989986, 0.999989986]
+      Intensity: 1
