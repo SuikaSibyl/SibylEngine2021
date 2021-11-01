@@ -93,6 +93,7 @@ namespace SIByL
 		glm::vec3 m_Right;
 
 		glm::mat4 m_Projection;
+		glm::mat4 m_ProjectionDither;
 		glm::mat4 m_View;
 		glm::mat4 m_ProjectionView;
 		glm::mat4 m_PreviousProjectionView;
@@ -111,10 +112,13 @@ namespace SIByL
 		ShaderConstantsBuffer& GetConstantsBuffer();
 	protected:
 		void UpdateProjectionConstant();
+		void UpdateProjectionDitherConstant();
 		void UpdatePreviousViewProjectionConstant();
 		void UpdateViewConstant();
 		virtual glm::mat4 GetPreciseProjectionMatrix() = 0;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
+
+		float HaltonX, HaltonY;
 	};
 
 	class OrthographicCamera :public Camera
@@ -166,11 +170,12 @@ namespace SIByL
 
 		virtual void Dither(double x, double y) override 
 		{
-			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
-			m_Projection[2][0] += (x * 2 - 1) / m_Width;
-			m_Projection[2][1] += (y * 2 - 1) / m_Height;
-			UpdateProjectionConstant();
-			m_ProjectionView = m_Projection * m_View;
+			m_ProjectionDither = m_Projection;
+			m_ProjectionDither[2][0] += (x * 2 - 1) / m_Width;
+			m_ProjectionDither[2][1] += (y * 2 - 1) / m_Height;
+			HaltonX = (x * 2 - 1);
+			HaltonY = (y * 2 - 1);
+			UpdateProjectionDitherConstant();
 		}
 
 	private:

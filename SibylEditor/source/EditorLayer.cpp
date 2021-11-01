@@ -25,8 +25,11 @@
 
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SPipe.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SPipeline.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SRenderContext.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/ACES.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/TAA.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ForwardLit.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/EarlyZ.h"
 
 #ifdef SIBYL_PLATFORM_CUDA
 #include <CudaModule/source/CudaModule.h>
@@ -129,30 +132,29 @@ namespace SIByLEditor
 
 		viewCameraController = std::make_shared<ViewCameraController>(camera);
 
-		FrameBufferDesc desc;
-		desc.Width = 1280;
-		desc.Height = 720;
-		desc.Formats = { 
-			FrameBufferTextureFormat::RGB8, 
-			FrameBufferTextureFormat::R16G16F,
-			FrameBufferTextureFormat::DEPTH24STENCIL8 };
-		// Frame Buffer 0: Main Render Buffer
-		m_FrameBuffer = FrameBuffer::Create(desc, "SceneView");
-		
-		desc.Formats = {FrameBufferTextureFormat::RGB8};
-
 		s_ViewportPanels.SetCamera(camera);
-		s_ViewportPanels.SetFrameBuffer(m_FrameBuffer);
 
 		m_ScriptablePipeline = CreateRef<SRenderPipeline::SPipeline>();
 		Ref<SRenderPipeline::SPipe> ACES = SRenderPipeline::SRPPipeACES::Create();
 		Ref<SRenderPipeline::SPipe> TAA = SRenderPipeline::SRPPipeTAA::Create();
+		Ref<SRenderPipeline::SPipe> EarlyZ = SRenderPipeline::SRPPipeEarlyZ::Create();
+		((SRenderPipeline::SRPPipeEarlyZ*)EarlyZ.get())->mCamera = camera;
+		Ref<SRenderPipeline::SPipe> ForwardLit = SRenderPipeline::SRPPipeForwardLit::Create();
+		((SRenderPipeline::SRPPipeForwardLit*)ForwardLit.get())->mCamera = camera;
+		
+		m_ScriptablePipeline->InsertPipe(EarlyZ, "EarlyZ");
+		m_ScriptablePipeline->InsertPipe(ForwardLit, "ForwardLit");
 		m_ScriptablePipeline->InsertPipe(ACES, "ACES");
 		m_ScriptablePipeline->InsertPipe(TAA, "TAA");
+
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "ACES", "Input");
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "MotionVector", "TAA", "MotionVector");
 		m_ScriptablePipeline->AttachPipes("ACES", "Output", "TAA", "Input");
 
-		ACES->SetInput("Input", m_FrameBuffer->GetRenderTarget(0));
-		TAA->SetInput("MotionVector", m_FrameBuffer->GetRenderTarget(1));
+		s_ViewportPanels.SetFrameBuffer(Library<FrameBuffer>::Fetch("TAA1"));
+
+		m_ScriptablePipeline->Build();
+		SRenderPipeline::SRenderContext::SetActiveRenderPipeline(m_ScriptablePipeline);
 	}
 
 	void EditorLayer::OnUpdate()
@@ -164,6 +166,9 @@ namespace SIByLEditor
 		//SIByL_CORE_INFO("FPS: {0}, {1} ms",
 		//	Application::Get().GetFrameTimer()->GetFPS(),
 		//	Application::Get().GetFrameTimer()->GetMsPF());
+		static unsigned int HaltonIndex = 0;
+		auto [x, y] = Halton::Halton23(HaltonIndex++);
+		camera->Dither(x, y);
 
 		if (s_ViewportPanels.IsViewportFocusd())
 			viewCameraController->OnUpdate();
@@ -172,28 +177,6 @@ namespace SIByLEditor
 	static bool NextFrame = false;
 	void EditorLayer::OnDraw()
 	{
-		Ref<FrameBuffer> viewportBuffer = Library<FrameBuffer>::Fetch("SceneView");
-		viewportBuffer->Bind();
-		viewportBuffer->ClearBuffer();
-
-		camera->SetCamera();
-		camera->RecordVPMatrix();
-		static unsigned int HaltonIndex = 0;
-		auto [x, y] = Halton::Halton23(HaltonIndex++);
-		camera->Dither(x, y);
-
-		DrawItemPool& diPool = m_ActiveScene->GetDrawItems();
-		for (Ref<DrawItem> drawItem : diPool)
-		{
-			drawItem->m_Material->SetPass();
-			Graphic::CurrentCamera->OnDrawCall();
-			Graphic::CurrentMaterial->OnDrawCall();
-			Graphic::CurrentFrameConstantsManager->OnDrawCall();
-			drawItem->OnDrawCall();
-		}
-
-		viewportBuffer->Unbind();
-
 		m_ScriptablePipeline->Run();
 	}
 

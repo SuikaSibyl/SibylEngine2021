@@ -12,6 +12,9 @@ namespace SIByL
 		static void RegisterLit();
 		static void RegisterLitHair();
 
+		static void RegisterEarlyZOpaque();
+		static void RegisterEarlyZDither();
+
 		static void RegisterACES();
 
 		static void RegisterTAA();

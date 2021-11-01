@@ -281,7 +281,9 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\FrameConstantsManager.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\EarlyZ.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\ACES.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\ForwardLit.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\TAA.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\DefaultRenderPipeline.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Drawing.cpp" />
@@ -451,7 +453,9 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Mesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\EarlyZ.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\ACES.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\ForwardLit.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\TAA.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Culling.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\DefaultRenderPipeline.h" />

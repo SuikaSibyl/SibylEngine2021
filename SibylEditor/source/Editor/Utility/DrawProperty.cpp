@@ -149,14 +149,15 @@ namespace SIByLEditor
 		ImGui::PopID();
 	}
 
-	void DrawMeshRendererMaterialSocket(const std::string& label, SIByL::MeshRendererComponent& meshRenderer, int i)
+	void DrawMeshRendererMaterialSocket(const std::string& label, const std::string& passName, SIByL::MeshRendererComponent& meshRenderer, int i)
 	{
 		ImGui::Text(label.c_str());
 		ImGui::SameLine();
 
 		ImGui::PushID(label.c_str());
 
-		std::string savePath = GetShort(meshRenderer.Materials[i]->GetSavePath());
+		std::vector<Ref<Material>>& PassMaterial = meshRenderer.GetPassMaterials(passName);
+		std::string savePath = (PassMaterial[i] == nullptr) ? "NULLPTR" : GetShort(PassMaterial[i]->GetSavePath());
 
 		ImGui::Button(savePath.c_str(), ImVec2(100.0f, 0.0f));
 		if (ImGui::BeginDragDropTarget())
@@ -166,7 +167,7 @@ namespace SIByLEditor
 				const wchar_t* path = (const wchar_t*)payload->Data;
 				std::filesystem::path materialPath = path;
 				SIByL::Ref<SIByL::Material> mat = SIByL::GetAssetByPath<SIByL::Material>(materialPath.string());
-				meshRenderer.Materials[i] = mat;
+				PassMaterial[i] = mat;
 			}
 			ImGui::EndDragDropTarget();
 		}

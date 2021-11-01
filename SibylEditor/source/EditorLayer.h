@@ -54,14 +54,14 @@ namespace SIByLEditor
 		Ref<ComputeShader> acesShader;
 		Ref<ViewCameraController> viewCameraController;
 		Ref<TriangleMesh> triangle;
-		Ref<Texture2D> texture;
-		Ref<Texture2D> texture1;
 		Ref<Camera> camera;
 		Ref<Camera> orthoCamera;
 		Ref<FrameBuffer> m_FrameBuffer;
 		Ref<SRenderPipeline::SPipeline> m_ScriptablePipeline;
 		Ref<FrameConstantsManager> m_FrameConstants;
 		Ref<Scene> m_ActiveScene;
+		Ref<Texture2D> texture;
+		Ref<Texture2D> texture1;
 
 		static SceneHierarchyPanel	s_SceneHierarchyPanel;
 		static ContentBrowserPanel	s_ContentBrowserPanel;

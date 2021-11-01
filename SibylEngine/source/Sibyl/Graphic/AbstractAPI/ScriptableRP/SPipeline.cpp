@@ -9,6 +9,13 @@ namespace SIByL
 	{
 		void SPipeline::Build()
 		{
+			for (Ref<SPipe>& pipe : mPipes)
+			{
+				if (pipe->GetType() == SPipe::PipeType::DrawPass)
+				{
+					mDrawPassNames.push_back(pipe->GetName());
+				}
+			}
 
 		}
 
@@ -23,6 +30,7 @@ namespace SIByL
 		void SPipeline::InsertPipe(Ref<SPipe> pipe, const std::string& name)
 		{
 			pipe->Attach();
+			pipe->SetName(name);
 			mPipes.push_back(pipe);
 			mPipeMapper[name] = pipe;
 		}

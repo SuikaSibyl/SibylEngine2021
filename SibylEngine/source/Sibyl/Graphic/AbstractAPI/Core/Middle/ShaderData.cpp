@@ -12,9 +12,11 @@ namespace SIByL
 	{
 		{ShaderDataType::Mat4, "View"},
 		{ShaderDataType::Mat4, "Projection" },
+		{ShaderDataType::Mat4, "ProjectionDither" },
 		{ShaderDataType::Mat4, "PreviousPV" },
 		{ShaderDataType::Mat4, "CurrentPV" },
 		{ShaderDataType::Float4, "ViewPos" },
+		{ShaderDataType::Float4, "ZNearFar" },
 	};
 
 	ConstantBufferLayout ConstantBufferLayout::PerFrameConstants =

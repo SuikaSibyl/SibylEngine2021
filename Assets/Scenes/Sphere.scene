@@ -2,11 +2,17 @@ Scene: Untitled
 Entities:
   - Entity: 124531623461
     TagComponent:
-      Tag: Light_1
+      Tag: Light_2
     TransformComponent:
       Translation: [0, 0, 0]
-      EulerAngles: [1.51190472, 0, 0]
+      EulerAngles: [0, 0.622029662, 0]
       Scale: [1, 1, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.582685888, 0, 0.81269747]
+      Color: [1, 0.999989986, 0.999989986]
+      Intensity: 1
   - Entity: 124531623461
     TagComponent:
       Tag: Empty Entity
@@ -23,14 +29,8 @@ Entities:
             Path: Resources\StandardLit.mat
   - Entity: 124531623461
     TagComponent:
-      Tag: Light_2
+      Tag: Light_1
     TransformComponent:
       Translation: [0, 0, 0]
-      EulerAngles: [0, 0.622029662, 0]
+      EulerAngles: [1.51190472, 0, 0]
       Scale: [1, 1, 1]
-    LightComponent:
-      Type: 1
-      Position: [0, 0, 0]
-      Direction: [0.582685888, 0, 0.81269747]
-      Color: [0, 0, 0]
-      Intensity: 1

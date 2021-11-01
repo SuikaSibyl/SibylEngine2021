@@ -11,9 +11,10 @@
 
 namespace SIByL
 {
-	void ViewportPanel::SetFrameBuffer(Ref<FrameBuffer> framebuffer)
+	void ViewportPanel::SetFrameBuffer(Ref<FrameBuffer> framebuffer, unsigned index)
 	{
 		m_FrameBuffer = framebuffer;
+		m_FrameBufferIndex = index;
 	}
 
 	void ViewportPanel::SetCamera(Ref<Camera> camera)

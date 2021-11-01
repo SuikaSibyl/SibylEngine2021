@@ -5,6 +5,7 @@
 #include "Sibyl/ECS/Components/Common/Tag.h"
 #include "Sibyl/ECS/Core/Entity.h"
 #include "Sibyl/ECS/Components/Components.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SRenderContext.h"
 
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -22,6 +23,7 @@ namespace SIByL
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
+		SRenderPipeline::SRenderContext::SetActiveScene(context);
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()

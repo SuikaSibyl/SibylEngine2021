@@ -8,6 +8,8 @@
 #include "Sibyl/ECS/Components/Components.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/Camera.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/ShaderBinder.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SPipeline.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SRenderContext.h"
 #include "Sibyl/Graphic/Core/Geometry/TriangleMesh.h"
 #include "Sibyl/Graphic/Core/Lighting/LightManager.h"
 #include "Sibyl/ECS/UniqueID/UniqueID.h"
@@ -46,25 +48,34 @@ namespace SIByL
 
 		// Update Draw Items Pool
 		{
-			DIPool.Reset();
-			auto view = m_Registry.view<TransformComponent, MeshFilterComponent, MeshRendererComponent>();
-			for (auto entity : view)
+			for (const std::string& passName : SRenderPipeline::SRenderContext::GetRenderPipeline()->GetDrawPassesNames())
 			{
-				auto& [transform, meshFilter, meshRenderer] = 
-					view.get<TransformComponent, MeshFilterComponent, MeshRendererComponent>(entity);
-
-				meshFilter.PerObjectBuffer->SetMatrix4x4("Model", transform.GetTransform());
-
-				int submeshIndex = 0;
-
-				for (auto& submesh : *(meshFilter.Mesh))
+				DIPool[passName].Reset();
+				auto view = m_Registry.view<TransformComponent, MeshFilterComponent, MeshRendererComponent>();
+				for (auto entity : view)
 				{
-					Ref<DrawItem> item = DIPool.Request();
-					item->m_Mesh = meshFilter.Mesh;
-					item->m_SubMesh = &submesh;
-					item->m_ConstantsBuffer = meshFilter.PerObjectBuffer;
-					item->m_Material = meshRenderer.Materials[submeshIndex++];
-					DIPool.Push(item);
+					auto& [transform, meshFilter, meshRenderer] =
+						view.get<TransformComponent, MeshFilterComponent, MeshRendererComponent>(entity);
+
+					meshFilter.PerObjectBuffer->SetMatrix4x4("Model", transform.GetTransform());
+					std::vector<Ref<Material>>& PassMaterials = meshRenderer.GetPassMaterials(passName);
+					int submeshIndex = 0;
+
+					for (auto& submesh : *(meshFilter.Mesh))
+					{
+						if (PassMaterials[submeshIndex] == nullptr)
+						{
+							submeshIndex++;
+							continue;
+						}
+
+						Ref<DrawItem> item = DIPool[passName].Request();
+						item->m_Mesh = meshFilter.Mesh;
+						item->m_SubMesh = &submesh;
+						item->m_ConstantsBuffer = meshFilter.PerObjectBuffer;
+						item->m_Material = meshRenderer.Materials[passName][submeshIndex++];
+						DIPool[passName].Push(item);
+					}
 				}
 			}
 		}

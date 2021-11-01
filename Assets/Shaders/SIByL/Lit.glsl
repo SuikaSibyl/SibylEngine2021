@@ -31,9 +31,11 @@ uniform mat4 Model;
 
 uniform mat4 View;
 uniform mat4 Projection;
+uniform mat4 ProjectionDither;
 uniform mat4 PreviousPV;
 uniform mat4 CurrentPV;
 uniform vec4 ViewPos;
+uniform vec4 ZNearFar;
 
 
 uniform vec4 Color;
@@ -54,7 +56,7 @@ void RegularVertexInit()
 
 void main()
 {
-    gl_Position = Projection * View * Model * vec4(aPos, 1.0);
+    gl_Position = ProjectionDither * View * Model * vec4(aPos, 1.0);
     v_prevPos = PreviousPV * Model * vec4(aPos, 1.0);
 
     RegularVertexInit();

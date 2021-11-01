@@ -11,7 +11,7 @@ namespace SIByL
 	public:
 		ViewportPanel() = default;
 
-		void SetFrameBuffer(Ref<FrameBuffer> framebuffer);
+		void SetFrameBuffer(Ref<FrameBuffer> framebuffer, unsigned index = 0);
 		void SetCamera(Ref<Camera> camera);
 		const glm::vec2& GetViewportSize();
 		bool IsViewportFocusd();

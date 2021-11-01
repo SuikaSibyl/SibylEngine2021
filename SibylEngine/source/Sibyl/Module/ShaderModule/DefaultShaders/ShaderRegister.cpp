@@ -11,6 +11,9 @@ namespace SIByL
 		RegisterLit();
 		RegisterLitHair();
 
+		RegisterEarlyZOpaque();
+		RegisterEarlyZDither();
+
 		RegisterACES();
 
 		RegisterTAA();
@@ -114,6 +117,65 @@ namespace SIByL
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 	}
 
+	void ShaderRegister::RegisterEarlyZOpaque()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			// ConstantBuffer0 : Per Object
+			ConstantBufferLayout::PerObjectConstants,
+			// ConstantBuffer1 : Per Material
+			{
+
+			},
+			// ConstantBuffer2 : Per Camera
+			ConstantBufferLayout::PerCameraConstants,
+			// ConstantBuffer3 : Per Frame
+			ConstantBufferLayout::PerFrameConstants,
+		};
+
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+			},
+		};
+
+		Shader::Create("Shaders/SIByL/EarlyZOpaque",
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 1 }),
+			ShaderBinderDesc(CBlayouts, SRlayouts));
+	}
+
+	void ShaderRegister::RegisterEarlyZDither()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			// ConstantBuffer0 : Per Object
+			ConstantBufferLayout::PerObjectConstants,
+			// ConstantBuffer1 : Per Material
+			{
+
+			},
+			// ConstantBuffer2 : Per Camera
+			ConstantBufferLayout::PerCameraConstants,
+			// ConstantBuffer3 : Per Frame
+			ConstantBufferLayout::PerFrameConstants,
+		};
+
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Main"},
+			},
+		};
+
+		Shader::Create("Shaders/SIByL/EarlyZDither",
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 1 }),
+			ShaderBinderDesc(CBlayouts, SRlayouts));
+
+	}
 
 	void ShaderRegister::RegisterACES()
 	{

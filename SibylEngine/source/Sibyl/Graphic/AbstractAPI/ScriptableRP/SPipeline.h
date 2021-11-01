@@ -16,10 +16,12 @@ namespace SIByL
 				const std::string& pipeIn, const std::string& inputName);
 
 			Ref<SPipe> GetPipe(const std::string& name);
+			std::vector<std::string>& GetDrawPassesNames() { return mDrawPassNames; }
 
 		protected:
 			std::vector<Ref<SPipe>> mPipes;
 			std::unordered_map<std::string, Ref<SPipe>> mPipeMapper;
+			std::vector<std::string> mDrawPassNames;
 		};
 	}
 }

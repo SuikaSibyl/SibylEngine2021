@@ -19,13 +19,13 @@ namespace SIByL
 
 		Entity CreateEntity(const std::string& name = "New Entity");
 		void DestroyEntity(Entity entity);
-		DrawItemPool& GetDrawItems() { return DIPool; };
+		DrawItemPool& GetDrawItems(std::string PassName) { return DIPool[PassName]; };
 
 	private:
 		entt::registry m_Registry;
 		friend class SceneHierarchyPanel;
 
-		DrawItemPool DIPool;
+		std::unordered_map<std::string, DrawItemPool> DIPool;
 
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);

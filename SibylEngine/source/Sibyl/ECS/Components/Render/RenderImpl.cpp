@@ -66,12 +66,25 @@ namespace SIByL
 		return Mesh->GetSubmesh();
 	}
 
+	std::vector<Ref<Material>>& MeshRendererComponent::GetPassMaterials(const std::string& passName)
+	{
+		auto& iter = Materials.find(passName);
+		if (iter == Materials.end() || Materials[passName].size() != SubmeshNum)
+		{
+			for (int i = Materials[passName].size(); i < SubmeshNum; i++)
+			{
+				Materials[passName].emplace_back(nullptr);
+			}
+		}
+		return Materials[passName];
+	}
+
 	void MeshRendererComponent::SetMaterialNums(int num)
 	{
-		MaterialNum = num;
+		SubmeshNum = num;
 		for (int i = 0; i < num; i++)
 		{
-			Materials.emplace_back(ShaderModule::GetDefaultMaterial());
+			Materials["ForwardLit"].emplace_back(ShaderModule::GetDefaultMaterial());
 		}
 	}
 

@@ -9,6 +9,9 @@
 
 #include "Sibyl/ECS/Core/Entity.h"
 
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SPipeline.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/SRenderContext.h"
+
 namespace SIByL
 {
 	InspectorPanel::InspectorPanel()
@@ -119,10 +122,17 @@ namespace SIByL
 
 		DrawComponent<MeshRendererComponent>("Mesh Renderer", entity, [](auto& component)
 			{
-				for (int i = 0; i < component.MaterialNum; i++)
+				for (const auto& iter : SRenderPipeline::SRenderContext::GetRenderPipeline()->GetDrawPassesNames())
 				{
-					std::string slot = std::string("Material ") + std::to_string(i);
-					SIByLEditor::DrawMeshRendererMaterialSocket(slot, component, i);
+					ImGui::Text(iter.c_str());
+
+					for (int i = 0; i < component.SubmeshNum; i++)
+					{
+						std::string slot = std::string("Material ") + std::to_string(i);
+						SIByLEditor::DrawMeshRendererMaterialSocket(slot, iter, component, i);
+					}
+
+					ImGui::Separator();
 				}
 			});
 

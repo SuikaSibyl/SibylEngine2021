@@ -70,7 +70,7 @@ namespace SIByL
 			auto& meshRenderer = entity.GetComponent<MeshRendererComponent>();
 
 			int i = 0;
-			for (auto subMaterial : meshRenderer.Materials)
+			for (auto subMaterial : meshRenderer.Materials["ForwardLit"])
 			{
 				out << YAML::BeginMap;
 				out << YAML::Key << "Material" << YAML::Value << i++;
@@ -205,7 +205,7 @@ namespace SIByL
 							auto info = material["INFO"];
 							std::string relativePathString = info["Path"].as<std::string>();
 							if (relativePathString != "NONE")
-								mrc.Materials[materialInd++] = GetAssetByPath<Material>(relativePathString);
+								mrc.Materials["ForwardLit"][materialInd++] = GetAssetByPath<Material>(relativePathString);
 						}
 					}
 				}

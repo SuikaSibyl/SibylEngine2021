@@ -55,6 +55,7 @@ namespace SIByL
 			m_ConstantsBuffer->SetMatrix4x4("CurrentPV", m_CurrentProjectionView);
 			m_ConstantsBuffer->SetMatrix4x4("PreviousPV", m_PreviousProjectionView);
 			m_ConstantsBuffer->SetFloat4("ViewPos", glm::vec4(m_Posistion, 1));
+			m_ConstantsBuffer->SetFloat4("ZNearFar", glm::vec4(0.001f, 100.0f, HaltonX, HaltonY));
 		}
 
 		m_PreviousProjectionView = m_CurrentProjectionView;
@@ -69,6 +70,14 @@ namespace SIByL
 	ShaderConstantsBuffer& Camera::GetConstantsBuffer()
 	{
 		return *m_ConstantsBuffer;
+	}
+
+	void Camera::UpdateProjectionDitherConstant()
+	{
+		if (m_ConstantsBuffer)
+		{
+			m_ConstantsBuffer->SetMatrix4x4("ProjectionDither", m_ProjectionDither);
+		}
 	}
 
 	void Camera::UpdateProjectionConstant()

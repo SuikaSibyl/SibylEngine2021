@@ -8,9 +8,10 @@ namespace SIByL
 
 	struct MeshRendererComponent
 	{
-		std::vector<Ref<Material>> Materials;
+		std::vector<Ref<Material>>& GetPassMaterials(const std::string& passName);
 
-		UINT MaterialNum;
+		std::unordered_map<std::string, std::vector<Ref<Material>>> Materials;
+		UINT SubmeshNum;
 
 		MeshRendererComponent() = default;
 		MeshRendererComponent(const MeshRendererComponent&) = default;
