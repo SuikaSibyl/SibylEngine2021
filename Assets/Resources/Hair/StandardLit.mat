@@ -5,7 +5,7 @@ Constants Buffer:
     INFO:
       Type: 13
       Name: Color
-      Value: [0.824134707, 0.824126482, 0.824126482, 1]
+      Value: [9.99999997e-07, 9.99989993e-07, 9.99989993e-07, 1]
 Textures:
   - TEXTURE: 0
     INFO:
@@ -14,4 +14,4 @@ Textures:
   - TEXTURE: 1
     INFO:
       Name: u_Normal
-      ID: FILE=..\Assets\Resources\Textures\Normal.png
+      ID: PROCEDURE=White

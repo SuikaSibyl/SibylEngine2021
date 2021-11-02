@@ -1,0 +1,59 @@
+Scene: Untitled
+Entities:
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Translation: [0.00497406302, -0.245760649, 0.0289250612]
+      EulerAngles: [0, 0, 0]
+      Scale: [1.68410492, 2.09000015, 2.09000015]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\plane.fbx
+    MeshRendererComponent:
+      SubmeshNum: 1
+      Passes:
+        - Pass: ForwardLit
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\StandardLit.mat
+        - Pass: EarlyZ
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [0.00516670663, 0.0357921869, -0.053240601]
+      EulerAngles: [0.18709147, 0.32346037, 0.201665148]
+      Scale: [1, 0.999999762, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.343230098, -0.119677924, 0.931595564]
+      Color: [0.681945741, 0.681938887, 0.681938887]
+      Intensity: 1
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Sphere
+    TransformComponent:
+      Translation: [0, 0.149393454, 0]
+      EulerAngles: [0, 0, 0.859330535]
+      Scale: [0.334879696, 0.334879696, 0.334879875]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\sphere.fbx
+    MeshRendererComponent:
+      SubmeshNum: 1
+      Passes:
+        - Pass: ForwardLit
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\StandardLit.mat
+        - Pass: EarlyZ
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat

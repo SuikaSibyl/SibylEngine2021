@@ -13,7 +13,7 @@ namespace SIByL
 		{
 		public:
 			SPipeBegin(SRPPipeBloom)
-				virtual void Build() override;
+			virtual void Build() override;
 			virtual void Attach() override;
 			virtual void Draw() override;
 			virtual void DrawImGui()override;

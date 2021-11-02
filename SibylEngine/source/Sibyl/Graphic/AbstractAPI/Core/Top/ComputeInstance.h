@@ -52,4 +52,6 @@ namespace SIByL
 		ShaderResourcesDesc* m_ResourcesDesc = nullptr;
 		ShaderResourcesDesc* m_UnorderedAccessDesc = nullptr;
 	};
+
+#define GRIDSIZE(x,ThreadSize) ((x+ThreadSize - 1)/ThreadSize)
 }

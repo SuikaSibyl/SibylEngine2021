@@ -24,6 +24,8 @@ out vec2 v_TexCoord;
 out vec4 v_WSCurrPos;
 out vec4 v_currPos;
 out vec4 v_prevPos;
+out vec3 v_vNormal;
+
 // out vec3 v_normal;
 
 // Uniform Constants
@@ -39,8 +41,11 @@ uniform vec4 ViewPos;
 
 uniform vec4 Color;
 
-void RegularVertexInit()
+void main()
 {
+    gl_Position = ProjectionDither * View * Model * vec4(aPos, 1.0);
+    v_prevPos = PreviousPV * Model * vec4(aPos, 1.0);
+
     mat3 normalMatrix = mat3(transpose(inverse(Model)));
     // Clac TBN
     vec3 wNormal = normalMatrix * normalize(aNormal);
@@ -51,14 +56,6 @@ void RegularVertexInit()
     v2f.tspace0 = vec3(wTangent.x, wBitangent.x, wNormal.x);
     v2f.tspace1 = vec3(wTangent.y, wBitangent.y, wNormal.y);
     v2f.tspace2 = vec3(wTangent.z, wBitangent.z, wNormal.z);
-}
-
-void main()
-{
-    gl_Position = ProjectionDither * View * Model * vec4(aPos, 1.0);
-    v_prevPos = PreviousPV * Model * vec4(aPos, 1.0);
-
-    RegularVertexInit();
 
     v_WSCurrPos = Model * vec4(aPos, 1.0);
     v_currPos = CurrentPV * v_WSCurrPos;
@@ -86,11 +83,14 @@ in vec2 v_TexCoord;
 in vec4 v_WSCurrPos;
 in vec4 v_currPos;
 in vec4 v_prevPos;
+in vec3 v_vNormal;
+
 // in vec3 v_normal;
 
 // Fragment outputs
 layout(location = 0) out vec4 FragColor;  
 layout(location = 1) out vec4 UVOffset;
+layout(location = 2) out vec4 Normal;
 
 // Uniform items
 uniform vec4 Color;
@@ -454,7 +454,10 @@ void main()
     FragColor.xyz = diffuse + specular;
     // FragColor.xyz = texture(u_SpecularCube, normal).xyz;
     FragColor = EncodeRGBM(FragColor.xyz);
-
+    
+    vec3 vNormal = mat3(transpose(inverse(View))) * normal;
+    Normal = vec4(normalize(vNormal)*0.5 + vec3(0.5,0.5,0.5), 1);;
+    
     vec2 offset = v_currPos.xy/v_currPos.w - v_prevPos.xy/v_prevPos.w;
     UVOffset = vec4(offset * 0.5,1.0,1.0);
 }

@@ -32,6 +32,7 @@
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Bloom.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Sharpen.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Vignette.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/SSAO.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ForwardLit.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/EarlyZ.h"
 
@@ -137,6 +138,7 @@ namespace SIByLEditor
 		viewCameraController = std::make_shared<ViewCameraController>(camera);
 
 		s_ViewportPanels.SetCamera(camera);
+		SRenderPipeline::SRenderContext::SetActiveCamera(camera);
 
 		m_ScriptablePipeline = CreateRef<SRenderPipeline::SPipeline>();
 		Ref<SRenderPipeline::SPipe> Bloom = SRenderPipeline::SRPPipeBloom::Create();
@@ -146,12 +148,14 @@ namespace SIByLEditor
 		Ref<SRenderPipeline::SPipe> EarlyZ = SRenderPipeline::SRPPipeEarlyZ::Create();
 		Ref<SRenderPipeline::SPipe> Vignette = SRenderPipeline::SRPPipeVignette::Create();
 		Ref<SRenderPipeline::SPipe> Sharpen = SRenderPipeline::SRPPipeSharpen::Create();
+		Ref<SRenderPipeline::SPipe> SSAO = SRenderPipeline::SRPPipeSSAO::Create();
 		((SRenderPipeline::SRPPipeEarlyZ*)EarlyZ.get())->mCamera = camera;
 		Ref<SRenderPipeline::SPipe> ForwardLit = SRenderPipeline::SRPPipeForwardLit::Create();
 		((SRenderPipeline::SRPPipeForwardLit*)ForwardLit.get())->mCamera = camera;
 		
 		m_ScriptablePipeline->InsertPipe(EarlyZ, "EarlyZ");
 		m_ScriptablePipeline->InsertPipe(ForwardLit, "ForwardLit");
+		m_ScriptablePipeline->InsertPipe(SSAO, "SSAO");
 		m_ScriptablePipeline->InsertPipe(Bloom, "Bloom");
 		m_ScriptablePipeline->InsertPipe(ACES, "ACES");
 		m_ScriptablePipeline->InsertPipe(TAA, "TAA");
@@ -159,11 +163,19 @@ namespace SIByLEditor
 		//m_ScriptablePipeline->InsertPipe(FXAA, "FXAA");
 		//m_ScriptablePipeline->InsertPipe(Sharpen, "Sharpen");
 
-		m_ScriptablePipeline->AttachPipes("ForwardLit", "MotionVector", "TAA", "MotionVector");
-		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "Bloom", "Input");
+		// SSAO input
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "SSAO", "Color");
+		m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "SSAO", "Depth");
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "Normal", "SSAO", "Normal");
+		// Bloom input
+		m_ScriptablePipeline->AttachPipes("SSAO", "Output", "Bloom", "Input");
 		m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "Bloom", "Depth");
+		// ACES & gamma correction input
 		m_ScriptablePipeline->AttachPipes("Bloom", "Output", "ACES", "Input");
+		// TAA input
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "MotionVector", "TAA", "MotionVector");
 		m_ScriptablePipeline->AttachPipes("ACES", "Output", "TAA", "Input");
+		// Vignette input
 		m_ScriptablePipeline->AttachPipes("TAA", "Output", "Vignette", "Input");
 		//m_ScriptablePipeline->AttachPipes("TAA", "Output", "FXAA", "Input");
 		//m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "Sharpen", "Depth");

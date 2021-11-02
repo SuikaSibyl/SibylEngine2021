@@ -15,6 +15,7 @@ out vec3 v_Color;
 out vec2 v_TexCoord;
 out vec4 v_currPos;
 out vec4 v_prevPos;
+out vec3 v_vNormal;
 
 // Uniform Constants
 uniform mat4 Model;
@@ -34,6 +35,7 @@ void main()
 
     v_Color = aPos;
     v_TexCoord = aUV;
+    v_vNormal = mat3(transpose(inverse(View * Model))) * normalize(aNormal);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -46,9 +48,13 @@ in vec3 v_Color;
 in vec2 v_TexCoord;
 in vec4 v_currPos;
 in vec4 v_prevPos;
+in vec3 v_vNormal;
+
 // Fragment outputs
 layout(location = 0) out vec4 FragColor;  
-layout(location = 1) out vec4 UVOffset;  
+layout(location = 1) out vec4 UVOffset;
+layout(location = 2) out vec4 Normal;
+
 // Uniform items
 uniform vec4 Color;
 uniform sampler2D u_Main;
@@ -62,4 +68,5 @@ void main()
 
     vec2 offset = v_currPos.xy/v_currPos.w - v_prevPos.xy/v_prevPos.w;
     UVOffset = vec4(offset * 0.5,1.0,1.0);
+    Normal = vec4(normalize(v_vNormal)*0.5 + vec3(0.5,0.5,0.5), 1);
 }

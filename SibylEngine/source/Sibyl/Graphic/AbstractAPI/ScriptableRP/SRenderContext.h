@@ -3,6 +3,7 @@
 namespace SIByL
 {
 	class Scene;
+	class Camera;
 
 	namespace SRenderPipeline
 	{
@@ -20,10 +21,14 @@ namespace SIByL
 			static void SetActiveRenderPipeline(Ref<SPipeline> rp) { ActiveRP = rp; }
 			static Ref<SPipeline> GetRenderPipeline() { return ActiveRP; }
 
+			static void SetActiveCamera(Ref<Camera> ca) { ActiveCamera = ca; }
+			static Ref<Camera> GetCamera() { return ActiveCamera; }
+
 		private:
 			static unsigned int ScreenWidth, ScreenHeight;
 			static Ref<Scene> ActiveScene;
 			static Ref<SPipeline> ActiveRP;
+			static Ref<Camera> ActiveCamera;
 		};
 
 	}

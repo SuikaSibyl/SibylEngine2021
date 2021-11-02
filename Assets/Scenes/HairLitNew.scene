@@ -2,6 +2,28 @@ Scene: Untitled
 Entities:
   - Entity: 124531623461
     TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [-0.475937903, -2.51006031, 0.207876325]
+      EulerAngles: [0, 0, 0]
+      Scale: [5.36000013, 5.36000013, 5.36000013]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\plane.fbx
+    MeshRendererComponent:
+      SubmeshNum: 1
+      Passes:
+        - Pass: ForwardLit
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\StandardLit.mat
+        - Pass: EarlyZ
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+  - Entity: 124531623461
+    TagComponent:
       Tag: Sphere
     TransformComponent:
       Translation: [1.42435575, 1.17175865, 2.04093623]
@@ -21,7 +43,7 @@ Entities:
           Materials:
             - Material: 0
               INFO:
-                Path: EMPTY
+                Path: Resources\OpaqueEarlyZ.mat
   - Entity: 124531623461
     TagComponent:
       Tag: Empty Entity

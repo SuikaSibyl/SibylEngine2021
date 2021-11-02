@@ -2,11 +2,12 @@
 /////                       Compute Shader                      //////
 //////////////////////////////////////////////////////////////////////
 #version 450 core
-layout (local_size_x = 1, local_size_y = 1) in;
+layout (local_size_x = 16, local_size_y = 16) in;
 layout(rgba8, binding = 0) uniform image2D img_output;
 
 layout(std430, binding=0) buffer Input
 {
+    vec2 OutputSize;
     vec2 uGlobalTexSize;
     vec2 uTextureBlurInputSize;
     vec2 uBlurDir;
@@ -38,7 +39,7 @@ vec4 gaussianBlur(vec2 uv) {
     vec3 pixel = 0.2734375 * DecodeRGBM(texture(u_Input, max(min(uv, maxCoord), minCoord)));
 
     vec2 offset;
-    vec2 blurDir = uBlurDir.xy / gl_NumWorkGroups.xy;
+    vec2 blurDir = uBlurDir.xy / OutputSize.xy;
 
     blurDir *= uGlobalTexSize.y * 0.00075;
     offset = blurDir * 1.3333333333333333;
@@ -56,10 +57,15 @@ void main(void)
     vec4 pixel = vec4(1.0, 0.0, 1.0, 1.0);
     // get index in global work group i.e x,y position
     ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-  
-    float u =1.0f * (gl_GlobalInvocationID.x + 0.5f)/gl_NumWorkGroups.x;
-    float v =1.0f * (gl_GlobalInvocationID.y + 0.5f)/gl_NumWorkGroups.y;
+    if(gl_GlobalInvocationID.x >= OutputSize.x || gl_GlobalInvocationID.y >= OutputSize.y)
+        return;
 
+    float du = 1.0f / OutputSize.x;
+    float dv = 1.0f / OutputSize.y;
+
+    float u = du * (gl_GlobalInvocationID.x + 0.5f);
+    float v = dv * (gl_GlobalInvocationID.y + 0.5f);
+    
     vec4 col = gaussianBlur(vec2(u,v));
     col = encodeRGBM(col.rgb, kRGBMRange);
     pixel= col;

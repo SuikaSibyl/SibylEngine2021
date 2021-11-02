@@ -37,7 +37,8 @@ namespace SIByL
 		void SRPPipeVignette::Draw()
 		{
 			auto& [screenX, screenY] = SRenderContext::GetScreenSize();
-			VignetteInstance->Dispatch(screenX, screenY, 1);
+			VignetteInstance->SetFloat2("OutputSize", { screenX, screenY });
+			VignetteInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
 		}
 
 		void SRPPipeVignette::DrawImGui()

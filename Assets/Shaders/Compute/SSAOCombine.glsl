@@ -8,12 +8,11 @@ layout(rgba8, binding = 0) uniform image2D img_output;
 layout(std430, binding=0) buffer Input
 {
     vec2 OutputSize;
-    vec2 uGlobalTexSize;
-    vec2 uTextureBlurInputSize;
-    vec2 uBlurDir;
+    float uAOFactor;
 };
 
-layout(binding = 0) uniform sampler2D u_Input;
+layout(binding = 0) uniform sampler2D u_Texture;
+layout(binding = 1) uniform sampler2D u_SSAO;
 
 const float kRGBMRange = 8.0;
 
@@ -32,24 +31,6 @@ vec3 DecodeRGBM(vec4 rgbm)
     return rgbm.xyz * rgbm.w * kRGBMRange;
 }
 
-vec4 gaussianBlur(vec2 uv) {
-    vec2 maxCoord = 1.0 - 1.0 / uTextureBlurInputSize.xy;
-    vec2 minCoord = 1.0 / uTextureBlurInputSize.xy;
-
-    vec3 pixel = 0.24609375 * DecodeRGBM(texture2D(u_Input, clamp(uv, minCoord, maxCoord)));
-    vec2 offset;
-    vec2 blurDir = uBlurDir.xy / OutputSize.xy;
-    blurDir *= uGlobalTexSize.y * 0.00075;
-    offset = blurDir * 1.3636363636363635;
-
-    pixel += 0.322265625 *  DecodeRGBM(texture(u_Input, clamp(uv + offset, minCoord, maxCoord)));
-    pixel += 0.322265625 *  DecodeRGBM(texture(u_Input, clamp(uv - offset, minCoord, maxCoord)));
-    offset = blurDir * 3.1818181818181817;
-    pixel += 0.0537109375 * DecodeRGBM(texture(u_Input, clamp(uv + offset, minCoord, maxCoord)));
-    pixel += 0.0537109375 * DecodeRGBM(texture(u_Input, clamp(uv - offset, minCoord, maxCoord)));
-    return vec4(pixel, 1.0);
-}
-
 void main(void)
 {
     // base pixel colour for image
@@ -64,10 +45,11 @@ void main(void)
 
     float u = du * (gl_GlobalInvocationID.x + 0.5f);
     float v = dv * (gl_GlobalInvocationID.y + 0.5f);
-    
-    vec4 col = gaussianBlur(vec2(u,v));
-    col = encodeRGBM(col.rgb, kRGBMRange);
-    pixel= col;
+
+    vec3 col = DecodeRGBM(texture(u_Texture, vec2(u,v)));
+    float ssao = texture(u_SSAO, vec2(u,v)).r;
+    ssao = clamp(1 - uAOFactor * (1-ssao), 0, 1);
+    pixel = encodeRGBM(col * ssao, kRGBMRange);
     
     // output to a specific pixel in the image
     imageStore(img_output, pixel_coords, pixel);

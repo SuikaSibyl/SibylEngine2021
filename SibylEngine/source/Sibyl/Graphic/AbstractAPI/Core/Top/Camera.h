@@ -67,6 +67,7 @@ namespace SIByL
 		}
 
 		const glm::mat4& GetProjectionMatrix() const { return m_Projection; }
+		const glm::mat4& GetProjectionDitherMatrix() const { return m_ProjectionDither; }
 		const glm::mat4& GetViewMatrix() const { return m_View; }
 		const glm::mat4& GetProjectionViewMatrix() const { return m_ProjectionView; }
 

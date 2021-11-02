@@ -20,7 +20,10 @@ namespace SIByL
 		static void RegisterTAA();
 		static void RegisterFXAA();
 		static void RegisterSharpen();
+		static void RegisterMedianBlur();
 		static void RegisterVignette();
+		static void RegisterSSAO();
+		static void RegisterSSAOCombine();
 
 		static void RegisterBloomExtract();
 		static void RegisterBloomCombine();

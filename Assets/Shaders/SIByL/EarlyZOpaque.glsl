@@ -65,9 +65,10 @@ vec4 encodeDepthAlphaProfileScatter(const in float depth, const in float alpha, 
 void main()
 {
     float alpha = 1.0;
-    float depth = (-v_currPos.z - ZNearFar.x) / (ZNearFar.y - ZNearFar.x);
+    float depth = (v_currPos.z - ZNearFar.x) / (ZNearFar.y - ZNearFar.x);
     float scatter = 0.0;
     float profile = 0.0;
 
+    // FragColor = vec4(depth,0,0,1);
     FragColor = encodeDepthAlphaProfileScatter(depth, alpha, profile, scatter);
 }

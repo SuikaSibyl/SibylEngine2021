@@ -2,11 +2,12 @@
 /////                       Compute Shader                      //////
 //////////////////////////////////////////////////////////////////////
 #version 450 core
-layout (local_size_x = 1, local_size_y = 1) in;
+layout (local_size_x = 16, local_size_y = 16) in;
 layout(rgba8, binding = 0) uniform image2D img_output;
 
 layout(std430, binding=0) buffer Input
 {
+    vec2 OutputSize;
     float Alpha;
 };
 
@@ -23,18 +24,13 @@ vec3 RGB2YCoCg(vec3 rgb)
 	YCoCg.z = rgb.g - temp;
 	YCoCg.x = temp + YCoCg.z / 2;
 
-    // YCoCg.x = ((rgb.r + 2*rgb.g + rgb.b)+ 2)/4;
-    // YCoCg.y = ((rgb.r - rgb.b) + 1)/2;
-    // YCoCg.z = (( - rgb.r + 2*rgb.g - rgb.b) + 2)/4;
     return YCoCg;
 }
 
 vec3 YCoCg2RGB(vec3 YCoCg)
 {
     vec3 rgb;
-    // rgb.r = YCoCg.x + YCoCg.y - YCoCg.z - 0.5;
-    // rgb.g = YCoCg.x + YCoCg.z - 1;
-    // rgb.b = YCoCg.x - YCoCg.y - YCoCg.z + 0.5;
+
 	float temp = YCoCg.x - YCoCg.z / 2;
 	rgb.g = YCoCg.z + temp;
 	rgb.b = temp - YCoCg.y / 2;
@@ -66,9 +62,11 @@ void main(void)
     vec4 pixel = vec4(1.0, 0.0, 1.0, 1.0);
     // get index in global work group i.e x,y position
     ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+    if(gl_GlobalInvocationID.x >= OutputSize.x || gl_GlobalInvocationID.y >= OutputSize.y)
+        return;
 
-    float du = 1.0f / gl_NumWorkGroups.x;
-    float dv = 1.0f / gl_NumWorkGroups.y;
+    float du = 1.0f / OutputSize.x;
+    float dv = 1.0f / OutputSize.y;
 
     float u = du * (gl_GlobalInvocationID.x + 0.5f);
     float v = dv * (gl_GlobalInvocationID.y + 0.5f);

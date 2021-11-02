@@ -43,7 +43,8 @@ namespace SIByL
 			mTaaBufferIdx++; if (mTaaBufferIdx == 2) mTaaBufferIdx = 0;
 
 			auto& [screenX, screenY] = SRenderContext::GetScreenSize();
-			TAAInstance->Dispatch(screenX, screenY, 1);
+			TAAInstance->SetFloat2("OutputSize", { screenX, screenY });
+			TAAInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
 		}
 
 		void SRPPipeTAA::DrawImGui()

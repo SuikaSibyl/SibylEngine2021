@@ -20,6 +20,9 @@ namespace SIByL
 		RegisterFXAA();
 		RegisterSharpen();
 		RegisterVignette();
+		RegisterSSAO();
+		RegisterSSAOCombine();
+		RegisterMedianBlur();
 
 		RegisterBloomExtract();
 		RegisterBloomCombine();
@@ -83,7 +86,7 @@ namespace SIByL
 		};
 
 		Shader::Create("Shaders/SIByL/Lit",
-			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 2 }),
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 3 }),
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 	}
 	
@@ -120,7 +123,7 @@ namespace SIByL
 		};
 
 		Shader::Create("Shaders/SIByL/LitHair",
-			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 2 }),
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 3 }),
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 	}
 
@@ -189,6 +192,7 @@ namespace SIByL
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float, "Para"},
 			}
 		};
@@ -218,6 +222,7 @@ namespace SIByL
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float, "Alpha"},
 			}
 		};
@@ -250,7 +255,7 @@ namespace SIByL
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
-				//{ShaderDataType::Float, "Alpha"},
+				{ShaderDataType::Float2, "OutputSize"},
 			}
 		};
 
@@ -280,6 +285,7 @@ namespace SIByL
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float, "uSharpFactor"},
 			}
 		};
@@ -305,12 +311,45 @@ namespace SIByL
 		ComputeShader::Create("Shaders/Compute/Sharpen",
 			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
 	}
+
+	void ShaderRegister::RegisterMedianBlur()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float2, "OutputSize"},
+				{ShaderDataType::Float, "u_radius"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Input"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "MedianBlurResult"},
+			},
+		};
+
+		ComputeShader::Create("Shaders/Compute/MedianBlurV",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+		ComputeShader::Create("Shaders/Compute/MedianBlurH",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
 	
 	void ShaderRegister::RegisterVignette()
 	{
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float2, "uLensRadius"},
 				{ShaderDataType::Float, "uFrameMod"},
 			}
@@ -336,12 +375,78 @@ namespace SIByL
 		ComputeShader::Create("Shaders/Compute/Vignette",
 			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
 	}
+	
+	void ShaderRegister::RegisterSSAO()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Mat4, "uProjection"},
+				{ShaderDataType::Float2, "OutputSize"},
+				{ShaderDataType::Float, "uRadius"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Normal"},
+				{ShaderResourceType::Texture2D, "u_Depth"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "SSAOResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/SSAO",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
+	
+	void ShaderRegister::RegisterSSAOCombine()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			{
+				{ShaderDataType::Float2, "OutputSize"},
+				{ShaderDataType::Float, "uAOFactor"},
+			}
+		};
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Texture"},
+				{ShaderResourceType::Texture2D, "u_SSAO"},
+			},
+		};
+
+		std::vector<ComputeOutputLayout> COlayouts =
+		{
+			// Compute Output
+			{
+				{ShaderResourceType::Texture2D, "SSAOCombinedResult"},
+			},
+		};
+
+
+		ComputeShader::Create("Shaders/Compute/SSAOCombine",
+			ShaderBinderDesc(CBlayouts, SRlayouts, COlayouts));
+	}
 
 	void ShaderRegister::RegisterBloomExtract()
 	{
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float, "uBloomThreshold"},
 			}
 		};
@@ -373,6 +478,7 @@ namespace SIByL
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float, "uBloomFactor"},
 			}
 		};
@@ -408,6 +514,7 @@ namespace SIByL
 		std::vector<ConstantBufferLayout> CBlayouts =
 		{
 			{
+				{ShaderDataType::Float2, "OutputSize"},
 				{ShaderDataType::Float2, "uGlobalTexSize"},
 				{ShaderDataType::Float2, "uTextureBlurInputSize"},
 				{ShaderDataType::Float2, "uBlurDir"},

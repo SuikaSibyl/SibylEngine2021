@@ -287,6 +287,7 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Bloom.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\FXAA.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Sharpen.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\SSAO.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\TAA.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Vignette.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\DefaultRenderPipeline.cpp" />
@@ -463,6 +464,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Bloom.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\FXAA.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Sharpen.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\SSAO.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\TAA.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\Vignette.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\Culling.h" />

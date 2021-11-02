@@ -85,11 +85,16 @@ const in vec4 fragCoord, const in int dithering, const in float alpha, const in 
     if ((alpha * factor) < rnd) discard;
 }
 
+float decode24(const in vec3 x) {
+    const vec3 decode = 1.0 / vec3(1.0, 255.0, 65025.0);
+    return dot(x, decode);
+}
+
 void main()
 {
     ditheringMaskingDiscard(gl_FragCoord, 1, getMaterialOpacity(), 1, ZNearFar.zw);
     float alpha = 1.0;
-    float depth = (-v_currPos.z - ZNearFar.x) / (ZNearFar.y - ZNearFar.x);
+    float depth = (v_currPos.z - ZNearFar.x) / (ZNearFar.y - ZNearFar.x);
     float scatter = 0.0;
     float profile = 0.0;
 

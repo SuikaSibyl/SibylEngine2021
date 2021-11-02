@@ -37,7 +37,8 @@ namespace SIByL
 		void SRPPipeACES::Draw()
 		{
 			auto& [screenX, screenY] = SRenderContext::GetScreenSize();
-			ACESInstance->Dispatch(screenX, screenY, 1);
+			ACESInstance->SetFloat2("OutputSize", { screenX, screenY });
+			ACESInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
 		}
 
 		void SRPPipeACES::DrawImGui()

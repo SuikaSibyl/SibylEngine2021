@@ -44,7 +44,8 @@ namespace SIByL
 
 	void ComputeInstance::SetMatrix4x4(const std::string& name, const glm::mat4& value)
 	{
-
+		m_ConstantsBuffer->SetMatrix4x4(name, value);
+		SetAssetDirty();
 	}
 
 	void ComputeInstance::SetTexture2D(const std::string& name, Ref<Texture2D> texture)

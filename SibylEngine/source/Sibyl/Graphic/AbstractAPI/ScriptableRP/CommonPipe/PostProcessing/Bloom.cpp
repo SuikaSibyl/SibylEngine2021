@@ -68,7 +68,7 @@ namespace SIByL
 
 		void SRPPipeBloom::Attach()
 		{
-			BloomExtractInstance->SetFloat("uBloomThreshold", 0);
+			BloomExtractInstance->SetFloat("uBloomThreshold", 2);
 			BloomExtractInstance->SetRenderTarget2D("ExtractResult", m_FrameBuffer_Bloom[0], 0);
 
 			BlurLevel0InstanceV->SetFloat2("uBlurDir", { 0,1 });
@@ -126,46 +126,62 @@ namespace SIByL
 		void SRPPipeBloom::Draw()
 		{
 			auto [screenX, screenY] = SRenderContext::GetScreenSize();
-			BloomExtractInstance->Dispatch(screenX, screenY, 1);
+			BloomExtractInstance->SetFloat2("OutputSize", { screenX, screenY });
+			BloomExtractInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
 
 			BlurLevel0InstanceV->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel0InstanceV->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 1, screenY * 1. / 1 });
-			BlurLevel0InstanceV->Dispatch(screenX * 1. / 2, screenY * 1. / 2, 1);
+			BlurLevel0InstanceV->SetFloat2("OutputSize", { screenX * 1. / 2, screenY * 1. / 2 });
+			BlurLevel0InstanceV->Dispatch(GRIDSIZE(screenX * 1. / 2, 16), GRIDSIZE(screenY * 1. / 2, 16), 1);
 
 			BlurLevel0InstanceH->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel0InstanceH->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 2, screenY * 1. / 2 });
-			BlurLevel0InstanceH->Dispatch(screenX * 1. / 2, screenY * 1. / 2, 1);
+			BlurLevel0InstanceH->SetFloat2("OutputSize", { screenX * 1. / 2, screenY * 1. / 2 });
+			BlurLevel0InstanceH->Dispatch(GRIDSIZE(screenX * 1. / 2, 16), GRIDSIZE(screenY * 1. / 2, 16), 1);
 
 
 			BlurLevel1InstanceV->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel1InstanceV->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 2, screenY * 1. / 2 });
-			BlurLevel1InstanceV->Dispatch(screenX * 1. / 4, screenY * 1. / 4, 1);
+			BlurLevel1InstanceV->SetFloat2("OutputSize", { screenX * 1. / 4, screenY * 1. / 4 });
+			BlurLevel1InstanceV->Dispatch(GRIDSIZE(screenX * 1. / 4, 16), GRIDSIZE(screenY * 1. / 4, 16), 1);
+
 			BlurLevel1InstanceH->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel1InstanceH->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 4, screenY * 1. / 4 });
-			BlurLevel1InstanceH->Dispatch(screenX * 1. / 4, screenY * 1. / 4, 1);
+			BlurLevel1InstanceH->SetFloat2("OutputSize", { screenX * 1. / 4, screenY * 1. / 4 });
+			BlurLevel1InstanceH->Dispatch(GRIDSIZE(screenX * 1. / 4, 16), GRIDSIZE(screenY * 1. / 4, 16), 1);
 
 			BlurLevel2InstanceV->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel2InstanceV->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 4, screenY * 1. / 4 });
-			BlurLevel2InstanceV->Dispatch(screenX * 1. / 8, screenY * 1. / 8, 1);
+			BlurLevel2InstanceV->SetFloat2("OutputSize", { screenX * 1. / 8, screenY * 1. / 8 });
+			BlurLevel2InstanceV->Dispatch(GRIDSIZE(screenX * 1. / 8, 16), GRIDSIZE(screenY * 1. / 8, 16), 1);
+
 			BlurLevel2InstanceH->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel2InstanceH->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 8, screenY * 1. / 8 });
-			BlurLevel2InstanceH->Dispatch(screenX * 1. / 8, screenY * 1. / 8, 1);
+			BlurLevel2InstanceH->SetFloat2("OutputSize", { screenX * 1. / 8, screenY * 1. / 8 });
+			BlurLevel2InstanceH->Dispatch(GRIDSIZE(screenX * 1. / 8, 16), GRIDSIZE(screenY * 1. / 8, 16), 1);
 
 			BlurLevel3InstanceV->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel3InstanceV->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 8, screenY * 1. / 8 });
-			BlurLevel3InstanceV->Dispatch(screenX * 1. / 16, screenY * 1. / 16, 1);
+			BlurLevel3InstanceV->SetFloat2("OutputSize", { screenX * 1. / 16, screenY * 1. / 16 });
+			BlurLevel3InstanceV->Dispatch(GRIDSIZE(screenX * 1. / 16, 16), GRIDSIZE(screenY * 1. / 16, 16), 1);
+
 			BlurLevel3InstanceH->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel3InstanceH->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 16, screenY * 1. / 16 });
-			BlurLevel3InstanceH->Dispatch(screenX * 1. / 16, screenY * 1. / 16, 1);
+			BlurLevel3InstanceH->SetFloat2("OutputSize", { screenX * 1. / 16, screenY * 1. / 16 });
+			BlurLevel3InstanceH->Dispatch(GRIDSIZE(screenX * 1. / 16, 16), GRIDSIZE(screenY * 1. / 16, 16), 1);
 
 			BlurLevel4InstanceV->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel4InstanceV->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 16, screenY * 1. / 16 });
-			BlurLevel4InstanceV->Dispatch(screenX * 1. / 32, screenY * 1. / 32, 1);
+			BlurLevel4InstanceV->SetFloat2("OutputSize", { screenX * 1. / 32, screenY * 1. / 32 });
+			BlurLevel4InstanceV->Dispatch(GRIDSIZE(screenX * 1. / 32, 16), GRIDSIZE(screenY * 1. / 32, 16), 1);
+
 			BlurLevel4InstanceH->SetFloat2("uGlobalTexSize", { screenX,screenY });
 			BlurLevel4InstanceH->SetFloat2("uTextureBlurInputSize", { screenX * 1. / 32, screenY * 1. / 32 });
-			BlurLevel4InstanceH->Dispatch(screenX * 1. / 32, screenY * 1. / 32, 1);
+			BlurLevel4InstanceH->SetFloat2("OutputSize", { screenX * 1. / 32, screenY * 1. / 32 });
+			BlurLevel4InstanceH->Dispatch(GRIDSIZE(screenX * 1. / 32, 16), GRIDSIZE(screenY * 1. / 32, 16), 1);
 
-			BloomCombineInstance->Dispatch(screenX, screenY, 1);
+			BloomCombineInstance->SetFloat2("OutputSize", { screenX, screenY });
+			BloomCombineInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
 		}
 
 		void SRPPipeBloom::DrawImGui()

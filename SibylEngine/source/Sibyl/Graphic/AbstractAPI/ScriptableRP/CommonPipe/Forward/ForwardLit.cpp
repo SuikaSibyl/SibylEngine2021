@@ -21,8 +21,9 @@ namespace SIByL
 			desc.Width = 1280;
 			desc.Height = 720;
 			desc.Formats = {
-				FrameBufferTextureFormat::RGB8,
-				FrameBufferTextureFormat::R16G16F,
+				FrameBufferTextureFormat::RGB8,		// Color
+				FrameBufferTextureFormat::R16G16F,	// Motion Vector
+				FrameBufferTextureFormat::RGB8,		// Normal
 				FrameBufferTextureFormat::DEPTH24STENCIL8 };
 			// Frame Buffer 0: Main Render Buffer
 			mFrameBuffer = FrameBuffer::Create(desc, "ForwardLit");
@@ -69,6 +70,10 @@ namespace SIByL
 			else if (name == "MotionVector")
 			{
 				return mFrameBuffer->GetRenderTarget(1);
+			}
+			else if (name == "Normal")
+			{
+				return mFrameBuffer->GetRenderTarget(2);
 			}
 
 			SIByL_CORE_ERROR("TAA Pipe get wrong output required");

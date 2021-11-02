@@ -35,7 +35,9 @@ namespace SIByL
 		void SRPPipeFXAA::Draw()
 		{
 			auto& [screenX, screenY] = SRenderContext::GetScreenSize();
-			FXAAInstance->Dispatch(screenX, screenY, 1);
+			FXAAInstance->SetFloat2("OutputSize", { screenX, screenY });
+			FXAAInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
+
 		}
 
 		void SRPPipeFXAA::DrawImGui()
