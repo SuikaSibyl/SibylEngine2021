@@ -24,18 +24,22 @@ namespace SIByL
 		{ShaderDataType::Int, "DirectionalLightNum"},
 		{ShaderDataType::Int, "PointLightNum"},
 
+		{ShaderDataType::Mat4, "directionalLights[0].projview"},
 		{ShaderDataType::Float3, "directionalLights[0].direction"},
 		{ShaderDataType::Float,  "directionalLights[0].intensity"},
 		{ShaderDataType::Float3, "directionalLights[0].color"},
 
+		{ShaderDataType::Mat4, "directionalLights[1].projview"},
 		{ShaderDataType::Float3, "directionalLights[1].direction"},
 		{ShaderDataType::Float,  "directionalLights[1].intensity"},
 		{ShaderDataType::Float3, "directionalLights[1].color"},
-		
+
+		{ShaderDataType::Mat4, "directionalLights[2].projview"},
 		{ShaderDataType::Float3, "directionalLights[2].direction"},
 		{ShaderDataType::Float,  "directionalLights[2].intensity"},
 		{ShaderDataType::Float3, "directionalLights[2].color"},
 
+		{ShaderDataType::Mat4, "directionalLights[3].projview"},
 		{ShaderDataType::Float3, "directionalLights[3].direction"},
 		{ShaderDataType::Float,  "directionalLights[3].intensity"},
 		{ShaderDataType::Float3, "directionalLights[3].color"},

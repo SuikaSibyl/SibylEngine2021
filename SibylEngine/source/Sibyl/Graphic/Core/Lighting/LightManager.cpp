@@ -45,6 +45,7 @@ namespace SIByL
 		{
 			if ((*iter)->m_Type == LightType::Directional)
 			{
+				frameBuffer->SetMatrix4x4("directionalLights[" + std::to_string(DirectionalLightCount) + "].projview", (*iter)->m_LightProjView);
 				frameBuffer->SetFloat3("directionalLights[" + std::to_string(DirectionalLightCount) + "].direction", (*iter)->m_Direction);
 				frameBuffer->SetFloat3("directionalLights[" + std::to_string(DirectionalLightCount) + "].color", (*iter)->m_Color);
 				frameBuffer->SetFloat("directionalLights[" + std::to_string(DirectionalLightCount) + "].intensity", 1);

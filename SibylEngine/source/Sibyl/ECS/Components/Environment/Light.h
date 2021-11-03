@@ -12,6 +12,7 @@ namespace SIByL
 		glm::vec3 m_Position;
 		glm::vec3 m_Direction;
 		glm::vec3 m_Color;
+		glm::mat4 m_LightProjView;
 		float m_Intensity = 1;
 		bool isDirty = false;
 	};

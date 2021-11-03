@@ -19,6 +19,7 @@ namespace SIByL
 		static Ref<FrameBuffer> Create(const FrameBufferDesc& desc, const std::string& key);
 
 		virtual void Bind() = 0;
+		virtual void CustomViewport(unsigned int xmin, unsigned int xmax, unsigned int ymin, unsigned int ymax) = 0;
 		virtual void Unbind() = 0;
 		virtual void ClearBuffer() = 0;
 		virtual void SetClearColor(const glm::vec4& color) { ClearColor = color; };

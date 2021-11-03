@@ -53,6 +53,7 @@ namespace SIByL
 		AlphaState alphaState;
 	};
 
+	class RenderTarget;
 	class Material :public CustomAsset
 	{
 	public:
@@ -65,6 +66,7 @@ namespace SIByL
 		void SetFloat4(const std::string& name, const glm::vec4& value);
 		void SetMatrix4x4(const std::string& name, const glm::mat4& value);
 		void SetTexture2D(const std::string& name, Ref<Texture2D> texture);
+		void SetTexture2D(const std::string& name, RenderTarget* texture);
 		void SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture);
 
 		void GetFloat(const std::string& name, float& value);

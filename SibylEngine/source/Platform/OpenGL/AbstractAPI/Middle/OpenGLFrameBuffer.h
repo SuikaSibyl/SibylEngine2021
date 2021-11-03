@@ -12,6 +12,7 @@ namespace SIByL
 		OpenGLFrameBuffer(const FrameBufferDesc& desc, std::string identifier);
 
 		virtual void Bind() override;
+		virtual void CustomViewport(unsigned int xmin, unsigned int xmax, unsigned int ymin, unsigned int ymax) override;
 		virtual void Unbind() override;
 		virtual void ClearBuffer() override;
 		virtual unsigned int CountColorAttachment() override;

@@ -47,6 +47,7 @@ namespace SIByL
 			for (Ref<DrawItem> drawItem : diPool)
 			{
 				drawItem->m_Material->SetPass();
+				drawItem->m_Material->SetTexture2D("u_DirectionalShadowmap", Library<FrameBuffer>::Fetch("DirectionalShadowmap")->GetRenderTarget(0));
 				Graphic::CurrentCamera->OnDrawCall();
 				Graphic::CurrentMaterial->OnDrawCall();
 				Graphic::CurrentFrameConstantsManager->OnDrawCall();

@@ -13,7 +13,7 @@ layout(std430, binding=0) buffer Input
 };
 
 layout(binding = 0) uniform sampler2D u_Normal;
-layout(binding = 0) uniform sampler2D u_Depth;
+layout(binding = 1) uniform sampler2D u_Depth;
 
 // Fetch Frag Pos in Vies Space
 vec3 GetFragPos(float depth, vec2 uv)
@@ -45,11 +45,8 @@ float decode24(const in vec3 x) {
 // uv range in [0,1]
 float GetFragDepth(vec2 uv)
 {
-    // if(uv.y<0 || uv.y > 1)
-    // {
-    //     return 100;
-    // }
-    float depth = decode24(texture(u_Depth, uv).rgb);
+    vec4 encode = texture(u_Depth, uv);
+    float depth = (encode.a != 0) ? decode24(encode.rgb) : 9999;
     float zc = depth * (100 - 0.001) + 0.001;
     return zc;
 }
@@ -169,7 +166,7 @@ vec3 SSAO(const in vec2 uv)
     for(int i = 0; i < 32; ++i)
     {
         vec3 samp = TBN * samples[i];
-        vec3 sample_pos = fragPos + samp * .5; 
+        vec3 sample_pos = fragPos + samp * uRadius; 
         vec2 offsetuv = Pos2UV(sample_pos);
         float sampleDepth = GetFragDepth(offsetuv);
         float distance = (abs(sample_pos.z - sampleDepth)*length(sample_pos)/abs(sample_pos.z));

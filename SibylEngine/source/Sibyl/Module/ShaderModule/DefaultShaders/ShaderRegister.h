@@ -14,6 +14,8 @@ namespace SIByL
 
 		static void RegisterEarlyZOpaque();
 		static void RegisterEarlyZDither();
+		static void RegisterShadowOpaque();
+		static void RegisterShadowDither();
 
 		static void RegisterACES();
 

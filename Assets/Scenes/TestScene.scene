@@ -2,44 +2,54 @@ Scene: Untitled
 Entities:
   - Entity: 124531623461
     TagComponent:
-      Tag: Plane
+      Tag: Box
     TransformComponent:
-      Translation: [0.00497406302, -0.245760649, 0.0289250612]
+      Translation: [-0.265692234, -0.201027021, 0.515828311]
       EulerAngles: [0, 0, 0]
-      Scale: [1.68410492, 2.09000015, 2.09000015]
+      Scale: [0.160000026, 0.160000026, 0.160000026]
     MeshFilterComponent:
-      Mesh: Resources\Meshes\plane.fbx
+      Mesh: Resources\Meshes\Little.fbx
     MeshRendererComponent:
-      SubmeshNum: 1
+      SubmeshNum: 3
       Passes:
         - Pass: ForwardLit
           Materials:
             - Material: 0
               INFO:
                 Path: Resources\StandardLit.mat
+            - Material: 1
+              INFO:
+                Path: Resources\StandardLit.mat
+            - Material: 2
+              INFO:
+                Path: Resources\StandardLit.mat
+        - Pass: ShadowMap
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+            - Material: 1
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+            - Material: 2
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
         - Pass: EarlyZ
           Materials:
             - Material: 0
               INFO:
                 Path: Resources\OpaqueEarlyZ.mat
-  - Entity: 124531623461
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Translation: [0.00516670663, 0.0357921869, -0.053240601]
-      EulerAngles: [0.18709147, 0.32346037, 0.201665148]
-      Scale: [1, 0.999999762, 1]
-    LightComponent:
-      Type: 1
-      Position: [0, 0, 0]
-      Direction: [0.343230098, -0.119677924, 0.931595564]
-      Color: [0.681945741, 0.681938887, 0.681938887]
-      Intensity: 1
+            - Material: 1
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+            - Material: 2
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
   - Entity: 124531623461
     TagComponent:
       Tag: Sphere
     TransformComponent:
-      Translation: [0, 0.149393454, 0]
+      Translation: [-0.020376984, 0.136143267, 0.00662895106]
       EulerAngles: [0, 0, 0.859330535]
       Scale: [0.334879696, 0.334879696, 0.334879875]
     MeshFilterComponent:
@@ -57,3 +67,74 @@ Entities:
             - Material: 0
               INFO:
                 Path: Resources\OpaqueEarlyZ.mat
+        - Pass: ShadowMap
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+  - Entity: 124531623461
+    TagComponent:
+      Tag: LightBlue
+    TransformComponent:
+      Translation: [0.00516670663, 0.0357921869, -0.053240601]
+      EulerAngles: [0.694387615, 0.3234604, 0.201666564]
+      Scale: [1, 0.999999881, 0.999999642]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.367476583, -0.578022599, 0.728595078]
+      Color: [0.0982226133, 0.404070675, 1]
+      Intensity: 1
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Translation: [0.00497406302, -0.203111082, 0.0289250612]
+      EulerAngles: [0, 0, 0]
+      Scale: [1.68410492, 2.09000015, 2.09000015]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\plane.fbx
+    MeshRendererComponent:
+      SubmeshNum: 1
+      Passes:
+        - Pass: ForwardLit
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\StandardLit.mat
+        - Pass: EarlyZ
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+        - Pass: ShadowMap
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+  - Entity: 124531623461
+    TagComponent:
+      Tag: LightRed
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [-2.41542745, 0.699999511, 2.82114267]
+      Scale: [1.00000501, 1, 1.00000441]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.248018727, -0.781936884, -0.571892858]
+      Color: [0.756782055, 0.215920031, 0.215920031]
+      Intensity: 1
+  - Entity: 124531623461
+    TagComponent:
+      Tag: LightGreen
+    TransformComponent:
+      Translation: [0.0184271447, 0.0812463313, 0.00174016762]
+      EulerAngles: [2.94974947, 1.0601896, 2.34322095]
+      Scale: [1, 0.999999762, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.734249651, -0.480339289, -0.479741216]
+      Color: [0.0797964334, 0.5659495, 0.0788835138]
+      Intensity: 1

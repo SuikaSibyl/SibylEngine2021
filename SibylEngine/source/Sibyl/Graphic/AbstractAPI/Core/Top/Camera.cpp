@@ -46,6 +46,16 @@ namespace SIByL
 		Graphic::CurrentCamera = this;
 	}
 
+	void OrthographicCamera::UpdateZNearFar()
+	{
+		m_ConstantsBuffer->SetFloat4("ZNearFar", glm::vec4(-Width, Width, HaltonX, HaltonY));
+	}
+
+	void PerspectiveCamera::UpdateZNearFar()
+	{
+		m_ConstantsBuffer->SetFloat4("ZNearFar", glm::vec4(0.001f, 100.0f, HaltonX, HaltonY));
+	}
+
 	void Camera::RecordVPMatrix()
 	{
 		m_CurrentProjectionView = GetPreciseProjectionMatrix() * m_View;
@@ -55,7 +65,7 @@ namespace SIByL
 			m_ConstantsBuffer->SetMatrix4x4("CurrentPV", m_CurrentProjectionView);
 			m_ConstantsBuffer->SetMatrix4x4("PreviousPV", m_PreviousProjectionView);
 			m_ConstantsBuffer->SetFloat4("ViewPos", glm::vec4(m_Posistion, 1));
-			m_ConstantsBuffer->SetFloat4("ZNearFar", glm::vec4(0.001f, 100.0f, HaltonX, HaltonY));
+			UpdateZNearFar();
 		}
 
 		m_PreviousProjectionView = m_CurrentProjectionView;

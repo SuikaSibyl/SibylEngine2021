@@ -34,6 +34,7 @@
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/Vignette.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/PostProcessing/SSAO.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ForwardLit.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ShadowMap.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/EarlyZ.h"
 
 #ifdef SIBYL_PLATFORM_CUDA
@@ -149,10 +150,12 @@ namespace SIByLEditor
 		Ref<SRenderPipeline::SPipe> Vignette = SRenderPipeline::SRPPipeVignette::Create();
 		Ref<SRenderPipeline::SPipe> Sharpen = SRenderPipeline::SRPPipeSharpen::Create();
 		Ref<SRenderPipeline::SPipe> SSAO = SRenderPipeline::SRPPipeSSAO::Create();
+		Ref<SRenderPipeline::SPipe> ShadowMap = SRenderPipeline::SRPPipeShadowMap::Create();
 		((SRenderPipeline::SRPPipeEarlyZ*)EarlyZ.get())->mCamera = camera;
 		Ref<SRenderPipeline::SPipe> ForwardLit = SRenderPipeline::SRPPipeForwardLit::Create();
 		((SRenderPipeline::SRPPipeForwardLit*)ForwardLit.get())->mCamera = camera;
 		
+		m_ScriptablePipeline->InsertPipe(ShadowMap, "ShadowMap");
 		m_ScriptablePipeline->InsertPipe(EarlyZ, "EarlyZ");
 		m_ScriptablePipeline->InsertPipe(ForwardLit, "ForwardLit");
 		m_ScriptablePipeline->InsertPipe(SSAO, "SSAO");

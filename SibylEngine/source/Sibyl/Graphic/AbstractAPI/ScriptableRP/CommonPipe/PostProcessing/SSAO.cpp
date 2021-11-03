@@ -36,7 +36,7 @@ namespace SIByL
 
 		void SRPPipeSSAO::Attach()
 		{
-			SSAOExtractInstance->SetFloat("uRadius", 0.01);
+			SSAOExtractInstance->SetFloat("uRadius", 0.05);
 			SSAOExtractInstance->SetRenderTarget2D("SSAOResult", m_FrameBuffer_SSAO[0], 0);
 
 			MedianBlurVInstance->SetFloat("u_radius", 1);

@@ -11,6 +11,7 @@ namespace SIByL
 		static void RemoveLight(LightComponent*);
 		static void SetFrameConstantsManager(FrameConstantsManager* m);
 		static void OnUpdate();
+		static std::vector<LightComponent*>& GetLights() { return Lights; }
 
 	private:
 		static std::vector<LightComponent*> Lights;

@@ -4,6 +4,8 @@
 #type VS
 #version 330 core
 
+#define DIRECTIONAL_LIGHTS_MAX 4
+
 // VData Inputs
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
@@ -25,6 +27,7 @@ out vec4 v_WSCurrPos;
 out vec4 v_currPos;
 out vec4 v_prevPos;
 out vec3 v_vNormal;
+out vec3 v_vLSPos[DIRECTIONAL_LIGHTS_MAX];
 // out vec3 v_normal;
 
 // Uniform Constants
@@ -40,6 +43,14 @@ uniform vec4 ZNearFar;
 
 
 uniform vec4 Color;
+
+struct DirectionalLight {
+    mat4 projview;
+    vec3 direction;
+    float intensity;
+    vec3 color;
+};  
+uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_MAX];
 
 
 void main()
@@ -63,6 +74,11 @@ void main()
     v_Color = aPos;
     v_TexCoord = aUV;
     v_vNormal = mat3(transpose(inverse(View * Model))) * normalize(aNormal);
+
+    for(int i =0; i<DIRECTIONAL_LIGHTS_MAX; i++)
+    {
+        v_vLSPos[i] = (directionalLights[i].projview * v_WSCurrPos).rgb;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -70,6 +86,8 @@ void main()
 //////////////////////////////////////////////////////////////////////
 #type FS
 #version 330 core
+
+#define DIRECTIONAL_LIGHTS_MAX 4
 
 struct StandardForwardV2F
 {
@@ -86,6 +104,7 @@ in vec4 v_WSCurrPos;
 in vec4 v_currPos;
 in vec4 v_prevPos;
 in vec3 v_vNormal;
+in vec3 v_vLSPos[DIRECTIONAL_LIGHTS_MAX];
 
 // in vec3 v_normal;
 
@@ -99,6 +118,7 @@ layout(location = 2) out vec4 Normal;
 uniform vec4 Color;
 uniform sampler2D u_Main;
 uniform sampler2D u_Normal;
+uniform sampler2D u_DirectionalShadowmap;
 
 // ==============================
 // Point Lights
@@ -109,11 +129,12 @@ uniform int DirectionalLightNum;
 uniform int PointLightNum;
 
 struct DirectionalLight {
+    mat4 projview;
     vec3 direction;
     float intensity;
     vec3 color;
 };  
-#define DIRECTIONAL_LIGHTS_MAX 4
+
 uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_MAX];
 
 // ==============================
@@ -128,6 +149,7 @@ struct PointLight {
 uniform PointLight pointLights[POINT_LIGHTS_MAX];
 
 struct Light {
+    mat4 projview;
     vec3 direction;
     float intensity;
     vec3 color;
@@ -138,6 +160,7 @@ Light[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX] PrepareLights()
     Light lights[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX];
     for(int i=0;i<DirectionalLightNum;i++)
     {
+        lights[i].projview=directionalLights[i].projview;
         lights[i].direction=directionalLights[i].direction;
         lights[i].intensity=directionalLights[i].intensity;
         lights[i].color=directionalLights[i].color;
@@ -204,6 +227,21 @@ vec3 specularLobe(const vec4 precomputeGGX, const vec3 normal, const vec3 eyeVec
     return (D * V * 3.141593) * F;
 }
 
+float decode24(const in vec3 x) {
+    const vec3 decode = 1.0 / vec3(1.0, 255.0, 65025.0);
+    return dot(x, decode);
+}
+
+float GetDepth(const in vec2 LSuv, const in vec2 uvoffset,const in vec2 pcfoffset)
+{
+    vec2 uvspaceUV = (LSuv + vec2(1)) * vec2(0.5, 0.5);
+    if(uvspaceUV.x > 1 || uvspaceUV.y > 1 || uvspaceUV.x < 0 || uvspaceUV.y < 0)
+        return 99999;
+    vec4 tmp = texture2D(u_DirectionalShadowmap, uvspaceUV * vec2(0.5) + uvoffset + pcfoffset);
+    if(tmp.a==0) return 99999;
+    else return decode24(tmp.rgb);
+}
+
 void computeLightLambertGGX(
 const in vec3 normal, const in vec3 eyeVector, const in float NoL, const in vec4 precomputeGGX, const in vec3 diffuse, const in vec3 specular, const in float attenuation, const in vec3 lightColor, const in vec3 eyeLightDir, const in float f90, out vec3 diffuseOut, out vec3 specularOut, out bool lighted) {
     lighted = NoL > 0.0;
@@ -240,16 +278,41 @@ void main()
     bool lighted;
 
     Light[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX] Lights = PrepareLights();
+    vec2 uvoffset[4];
+    uvoffset[0] = vec2(0,0);
+    uvoffset[1] = vec2(0.5,0);
+    uvoffset[2] = vec2(0,0.5);
+    uvoffset[3] = vec2(0.5,0.5);
     for(int i=0;i<DirectionalLightNum;i++)
     {
         float dotNL = dot(normal, -Lights[i].direction);
         if(dotNL<0) dotNL=0;
 
+        // Shadow
+        vec3 LSpos = v_vLSPos[i];
+
+        float actualDistance = LSpos.z;
+        float bias = max(0.05 * (1.0 - dotNL), 0.005);
+        float shadow = 0.0;
+        vec2 texelSize = 1.0 / vec2(1024);
+        for(int x = -1; x <= 1; ++x)
+        {
+            for(int y = -1; y <= 1; ++y)
+            {
+                float lightDistance = GetDepth(LSpos.xy, uvoffset[i], vec2(x, y) * texelSize);
+                lightDistance = lightDistance * 2 - 1;
+                shadow += actualDistance - bias > lightDistance ? 0.0 : 1.0;        
+            }    
+        }
+        shadow /= 9.0;
+
+        float shadowIntensity = shadow;
+
 
         computeLightLambertGGX(normal, eyeVector, dotNL, prepGGX, materialDiffuse.rgb, 
             materialSpecular, attenuation, Lights[i].color, -Lights[i].direction, 
             materialF90, lightDiffuse, lightSpecular, lighted);
-        FragColor.xyz += lightDiffuse + lightSpecular;
+        FragColor.xyz += shadowIntensity * (lightDiffuse + lightSpecular);
     }
 
     FragColor = EncodeRGBM(FragColor.xyz);

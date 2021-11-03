@@ -23,3 +23,7 @@ Textures:
     INFO:
       Name: u_IBLLUT
       ID: FILE=..\Assets\Resources\Textures\IBL_LUT.png
+  - TEXTURE: 4
+    INFO:
+      Name: u_DirectionalShadowmap
+      ID: DirectionalShadowmap0

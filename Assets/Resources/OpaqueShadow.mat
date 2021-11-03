@@ -1,0 +1,6 @@
+Material: Untitled
+Shader: Shaders/SIByL/ShadowOpaque
+Constants Buffer:
+  - {}
+Textures:
+  []

@@ -70,6 +70,7 @@ namespace SIByL
 		DX12FrameBuffer(const FrameBufferDesc& desc);
 
 		virtual void Bind() override;
+		virtual void CustomViewport(unsigned int xmin, unsigned int xmax, unsigned int ymin, unsigned int ymax) override;
 		virtual void Unbind() override;
 		virtual void ClearBuffer() override;
 		virtual unsigned int CountColorAttachment() override;

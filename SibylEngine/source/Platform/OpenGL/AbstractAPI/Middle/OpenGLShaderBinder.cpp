@@ -340,6 +340,7 @@ namespace SIByL
 	{
 		m_IsDirty = true;
 
+		if (texture == nullptr)return;
 		ShaderResourceItem item;
 		if (m_ShaderResourcesDesc.Mapper.FetchResource(name, item))
 		{

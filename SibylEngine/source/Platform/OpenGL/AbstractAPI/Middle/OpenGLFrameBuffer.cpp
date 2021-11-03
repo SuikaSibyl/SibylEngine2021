@@ -215,6 +215,11 @@ namespace SIByL
 		glViewport(0, 0, Width, Height);
 	}
 
+	void OpenGLFrameBuffer::CustomViewport(unsigned int xmin, unsigned int ymin, unsigned int xmax, unsigned int ymax)
+	{
+		glViewport(xmin, ymin, xmax, ymax);
+	}
+
 	void OpenGLFrameBuffer::Unbind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

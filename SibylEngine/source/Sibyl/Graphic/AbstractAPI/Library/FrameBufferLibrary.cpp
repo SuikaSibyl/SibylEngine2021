@@ -12,7 +12,7 @@ namespace SIByL
 		for (auto iter : frameBuffers)
 		{
 			auto& [x, y] = iter.second->GetScale();
-			iter.second->Resize(width * x, height * y);
+			if (x != -1 && y != -1)iter.second->Resize(width * x, height * y);
 		}
 	}
 

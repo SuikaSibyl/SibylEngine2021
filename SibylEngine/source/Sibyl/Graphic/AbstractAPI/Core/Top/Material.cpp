@@ -70,6 +70,12 @@ namespace SIByL
 		m_ResourcesBuffer->SetTexture2D(name, texture);
 		SetAssetDirty();
 	}
+	
+	void Material::SetTexture2D(const std::string& name, RenderTarget* texture)
+	{
+		m_ResourcesBuffer->SetTexture2D(name, texture);
+		SetAssetDirty();
+	}
 
 	void Material::SetTextureCubemap(const std::string& name, Ref<TextureCubemap> texture)
 	{

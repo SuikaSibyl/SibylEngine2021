@@ -13,6 +13,8 @@ namespace SIByL
 
 		RegisterEarlyZOpaque();
 		RegisterEarlyZDither();
+		RegisterShadowOpaque();
+		RegisterShadowDither();
 
 		RegisterACES();
 
@@ -82,6 +84,7 @@ namespace SIByL
 			{
 				{ShaderResourceType::Texture2D, "u_Main"},
 				{ShaderResourceType::Texture2D, "u_Normal"},
+				{ShaderResourceType::Texture2D, "u_DirectionalShadowmap"},
 			},
 		};
 
@@ -116,6 +119,7 @@ namespace SIByL
 				{ShaderResourceType::Texture2D, "u_Normal"},
 				{ShaderResourceType::Texture2D, "u_DiffuseAO"},
 				{ShaderResourceType::Texture2D, "u_IBLLUT"},
+				{ShaderResourceType::Texture2D, "u_DirectionalShadowmap"},
 			},
 			{
 				{ShaderResourceType::Cubemap, "u_SpecularCube"},
@@ -182,6 +186,66 @@ namespace SIByL
 		};
 
 		Shader::Create("Shaders/SIByL/EarlyZDither",
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 1 }),
+			ShaderBinderDesc(CBlayouts, SRlayouts));
+
+	}
+	
+	void ShaderRegister::RegisterShadowOpaque()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			// ConstantBuffer0 : Per Object
+			ConstantBufferLayout::PerObjectConstants,
+			// ConstantBuffer1 : Per Material
+			{
+
+			},
+			// ConstantBuffer2 : Per Camera
+			ConstantBufferLayout::PerCameraConstants,
+			// ConstantBuffer3 : Per Frame
+			ConstantBufferLayout::PerFrameConstants,
+		};
+
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+			},
+		};
+
+		Shader::Create("Shaders/SIByL/ShadowOpaque",
+			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 1 }),
+			ShaderBinderDesc(CBlayouts, SRlayouts));
+	}
+
+	void ShaderRegister::RegisterShadowDither()
+	{
+		std::vector<ConstantBufferLayout> CBlayouts =
+		{
+			// ConstantBuffer0 : Per Object
+			ConstantBufferLayout::PerObjectConstants,
+			// ConstantBuffer1 : Per Material
+			{
+
+			},
+			// ConstantBuffer2 : Per Camera
+			ConstantBufferLayout::PerCameraConstants,
+			// ConstantBuffer3 : Per Frame
+			ConstantBufferLayout::PerFrameConstants,
+		};
+
+
+		std::vector<ShaderResourceLayout> SRlayouts =
+		{
+			// ShaderResourceTable 1
+			{
+				{ShaderResourceType::Texture2D, "u_Main"},
+			},
+		};
+
+		Shader::Create("Shaders/SIByL/ShadowDither",
 			ShaderDesc({ true,SIByL::VertexBufferLayout::StandardVertexBufferLayout, 1 }),
 			ShaderBinderDesc(CBlayouts, SRlayouts));
 

@@ -54,7 +54,23 @@ namespace SIByL
 			RecalculateViewMatrix(); 
 		}
 
-		virtual void Dither(double x, double y) {}
+		void SetDirection(const glm::vec3& front) {
+			m_Front = front;
+			m_Front = glm::normalize(m_Front);
+			m_Right = glm::normalize(glm::cross(m_WorldUp, m_Front));
+			m_Up = glm::normalize(glm::cross(m_Front, m_Right));
+			RecalculateViewMatrix();
+		}
+
+		virtual void Dither(double x, double y)
+		{
+			m_ProjectionDither = m_Projection;
+			m_ProjectionDither[2][0] += (x * 2 - 1) / m_Width;
+			m_ProjectionDither[2][1] += (y * 2 - 1) / m_Height;
+			HaltonX = (x * 2 - 1);
+			HaltonY = (y * 2 - 1);
+			UpdateProjectionDitherConstant();
+		}
 		virtual void RecalculateProjectionMatrix() = 0;
 		void Resize(float width, float height)
 		{
@@ -116,6 +132,7 @@ namespace SIByL
 		void UpdateProjectionDitherConstant();
 		void UpdatePreviousViewProjectionConstant();
 		void UpdateViewConstant();
+		virtual void UpdateZNearFar() = 0;
 		virtual glm::mat4 GetPreciseProjectionMatrix() = 0;
 		Ref<ShaderConstantsBuffer> m_ConstantsBuffer = nullptr;
 
@@ -132,18 +149,22 @@ namespace SIByL
 			m_Height = height;
 			RecalculateProjectionMatrix();
 		}
+		virtual void UpdateZNearFar() override;
 
 	protected:
 		virtual glm::mat4 GetPreciseProjectionMatrix() override
 		{
-			return glm::orthoLH_NO(-1.0f, 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
+			return glm::orthoLH_NO(-Width, Width, -Width, Width, -100.0f, 100.0f);
 		}
+
 		virtual void RecalculateProjectionMatrix() override
 		{
-			m_Projection = glm::orthoLH_NO(-1.0f, 1.0f, -1.0f, 1.0f, -100.0f, 100.0f);
+			m_Projection = glm::orthoLH_NO(-Width, Width, -Width, Width, -Width, Width);
 			UpdateProjectionConstant();
 			m_ProjectionView = m_Projection * m_View;
 		}
+
+		float Width = 2;
 	};
 
 	class PerspectiveCamera :public Camera
@@ -163,20 +184,10 @@ namespace SIByL
 			m_Projection = glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
 			UpdateProjectionConstant();
 		}
-
+		virtual void UpdateZNearFar() override;
 		virtual glm::mat4 GetPreciseProjectionMatrix() override
 		{
 			return glm::perspectiveLH_NO(glm::radians(m_FoV), m_Width / m_Height, 0.001f, 100.0f);
-		}
-
-		virtual void Dither(double x, double y) override 
-		{
-			m_ProjectionDither = m_Projection;
-			m_ProjectionDither[2][0] += (x * 2 - 1) / m_Width;
-			m_ProjectionDither[2][1] += (y * 2 - 1) / m_Height;
-			HaltonX = (x * 2 - 1);
-			HaltonY = (y * 2 - 1);
-			UpdateProjectionDitherConstant();
 		}
 
 	private:

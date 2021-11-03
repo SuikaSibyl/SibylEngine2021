@@ -268,6 +268,28 @@ namespace SIByL
 		delete[] targets;
 	}
 
+	void DX12FrameBuffer::CustomViewport(unsigned int xmin, unsigned int xmax, unsigned int ymin, unsigned int ymax)
+	{	
+		// Set Viewport
+		viewPort.TopLeftX = xmin;
+		viewPort.TopLeftY = ymin;
+		viewPort.Width = (float)xmax;
+		viewPort.Height = (float)ymax;
+		viewPort.MaxDepth = 1.0f;
+		viewPort.MinDepth = 0.0f;
+
+		// Set Scissor Rect
+		scissorRect.left = xmin;
+		scissorRect.top = ymin;
+		scissorRect.right = xmax;
+		scissorRect.bottom = ymax;
+
+		Ref<DX12CommandList> cmdList = DX12Context::GetInFlightSCmdList();
+
+		cmdList->GetGraphicsCommandList()->RSSetViewports(1, &viewPort);
+		cmdList->GetGraphicsCommandList()->RSSetScissorRects(1, &scissorRect);
+	}
+
 	void DX12FrameBuffer::Unbind()
 	{
 		SwapChain* swapChain = DX12Context::GetSwapChain();

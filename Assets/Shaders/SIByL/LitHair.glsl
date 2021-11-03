@@ -10,6 +10,7 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec4 aTangent;
 layout (location = 3) in vec2 aUV;
 
+#define DIRECTIONAL_LIGHTS_MAX 4
 struct StandardForwardV2F
 {
     vec3 tspace0;
@@ -25,6 +26,7 @@ out vec4 v_WSCurrPos;
 out vec4 v_currPos;
 out vec4 v_prevPos;
 out vec3 v_vNormal;
+out vec3 v_vLSPos[DIRECTIONAL_LIGHTS_MAX];
 
 // out vec3 v_normal;
 
@@ -37,6 +39,14 @@ uniform mat4 ProjectionDither;
 uniform mat4 PreviousPV;
 uniform mat4 CurrentPV;
 uniform vec4 ViewPos;
+
+struct DirectionalLight {
+    mat4 projview;
+    vec3 direction;
+    float intensity;
+    vec3 color;
+};  
+uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_MAX];
 
 
 uniform vec4 Color;
@@ -61,6 +71,12 @@ void main()
     v_currPos = CurrentPV * v_WSCurrPos;
     v_Color = aPos;
     v_TexCoord = aUV;
+
+    for(int i =0; i<DIRECTIONAL_LIGHTS_MAX; i++)
+    {
+        v_vLSPos[i] = (directionalLights[i].projview * v_WSCurrPos).rgb;
+    }
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -69,6 +85,7 @@ void main()
 #type FS
 #version 330 core
 
+#define DIRECTIONAL_LIGHTS_MAX 4
 struct StandardForwardV2F
 {
     vec3 tspace0;
@@ -84,6 +101,7 @@ in vec4 v_WSCurrPos;
 in vec4 v_currPos;
 in vec4 v_prevPos;
 in vec3 v_vNormal;
+in vec3 v_vLSPos[DIRECTIONAL_LIGHTS_MAX];
 
 // in vec3 v_normal;
 
@@ -98,9 +116,9 @@ uniform sampler2D u_Main;
 uniform sampler2D u_Normal;
 uniform sampler2D u_DiffuseAO;
 uniform sampler2D u_IBLLUT;
+uniform sampler2D u_DirectionalShadowmap;
 
 uniform samplerCube u_SpecularCube;
-
 // ==============================
 // Point Lights
 // ==============================
@@ -112,11 +130,11 @@ uniform int PointLightNum;
 uniform vec4 ZNearFar;
 
 struct DirectionalLight {
+    mat4 projview;
     vec3 direction;
     float intensity;
     vec3 color;
 };  
-#define DIRECTIONAL_LIGHTS_MAX 4
 uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_MAX];
 
 // ==============================
@@ -131,6 +149,7 @@ struct PointLight {
 uniform PointLight pointLights[POINT_LIGHTS_MAX];
 
 struct Light {
+    mat4 projview;
     vec3 direction;
     float intensity;
     vec3 color;
@@ -141,6 +160,7 @@ Light[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX] PrepareLights()
     Light lights[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX];
     for(int i=0;i<DirectionalLightNum;i++)
     {
+        lights[i].projview=directionalLights[i].projview;
         lights[i].direction=directionalLights[i].direction;
         lights[i].intensity=directionalLights[i].intensity;
         lights[i].color=directionalLights[i].color;
@@ -389,6 +409,21 @@ vec3 sRGBToLinear(const in vec3 color) {
     return vec3( color.r < 0.04045 ? color.r * (1.0 / 12.92) : pow((color.r + 0.055) * (1.0 / 1.055), 2.4), color.g < 0.04045 ? color.g * (1.0 / 12.92) : pow((color.g + 0.055) * (1.0 / 1.055), 2.4), color.b < 0.04045 ? color.b * (1.0 / 12.92) : pow((color.b + 0.055) * (1.0 / 1.055), 2.4));
 }
 
+float decode24(const in vec3 x) {
+    const vec3 decode = 1.0 / vec3(1.0, 255.0, 65025.0);
+    return dot(x, decode);
+}
+
+float GetDepth(const in vec2 LSuv, const in vec2 uvoffset,const in vec2 pcfoffset)
+{
+    vec2 uvspaceUV = (LSuv + vec2(1)) * vec2(0.5, 0.5);
+    if(uvspaceUV.x > 1 || uvspaceUV.y > 1 || uvspaceUV.x < 0 || uvspaceUV.y < 0)
+        return 99999;
+    vec4 tmp = texture2D(u_DirectionalShadowmap, uvspaceUV * vec2(0.5) + uvoffset + pcfoffset);
+    if(tmp.a==0) return 99999;
+    else return decode24(tmp.rgb);
+}
+
 void main()
 {
     FragColor = vec4(0,0,0,1);
@@ -435,20 +470,48 @@ void main()
     specular *= aoSpec;
     // specular = ssr(specular, materialSpecular * aoSpec, materialRoughness, bentAnisotropicNormal, eyeVector);
 
+    vec2 uvoffset[4];
+    uvoffset[0] = vec2(0,0);
+    uvoffset[1] = vec2(0.5,0);
+    uvoffset[2] = vec2(0,0.5);
+    uvoffset[3] = vec2(0.5,0.5);
     Light[DIRECTIONAL_LIGHTS_MAX+POINT_LIGHTS_MAX] Lights = PrepareLights();
     for(int i=0;i<DirectionalLightNum;i++)
     {
         float dotNL = dot(normal, -Lights[i].direction);
         if(dotNL<0) dotNL=0;
 
+        
+        // Shadow
+        vec3 LSpos = v_vLSPos[i];
+
+        float actualDistance = LSpos.z;
+        float bias = max(0.05 * (1.0 - dotNL), 0.005);
+        float shadow = 0.0;
+        float shadowDistance = 0.0;
+        vec2 texelSize = 1.0 / vec2(1024);
+        for(int x = -1; x <= 1; ++x)
+        {
+            for(int y = -1; y <= 1; ++y)
+            {
+                float lightDistance = GetDepth(LSpos.xy, uvoffset[i], vec2(x, y) * texelSize);
+                lightDistance = lightDistance * 2 - 1;
+                shadow += actualDistance - bias > lightDistance ? 0.0 : 1.0;      
+                if(actualDistance - bias > lightDistance) shadowDistance += actualDistance - bias - lightDistance;
+            }    
+        }
+        shadow /= 9.0;
+        shadowDistance /= 9/0;
+        float shadowIntensity = shadow;
+
         computeLightLambertGGXAnisotropy(normal, eyeVector, dotNL, prepGGX, DiffuseAO.rgb, 
             materialSpecular, attenuation, Lights[i].color, -Lights[i].direction, 
             materialF90, anisotropicT, anisotropicB, anisotropy, lightDiffuse, lightSpecular, lighted);
 
-        // diffuse += computeLightSSS(dotNL, attenuation, 0, vec3(1, 0.4120, 0.0465), 1, shadowDistance, DiffuseAO.rgb, Lights[i].color);
+        diffuse += lightDiffuse * shadowIntensity;
+        specular += lightSpecular * shadowIntensity;
+        diffuse += 0.1 * computeLightSSS(dotNL, attenuation, 0, vec3(1, 0.4120, 0.0465), 1, shadowDistance, DiffuseAO.rgb, Lights[i].color);
 
-        diffuse += lightDiffuse;
-        specular += lightSpecular;
     }
 
     FragColor.xyz = diffuse + specular;

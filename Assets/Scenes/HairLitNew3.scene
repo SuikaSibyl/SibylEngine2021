@@ -2,83 +2,11 @@ Scene: Untitled
 Entities:
   - Entity: 124531623461
     TagComponent:
-      Tag: Light2
-    TransformComponent:
-      Translation: [0, 0, 0]
-      EulerAngles: [-3.1415925, -0.930639386, -3.14159226]
-      Scale: [0.999999583, 1, 0.999999583]
-  - Entity: 124531623461
-    TagComponent:
-      Tag: Light1
-    TransformComponent:
-      Translation: [0, 0, 0]
-      EulerAngles: [0.928651571, 0.837351203, 0.465506315]
-      Scale: [0.999999881, 1.00000012, 1]
-    LightComponent:
-      Type: 1
-      Position: [0, 0, 0]
-      Direction: [0.75704062, -0.515889883, 0.400933027]
-      Color: [1, 0.999989986, 0.999989986]
-      Intensity: 1
-  - Entity: 124531623461
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Translation: [0.0732304603, -0.375707924, 0.048092857]
-      EulerAngles: [0, 0, 0]
-      Scale: [0.000129283027, 0.000129283027, 0.000129283027]
-    MeshFilterComponent:
-      Mesh: Resources\Meshes\hair_frozen.fbx
-    MeshRendererComponent:
-      SubmeshNum: 3
-      Passes:
-        - Pass: ForwardLit
-          Materials:
-            - Material: 0
-              INFO:
-                Path: Resources\StandardLit.mat
-            - Material: 1
-              INFO:
-                Path: Resources\Hair\LitHair.mat
-            - Material: 2
-              INFO:
-                Path: Resources\Hair\LitHair.mat
-        - Pass: EarlyZ
-          Materials:
-            - Material: 0
-              INFO:
-                Path: Resources\OpaqueEarlyZ.mat
-            - Material: 1
-              INFO:
-                Path: Resources\Hair\EarlyZDither.mat
-            - Material: 2
-              INFO:
-                Path: Resources\Hair\EarlyZDither.mat
-        - Pass: ShadowMap
-          Materials:
-            - Material: 0
-              INFO:
-                Path: Resources\OpaqueShadow.mat
-            - Material: 1
-              INFO:
-                Path: Resources\Hair\HairShadow.mat
-            - Material: 2
-              INFO:
-                Path: Resources\Hair\HairShadow.mat
-  - Entity: 124531623461
-    TagComponent:
       Tag: Empty Entity
     TransformComponent:
       Translation: [0, 0, 0]
       EulerAngles: [0, 0, 0]
       Scale: [1, 1, 1]
-  - Entity: 124531623461
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Translation: [0, 0, 0]
-      EulerAngles: [0, 0, 0]
-      Scale: [1.97829127, 1.97829127, 1.97829127]
     MeshFilterComponent:
       Mesh: Resources\Meshes\plane.fbx
     MeshRendererComponent:
@@ -99,3 +27,74 @@ Entities:
             - Material: 0
               INFO:
                 Path: Resources\OpaqueShadow.mat
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [0.0435756519, -0.273278117, 0.00033774972]
+      EulerAngles: [0, 0, 0]
+      Scale: [8.75999976e-05, 8.75999976e-05, 8.75999976e-05]
+    MeshFilterComponent:
+      Mesh: Resources\Meshes\hair_frozen.fbx
+    MeshRendererComponent:
+      SubmeshNum: 3
+      Passes:
+        - Pass: ForwardLit
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\BlackUnlit.mat
+            - Material: 1
+              INFO:
+                Path: Resources\Hair\LitHair.mat
+            - Material: 2
+              INFO:
+                Path: Resources\Hair\LitHair.mat
+        - Pass: EarlyZ
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueEarlyZ.mat
+            - Material: 1
+              INFO:
+                Path: Resources\Hair\EarlyZDither.mat
+            - Material: 2
+              INFO:
+                Path: Resources\Hair\EarlyZDither.mat
+        - Pass: ShadowMap
+          Materials:
+            - Material: 0
+              INFO:
+                Path: Resources\OpaqueShadow.mat
+            - Material: 1
+              INFO:
+                Path: Resources\Hair\HairShadow.mat
+            - Material: 2
+              INFO:
+                Path: Resources\Hair\HairShadow.mat
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Light1
+    TransformComponent:
+      Translation: [0, 0, 0]
+      EulerAngles: [0.928651571, 0.837351203, 0.465506315]
+      Scale: [0.999999881, 1.00000012, 1]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [0.75704062, -0.515889883, 0.400933027]
+      Color: [1, 0.999989986, 0.999989986]
+      Intensity: 1
+  - Entity: 124531623461
+    TagComponent:
+      Tag: Light2
+    TransformComponent:
+      Translation: [-9.59485078e-08, 0.187945202, -1.69513363e-08]
+      EulerAngles: [0.477469027, -0.54181987, 0.041607257]
+      Scale: [0.999999821, 1, 1.00000024]
+    LightComponent:
+      Type: 1
+      Position: [0, 0, 0]
+      Direction: [-0.438510269, -0.478186548, 0.760950983]
+      Color: [0.453690529, 0.453693748, 0.453695059]
+      Intensity: 1

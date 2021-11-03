@@ -1,0 +1,9 @@
+Material: Untitled
+Shader: Shaders/SIByL/ShadowDither
+Constants Buffer:
+  - {}
+Textures:
+  - TEXTURE: 0
+    INFO:
+      Name: u_Main
+      ID: FILE=..\Assets\Resources\Hair\spec_opacity.png
