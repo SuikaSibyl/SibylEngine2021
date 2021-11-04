@@ -17,8 +17,8 @@ Thanks for his great tutorials, which really taught me to learn a lot.*
 
 **Recent Plans**
 
-- [ ] Post Process Pipe: SSAO
-- [ ] Shadow System ( directed )
+- [x] Post Process Pipe: SSAO
+- [x] Shadow System ( directed )
 - [ ] SSR
 
 **Future Plans**
