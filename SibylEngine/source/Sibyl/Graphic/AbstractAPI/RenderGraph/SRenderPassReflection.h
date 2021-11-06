@@ -27,7 +27,7 @@
  **************************************************************************/
 #pragma once
 
-#include "Sibyl/Graphic/AbstractAPI/Resource/Texture.h"
+//#include "Sibyl/Graphic/AbstractAPI/Resource/Texture.h"
 
 namespace SIByL
 {
