@@ -14,18 +14,20 @@ Thanks for his great tutorials, which really taught me to learn a lot.*
 
 
 ## Plans
+**Recent Update**
+- [x] Post Process Pipe: SSAO
+- [x] Shadow System ( directed )
 
 **Recent Plans**
 
-- [x] Post Process Pipe: SSAO
-- [x] Shadow System ( directed )
 - [ ] SSR
+- [ ] SPIRV Support
 
 **Future Plans**
 
 - [ ] CUDA Path Tracer
 - [ ] PBR probe system
-- [ ] Some GI system...
+- [ ] Other GI system...
 
 
 
