@@ -13,14 +13,14 @@ layout(std430, binding=0) buffer Input
 layout(binding = 0) uniform sampler2D u_Texture;
 
 vec4 fxaa(vec2 uv) {
-    vec2 fxaaQualityRcpFrame = vec2(1.0) / gl_NumWorkGroups.xy;
+    vec2 fxaaQualityRcpFrame = vec2(1.0) / OutputSize.xy;
     float fxaaQualitySubpix = 0.75;
     float fxaaQualityEdgeThreshold = 0.125;
     float fxaaQualityEdgeThresholdMin = 0.0625;
 
     vec2 posM = uv;
-    vec2 maxCoord = vec2(1.0) - vec2(1.0) / gl_NumWorkGroups.xy;
-    vec2 minCoord = vec2(1.0) / gl_NumWorkGroups.xy;
+    vec2 maxCoord = vec2(1.0) - vec2(1.0) / OutputSize.xy;
+    vec2 minCoord = vec2(1.0) / OutputSize.xy;
 
     vec4 rgbyM = (texture(u_Texture, posM));
     float lumaM = rgbyM.y;

@@ -68,7 +68,7 @@ namespace SIByL
 
 		void SRPPipeBloom::Attach()
 		{
-			BloomExtractInstance->SetFloat("uBloomThreshold", 2);
+			BloomExtractInstance->SetFloat("uBloomThreshold", 1);
 			BloomExtractInstance->SetRenderTarget2D("ExtractResult", m_FrameBuffer_Bloom[0], 0);
 
 			BlurLevel0InstanceV->SetFloat2("uBlurDir", { 0,1 });

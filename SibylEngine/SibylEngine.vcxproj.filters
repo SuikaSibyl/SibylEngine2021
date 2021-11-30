@@ -405,9 +405,6 @@
     <ClCompile Include="source\Sibyl\Basic\Utils\InternalDirectory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPassReflection.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\ResourceView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -1827,9 +1824,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Basic\Utils\InternalDirectory.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPassReflection.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Resource\ResourceView.h">

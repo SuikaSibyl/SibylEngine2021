@@ -181,7 +181,6 @@ namespace SIByLEditor
 		// Vignette input
 		m_ScriptablePipeline->AttachPipes("TAA", "Output", "Vignette", "Input");
 		//m_ScriptablePipeline->AttachPipes("TAA", "Output", "FXAA", "Input");
-		//m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "Sharpen", "Depth");
 		//m_ScriptablePipeline->AttachPipes("FXAA", "Output", "Sharpen", "Input");
 
 		s_ViewportPanels.SetFrameBuffer(Library<FrameBuffer>::Fetch("Vignette"));
@@ -202,7 +201,7 @@ namespace SIByLEditor
 
 		static unsigned int HaltonIndex = 0;
 		auto [x, y] = Halton::Halton23(HaltonIndex++);
-		camera->Dither(x, y);
+		camera->Dither(x * 0.9, y * 0.9);
 
 		if (s_ViewportPanels.IsViewportFocusd())
 			viewCameraController->OnUpdate();

@@ -269,7 +269,6 @@
     <ClCompile Include="source\Sibyl\ECS\Scene\DrawItemPool.cpp" />
     <ClCompile Include="source\Sibyl\ECS\Scene\SceneSerializer.cpp" />
     <ClCompile Include="source\Sibyl\ECS\UniqueID\UniqueID.cpp" />
-    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPassReflection.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\Buffer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\Resource.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Resource\ResourceView.cpp" />
@@ -444,7 +443,6 @@
     <ClInclude Include="source\Sibyl\ECS\Scene\DrawItemPool.h" />
     <ClInclude Include="source\Sibyl\ECS\Scene\SceneSerializer.h" />
     <ClInclude Include="source\Sibyl\ECS\UniqueID\UniqueID.h" />
-    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\RenderGraph\SRenderPassReflection.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Resource\Buffer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Bottom\CommandList.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Resource\Resource.h" />

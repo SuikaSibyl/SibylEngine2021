@@ -1,5 +1,6 @@
 #include "SIByLpch.h"
 #include "Resource.h"
+
 namespace SIByL
 {
 	namespace SGraphic
