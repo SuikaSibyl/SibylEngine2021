@@ -108,17 +108,6 @@ namespace SIByL
                 temps[i].radius = rnd(30.0f) + 20;
             }
 
-            //  cudaMemcpy(s, temps, sizeof(Sphere)*SPHERES, cudaMemcpyHostToDevice);  
-            //cudaMemcpyToSymbol(s, temps, sizeof(Sphere) * SPHERES);
-            //free(temps);
-        }
-
-        for (int i = 0; i < SPHERES; i++)
-        {
-            velocities[i] -= 9.8 * deltaTime;
-            velocities[i] *= 0.999999;
-            temps[i].y += velocities[i];
-            if (temps[i].y < -300) velocities[i] = -velocities[i];
         }
 
         cudaEvent_t start, stop;

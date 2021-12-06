@@ -281,6 +281,7 @@
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Graphic.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\EarlyZ.cpp" />
+    <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\PathTracer.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\ShadowMap.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\ACES.cpp" />
     <ClCompile Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\ForwardLit.cpp" />
@@ -458,6 +459,7 @@
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\Core\Top\Mesh.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommandBuffer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\EarlyZ.h" />
+    <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\PathTracer.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\ShadowMap.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\PostProcessing\ACES.h" />
     <ClInclude Include="source\Sibyl\Graphic\AbstractAPI\ScriptableRP\CommonPipe\Forward\ForwardLit.h" />

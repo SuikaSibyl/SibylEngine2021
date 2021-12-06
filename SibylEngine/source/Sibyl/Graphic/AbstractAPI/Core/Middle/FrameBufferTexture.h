@@ -2,6 +2,8 @@
 
 #include "Sibyl/Graphic/AbstractAPI/Core/Middle/Texture.h"
 
+#include "CudaModule/source/GraphicInterop/TextureInterface.h"
+
 namespace SIByL
 {
 	/////////////////////////////////////////////////////////////
@@ -62,8 +64,17 @@ namespace SIByL
 	public:
 		const std::string& GetIdentifier() { return Identifier; }
 		void SetIdentifier(const std::string& id) { Identifier = id; }
+
+	public:
+		PtrCudaSurface* GetCudaSurface() { return ptrCudaSurface.get(); }
+		virtual void InvalidCudaSurface() {}
+
 	private:
 		std::string Identifier;
+
+	protected:
+		Scope<PtrCudaSurface> ptrCudaSurface;
+
 	};
 
 	/////////////////////////////////////////////////////////////

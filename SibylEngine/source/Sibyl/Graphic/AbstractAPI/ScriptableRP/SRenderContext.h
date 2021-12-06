@@ -24,6 +24,8 @@ namespace SIByL
 			static void SetActiveCamera(Ref<Camera> ca) { ActiveCamera = ca; }
 			static Ref<Camera> GetCamera() { return ActiveCamera; }
 
+			static float GetDelta();
+
 		private:
 			static unsigned int ScreenWidth, ScreenHeight;
 			static Ref<Scene> ActiveScene;

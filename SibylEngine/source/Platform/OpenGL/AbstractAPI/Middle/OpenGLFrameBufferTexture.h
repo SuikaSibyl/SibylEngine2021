@@ -20,6 +20,8 @@ namespace SIByL
 		void SetComputeRenderTarget(unsigned int i, unsigned int miplevel = 0);
 		void SetShaderResource(unsigned int i);
 
+		virtual void InvalidCudaSurface();
+
 	private:
 		unsigned int GLType = 0;
 		unsigned int m_TextureObject = 0;

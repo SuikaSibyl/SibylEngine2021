@@ -36,6 +36,7 @@
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ForwardLit.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/ShadowMap.h"
 #include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/EarlyZ.h"
+#include "Sibyl/Graphic/AbstractAPI/ScriptableRP/CommonPipe/Forward/PathTracer.h"
 
 #ifdef SIBYL_PLATFORM_CUDA
 #include <CudaModule/source/CudaModule.h>
@@ -153,8 +154,11 @@ namespace SIByLEditor
 		Ref<SRenderPipeline::SPipe> ShadowMap = SRenderPipeline::SRPPipeShadowMap::Create();
 		((SRenderPipeline::SRPPipeEarlyZ*)EarlyZ.get())->mCamera = camera;
 		Ref<SRenderPipeline::SPipe> ForwardLit = SRenderPipeline::SRPPipeForwardLit::Create();
+		Ref<SRenderPipeline::SPipe> PathTracer = SRenderPipeline::SRPPipePathTracer::Create();
 		((SRenderPipeline::SRPPipeForwardLit*)ForwardLit.get())->mCamera = camera;
-		
+		((SRenderPipeline::SRPPipeForwardLit*)PathTracer.get())->mCamera = camera;
+
+		m_ScriptablePipeline->InsertPipe(PathTracer, "PathTracer");
 		m_ScriptablePipeline->InsertPipe(ShadowMap, "ShadowMap");
 		m_ScriptablePipeline->InsertPipe(EarlyZ, "EarlyZ");
 		m_ScriptablePipeline->InsertPipe(ForwardLit, "ForwardLit");

@@ -4,6 +4,9 @@
 #include "Platform/OpenGL/Common/OpenGLContext.h"
 #include "Platform/OpenGL/AbstractAPI/Middle/OpenGLTexture.h"
 
+#include "CudaModule/source/GraphicInterop/TextureInterface.h"
+#include "CudaModule/source/RayTracer/RayTracerInterface.h"
+
 namespace SIByL
 {
 	// ==========================================================
@@ -62,6 +65,11 @@ namespace SIByL
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		if (ptrCudaSurface)
+		{
+			InvalidCudaSurface();
+		}
 	}
 
 	void OpenGLRenderTarget::DeleteObject()
@@ -84,6 +92,15 @@ namespace SIByL
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, m_TextureObject);
+	}
+
+
+	void OpenGLRenderTarget::InvalidCudaSurface()
+	{
+#ifdef SIBYL_PLATFORM_CUDA
+		if (!ptrCudaSurface) ptrCudaSurface = CreateScope<PtrCudaSurface>();
+		ptrCudaSurface->RegisterByOpenGLTexture(m_TextureObject, Descriptor.Width, Descriptor.Height);
+#endif // SIBYL_PLATFORM_CUDA
 	}
 
 	// ==========================================================
