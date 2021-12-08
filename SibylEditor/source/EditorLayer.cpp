@@ -392,7 +392,7 @@ namespace SIByLEditor
 		s_SceneHierarchyPanel.OnImGuiRender();
 		s_ContentBrowserPanel.OnImGuiRender();
 		s_InspectorPanel.OnImGuiRender();
-
+		
 		ImGui::End();
 
 		ImGui::Begin("Post Processing");

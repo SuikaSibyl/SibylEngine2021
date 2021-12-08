@@ -155,10 +155,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\ShaderModule.hpp" />
+    <ClInclude Include="include\ShaderModule.h" />
+    <ClInclude Include="source\ShaderLoader.h" />
+    <ClInclude Include="source\SlangMachine.h" />
     <ClInclude Include="source\SShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\ShaderLoader.cpp" />
+    <ClCompile Include="source\SlangMachine.cpp" />
     <ClCompile Include="source\SShader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

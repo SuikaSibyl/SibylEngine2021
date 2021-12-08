@@ -2,11 +2,9 @@
 
 namespace SIByL
 {
-	inline namespace ShaderModule
+	class SShader
 	{
-		class SShader
-		{
-
-		};
-	}
+	public:
+		static void TestModule();
+	};
 }

@@ -1,11 +1,12 @@
 #include "SShader.h"
 
-#include <slang.h>
+#include "SlangMachine.h"
 
 namespace SIByL
 {
-	inline namespace ShaderModule
+	void SShader::TestModule()
 	{
-
+		ShaderModule::SlangMachine machine;
+		machine.CreateSession();
 	}
 }

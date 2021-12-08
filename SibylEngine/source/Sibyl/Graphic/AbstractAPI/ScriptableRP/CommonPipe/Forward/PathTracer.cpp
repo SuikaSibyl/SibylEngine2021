@@ -11,7 +11,6 @@
 #include "Sibyl/ECS/Scene/Scene.h"
 #include "Sibyl/Graphic/AbstractAPI/Core/Top/FrameConstantsManager.h"
 
-
 #include "CudaModule/source/RayTracer/RayTracerInterface.h"
 
 namespace SIByL
