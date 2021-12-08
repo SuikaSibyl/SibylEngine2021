@@ -18,7 +18,7 @@ namespace SIByL
 			sessionDesc.targets = &targetDesc;
 			sessionDesc.targetCount = 1;
 
-			const char* searchPaths[] = { "G:/slang/examples/hello-world/" };
+			const char* searchPaths[] = { "../Assets/Shaders/" };
 			sessionDesc.searchPaths = searchPaths;
 			sessionDesc.searchPathCount = 1;
 
@@ -26,7 +26,7 @@ namespace SIByL
 
 			slang::IModule* slangModule = nullptr;
 			ComPtr<slang::IBlob> diagnostics;
-			slangModule = mSession->loadModule("hello-world", diagnostics.writeRef());
+			slangModule = mSession->loadModule("SIByL/hello-world", diagnostics.writeRef());
 			if (diagnostics)
 			{
 				fprintf(stderr, "%s\n", (const char*)diagnostics->getBufferPointer());

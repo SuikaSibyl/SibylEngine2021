@@ -1,7 +1,7 @@
 #pragma once
 
-#include <slang.h>
-#include <slang-com-ptr.h>
+#include "../vendor/slang/include/slang.h"
+#include "../vendor/slang/include/slang-com-ptr.h"
 
 namespace SIByL
 {

@@ -65,11 +65,12 @@
 
 //#include <Core/module.h>
 #include <FileModule/module.h>
-#include <ShaderModule/include/ShaderModule.h>
+#include <ShaderModule/module.h>
 
 int main()
 {
 	SIByL::File::ModuleTest::Test();
+	SIByL::SShader::TestModule();
 	//S_CORE_INFO(SIByL::SShader::TestModule();
 }
 	

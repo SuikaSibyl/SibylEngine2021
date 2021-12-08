@@ -35,6 +35,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NetworkModule", "Modules\NetworkModule\NetworkModule.vcxproj", "{94B4963D-A20D-4251-B0EB-6D2320E08600}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderModule", "Modules\ShaderModule\ShaderModule.vcxproj", "{3AC3C7C4-FCDB-41F5-88D6-72C5626F6DB4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A88A7E71-99FE-429C-B8A9-8B86C4F93A6C} = {A88A7E71-99FE-429C-B8A9-8B86C4F93A6C}
+		{E50A4BF8-6456-4975-ACB6-AA2DE7335D84} = {E50A4BF8-6456-4975-ACB6-AA2DE7335D84}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileModule", "Modules\FileModule\FileModule.vcxproj", "{A88A7E71-99FE-429C-B8A9-8B86C4F93A6C}"
 EndProject

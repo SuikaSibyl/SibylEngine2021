@@ -86,17 +86,17 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules\$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\Modules\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)vendor/slang/libs;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)vendor/slang/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Modules/ShaderModule/vendor/slang/libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules\$(ProjectName)\</OutDir>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules</OutDir>
     <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\Modules\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)vendor/slang/libs;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)vendor/slang/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Modules/ShaderModule/vendor/slang/libs;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,6 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,7 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\ShaderModule.h" />
+    <ClInclude Include="module.h" />
     <ClInclude Include="source\ShaderLoader.h" />
     <ClInclude Include="source\SlangMachine.h" />
     <ClInclude Include="source\SShader.h" />

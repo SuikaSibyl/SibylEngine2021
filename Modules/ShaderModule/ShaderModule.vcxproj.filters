@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ShaderModule.h">
+    <ClInclude Include="module.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="source\SShader.h">
