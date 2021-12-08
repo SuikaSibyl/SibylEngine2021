@@ -69,7 +69,7 @@
 
 int main()
 {
-	SIByL::File::ModuleTest::Test();
+	//SIByL::File::ModuleTest::Test();
 	SIByL::SShader::TestModule();
 	//S_CORE_INFO(SIByL::SShader::TestModule();
 }

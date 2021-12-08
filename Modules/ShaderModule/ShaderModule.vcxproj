@@ -161,11 +161,18 @@
     <ClInclude Include="source\ShaderLoader.h" />
     <ClInclude Include="source\SlangMachine.h" />
     <ClInclude Include="source\SShader.h" />
+    <ClInclude Include="source\SShaderCursor.h" />
+    <ClInclude Include="source\SShaderObject.h" />
+    <ClInclude Include="source\SShaderOffset.h" />
+    <ClInclude Include="source\SShaderTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\ShaderLoader.cpp" />
     <ClCompile Include="source\SlangMachine.cpp" />
     <ClCompile Include="source\SShader.cpp" />
+    <ClCompile Include="source\SShaderCursor.cpp" />
+    <ClCompile Include="source\SShaderOffset.cpp" />
+    <ClCompile Include="source\SShaderTypes.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

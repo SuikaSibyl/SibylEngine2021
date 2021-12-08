@@ -27,6 +27,18 @@
     <ClInclude Include="source\SlangMachine.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\SShaderObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SShaderCursor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SShaderOffset.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\SShaderTypes.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\SShader.cpp">
@@ -36,6 +48,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\SlangMachine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SShaderOffset.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SShaderCursor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SShaderTypes.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

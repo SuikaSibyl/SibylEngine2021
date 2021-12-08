@@ -26,14 +26,14 @@ namespace SIByL
 
 			slang::IModule* slangModule = nullptr;
 			ComPtr<slang::IBlob> diagnostics;
-			slangModule = mSession->loadModule("SIByL/hello-world", diagnostics.writeRef());
+			slangModule = mSession->loadModule("SIByL/model-viewer", diagnostics.writeRef());
 			if (diagnostics)
 			{
 				fprintf(stderr, "%s\n", (const char*)diagnostics->getBufferPointer());
 			}
 
 			ComPtr<slang::IEntryPoint> computeEntryPoint;
-			slangModule->findEntryPointByName("computeMain", computeEntryPoint.writeRef());
+			slangModule->findEntryPointByName("vertexMain", computeEntryPoint.writeRef());
 
 			slang::IComponentType* components[] = { slangModule, computeEntryPoint };
 			ComPtr<slang::IComponentType> program;
@@ -45,6 +45,7 @@ namespace SIByL
 			}
 
 			auto programReflection = program->getLayout();
+
 			for (SlangUInt i = 0; i < programReflection->getEntryPointCount(); i++)
 			{
 				auto entryPointInfo = programReflection->getEntryPointByIndex(i);
