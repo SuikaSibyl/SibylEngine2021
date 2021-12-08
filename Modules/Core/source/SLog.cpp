@@ -1,19 +1,15 @@
 #include "SLog.h"
-#include <stdarg.h>
 
-#include <spdlog/spdlog.h>
-#include <spdlog/fmt/ostr.h>
-
-#include <spdlog/sinks/stdout_color_sinks.h>
+#include "../vendor/spdlog/include/spdlog/sinks/stdout_color_sinks.h"
 
 namespace SIByL
 {
 	namespace Core
 	{
-		static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
+		std::shared_ptr<spdlog::logger> SLog::s_CoreLogger;
+		std::shared_ptr<spdlog::logger> SLog::s_ClientLogger;
 		
-		static void Init()
+		void SLog::Init()
 		{
 			spdlog::set_pattern("%^[%T] %n:  %v%$");
 
@@ -24,31 +20,15 @@ namespace SIByL
 			s_ClientLogger->set_level(spdlog::level::trace);
 		}
 
-		static std::shared_ptr<spdlog::logger>& GetCoreLogger()
+		std::shared_ptr<spdlog::logger>& SLog::GetCoreLogger()
 		{
 			if (s_CoreLogger == nullptr) Init();
 			return s_CoreLogger;
 		}
-		static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 
-
-		void SLog::Core_Trace(int i, ...)
-		{
-			{
-				std::cout << "hello";
-			}
-			/* Declare a va_list type variable */
-			va_list myargs;
-
-			/* Initialise the va_list variable with the ... after fmt */
-
-			va_start(myargs, i);
-
-			/* Forward the '...' to vprintf */
-			GetCoreLogger()->trace(myargs);
-
-			/* Clean up the va_list */
-			va_end(myargs);
+		std::shared_ptr<spdlog::logger>& SLog::GetClientLogger() {
+			if (s_ClientLogger == nullptr) Init();
+			return s_ClientLogger;
 		}
 	}
 }

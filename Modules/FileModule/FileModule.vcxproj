@@ -149,10 +149,17 @@
   <ItemGroup>
     <ClInclude Include="module.h" />
     <ClInclude Include="source\ModuleTest.h" />
+    <ClInclude Include="source\SBuffer.h" />
+    <ClInclude Include="source\SStructuredBuffer.h" />
     <ClInclude Include="source\SCache.h" />
+    <ClInclude Include="source\SFileSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\ModuleTest.cpp" />
+    <ClCompile Include="source\SBuffer.cpp" />
+    <ClCompile Include="source\SFileSystem.cpp" />
+    <ClCompile Include="source\SStructuredBuffer.cpp" />
+    <ClCompile Include="source\SCache.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
