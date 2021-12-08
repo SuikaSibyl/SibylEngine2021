@@ -44,6 +44,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileModule", "Modules\FileM
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "Modules\Core\Core.vcxproj", "{E50A4BF8-6456-4975-ACB6-AA2DE7335D84}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GraphicModule", "Modules\GraphicModule\GraphicModule.vcxproj", "{DC3D454F-0874-466B-AFE4-8EC110C09B7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -124,6 +126,14 @@ Global
 		{E50A4BF8-6456-4975-ACB6-AA2DE7335D84}.Release|x64.Build.0 = Release|x64
 		{E50A4BF8-6456-4975-ACB6-AA2DE7335D84}.ReleaseCuda|x64.ActiveCfg = Release|x64
 		{E50A4BF8-6456-4975-ACB6-AA2DE7335D84}.ReleaseCuda|x64.Build.0 = Release|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.Debug|x64.ActiveCfg = Debug|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.Debug|x64.Build.0 = Debug|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.DebugCuda|x64.ActiveCfg = Debug|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.DebugCuda|x64.Build.0 = Debug|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.Release|x64.ActiveCfg = Release|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.Release|x64.Build.0 = Release|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.ReleaseCuda|x64.ActiveCfg = Release|x64
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B}.ReleaseCuda|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -135,6 +145,7 @@ Global
 		{3AC3C7C4-FCDB-41F5-88D6-72C5626F6DB4} = {AAED3A2E-092C-4F55-84D2-9389696D5156}
 		{A88A7E71-99FE-429C-B8A9-8B86C4F93A6C} = {AAED3A2E-092C-4F55-84D2-9389696D5156}
 		{E50A4BF8-6456-4975-ACB6-AA2DE7335D84} = {AAED3A2E-092C-4F55-84D2-9389696D5156}
+		{DC3D454F-0874-466B-AFE4-8EC110C09B7B} = {AAED3A2E-092C-4F55-84D2-9389696D5156}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D550D001-90EB-4AA5-B155-8644473D3487}
