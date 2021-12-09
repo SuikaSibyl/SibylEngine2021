@@ -18,16 +18,49 @@
     <ClInclude Include="module.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\Interface\Bottom\SResource.h">
+    <ClInclude Include="source\Interface\Resource\IResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\API\DirectX12\Bottom\DX12SResource.h">
+    <ClInclude Include="source\Interface\Misc\IDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\API\OpenGL\Bottom\OpenGLSResource.h">
+    <ClInclude Include="source\Interface\Resource\IResourceView.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="source\API\Vulkan\Bottom\VulkanSResource.h">
+    <ClInclude Include="source\Interface\Misc\Define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Resource\IBufferResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Resource\ITextureResource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Misc\IFence.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Command\ICommandQueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Command\ICommandBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Shader\IShaderObject.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Shader\IShaderProgram.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Command\ICommandEncoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\API\DirectX12\Shader\DX12ShaderProgram.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\API\OpenGL\Shader\OGLShaderProgram.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\API\Vulkan\Shader\VKShaderProgram.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

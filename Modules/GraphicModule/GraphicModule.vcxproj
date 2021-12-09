@@ -142,10 +142,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="module.h" />
-    <ClInclude Include="source\API\DirectX12\Bottom\DX12SResource.h" />
-    <ClInclude Include="source\API\OpenGL\Bottom\OpenGLSResource.h" />
-    <ClInclude Include="source\API\Vulkan\Bottom\VulkanSResource.h" />
-    <ClInclude Include="source\Interface\Bottom\SResource.h" />
+    <ClInclude Include="source\API\DirectX12\Shader\DX12ShaderProgram.h" />
+    <ClInclude Include="source\API\OpenGL\Shader\OGLShaderProgram.h" />
+    <ClInclude Include="source\API\Vulkan\Shader\VKShaderProgram.h" />
+    <ClInclude Include="source\Interface\Command\ICommandBuffer.h" />
+    <ClInclude Include="source\Interface\Command\ICommandEncoder.h" />
+    <ClInclude Include="source\Interface\Command\ICommandQueue.h" />
+    <ClInclude Include="source\Interface\Misc\Define.h" />
+    <ClInclude Include="source\Interface\Resource\IBufferResource.h" />
+    <ClInclude Include="source\Interface\Misc\IDevice.h" />
+    <ClInclude Include="source\Interface\Misc\IFence.h" />
+    <ClInclude Include="source\Interface\Resource\IResource.h" />
+    <ClInclude Include="source\Interface\Resource\IResourceView.h" />
+    <ClInclude Include="source\Interface\Resource\ITextureResource.h" />
+    <ClInclude Include="source\Interface\Shader\IShaderObject.h" />
+    <ClInclude Include="source\Interface\Shader\IShaderProgram.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
