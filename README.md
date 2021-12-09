@@ -21,12 +21,12 @@ Thanks for his great tutorials, which really taught me to learn a lot.*
 
 **Recent Plans**
 
-- [ ] SSR
-- [ ] SPIRV Support
+- [ ] New Shader System
+- [ ] New graphic abstract layer
 
 **Future Plans**
 
-- [ ] CUDA Path Tracer
+- [ ] Path Tracer
 - [ ] PBR probe system
 - [ ] Other GI system...
 
