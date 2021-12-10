@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 namespace SIByL
 {
 	namespace Graphic
@@ -115,6 +117,23 @@ namespace SIByL
             CountOf,
         };
 
+        struct ScissorRect
+        {
+            int32_t minX;
+            int32_t minY;
+            int32_t maxX;
+            int32_t maxY;
+        };
+
+        struct Viewport
+        {
+            float originX = 0.0f;
+            float originY = 0.0f;
+            float extentX = 0.0f;
+            float extentY = 0.0f;
+            float minZ = 0.0f;
+            float maxZ = 1.0f;
+        };
 
     }
 }

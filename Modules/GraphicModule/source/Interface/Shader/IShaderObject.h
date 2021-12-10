@@ -9,5 +9,7 @@ namespace SIByL
 		public:
 			virtual ~IShaderObject() noexcept = default;
 		};
+
+		
 	}
 }

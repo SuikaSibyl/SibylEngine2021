@@ -63,5 +63,37 @@
     <ClInclude Include="source\API\Vulkan\Shader\VKShaderProgram.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\Interface\Render\IFramebufferLayout.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Render\IPipelineState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Render\IFramebuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Shader\IShaderComponent.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="module\import.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\API\OpenGL\Misc\GLDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\API\Vulkan\Misc\VKDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\API\DirectX12\Misc\DX12Device.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\Interface\Misc\IDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\API\OpenGL\Misc\GLDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

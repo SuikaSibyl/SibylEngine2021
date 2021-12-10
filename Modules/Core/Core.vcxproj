@@ -148,6 +148,7 @@
     <ClInclude Include="module.h" />
     <ClInclude Include="source\SLog.h" />
     <ClInclude Include="source\SLogExtension.h" />
+    <ClInclude Include="source\SSmartPtr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\SLog.cpp" />

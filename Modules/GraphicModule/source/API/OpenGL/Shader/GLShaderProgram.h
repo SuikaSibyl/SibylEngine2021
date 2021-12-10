@@ -6,10 +6,10 @@ namespace SIByL
 {
 	namespace Graphic
 	{
-		class OGLShaderProgram :public IShaderProgram
+		class GLShaderProgram :public IShaderProgram
 		{
 		public:
-			virtual ~OGLShaderProgram() noexcept = default;
+			virtual ~GLShaderProgram() noexcept = default;
 		};
 	}
 }

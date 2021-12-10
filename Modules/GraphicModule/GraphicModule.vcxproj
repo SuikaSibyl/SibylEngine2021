@@ -40,13 +40,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -79,10 +79,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)Modules/;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\Modules\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)Modules/;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\Modules</OutDir>
+    <IntDir>$(SolutionDir)bin-int\$(Configuration)-$(Platform)\Modules\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,22 +145,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="module\import.h" />
     <ClInclude Include="module.h" />
+    <ClInclude Include="source\API\DirectX12\Misc\DX12Device.h" />
     <ClInclude Include="source\API\DirectX12\Shader\DX12ShaderProgram.h" />
+    <ClInclude Include="source\API\OpenGL\Misc\GLDevice.h" />
     <ClInclude Include="source\API\OpenGL\Shader\OGLShaderProgram.h" />
+    <ClInclude Include="source\API\Vulkan\Misc\VKDevice.h" />
     <ClInclude Include="source\API\Vulkan\Shader\VKShaderProgram.h" />
     <ClInclude Include="source\Interface\Command\ICommandBuffer.h" />
     <ClInclude Include="source\Interface\Command\ICommandEncoder.h" />
     <ClInclude Include="source\Interface\Command\ICommandQueue.h" />
     <ClInclude Include="source\Interface\Misc\Define.h" />
+    <ClInclude Include="source\Interface\Render\IFramebuffer.h" />
+    <ClInclude Include="source\Interface\Render\IFramebufferLayout.h" />
+    <ClInclude Include="source\Interface\Render\IPipelineState.h" />
     <ClInclude Include="source\Interface\Resource\IBufferResource.h" />
     <ClInclude Include="source\Interface\Misc\IDevice.h" />
     <ClInclude Include="source\Interface\Misc\IFence.h" />
     <ClInclude Include="source\Interface\Resource\IResource.h" />
     <ClInclude Include="source\Interface\Resource\IResourceView.h" />
     <ClInclude Include="source\Interface\Resource\ITextureResource.h" />
+    <ClInclude Include="source\Interface\Shader\IShaderComponent.h" />
     <ClInclude Include="source\Interface\Shader\IShaderObject.h" />
     <ClInclude Include="source\Interface\Shader\IShaderProgram.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\API\OpenGL\Misc\GLDevice.cpp" />
+    <ClCompile Include="source\Interface\Misc\IDevice.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
