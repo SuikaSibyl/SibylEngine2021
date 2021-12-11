@@ -158,11 +158,11 @@ namespace SIByLEditor
 		((SRenderPipeline::SRPPipeForwardLit*)ForwardLit.get())->mCamera = camera;
 		((SRenderPipeline::SRPPipeForwardLit*)PathTracer.get())->mCamera = camera;
 
-		//m_ScriptablePipeline->InsertPipe(PathTracer, "PathTracer");
+		m_ScriptablePipeline->InsertPipe(PathTracer, "PathTracer");
 		m_ScriptablePipeline->InsertPipe(ShadowMap, "ShadowMap");
 		m_ScriptablePipeline->InsertPipe(EarlyZ, "EarlyZ");
 		m_ScriptablePipeline->InsertPipe(ForwardLit, "ForwardLit");
-		//m_ScriptablePipeline->InsertPipe(SSAO, "SSAO");
+		m_ScriptablePipeline->InsertPipe(SSAO, "SSAO");
 		m_ScriptablePipeline->InsertPipe(Bloom, "Bloom");
 		m_ScriptablePipeline->InsertPipe(ACES, "ACES");
 		m_ScriptablePipeline->InsertPipe(TAA, "TAA");
@@ -171,11 +171,11 @@ namespace SIByLEditor
 		//m_ScriptablePipeline->InsertPipe(Sharpen, "Sharpen");
 
 		// SSAO input
-		//m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "SSAO", "Color");
-		//m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "SSAO", "Depth");
-		//m_ScriptablePipeline->AttachPipes("ForwardLit", "Normal", "SSAO", "Normal");
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "SSAO", "Color");
+		m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "SSAO", "Depth");
+		m_ScriptablePipeline->AttachPipes("ForwardLit", "Normal", "SSAO", "Normal");
 		// Bloom input
-		m_ScriptablePipeline->AttachPipes("ForwardLit", "Color", "Bloom", "Input");
+		m_ScriptablePipeline->AttachPipes("SSAO", "Output", "Bloom", "Input");
 		m_ScriptablePipeline->AttachPipes("EarlyZ", "EarlyZ", "Bloom", "Depth");
 		// ACES & gamma correction input
 		m_ScriptablePipeline->AttachPipes("Bloom", "Output", "ACES", "Input");
