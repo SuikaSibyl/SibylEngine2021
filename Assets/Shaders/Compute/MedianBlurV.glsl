@@ -37,16 +37,16 @@ void main(void)
     if(gl_LocalInvocationID.x < radius)
     {
         float extrau = du * (max(gl_GlobalInvocationID.x - radius, 0) + 0.5f);
-        imagePixel[gl_LocalInvocationID.x] = texture2D(u_Input, vec2(extrau,v)).rgb;
+        imagePixel[gl_LocalInvocationID.x] = texture(u_Input, vec2(extrau,v)).rgb;
     }
 
     if(gl_LocalInvocationID.x >= gl_WorkGroupSize.x - radius)
     {
         float extrau = du * (min(gl_GlobalInvocationID.x + radius, OutputSize.x - 1) + 0.5f);
-        imagePixel[gl_LocalInvocationID.x + 2 * radius] = texture2D(u_Input, vec2(extrau,v)).rgb;
+        imagePixel[gl_LocalInvocationID.x + 2 * radius] = texture(u_Input, vec2(extrau,v)).rgb;
     }
 
-    imagePixel[gl_LocalInvocationID.x + radius] = texture2D(u_Input, vec2(u,v)).rgb;
+    imagePixel[gl_LocalInvocationID.x + radius] = texture(u_Input, vec2(u,v)).rgb;
     memoryBarrierShared();
     barrier();
 

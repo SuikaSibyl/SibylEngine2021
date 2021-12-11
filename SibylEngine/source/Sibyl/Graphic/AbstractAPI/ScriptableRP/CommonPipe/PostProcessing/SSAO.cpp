@@ -64,11 +64,11 @@ namespace SIByL
 			MedianBlurVInstance->SetFloat2("OutputSize", { screenX, screenY });
 			MedianBlurVInstance->Dispatch(GRIDSIZE(screenX, 64), GRIDSIZE(screenY, 1), 1);
 
-			MedianBlurHInstance->SetFloat2("OutputSize", { screenX, screenY });
-			MedianBlurHInstance->Dispatch(GRIDSIZE(screenX, 1), GRIDSIZE(screenY, 64), 1);
+			//MedianBlurHInstance->SetFloat2("OutputSize", { screenX, screenY });
+			//MedianBlurHInstance->Dispatch(GRIDSIZE(screenX, 1), GRIDSIZE(screenY, 64), 1);
 
-			SSAOCombineInstance->SetFloat2("OutputSize", { screenX, screenY });
-			SSAOCombineInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
+			//SSAOCombineInstance->SetFloat2("OutputSize", { screenX, screenY });
+			//SSAOCombineInstance->Dispatch(GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1);
 		}
 
 		void SRPPipeSSAO::DrawImGui()

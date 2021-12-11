@@ -36,7 +36,7 @@ vec4 gaussianBlur(vec2 uv) {
     vec2 maxCoord = 1.0 - 1.0 / uTextureBlurInputSize.xy;
     vec2 minCoord = 1.0 / uTextureBlurInputSize.xy;
 
-    vec3 pixel = 0.24609375 * DecodeRGBM(texture2D(u_Input, clamp(uv, minCoord, maxCoord)));
+    vec3 pixel = 0.24609375 * DecodeRGBM(texture(u_Input, clamp(uv, minCoord, maxCoord)));
     vec2 offset;
     vec2 blurDir = uBlurDir.xy / OutputSize.xy;
     blurDir *= uGlobalTexSize.y * 0.00075;
