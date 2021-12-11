@@ -40,7 +40,7 @@ namespace SIByL
 		{
 			Ref<SPipe> PipeOut = GetPipe(pipeOut);
 			Ref<SPipe> Pipein = GetPipe(pipeIn);
-			Pipein->SetInput(inputName, PipeOut->GetRenderTarget(outputName));
+			Pipein->SetInput(inputName, PipeOut.get()->GetRenderTarget(outputName));
 		}
 
 		Ref<SPipe> SPipeline::GetPipe(const std::string& name)

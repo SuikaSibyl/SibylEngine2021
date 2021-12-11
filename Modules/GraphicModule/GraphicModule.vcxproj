@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -150,7 +150,7 @@
     <ClInclude Include="source\API\DirectX12\Misc\DX12Device.h" />
     <ClInclude Include="source\API\DirectX12\Shader\DX12ShaderProgram.h" />
     <ClInclude Include="source\API\OpenGL\Misc\GLDevice.h" />
-    <ClInclude Include="source\API\OpenGL\Shader\OGLShaderProgram.h" />
+    <ClInclude Include="source\API\OpenGL\Shader\GLShaderProgram.h" />
     <ClInclude Include="source\API\Vulkan\Misc\VKDevice.h" />
     <ClInclude Include="source\API\Vulkan\Shader\VKShaderProgram.h" />
     <ClInclude Include="source\Interface\Command\ICommandBuffer.h" />

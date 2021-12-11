@@ -57,7 +57,7 @@ vec4 bloomCombine(vec2 uv) {
     bloom += (DecodeRGBM(texture(TextureBloomBlur3, uv))) * getRadiusFactored(factor3, midVal);
     bloom += (DecodeRGBM(texture(TextureBloomBlur4, uv))) * getRadiusFactored(factor4, midVal);
     bloom += (DecodeRGBM(texture(TextureBloomBlur5, uv))) * getRadiusFactored(factor5, midVal);
-    vec3 color = DecodeRGBM(texture2D(u_Texture, uv));
+    vec3 color = DecodeRGBM(texture(u_Texture, uv));
     return vec4(color + (bloom * uBloomFactor), 1.0);
 }
 

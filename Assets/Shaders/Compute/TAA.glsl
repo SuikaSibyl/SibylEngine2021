@@ -71,16 +71,16 @@ void main(void)
     float u = du * (gl_GlobalInvocationID.x + 0.5f);
     float v = dv * (gl_GlobalInvocationID.y + 0.5f);
 
-    vec2 Offset = texture2D(u_Offset, vec2(u,v)).xy;
-    vec4 previousCol = texture2D(u_PreviousFrame, vec2(u,v) - Offset);
+    vec2 Offset = texture(u_Offset, vec2(u,v)).xy;
+    vec4 previousCol = texture(u_PreviousFrame, vec2(u,v) - Offset);
     vec3 previousColYcc = RGB2YCoCg(previousCol.rgb);
     
-    vec4 currentCol = texture2D(u_CurrentFrame, vec2(u,v));
+    vec4 currentCol = texture(u_CurrentFrame, vec2(u,v));
 
-    vec3 currentCol_z0p1 = RGB2YCoCg(texture2D(u_CurrentFrame, vec2(u,v) + vec2(0, +dv)).xyz);
-    vec3 currentCol_z0m1 = RGB2YCoCg(texture2D(u_CurrentFrame, vec2(u,v) + vec2(0, -dv)).xyz);
-    vec3 currentCol_m1z0 = RGB2YCoCg(texture2D(u_CurrentFrame, vec2(u,v) + vec2(-dv, 0)).xyz);
-    vec3 currentCol_p1z0 = RGB2YCoCg(texture2D(u_CurrentFrame, vec2(u,v) + vec2(+dv, 0)).xyz);
+    vec3 currentCol_z0p1 = RGB2YCoCg(texture(u_CurrentFrame, vec2(u,v) + vec2(0, +dv)).xyz);
+    vec3 currentCol_z0m1 = RGB2YCoCg(texture(u_CurrentFrame, vec2(u,v) + vec2(0, -dv)).xyz);
+    vec3 currentCol_m1z0 = RGB2YCoCg(texture(u_CurrentFrame, vec2(u,v) + vec2(-dv, 0)).xyz);
+    vec3 currentCol_p1z0 = RGB2YCoCg(texture(u_CurrentFrame, vec2(u,v) + vec2(+dv, 0)).xyz);
     
     vec3 min_currCol = min(min(currentCol_z0p1,currentCol_z0m1),min(currentCol_m1z0,currentCol_p1z0));
     vec3 max_currCol = max(max(currentCol_z0p1,currentCol_z0m1),max(currentCol_m1z0,currentCol_p1z0));
