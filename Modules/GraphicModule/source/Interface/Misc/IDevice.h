@@ -15,8 +15,9 @@ namespace SIByL
 			virtual ~IDevice() noexcept = default;
 
 		public:
-			virtual bool createProgram (const ShaderProgramDesc& desc, Ref<IShaderProgram> outProgram) noexcept = 0;
-			inline Ref<IShaderProgram> createProgram(const ShaderProgramDesc& desc);
+			virtual bool createProgram (const ShaderProgramDesc& desc, Scope<IShaderProgram>& outProgram) noexcept = 0;
+
+			inline Scope<IShaderProgram> createProgram(const ShaderProgramDesc& desc);
 
 		};
 	}

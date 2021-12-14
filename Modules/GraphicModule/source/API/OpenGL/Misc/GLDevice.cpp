@@ -4,7 +4,7 @@ namespace SIByL
 {
 	namespace Graphic
 	{
-		bool GLDevice::createProgram(const ShaderProgramDesc& desc, Ref<IShaderProgram> outProgram) noexcept
+		bool GLDevice::createProgram(const ShaderProgramDesc& desc, Scope<IShaderProgram>& outProgram) noexcept
 		{
 
 			return true;

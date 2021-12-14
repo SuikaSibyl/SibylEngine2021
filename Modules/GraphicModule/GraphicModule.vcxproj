@@ -169,6 +169,7 @@
     <ClInclude Include="source\Interface\Shader\IShaderComponent.h" />
     <ClInclude Include="source\Interface\Shader\IShaderObject.h" />
     <ClInclude Include="source\Interface\Shader\IShaderProgram.h" />
+    <ClInclude Include="source\Interface\Shader\ShaderOffset.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\API\OpenGL\Misc\GLDevice.cpp" />

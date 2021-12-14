@@ -6,6 +6,10 @@ namespace SIByL
 {
 	namespace Graphic
 	{
+        typedef unsigned int        sINT32;
+        typedef long long           sINT64;
+        typedef unsigned long long  sUINT64;
+
         enum class PipelineType
         {
             Unknown,

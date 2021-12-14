@@ -7,10 +7,10 @@ namespace SIByL
 		class GLDevice final : public IDevice
 		{
 		public:
-			~GLDevice();
+			virtual ~GLDevice() noexcept = default;
 
 		public:
-			virtual bool createProgram(const ShaderProgramDesc& desc, Ref<IShaderProgram> outProgram) noexcept override;
+			virtual bool createProgram(const ShaderProgramDesc& desc, Scope<IShaderProgram>& outProgram) noexcept override;
 
 		};
 	}
