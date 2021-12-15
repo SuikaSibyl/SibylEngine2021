@@ -90,12 +90,21 @@
     <ClInclude Include="source\Interface\Shader\ShaderOffset.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="source\API\OpenGL\Misc\GLContext.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Interface\Shader\ShaderReflection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Interface\Misc\IDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="source\API\OpenGL\Misc\GLDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Interface\Shader\IShaderObject.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -149,6 +149,7 @@
     <ClInclude Include="module.h" />
     <ClInclude Include="source\API\DirectX12\Misc\DX12Device.h" />
     <ClInclude Include="source\API\DirectX12\Shader\DX12ShaderProgram.h" />
+    <ClInclude Include="source\API\OpenGL\Misc\GLContext.h" />
     <ClInclude Include="source\API\OpenGL\Misc\GLDevice.h" />
     <ClInclude Include="source\API\OpenGL\Shader\GLShaderProgram.h" />
     <ClInclude Include="source\API\Vulkan\Misc\VKDevice.h" />
@@ -170,10 +171,12 @@
     <ClInclude Include="source\Interface\Shader\IShaderObject.h" />
     <ClInclude Include="source\Interface\Shader\IShaderProgram.h" />
     <ClInclude Include="source\Interface\Shader\ShaderOffset.h" />
+    <ClInclude Include="source\Interface\Shader\ShaderReflection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\API\OpenGL\Misc\GLDevice.cpp" />
     <ClCompile Include="source\Interface\Misc\IDevice.cpp" />
+    <ClCompile Include="source\Interface\Shader\IShaderObject.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

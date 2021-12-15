@@ -1,4 +1,4 @@
 #pragma once
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include "../../../../../../SibylEngine/vendor/glad/include/glad/glad.h"
+#include "../../../../../../SibylEngine/vendor/glfw/include/GLFW/glfw3.h"

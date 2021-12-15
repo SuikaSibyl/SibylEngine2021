@@ -17,7 +17,7 @@ namespace SIByL
 		struct ShaderProgramDesc
 		{
 			PipelineType pipelineType;
-			IShaderComponent* slangProgram;
+			IShaderComponent* program;
 		};
 	}
 }
