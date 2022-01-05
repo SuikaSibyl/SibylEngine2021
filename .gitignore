@@ -1,1 +1,3 @@
-.vs/
+.vs
+Engine/Binaries/Source/
+Engine/Binaries-Int/
