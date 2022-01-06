@@ -2,5 +2,6 @@ import Core;
 
 int main()
 {
-	SE_TRACE("Hello World, {0}, It's {1}", "Suika", 2022);
+	SE_CORE_ASSERT(true, "HELLO");
+	SE_CORE_ASSERT(false, "HELLO FALSE");
 }

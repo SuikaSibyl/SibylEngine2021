@@ -24,5 +24,8 @@
     <ClCompile Include="Private\Log.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Assert.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

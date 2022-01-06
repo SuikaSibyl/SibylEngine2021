@@ -153,6 +153,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="Public\Assert.ixx" />
     <ClCompile Include="Public\Core.ixx" />
     <ClCompile Include="Public\Log.ixx" />
   </ItemGroup>
