@@ -21,7 +21,7 @@ namespace SIByL::Core
 
 	void TestPool::execAll()
 	{
-		::SE_CORE_DEBUG("¨q BEGIN RUN ALL TESTCASES");
+		::SE_CORE_DEBUG("â•­ BEGIN RUN ALL TESTCASES");
 		for (auto iter = tests.begin(); iter != tests.end(); iter++)
 		{
 			if (iter + 1 == tests.end())
@@ -32,17 +32,17 @@ namespace SIByL::Core
 			{
 				is_last_testcase = false;
 			}
-			::SE_CORE_TRACE("©¦ ¨q©¤ TESTCASE: {0}", (*iter)->desc);
+			::SE_CORE_TRACE("â”‚ â•­â”€ TESTCASE: {0}", (*iter)->desc);
 			fail_number_local = 0;
 			(*iter)->fn();
-			::SE_CORE_TRACE("©¦ ¨t©¤ CHECK FAILURE : {0}", fail_number_local);
+			::SE_CORE_TRACE("â”‚ â•°â”€ CHECK FAILURE : {0}", fail_number_local);
 		}
-		::SE_CORE_DEBUG("¨t FINISH ALL TESTCASES, PASS: {0}, FAIL: {1}", pass_number, fail_number);
+		::SE_CORE_DEBUG("â•° FINISH ALL TESTCASES, PASS: {0}, FAIL: {1}", pass_number, fail_number);
 	}
 
 	auto testCeck(bool x, std::string_view desc) noexcept -> void
 	{
-		static std::string_view prefix  = "©¦ ©¦    ";
+		static std::string_view prefix  = "â”‚ â”‚    ";
 
 		if (x) {
 			g_test_pool.pass_number++;
