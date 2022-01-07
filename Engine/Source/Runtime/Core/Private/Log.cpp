@@ -1,9 +1,9 @@
+module;
+#include <memory>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 module Core.Log;
-
-import <memory>;
 
 namespace SIByL::Core
 {

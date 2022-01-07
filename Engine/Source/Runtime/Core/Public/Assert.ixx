@@ -1,5 +1,6 @@
+module;
+#include <utility>
 export module Core.Assert;
-
 import Core.Log;
 
 export template <class... Args> auto SE_CORE_ASSERT(bool x, Args&&... args) noexcept -> void 

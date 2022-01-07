@@ -1,8 +1,8 @@
 module;
+#include <iostream>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 export module Core.Log;
-export import <iostream>;
 
 namespace SIByL::Core
 {
