@@ -4,21 +4,24 @@ module;
 #include <spdlog/fmt/ostr.h>
 export module Core.Log;
 
-namespace SIByL::Core
+namespace SIByL
 {
-	class Logger
+	inline namespace Core
 	{
-	public:
-		Logger();
-		static auto instance() noexcept -> Logger&;
+		class Logger
+		{
+		public:
+			Logger();
+			static auto instance() noexcept -> Logger&;
 
-		std::shared_ptr<spdlog::logger>& getCoreLogger();
-		std::shared_ptr<spdlog::logger>& getClientLogger();
+			std::shared_ptr<spdlog::logger>& getCoreLogger();
+			std::shared_ptr<spdlog::logger>& getClientLogger();
 
-	private:
-		std::shared_ptr<spdlog::logger> coreLogger;
-		std::shared_ptr<spdlog::logger> clientLogger;
-	};
+		private:
+			std::shared_ptr<spdlog::logger> coreLogger;
+			std::shared_ptr<spdlog::logger> clientLogger;
+		};
+	}
 }
 
 export template <class... Args> auto SE_CORE_TRACE(Args&&... args) noexcept -> void { ::SIByL::Core::Logger::instance().getCoreLogger()->trace(std::forward<Args>(args)...); }

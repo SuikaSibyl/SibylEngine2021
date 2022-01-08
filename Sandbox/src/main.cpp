@@ -1,22 +1,27 @@
 #include <iostream>
 #include <memory>
+#include <EntryPoint.h>
 
+import Core.Application;
 import Core.Assert;
 import Core.Test;
+import Core.Window;
+import Core.Enums;
+import Core.GraphicContext.VK;
 
-int main()
+class SandboxApp :public SIByL::IApplication
 {
+
+};
+
+auto SE_CREATE_APP() noexcept -> SIByL::IApplication*
+{
+#ifdef _DEBUG
 	SE_TEST_EXEC_ALL();
+#endif
+
+	SandboxApp* app = new SandboxApp();
+	app->addWindow({ SIByL::EWindowVendor::GLFW, 1280, 720, "Hello" });
+	app->addWindow({ SIByL::EWindowVendor::GLFW, 1280, 720, "World" });
+	return app;
 }
-
-static SE_TEST_CASE main_test_1([]() {
-	SE_TEST_CHECK(1 == 1, "1 == 1");
-	SE_TEST_CHECK(1 == 2, "1 == 2");
-	return;
-	}, "Hell0");
-
-static SE_TEST_CASE main_test_2([]() {
-	SE_TEST_CHECK(1 == 1, "1 == 1");
-	SE_TEST_CHECK(2 == 2, "2 == 2");
-	return; 
-	}, "Hell1");
