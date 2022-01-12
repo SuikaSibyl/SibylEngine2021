@@ -19,9 +19,12 @@ auto SE_CREATE_APP() noexcept -> SIByL::IApplication*
 #ifdef _DEBUG
 	SE_TEST_EXEC_ALL();
 #endif
-
+	SIByL::IGraphicContextVK vk;
+	vk.initVulkan();
+	vk.cleanUp();
+	//vk.checkValidationLayerSupport();
 	SandboxApp* app = new SandboxApp();
 	app->addWindow({ SIByL::EWindowVendor::GLFW, 1280, 720, "Hello" });
-	app->addWindow({ SIByL::EWindowVendor::GLFW, 1280, 720, "World" });
+	//app->addWindow({ SIByL::EWindowVendor::GLFW, 1280, 720, "World" });
 	return app;
 }
