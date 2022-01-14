@@ -18,8 +18,10 @@ namespace SIByL
 			auto getRequiredExtensions() -> std::vector<const char*>;
 			auto cleanUp() -> void;
 			auto setupDebugMessenger() -> void;
+			auto pickPhysicalDevice() -> void;
 
 			VkInstance instance;
+			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 			VkDebugUtilsMessengerEXT debugMessenger;
 		};
 	}

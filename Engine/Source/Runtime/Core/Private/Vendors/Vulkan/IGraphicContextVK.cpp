@@ -58,6 +58,7 @@ namespace SIByL
 		{
 			createInstance();
 			setupDebugMessenger();
+			pickPhysicalDevice();
 		}
 
 		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
@@ -203,6 +204,43 @@ namespace SIByL
 			// load function from extern
 			if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
 				SE_CORE_ERROR("failed to set up debug messenger!");
+			}
+		}
+
+		bool isDeviceSuitable(VkPhysicalDevice device) {
+			VkPhysicalDeviceProperties deviceProperties;
+			VkPhysicalDeviceFeatures deviceFeatures;
+			vkGetPhysicalDeviceProperties(device, &deviceProperties);
+			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+			return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+				deviceFeatures.geometryShader;
+		}
+
+		auto IGraphicContextVK::pickPhysicalDevice() -> void
+		{
+			uint32_t deviceCount = 0;
+			vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+			// If there are 0 devices with Vulkan support
+			if (deviceCount == 0) {
+				SE_CORE_ERROR("VULKAN :: failed to find GPUs with Vulkan support!");
+			}
+
+			// get all of the VkPhysicalDevice handles
+			std::vector<VkPhysicalDevice> devices(deviceCount);
+			vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+			// check if any of the physical devices meet the requirements
+			for (const auto& device : devices) {
+				if (isDeviceSuitable(device)) {
+					physicalDevice = device;
+					break;
+				}
+			}
+
+			if (physicalDevice == VK_NULL_HANDLE) {
+				SE_CORE_ERROR("failed to find a suitable GPU!");
 			}
 		}
 
