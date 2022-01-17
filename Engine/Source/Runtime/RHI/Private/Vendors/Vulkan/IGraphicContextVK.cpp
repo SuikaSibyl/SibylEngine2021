@@ -11,9 +11,6 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		const uint32_t WIDTH = 800;
-		const uint32_t HEIGHT = 600;
-
 		const std::vector<const char*> validationLayers = {
 			"VK_LAYER_KHRONOS_validation"
 		};
@@ -33,7 +30,7 @@ namespace SIByL
 			switch (messageSeverity)
 			{
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-				SE_CORE_TRACE("VULKAN :: VALIDATION :: {0}", pCallbackData->pMessage);
+				//SE_CORE_TRACE("VULKAN :: VALIDATION :: {0}", pCallbackData->pMessage);
 				break;
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
 				SE_CORE_INFO("VULKAN :: VALIDATION :: {0}", pCallbackData->pMessage);
@@ -55,9 +52,11 @@ namespace SIByL
 			return VK_FALSE;
 		}
 
-		auto IGraphicContextVK::findQueueFamilies() -> QueueFamilyIndicesVK
+		VkInstance IGraphicContextVK::instance;
+
+		auto IGraphicContextVK::getVKInstance()->VkInstance&
 		{
-			return findQueueFamilies(physicalDevice);
+			return instance;
 		}
 
 		auto IGraphicContextVK::hasValidationLayers() -> bool
@@ -65,11 +64,12 @@ namespace SIByL
 			return true;
 		}
 
-		auto IGraphicContextVK::initVulkan() -> void
+		auto IGraphicContextVK::initialize() -> bool
 		{
 			createInstance();
 			setupDebugMessenger();
-			pickPhysicalDevice();
+
+			return true;
 		}
 
 		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
@@ -218,99 +218,14 @@ namespace SIByL
 			}
 		}
 
-		auto IGraphicContextVK::isDeviceSuitable(VkPhysicalDevice device) -> bool
-		{
-			VkPhysicalDeviceProperties deviceProperties;
-			VkPhysicalDeviceFeatures deviceFeatures;
-			vkGetPhysicalDeviceProperties(device, &deviceProperties);
-			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-
-			QueueFamilyIndicesVK indices = findQueueFamilies(device);
-			return indices.isComplete();
-		}
-
-		int rateDeviceSuitability(VkPhysicalDevice device) {
-			VkPhysicalDeviceProperties deviceProperties;
-			VkPhysicalDeviceFeatures deviceFeatures;
-			vkGetPhysicalDeviceProperties(device, &deviceProperties);
-			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-
-			int score = 0;
-
-			// Discrete GPUs have a significant performance advantage
-			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
-				score += 1000;
-			}
-
-			// Maximum possible size of textures affects graphics quality
-			score += deviceProperties.limits.maxImageDimension2D;
-
-			// Application can't function without geometry shaders
-			if (!deviceFeatures.geometryShader) {
-				return 0;
-			}
-
-			return score;
-		}
-
-		auto IGraphicContextVK::pickPhysicalDevice() -> void
-		{
-			uint32_t deviceCount = 0;
-			vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
-
-			// If there are 0 devices with Vulkan support
-			if (deviceCount == 0) {
-				SE_CORE_ERROR("VULKAN :: failed to find GPUs with Vulkan support!");
-			}
-
-			// get all of the VkPhysicalDevice handles
-			std::vector<VkPhysicalDevice> devices(deviceCount);
-			vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
-
-			// check if any of the physical devices meet the requirements
-			for (const auto& device : devices) {
-				if (isDeviceSuitable(device)) {
-					physicalDevice = device;
-					break;
-				}
-			}
-
-			if (physicalDevice == VK_NULL_HANDLE) {
-				SE_CORE_ERROR("failed to find a suitable GPU!");
-			}
-		}
-
-		auto IGraphicContextVK::findQueueFamilies(VkPhysicalDevice device) -> QueueFamilyIndicesVK
-		{
-			QueueFamilyIndicesVK indices;
-			// Logic to find queue family indices to populate struct with
-			uint32_t queueFamilyCount = 0;
-			vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
-			std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-			vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
-			// find at least one queue family that supports VK_QUEUE_GRAPHICS_BIT
-			int i = 0;
-			for (const auto& queueFamily : queueFamilies) {
-				if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-					indices.graphicsFamily = i;
-				}
-
-				if (indices.isComplete()) {
-					break;
-				}
-
-				i++;
-			}
-			return indices;
-		}
-
-		auto IGraphicContextVK::cleanUp() -> void
+		auto IGraphicContextVK::destroy() -> bool
 		{
 			if (enableValidationLayers) {
 				DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 			}
 
 			vkDestroyInstance(instance, nullptr);
+			return true;
 		}
 	}
 }

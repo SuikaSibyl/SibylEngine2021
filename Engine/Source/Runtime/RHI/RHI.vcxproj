@@ -166,6 +166,9 @@
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

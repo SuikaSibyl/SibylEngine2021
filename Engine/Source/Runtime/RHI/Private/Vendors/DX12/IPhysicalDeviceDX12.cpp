@@ -1,9 +1,6 @@
 module;
-#pragma comment(lib, "dxgi.lib")
-#include <Windows.h>
-#include <dxgi1_6.h>
+#include "WindowsPlatform.h"
 #include <vector>
-#include <WinNls.h>
 #include <string>
 module RHI.IPhysicalDevice.DX12;
 import Core.Log;
@@ -16,11 +13,6 @@ namespace SIByL::RHI
 #else
 	const bool enableValidationLayers = false;
 #endif
-
-	IPhysicalDeviceDX12::IPhysicalDeviceDX12()
-	{
-
-	}
 
 	auto IPhysicalDeviceDX12::initialize() -> bool
 	{
@@ -43,6 +35,16 @@ namespace SIByL::RHI
 		return true;
 	}
 
+	auto IPhysicalDeviceDX12::destroy() -> bool
+	{
+		for (auto iter : DXGIAdapters)
+		{
+			SAFE_RELEASE(iter);
+		}
+		SAFE_RELEASE(pDXGIFactory);
+		return true;
+	}
+
 	auto IPhysicalDeviceDX12::queryAllAdapters() noexcept -> void
 	{
 		IDXGIAdapter4* adapter = NULL;
@@ -58,6 +60,7 @@ namespace SIByL::RHI
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 			{
 				foundSoftwareAdapter = true;
+				SAFE_RELEASE(adapter);
 			}
 			else
 				DXGIAdapters.push_back(adapter);

@@ -15,15 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Public\Device\ILogicalDevice.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Public\Device\IGraphicContext.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -48,5 +39,19 @@
     <ClCompile Include="Private\Vendors\Vulkan\IPhysicalDeviceVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Device\ILogicalDevice.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

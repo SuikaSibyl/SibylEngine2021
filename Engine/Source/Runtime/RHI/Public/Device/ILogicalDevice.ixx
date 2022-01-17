@@ -1,14 +1,16 @@
-export module RHI.LogicalDevice;
+module;
+
+export module RHI.ILogicalDevice;
+import Core.SObject;
 
 namespace SIByL
 {
 	namespace RHI
 	{
-		export class ILogicalDevice
+		export class ILogicalDevice :public SObject
 		{
 		public:
-
-		private:
+			virtual ~ILogicalDevice() = default;
 
 		};
 	}

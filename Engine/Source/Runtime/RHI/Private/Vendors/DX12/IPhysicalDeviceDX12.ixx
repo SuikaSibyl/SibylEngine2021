@@ -12,10 +12,10 @@ namespace SIByL
 		export class IPhysicalDeviceDX12 :public IPhysicalDevice
 		{
 		public:
-			IPhysicalDeviceDX12();
 			virtual ~IPhysicalDeviceDX12() = default;
 
 			virtual auto initialize() -> bool;
+			virtual auto destroy() -> bool;
 			virtual auto isDebugLayerEnabled() noexcept -> bool;
 
 		private:
