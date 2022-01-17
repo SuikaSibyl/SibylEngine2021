@@ -6,6 +6,7 @@ import Core.Enums;
 import Core.Event;
 import Core.Input;
 import Core.Layer;
+import Core.SObject;
 
 namespace SIByL
 {
@@ -13,9 +14,10 @@ namespace SIByL
 	{
 		export using EventCallbackFn = std::function<void(Event&)>;
 
-		export class IWindow
+		export class IWindow :public SObject
 		{
 		public:
+			IWindow(const wchar_t* title = L"SIByL App");
 			virtual ~IWindow() = default;
 
 			virtual auto onUpdate() noexcept -> void = 0;

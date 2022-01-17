@@ -72,19 +72,13 @@
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\GraphicContext.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Private\Vendors\Windows\IWindowWIN.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\Windows\IWindowWIN.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\SObject.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

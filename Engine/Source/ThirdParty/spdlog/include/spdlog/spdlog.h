@@ -6,6 +6,8 @@
 
 #ifndef SPDLOG_H
 #define SPDLOG_H
+#define SPDLOG_WCHAR_FILENAMES
+#define SPDLOG_WCHAR_TO_UTF8_SUPPORT
 
 #pragma once
 

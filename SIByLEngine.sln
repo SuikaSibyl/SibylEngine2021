@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{7A21
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.vcxproj", "{838CC1A8-34B7-49EB-BA38-125B4299CDA3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RHI", "Engine\Source\Runtime\RHI\RHI.vcxproj", "{57D1ED0C-7818-473F-A88E-20CD0F8B0875}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -33,12 +35,21 @@ Global
 		{838CC1A8-34B7-49EB-BA38-125B4299CDA3}.Release|x64.Build.0 = Release|x64
 		{838CC1A8-34B7-49EB-BA38-125B4299CDA3}.Release|x86.ActiveCfg = Release|Win32
 		{838CC1A8-34B7-49EB-BA38-125B4299CDA3}.Release|x86.Build.0 = Release|Win32
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Debug|x64.ActiveCfg = Debug|x64
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Debug|x64.Build.0 = Debug|x64
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Debug|x86.ActiveCfg = Debug|Win32
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Debug|x86.Build.0 = Debug|Win32
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Release|x64.ActiveCfg = Release|x64
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Release|x64.Build.0 = Release|x64
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Release|x86.ActiveCfg = Release|Win32
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{1D8E4D1C-5A87-4EF4-891E-EC0B21B08905} = {7A21A15F-29D8-4406-A7D5-DD7B6CAA8BAB}
+		{57D1ED0C-7818-473F-A88E-20CD0F8B0875} = {7A21A15F-29D8-4406-A7D5-DD7B6CAA8BAB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27B9800B-2764-4CEA-AC3A-22CF85804273}

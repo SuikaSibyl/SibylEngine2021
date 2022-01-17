@@ -1,4 +1,6 @@
 module;
+#define SPDLOG_WCHAR_FILENAMES
+#define SPDLOG_WCHAR_TO_UTF8_SUPPORT
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>

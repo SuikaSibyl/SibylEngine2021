@@ -162,8 +162,6 @@
     <ClCompile Include="Private\Vendors\GLFW\IWindowGLFW.cpp" />
     <ClCompile Include="Private\Test.cpp" />
     <ClCompile Include="Private\Vendors\GLFW\IWindowGLFW.ixx" />
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.cpp" />
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.ixx" />
     <ClCompile Include="Private\Vendors\Windows\IWindowWIN.cpp" />
     <ClCompile Include="Private\Vendors\Windows\IWindowWIN.ixx" />
     <ClCompile Include="Private\Window.cpp" />
@@ -172,13 +170,13 @@
     <ClCompile Include="Public\Core.ixx" />
     <ClCompile Include="Public\Enums.ixx" />
     <ClCompile Include="Public\Event.ixx" />
-    <ClCompile Include="Public\GraphicContext.ixx" />
     <ClCompile Include="Public\Input.ixx" />
     <ClCompile Include="Public\Layer.ixx" />
     <ClCompile Include="Public\Log.ixx">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="Public\SObject.ixx" />
     <ClCompile Include="Public\Test.ixx" />
     <ClCompile Include="Public\Window.ixx" />
   </ItemGroup>

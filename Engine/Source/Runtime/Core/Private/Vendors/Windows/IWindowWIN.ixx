@@ -7,6 +7,7 @@ export module Core.Window.WIN;
 
 import Core.Window;
 import Core.Input;
+import Core.Event;
 
 namespace SIByL
 {
@@ -42,9 +43,9 @@ namespace SIByL
 
 			WindowData	data;
 			HINSTANCE	mhAppInst = nullptr; // application instance handle
-			HWND		mhMainWnd = nullptr; // main window handle
+			HWND		hWnd = nullptr; // main window handle
 
-			auto getHWND() -> HWND* { return &mhMainWnd; }
+			auto getHWND() -> HWND* { return &hWnd; }
 			LRESULT CALLBACK MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 		};

@@ -7,6 +7,11 @@ import Core.Window.GLFW;
 
 namespace SIByL::Core
 {
+	IWindow::IWindow(const wchar_t* title)
+	{
+
+	}
+
 	IWindow* IWindowFactory(
 		EWindowVendor vendor,
 		uint32_t const& width,

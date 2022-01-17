@@ -1,14 +1,15 @@
 module;
 #include <vector>
+#include <optional>
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>;
 import Core.Log;
-module Core.GraphicContext.VK;
-import Core.GraphicContext;
+module RHI.GraphicContext.VK;
+import RHI.GraphicContext;
 
 namespace SIByL
 {
-	inline namespace Core
+	namespace RHI
 	{
 		const uint32_t WIDTH = 800;
 		const uint32_t HEIGHT = 600;
@@ -52,6 +53,16 @@ namespace SIByL
 			//std::cerr << "VULKAN :: validation layer :: " << pCallbackData->pMessage << std::endl;
 
 			return VK_FALSE;
+		}
+
+		auto IGraphicContextVK::findQueueFamilies() -> QueueFamilyIndicesVK
+		{
+			return findQueueFamilies(physicalDevice);
+		}
+
+		auto IGraphicContextVK::hasValidationLayers() -> bool
+		{
+			return true;
 		}
 
 		auto IGraphicContextVK::initVulkan() -> void
@@ -207,14 +218,39 @@ namespace SIByL
 			}
 		}
 
-		bool isDeviceSuitable(VkPhysicalDevice device) {
+		auto IGraphicContextVK::isDeviceSuitable(VkPhysicalDevice device) -> bool
+		{
 			VkPhysicalDeviceProperties deviceProperties;
 			VkPhysicalDeviceFeatures deviceFeatures;
 			vkGetPhysicalDeviceProperties(device, &deviceProperties);
 			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-			return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
-				deviceFeatures.geometryShader;
+			QueueFamilyIndicesVK indices = findQueueFamilies(device);
+			return indices.isComplete();
+		}
+
+		int rateDeviceSuitability(VkPhysicalDevice device) {
+			VkPhysicalDeviceProperties deviceProperties;
+			VkPhysicalDeviceFeatures deviceFeatures;
+			vkGetPhysicalDeviceProperties(device, &deviceProperties);
+			vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+			int score = 0;
+
+			// Discrete GPUs have a significant performance advantage
+			if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+				score += 1000;
+			}
+
+			// Maximum possible size of textures affects graphics quality
+			score += deviceProperties.limits.maxImageDimension2D;
+
+			// Application can't function without geometry shaders
+			if (!deviceFeatures.geometryShader) {
+				return 0;
+			}
+
+			return score;
 		}
 
 		auto IGraphicContextVK::pickPhysicalDevice() -> void
@@ -242,6 +278,30 @@ namespace SIByL
 			if (physicalDevice == VK_NULL_HANDLE) {
 				SE_CORE_ERROR("failed to find a suitable GPU!");
 			}
+		}
+
+		auto IGraphicContextVK::findQueueFamilies(VkPhysicalDevice device) -> QueueFamilyIndicesVK
+		{
+			QueueFamilyIndicesVK indices;
+			// Logic to find queue family indices to populate struct with
+			uint32_t queueFamilyCount = 0;
+			vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+			std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+			vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+			// find at least one queue family that supports VK_QUEUE_GRAPHICS_BIT
+			int i = 0;
+			for (const auto& queueFamily : queueFamilies) {
+				if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+					indices.graphicsFamily = i;
+				}
+
+				if (indices.isComplete()) {
+					break;
+				}
+
+				i++;
+			}
+			return indices;
 		}
 
 		auto IGraphicContextVK::cleanUp() -> void
