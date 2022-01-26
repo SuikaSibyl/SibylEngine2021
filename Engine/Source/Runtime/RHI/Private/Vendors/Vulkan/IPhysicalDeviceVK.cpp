@@ -97,6 +97,11 @@ namespace SIByL::RHI
 		}
 	}
 
+	auto IPhysicalDeviceVK::getPhysicalDevice() noexcept -> VkPhysicalDevice&
+	{
+		return physicalDevice;
+	}
+
 	auto IPhysicalDeviceVK::findQueueFamilies() -> QueueFamilyIndices
 	{
 		QueueFamilyIndices indices;

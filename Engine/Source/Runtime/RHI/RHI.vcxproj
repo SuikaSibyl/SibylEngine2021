@@ -160,6 +160,9 @@
     <ClCompile Include="Public\Device\IGraphicContext.ixx" />
     <ClCompile Include="Public\Device\ILogicalDevice.ixx" />
     <ClCompile Include="Public\Device\IPhysicalDevice.ixx" />
+    <ClCompile Include="Public\Resource\IBuffer.ixx" />
+    <ClCompile Include="Public\Resource\ISwapChain.ixx" />
+    <ClCompile Include="Public\Resource\IResource.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

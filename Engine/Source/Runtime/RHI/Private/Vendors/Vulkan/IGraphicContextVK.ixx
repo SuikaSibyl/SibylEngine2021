@@ -28,9 +28,11 @@ namespace SIByL
 			auto checkValidationLayerSupport() -> bool;
 			auto getRequiredExtensions() -> std::vector<const char*>;
 			auto setupDebugMessenger() -> void;
-			
+			auto createSurface() -> void;
+
 			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 			VkDebugUtilsMessengerEXT debugMessenger;
+			VkSurfaceKHR surface;
 		};
 	}
 }

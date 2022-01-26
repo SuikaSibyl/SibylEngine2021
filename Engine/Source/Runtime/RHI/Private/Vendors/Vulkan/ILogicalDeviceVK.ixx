@@ -22,6 +22,10 @@ namespace SIByL
 		private:
 			IPhysicalDeviceVK* physicalDevice;
 			VkDevice device;
+			VkQueue graphicsQueue;
+
+		private:
+			auto createLogicalDevice(IPhysicalDeviceVK* physicalDevice) noexcept -> void;
 		};
 	}
 }

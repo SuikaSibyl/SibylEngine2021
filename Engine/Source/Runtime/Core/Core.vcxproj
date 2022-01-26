@@ -177,6 +177,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <ClCompile Include="Public\SObject.ixx" />
+    <ClCompile Include="Public\SPointer.ixx" />
     <ClCompile Include="Public\Test.ixx" />
     <ClCompile Include="Public\Window.ixx" />
   </ItemGroup>

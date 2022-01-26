@@ -26,6 +26,9 @@ namespace SIByL
 			};
 			auto findQueueFamilies()->QueueFamilyIndices;
 
+		public:
+			auto getPhysicalDevice() noexcept -> VkPhysicalDevice&;
+
 		private:
 			bool enableDebugLayer;
 			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
