@@ -1,5 +1,3 @@
-module;
-
 export module RHI.IPhysicalDevice;
 import Core.SObject;
 

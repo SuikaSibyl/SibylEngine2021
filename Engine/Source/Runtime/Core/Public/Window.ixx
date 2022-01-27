@@ -2,6 +2,7 @@ module;
 #include <cstdint>
 #include <functional>
 export module Core.Window;
+
 import Core.Enums;
 import Core.Event;
 import Core.Input;
@@ -48,6 +49,7 @@ namespace SIByL
 
 			virtual void onUpdate() override;
 			virtual void onShutdown() override;
+
 			IWindow* getWindow();
 
 		private:

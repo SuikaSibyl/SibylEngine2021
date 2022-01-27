@@ -1,5 +1,5 @@
 module;
-#include <GLFW/glfw3.h>;
+#include <GLFW/glfw3.h>
 module Core.Input.GLFW;
 
 namespace SIByL::Core

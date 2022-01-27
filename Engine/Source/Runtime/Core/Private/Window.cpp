@@ -28,6 +28,8 @@ namespace SIByL::Core
 		default:
 			break;
 		}
+
+		return nullptr;
 	}
 
 	WindowLayer::WindowLayer(

@@ -1,10 +1,11 @@
 module;
-#include <string_view>;
+#include <string_view>
 #include <vector>
 #include <unordered_map>
 export module Core.Application;
 
 import Core.Layer;
+import Core.LayerStack;
 import Core.Event;
 import Core.Window;
 import Core.Enums;
@@ -34,7 +35,7 @@ namespace SIByL
 			void onEvent(Event& e);
 			bool onWindowClose(WindowCloseEvent& e);
 
-			void addWindow(DescWindow const& desc);
+			auto addWindow(DescWindow const& desc) noexcept -> WindowLayer*;
 
 			void pushLayer(ILayer* layer);
 			void pushOverlay(ILayer* overlay);

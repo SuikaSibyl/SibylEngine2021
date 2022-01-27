@@ -45,9 +45,6 @@
     <ClCompile Include="Public\Event.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Layer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Public\Window.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -82,6 +79,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\SPointer.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\LayerStack.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\LayerStack.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Layer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

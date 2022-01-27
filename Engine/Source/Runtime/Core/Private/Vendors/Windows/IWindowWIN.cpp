@@ -1,8 +1,8 @@
 module;
-#include <cstdint>;
+#include <cstdint>
 #include <functional>
-#include <string_view>;
-#include <Windows.h>;
+#include <string_view>
+#include <Windows.h>
 module Core.Window.WIN;
 
 import Core.Log;

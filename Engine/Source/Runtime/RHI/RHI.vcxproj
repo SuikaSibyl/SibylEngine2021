@@ -151,12 +151,14 @@
   <ItemGroup>
     <ClCompile Include="Private\Vendors\DX12\IPhysicalDeviceDX12.cpp" />
     <ClCompile Include="Private\Vendors\DX12\IPhysicalDeviceDX12.ixx" />
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.cpp" />
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.ixx" />
-    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.cpp" />
-    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.ixx" />
-    <ClCompile Include="Private\Vendors\Vulkan\IPhysicalDeviceVK.cpp" />
-    <ClCompile Include="Private\Vendors\Vulkan\IPhysicalDeviceVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IPhysicalDeviceVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IPhysicalDeviceVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.ixx" />
     <ClCompile Include="Public\Device\IGraphicContext.ixx" />
     <ClCompile Include="Public\Device\ILogicalDevice.ixx" />
     <ClCompile Include="Public\Device\IPhysicalDevice.ixx" />

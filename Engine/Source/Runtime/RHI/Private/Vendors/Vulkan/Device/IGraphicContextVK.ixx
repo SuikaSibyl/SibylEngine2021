@@ -3,6 +3,8 @@ module;
 #include <vector>
 export module RHI.GraphicContext.VK;
 import RHI.GraphicContext;
+import Core.Window;
+import Core.Window.GLFW;
 
 namespace SIByL
 {
@@ -12,16 +14,19 @@ namespace SIByL
 		{
 		public:
 			static auto getVKInstance() -> VkInstance&;
-
+			// SObject
 			virtual auto initialize() -> bool;
 			virtual auto destroy() -> bool;
+			// IGraphicContext
+			virtual auto attachWindow(IWindow* window) noexcept -> void override;
 
 		private:
 			static VkInstance instance;
 
 		public:
 			auto hasValidationLayers() -> bool;
-
+			auto getSurface() noexcept -> VkSurfaceKHR&;
+			auto getAttachedWindow() noexcept -> IWindowGLFW*;
 		public:
 			auto createInstance() -> void;
 			auto checkExtension() -> void;
@@ -33,6 +38,7 @@ namespace SIByL
 			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 			VkDebugUtilsMessengerEXT debugMessenger;
 			VkSurfaceKHR surface;
+			IWindowGLFW* windowAttached;
 		};
 	}
 }

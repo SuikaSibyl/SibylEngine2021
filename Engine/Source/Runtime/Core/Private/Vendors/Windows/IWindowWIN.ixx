@@ -1,7 +1,7 @@
 module;
-#include <cstdint>;
+#include <cstdint>
 #include <functional>
-#include <string_view>;
+#include <string_view>
 #include <Windows.h>
 export module Core.Window.WIN;
 

@@ -1,5 +1,5 @@
 module;
-#include <type_traits>;
+#include <type_traits>
 export module Core.SObject;
 
 namespace SIByL

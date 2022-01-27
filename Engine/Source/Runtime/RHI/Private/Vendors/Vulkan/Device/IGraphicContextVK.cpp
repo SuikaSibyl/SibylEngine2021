@@ -2,9 +2,11 @@ module;
 #include <vector>
 #include <optional>
 #include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>;
-import Core.Log;
+#include <GLFW/glfw3.h>
 module RHI.GraphicContext.VK;
+import Core.Log;
+import Core.Window;
+import Core.Window.GLFW;
 import RHI.GraphicContext;
 
 namespace SIByL
@@ -62,6 +64,16 @@ namespace SIByL
 		auto IGraphicContextVK::hasValidationLayers() -> bool
 		{
 			return true;
+		}
+
+		auto IGraphicContextVK::getSurface() noexcept -> VkSurfaceKHR&
+		{
+			return surface;
+		}
+
+		auto IGraphicContextVK::getAttachedWindow() noexcept -> IWindowGLFW*
+		{
+			return windowAttached;
 		}
 
 		auto IGraphicContextVK::initialize() -> bool
@@ -231,8 +243,28 @@ namespace SIByL
 				DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 			}
 
+			if (surface)
+				vkDestroySurfaceKHR(instance, surface, nullptr);
 			vkDestroyInstance(instance, nullptr);
 			return true;
+		}
+
+		auto IGraphicContextVK::attachWindow(IWindow* window) noexcept -> void
+		{
+			IWindowGLFW* window_glfw = dynamic_cast<IWindowGLFW*>(window);
+			windowAttached = window_glfw;
+			if (window_glfw == nullptr)
+			{
+#ifdef _DEBUG
+				SE_CORE_ERROR("Vulkan :: cannot be attached to a non-glfw window now.");
+#endif // _DEBUG
+			}
+			if (glfwCreateWindowSurface(instance, (GLFWwindow*)window_glfw->getNativeWindow(), nullptr, &surface) != VK_SUCCESS)
+			{
+#ifdef _DEBUG
+				SE_CORE_ERROR("Vulkan :: cannot be attached to a non-glfw window now.");
+#endif // _DEBUG
+			}
 		}
 	}
 }

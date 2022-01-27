@@ -1,5 +1,6 @@
 export module RHI.GraphicContext;
 import Core.SObject;
+import Core.Window;
 
 namespace SIByL
 {
@@ -10,6 +11,7 @@ namespace SIByL
 		public:
 			virtual ~IGraphicContext() = default;
 
+			virtual auto attachWindow(IWindow* window) noexcept -> void = 0;
 
 		private:
 

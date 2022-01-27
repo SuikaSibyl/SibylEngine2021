@@ -18,16 +18,16 @@
     <ClCompile Include="Public\Device\IGraphicContext.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\IGraphicContextVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Device\IPhysicalDevice.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\IPhysicalDeviceVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IPhysicalDeviceVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\DX12\IPhysicalDeviceDX12.ixx">
@@ -36,16 +36,16 @@
     <ClCompile Include="Private\Vendors\DX12\IPhysicalDeviceDX12.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\IPhysicalDeviceVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Device\IPhysicalDeviceVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Device\ILogicalDevice.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\ILogicalDeviceVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Resource\ISwapChain.ixx">
@@ -55,6 +55,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Resource\IBuffer.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

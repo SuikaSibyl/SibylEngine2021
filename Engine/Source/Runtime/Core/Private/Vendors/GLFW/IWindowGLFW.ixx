@@ -1,11 +1,12 @@
 module;
-#include <cstdint>;
+#include <cstdint>
 #include <functional>
-#include <string_view>;
-#include <GLFW/glfw3.h>;
+#include <string_view>
+#include <GLFW/glfw3.h>
 export module Core.Window.GLFW;
 
 import Core.Window;
+import Core.Event;
 import Core.Input;
 
 namespace SIByL
@@ -27,6 +28,8 @@ namespace SIByL
 			virtual auto isVSync() const noexcept -> bool override;
 			virtual auto setEventCallback(const EventCallbackFn& callback) noexcept -> void override;
 			virtual auto getInput() const noexcept -> IInput* override;
+
+			auto getFramebufferSize(uint32_t& width, uint32_t& height) const noexcept -> void;
 
 		private:
 			GLFWwindow* glfw_window;

@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Layer.cpp" />
+    <ClCompile Include="Private\LayerStack.cpp" />
     <ClCompile Include="Private\Log.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
@@ -172,6 +173,7 @@
     <ClCompile Include="Public\Event.ixx" />
     <ClCompile Include="Public\Input.ixx" />
     <ClCompile Include="Public\Layer.ixx" />
+    <ClCompile Include="Public\LayerStack.ixx" />
     <ClCompile Include="Public\Log.ixx">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>

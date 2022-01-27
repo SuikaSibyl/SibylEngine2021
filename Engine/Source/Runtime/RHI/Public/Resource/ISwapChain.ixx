@@ -1,13 +1,13 @@
 module;
 
 export module RHI.ISwapChain;
-import Core.SObject;
+import RHI.IResource;
 
 namespace SIByL
 {
 	namespace RHI
 	{
-		export class ISwapChain :public SObject
+		export class ISwapChain :public IResource
 		{
 		public:
 			virtual ~ISwapChain() = default;

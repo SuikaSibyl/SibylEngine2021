@@ -31,9 +31,9 @@ namespace SIByL::Core
 		while (is_running)
 		{
 			// Update
-			for (int i = 0; i < layer_stack.layers.size(); i++)
+			for (int i = 0; i < layer_stack.layer_stack.size(); i++)
 			{
-				layer_stack.layers[i]->onUpdate();
+				layer_stack.layer_stack[i]->onUpdate();
 			}
 		}
 	}
@@ -81,7 +81,7 @@ namespace SIByL::Core
 		return true;
 	}
 
-	void IApplication::addWindow(DescWindow const& desc)
+	auto IApplication::addWindow(DescWindow const& desc) noexcept -> WindowLayer*
 	{
 		WindowLayer* window_layer = new WindowLayer(
 			desc.vendor,
@@ -92,6 +92,8 @@ namespace SIByL::Core
 
 		pushLayer(window_layer);
 		window_layers.push_back(window_layer);
+
+		return window_layer;
 	}
 
 	void IApplication::pushLayer(ILayer* layer)

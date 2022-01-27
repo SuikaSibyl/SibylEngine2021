@@ -1,5 +1,5 @@
 module;
-#include <type_traits>;
+#include <type_traits>
 export module Core.SPointer;
 import Core.Log;
 
@@ -18,6 +18,7 @@ namespace SIByL
 			~Scope();
 
 			T* get();
+			T* operator->();
 
 		private:
 			// non-copyable
@@ -43,6 +44,12 @@ namespace SIByL
 
 		template<typename T>
 		T* Scope<T>::get()
+		{
+			return ptr;
+		}
+
+		template<typename T>
+		T* Scope<T>::operator->()
 		{
 			return ptr;
 		}

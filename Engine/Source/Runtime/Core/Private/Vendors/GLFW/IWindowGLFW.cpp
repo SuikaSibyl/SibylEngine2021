@@ -1,8 +1,8 @@
 module;
-#include <cstdint>;
+#include <cstdint>
 #include <functional>
-#include <string_view>;
-#include <GLFW/glfw3.h>;
+#include <string_view>
+#include <GLFW/glfw3.h>
 module Core.Window.GLFW;
 
 import Core.Log;
@@ -192,4 +192,13 @@ namespace SIByL::Core
 	{
 		return input;
 	}
+
+	auto IWindowGLFW::getFramebufferSize(uint32_t& width, uint32_t& height) const noexcept -> void
+	{
+		int _width, _height;
+		glfwGetFramebufferSize(glfw_window, &_width, &_height);
+		width = static_cast<uint32_t>(_width);
+		height = static_cast<uint32_t>(_height);
+	}
+
 }
