@@ -149,8 +149,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Vendors\DX12\IPhysicalDeviceDX12.cpp" />
-    <ClCompile Include="Private\Vendors\DX12\IPhysicalDeviceDX12.ixx" />
+    <ClCompile Include="Private\Vendors\DX12\Device\IPhysicalDeviceDX12.cpp" />
+    <ClCompile Include="Private\Vendors\DX12\Device\IPhysicalDeviceDX12.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.cpp" />
@@ -172,6 +172,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Private\Vendors\DX12\Device\WindowsPlatform.h" />
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

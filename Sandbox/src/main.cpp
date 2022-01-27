@@ -33,7 +33,7 @@ auto SE_CREATE_APP() noexcept -> SIByL::IApplication*
 
 	auto vk_context = CreateScope<RHI::IGraphicContextVK>();
 	vk_context->attachWindow(window_layer->getWindow());
-	//auto dx12 = CreateScope<RHI::IPhysicalDeviceDX12>();
+	auto dx12 = CreateScope<RHI::IPhysicalDeviceDX12>();
 	auto vk_device = CreateScope<RHI::IPhysicalDeviceVK>(vk_context.get());
 	auto vk_logical_device = CreateScope<RHI::ILogicalDeviceVK>(vk_device.get());
 	auto vk_swapbuffer = CreateScope<RHI::ISwapChainVK>(vk_logical_device.get());
