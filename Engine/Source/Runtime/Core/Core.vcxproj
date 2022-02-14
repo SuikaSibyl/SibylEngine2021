@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Allocator.cpp" />
     <ClCompile Include="Private\Application.cpp" />
     <ClCompile Include="Private\Layer.cpp" />
     <ClCompile Include="Private\LayerStack.cpp" />
@@ -158,6 +159,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="Private\Memory.cpp" />
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.cpp" />
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.ixx" />
     <ClCompile Include="Private\Vendors\GLFW\IWindowGLFW.cpp" />
@@ -166,6 +168,7 @@
     <ClCompile Include="Private\Vendors\Windows\IWindowWIN.cpp" />
     <ClCompile Include="Private\Vendors\Windows\IWindowWIN.ixx" />
     <ClCompile Include="Private\Window.cpp" />
+    <ClCompile Include="Public\Allocator.ixx" />
     <ClCompile Include="Public\Application.ixx" />
     <ClCompile Include="Public\Assert.ixx" />
     <ClCompile Include="Public\Core.ixx" />
@@ -178,6 +181,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">TurnOffAllWarnings</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
+    <ClCompile Include="Public\Memory.ixx" />
     <ClCompile Include="Public\SObject.ixx" />
     <ClCompile Include="Public\SPointer.ixx" />
     <ClCompile Include="Public\Test.ixx" />

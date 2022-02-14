@@ -1,6 +1,7 @@
 module;
 #include <vector>
 #include <string_view>
+#include <unordered_map>
 #include <functional>
 #include <Macros.h>
 module Core.Application;
@@ -13,7 +14,7 @@ namespace SIByL::Core
 {
 	IApplication::IApplication()
 	{
-
+		onEventCallbackFn = BIND_EVENT_FN(IApplication::onEvent);
 	}
 
 	IApplication::~IApplication()
@@ -24,12 +25,14 @@ namespace SIByL::Core
 	void IApplication::awake()
 	{
 		is_running = true;
+		onAwake();
 	}
 
 	void IApplication::mainLoop()
 	{
 		while (is_running)
 		{
+			onUpdate();
 			// Update
 			for (int i = 0; i < layer_stack.layer_stack.size(); i++)
 			{
@@ -65,35 +68,7 @@ namespace SIByL::Core
 
 	bool IApplication::onWindowClose(WindowCloseEvent& e)
 	{
-		for (auto iter = window_layers.begin(); iter != window_layers.end(); iter++)
-		{
-			if ((*iter)->getWindow() == (IWindow*)e.window)
-			{
-				delete (*iter);
-				layer_stack.popLayer((ILayer*) *iter);
-				window_layers.erase(iter);
-				break;
-			}
-		}
-		
-		if (window_layers.size() == 0)
-			is_running = false;
-		return true;
-	}
-
-	auto IApplication::addWindow(DescWindow const& desc) noexcept -> WindowLayer*
-	{
-		WindowLayer* window_layer = new WindowLayer(
-			desc.vendor,
-			BIND_EVENT_FN(IApplication::onEvent), 
-			desc.width, 
-			desc.height, 
-			desc.name);
-
-		pushLayer(window_layer);
-		window_layers.push_back(window_layer);
-
-		return window_layer;
+		return false;
 	}
 
 	void IApplication::pushLayer(ILayer* layer)

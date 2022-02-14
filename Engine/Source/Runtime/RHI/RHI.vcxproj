@@ -80,15 +80,15 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/ThirdParty/slang/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/ThirdParty/slang/include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -149,22 +149,73 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Common\IEnum.cpp" />
+    <ClCompile Include="Private\Common\IFixedFunctions.cpp" />
+    <ClCompile Include="Private\Slang\ICompileSession.cpp" />
+    <ClCompile Include="Private\Slang\IGlobalSession.cpp" />
+    <ClCompile Include="Private\Slang\SlangUtility.ixx" />
+    <ClCompile Include="Private\Vendors\DX12\Device\IGraphicContextDX12.cpp" />
+    <ClCompile Include="Private\Vendors\DX12\Device\IGraphicContextDX12.ixx" />
+    <ClCompile Include="Private\Vendors\DX12\Device\ILogicalDeviceDX12.cpp" />
+    <ClCompile Include="Private\Vendors\DX12\Device\ILogicalDeviceDX12.ixx" />
     <ClCompile Include="Private\Vendors\DX12\Device\IPhysicalDeviceDX12.cpp" />
     <ClCompile Include="Private\Vendors\DX12\Device\IPhysicalDeviceDX12.ixx" />
+    <ClCompile Include="Private\Vendors\OpenGL\Device\IGraphicContextGL.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IPhysicalDeviceVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IPhysicalDeviceVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IFixedFunctionsVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IFixedFunctionsVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IPipelineLayoutVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IPipelineLayoutVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IPipelineVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IPipelineVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IRenderPassVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Pass\IRenderPassVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IFrameBufferVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IFrameBufferVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderVK.ixx" />
+    <ClCompile Include="Public\Command\ICommandBuffer.ixx" />
+    <ClCompile Include="Public\Command\ICommandList.ixx" />
+    <ClCompile Include="Public\Command\ICommandPool.ixx" />
+    <ClCompile Include="Public\Command\IFence.ixx" />
+    <ClCompile Include="Public\Command\IQueue.ixx" />
     <ClCompile Include="Public\Device\IGraphicContext.ixx" />
     <ClCompile Include="Public\Device\ILogicalDevice.ixx" />
     <ClCompile Include="Public\Device\IPhysicalDevice.ixx" />
+    <ClCompile Include="Public\Pass\IFixedFunctions.ixx" />
+    <ClCompile Include="Public\Pass\IPipeline.ixx" />
+    <ClCompile Include="Public\Pass\IPipelineLayout.ixx" />
+    <ClCompile Include="Public\Pass\IRenderPass.ixx" />
+    <ClCompile Include="Public\Pass\IShaderBinding.ixx" />
+    <ClCompile Include="Public\Resource\IBarrier.ixx" />
     <ClCompile Include="Public\Resource\IBuffer.ixx" />
+    <ClCompile Include="Public\Resource\IFramebuffer.ixx" />
+    <ClCompile Include="Public\Command\ISemaphore.ixx" />
     <ClCompile Include="Public\Resource\ISwapChain.ixx" />
     <ClCompile Include="Public\Resource\IResource.ixx" />
+    <ClCompile Include="Public\Resource\ITexture.ixx" />
+    <ClCompile Include="Public\Resource\IWindowSurface.ixx" />
+    <ClCompile Include="Public\Shader\ICompileSession.ixx" />
+    <ClCompile Include="Public\Resource\IEnum.ixx" />
+    <ClCompile Include="Public\Shader\IGlobalSession.ixx" />
+    <ClCompile Include="Public\Shader\IShader.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
@@ -172,7 +223,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Private\Vendors\DX12\Device\WindowsPlatform.h" />
+    <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h" />
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

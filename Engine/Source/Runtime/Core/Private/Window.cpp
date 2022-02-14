@@ -1,8 +1,14 @@
 module;
+#include <cstdint>
+#include <functional>
 #include <string_view>
 #include <functional>
 module Core.Window;
-
+import Core.Enums;
+import Core.Event;
+import Core.Input;
+import Core.Layer;
+import Core.SObject;
 import Core.Window.GLFW;
 
 namespace SIByL::Core

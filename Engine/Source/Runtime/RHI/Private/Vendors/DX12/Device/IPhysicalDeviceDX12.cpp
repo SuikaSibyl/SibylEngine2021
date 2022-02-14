@@ -1,6 +1,7 @@
 module;
-#include "WindowsPlatform.h"
+#include <Vendors/DX12/WindowsPlatform.h>
 #include <vector>
+#include <dxgi1_6.h>
 #include <string>
 module RHI.IPhysicalDevice.DX12;
 import Core.Log;
@@ -14,34 +15,38 @@ namespace SIByL::RHI
 	const bool enableValidationLayers = false;
 #endif
 
+	IPhysicalDeviceDX12::IPhysicalDeviceDX12(IGraphicContext* graphic_context)
+	{
+		graphicContext = static_cast<IGraphicContextDX12*>(graphic_context);
+	}
+
 	auto IPhysicalDeviceDX12::initialize() -> bool
 	{
 		// set debugLayer according to compile mode
 		enableDebugLayer = enableValidationLayers;
-		UINT flags = 0;
-		if (enableDebugLayer) flags = DXGI_CREATE_FACTORY_DEBUG;
 
-		// create dxgiFactory
-		if (SUCCEEDED(CreateDXGIFactory2(flags, IID_PPV_ARGS(&pDXGIFactory))))
+		queryAllAdapters();
+		// If the only adapter we found is a software adapter, log error message for QA
+		if (!enumedDXGIAdapters.size() && foundSoftwareAdapter)
 		{
-			queryAllAdapters();
-			// If the only adapter we found is a software adapter, log error message for QA
-			if (!DXGIAdapters.size() && foundSoftwareAdapter)
-			{
-				SE_CORE_ASSERT(0, "The only available GPU has DXGI_ADAPTER_FLAG_SOFTWARE. Early exiting");
-				return false;
-			}
+			SE_CORE_ASSERT(0, "The only available GPU has DXGI_ADAPTER_FLAG_SOFTWARE. Early exiting");
+			return false;
 		}
+		else
+		{
+			selectedAdapter = enumedDXGIAdapters[0];
+		}
+
 		return true;
 	}
 
 	auto IPhysicalDeviceDX12::destroy() -> bool
 	{
-		for (auto iter : DXGIAdapters)
+		for (auto iter : enumedDXGIAdapters)
 		{
 			SAFE_RELEASE(iter);
 		}
-		SAFE_RELEASE(pDXGIFactory);
+
 		return true;
 	}
 
@@ -49,7 +54,7 @@ namespace SIByL::RHI
 	{
 		IDXGIAdapter4* adapter = NULL;
 		// Use DXGI6 interface which lets us specify gpu preference
-		for (UINT i = 0; pDXGIFactory->EnumAdapterByGpuPreference(i,
+		for (UINT i = 0; graphicContext->getDXGIFactory()->EnumAdapterByGpuPreference(i,
 			DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE,
 			IID_PPV_ARGS(&adapter)) != DXGI_ERROR_NOT_FOUND;
 			i++)
@@ -63,7 +68,7 @@ namespace SIByL::RHI
 				SAFE_RELEASE(adapter);
 			}
 			else
-				DXGIAdapters.push_back(adapter);
+				enumedDXGIAdapters.push_back(adapter);
 		}
 	}
 
@@ -72,4 +77,13 @@ namespace SIByL::RHI
 		return enableDebugLayer;
 	}
 
+	auto IPhysicalDeviceDX12::getGraphicContext() noexcept -> IGraphicContextDX12*
+	{
+		return graphicContext;
+	}
+
+	auto IPhysicalDeviceDX12::getAdapter() noexcept -> IDXGIAdapter4*
+	{
+		return selectedAdapter;
+	}
 }

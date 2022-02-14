@@ -3,10 +3,14 @@ module;
 #include <vulkan/vulkan.h>
 #include <cstdint> // Necessary for UINT32_MAX
 #include <algorithm> // Necessary for std::clamp
+#include <utility>
 module RHI.ISwapChain.VK;
 import Core.Log;
 import RHI.ISwapChain;
 import RHI.IPhysicalDevice.VK;
+import RHI.ITexture;
+import RHI.ITexture.VK;
+import RHI.IResource.VK;
 
 namespace SIByL::RHI
 {
@@ -71,11 +75,22 @@ namespace SIByL::RHI
 			SE_CORE_ERROR("failed to create swap chain!");
 		}
 
+		std::vector<VkImage> images;
 		vkGetSwapchainImagesKHR(logicalDevice->getDeviceHandle(), swapChain, &imageCount, nullptr);
-		swapChainImages.resize(imageCount);
-		vkGetSwapchainImagesKHR(logicalDevice->getDeviceHandle(), swapChain, &imageCount, swapChainImages.data());
+		images.resize(imageCount);
+		vkGetSwapchainImagesKHR(logicalDevice->getDeviceHandle(), swapChain, &imageCount, images.data());
 		swapChainImageFormat = surfaceFormat.format;
 		swapChainExtent = extent;
+
+		std::vector<ITextureVK> swapChain_Textures;
+		for (uint32_t i = 0; i < imageCount; i++)
+		{
+			IResourceVK resource;
+			resource.setVKFormat(swapChainImageFormat);
+			resource.setVKImageViewType(VK_IMAGE_VIEW_TYPE_2D);
+			ITextureVK texture(images[i], std::move(resource), logicalDevice);
+			swapChain_Textures.emplace_back(std::move(texture));
+		}
 	}
 
 	// There are three types of settings to determine:

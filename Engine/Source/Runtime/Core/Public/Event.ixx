@@ -48,6 +48,8 @@ namespace SIByL
 			bool handled = false;
 		};
 
+		export using EventCallbackFn = std::function<void(Event&)>;
+
 		export class EventDispatcher
 		{
 			template<typename T>

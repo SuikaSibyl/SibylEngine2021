@@ -6,6 +6,13 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		// The context generally allows you to access the API's inner classes.
+		// ╭──────────────┬──────────────────╮
+		// │  Vulkan	  │   vk::Instance   │
+		// │  DirectX 12  │   IDXGIFactory   │
+		// │  OpenGL      │   Varies by OS   │
+		// ╰──────────────┴──────────────────╯
+
 		export class IGraphicContext :public SObject
 		{
 		public:

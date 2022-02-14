@@ -4,7 +4,6 @@ module;
 #include <string_view>
 #include <GLFW/glfw3.h>
 export module Core.Window.GLFW;
-
 import Core.Window;
 import Core.Event;
 import Core.Input;
@@ -26,7 +25,7 @@ namespace SIByL
 			virtual auto getNativeWindow() const noexcept -> void* override;
 			virtual auto setVSync(bool enabled) noexcept -> void override;
 			virtual auto isVSync() const noexcept -> bool override;
-			virtual auto setEventCallback(const EventCallbackFn& callback) noexcept -> void override;
+			virtual auto setEventCallback(EventCallbackFn const& callback) noexcept -> void override;
 			virtual auto getInput() const noexcept -> IInput* override;
 
 			auto getFramebufferSize(uint32_t& width, uint32_t& height) const noexcept -> void;

@@ -6,6 +6,7 @@ import Core.Window.GLFW;
 import RHI.ISwapChain;
 import RHI.IPhysicalDevice.VK;
 import RHI.ILogicalDevice.VK;
+import RHI.ITexture.VK;
 
 namespace SIByL
 {
@@ -22,7 +23,7 @@ namespace SIByL
 			IPhysicalDeviceVK* physicalDevice;
 			ILogicalDeviceVK* logicalDevice;
 			IWindowGLFW* windowAttached;
-			std::vector<VkImage> swapChainImages;
+			std::vector<ITextureVK> swapChainTextures;
 			VkFormat swapChainImageFormat;
 			VkExtent2D swapChainExtent;
 

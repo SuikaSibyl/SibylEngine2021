@@ -1,7 +1,8 @@
 module;
-
+#include <stdint.h>
 export module RHI.IResource;
 import Core.SObject;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -12,9 +13,12 @@ namespace SIByL
 		public:
 			IResource() = default;
 			IResource(IResource&&) = default;
-			IResource(IResource const&) = delete;
 			virtual ~IResource() = default;
 
+        protected:
+            ResourceType type;
+            ResourceState state;
+            ResourceFormat format;
 		};
 	}
 }
