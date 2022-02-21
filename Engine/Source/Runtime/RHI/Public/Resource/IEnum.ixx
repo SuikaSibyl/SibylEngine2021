@@ -154,5 +154,16 @@ namespace SIByL
 			VIEWPORT,
 			LINE_WIDTH,
 		};
+
+		export enum class SampleCount : uint32_t
+		{
+			COUNT_1_BIT,
+			COUNT_2_BIT,
+			COUNT_4_BIT,
+			COUNT_8_BIT,
+			COUNT_16_BIT,
+			COUNT_32_BIT,
+			COUNT_64_BIT,
+		};
 	}
 }

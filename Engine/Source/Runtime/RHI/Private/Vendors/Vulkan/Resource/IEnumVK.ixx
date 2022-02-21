@@ -14,4 +14,7 @@ namespace SIByL::RHI
 	export inline auto getVkBlendOperator(BlendOperator mode) noexcept -> VkBlendOp;
 	export inline auto getVkBlendFactor(BlendFactor mode) noexcept -> VkBlendFactor;
 	export inline auto getVkDynamicState(PipelineState state) noexcept -> VkDynamicState;
+	export inline auto getVkSampleCount(SampleCount count) noexcept -> VkSampleCountFlagBits;
+	export inline auto getVKFormat(ResourceFormat format) noexcept -> VkFormat;
+
 }

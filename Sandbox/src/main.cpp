@@ -25,16 +25,14 @@ import Core.File;
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
 import RHI.ILogicalDevice;
-import RHI.ILogicalDevice.VK;
-import RHI.ILogicalDevice.DX12;
+import RHI.IPipelineLayout;
 import RHI.ISwapChain;
-import RHI.ISwapChain.VK;
 import RHI.ICompileSession;
 import RHI.IEnum;
 import RHI.IFactory;
 import RHI.IShader;
-import RHI.IShader.VK;
 import RHI.IFixedFunctions;
+import RHI.IPipeline;
 import UAT.IUniversalApplication;
 
 using namespace SIByL;
@@ -111,6 +109,35 @@ public:
 		};
 		MemScope<RHI::IDynamicState> dynamic_states = resourceFactory->createDynamicState(pipelinestates_desc);
 
+		RHI::PipelineLayoutDesc pipelineLayout_desc =
+		{
+			0,
+		};
+		MemScope<RHI::IPipelineLayout> pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
+
+		RHI::RenderPassDesc renderpass_desc =
+		{
+			RHI::SampleCount::COUNT_1_BIT,
+			RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB,
+		};
+		MemScope<RHI::IRenderPass> render_pass = resourceFactory->createRenderPass(renderpass_desc);
+
+		RHI::PipelineDesc pipeline_desc =
+		{
+			{ shaderVert.get(), shaderFrag.get()},
+			vertex_layout.get(),
+			input_assembly.get(),
+			viewport_scissors.get(),
+			rasterizer.get(),
+			multisampling.get(),
+			depthstencil.get(),
+			color_blending.get(),
+			dynamic_states.get(),
+			pipeline_layout.get(),
+			render_pass.get(),
+		};
+		pipeline = resourceFactory->createPipeline(pipeline_desc);
+
 	}
 
 	virtual void onUpdate() override
@@ -121,12 +148,15 @@ public:
 private:
 	Scope<RHI::IGraphicContext> graphicContext;
 	Scope<RHI::IPhysicalDevice> physicalDevice;
+
 	Scope<RHI::ILogicalDevice> logicalDevice;
 	Scope<RHI::ISwapChain> swapchain;
 
 	MemScope<RHI::IResourceFactory> resourceFactory;
 	MemScope<RHI::IShader> shaderVert;
 	MemScope<RHI::IShader> shaderFrag;
+
+	MemScope<RHI::IPipeline> pipeline;
 };
 
 auto SE_CREATE_APP() noexcept -> SIByL::IApplication*

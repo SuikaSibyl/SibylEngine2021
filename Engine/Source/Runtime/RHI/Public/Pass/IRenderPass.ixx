@@ -1,6 +1,7 @@
 module;
 export module RHI.IRenderPass;
 import Core.SObject;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -16,6 +17,12 @@ namespace SIByL
 		// │  DirectX 12  │   render pass   │
 		// │  OpenGL      │                 │
 		// ╰──────────────┴─────────────────╯
+
+		export struct RenderPassDesc
+		{
+			SampleCount samples;
+			ResourceFormat format;
+		};
 
 		export class IRenderPass :public SObject
 		{

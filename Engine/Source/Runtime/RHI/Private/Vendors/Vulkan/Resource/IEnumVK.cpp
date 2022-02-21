@@ -214,5 +214,55 @@ namespace SIByL::RHI
 		return VK_DYNAMIC_STATE_MAX_ENUM;
 	}
 
+	inline auto getVkSampleCount(SampleCount count) noexcept -> VkSampleCountFlagBits
+	{
+		switch (count)
+		{
+		case SIByL::RHI::SampleCount::COUNT_64_BIT:
+			return VK_SAMPLE_COUNT_64_BIT;
+			break;
+		case SIByL::RHI::SampleCount::COUNT_32_BIT:
+			return VK_SAMPLE_COUNT_32_BIT;
+			break;
+		case SIByL::RHI::SampleCount::COUNT_16_BIT:
+			return VK_SAMPLE_COUNT_16_BIT;
+			break;
+		case SIByL::RHI::SampleCount::COUNT_8_BIT:
+			return VK_SAMPLE_COUNT_8_BIT;
+			break;
+		case SIByL::RHI::SampleCount::COUNT_4_BIT:
+			return VK_SAMPLE_COUNT_4_BIT;
+			break;
+		case SIByL::RHI::SampleCount::COUNT_2_BIT:
+			return VK_SAMPLE_COUNT_2_BIT;
+			break;
+		case SIByL::RHI::SampleCount::COUNT_1_BIT:
+			return VK_SAMPLE_COUNT_1_BIT;
+			break;
+		default:
+			break;
+		}
+
+		return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
+	}
+
+	inline auto getVKFormat(ResourceFormat format) noexcept -> VkFormat
+	{
+		switch (format)
+		{
+		case ResourceFormat::FORMAT_B8G8R8A8_RGB:
+			return VK_FORMAT_B8G8R8A8_UINT;
+			break;
+		case ResourceFormat::FORMAT_B8G8R8A8_SRGB:
+			return VK_FORMAT_B8G8R8A8_SRGB;
+			break;
+		case ResourceFormat::FORMAT_R8G8B8A8_SRGB:
+			return VK_FORMAT_R8G8B8A8_SRGB;
+			break;
+		default:
+			break;
+		}
+		return VK_FORMAT_UNDEFINED;
+	}
 
 }

@@ -20,6 +20,9 @@ import RHI.ILogicalDevice;
 import RHI.ISwapChain;
 import RHI.IShader;
 import RHI.IFixedFunctions;
+import RHI.IPipelineLayout;
+import RHI.IRenderPass;
+import RHI.IPipeline;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -27,6 +30,9 @@ import RHI.ILogicalDevice.VK;
 import RHI.ISwapChain.VK;
 import RHI.IShader.VK;
 import RHI.IFixedFunctions.VK;
+import RHI.IPipelineLayout.VK;
+import RHI.IRenderPass.VK;
+import RHI.IPipeline.VK;
 
 namespace SIByL::RHI
 {
@@ -314,5 +320,62 @@ namespace SIByL::RHI
 			break;
 		}
 		return ds;
+	}
+
+	auto IResourceFactory::createPipelineLayout(PipelineLayoutDesc const& desc) noexcept -> MemScope<IPipelineLayout>
+	{
+		MemScope<IPipelineLayout> pl = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IPipelineLayoutVK> pl_vk = MemNew<IPipelineLayoutVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			pl = MemCast<IPipelineLayout>(pl_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return pl;
+	}
+
+	auto IResourceFactory::createRenderPass(RenderPassDesc const& desc) noexcept -> MemScope<IRenderPass>
+	{
+		MemScope<IRenderPass> rp = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IRenderPassVK> rp_vk = MemNew<IRenderPassVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			rp = MemCast<IRenderPass>(rp_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return rp;
+	}
+
+	auto IResourceFactory::createPipeline(PipelineDesc const& desc) noexcept -> MemScope<IPipeline>
+	{
+		MemScope<IPipeline> rp = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IPipelineVK> rp_vk = MemNew<IPipelineVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			rp = MemCast<IPipeline>(rp_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return rp;
 	}
 }

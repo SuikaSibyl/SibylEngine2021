@@ -28,7 +28,7 @@ namespace SIByL
 		// Fixed-function state : all of the structures that define the fixed - function stages of the pipeline, like input assembly, rasterizer, viewportand color blending
 		// Pipeline layout		: the uniformand push values referenced by the shader that can be updated at draw time
 		// Render pass			: the attachments referenced by the pipeline stagesand their usage
-		export struct IPipelineDesc
+		export struct PipelineDesc
 		{
 			std::vector<IShader*> shaders;
 			IVertexLayout* vertexLayout;
@@ -49,9 +49,6 @@ namespace SIByL
 			IPipeline() = default;
 			IPipeline(IPipeline&&) = default;
 			virtual ~IPipeline() = default;
-
-		protected:
-			IPipelineDesc desc;
 		};
 	}
 }

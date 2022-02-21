@@ -1,5 +1,5 @@
 module;
-
+#include <cstdint>
 export module RHI.IPipelineLayout;
 import Core.SObject;
 
@@ -15,6 +15,11 @@ namespace SIByL
 		// │  DirectX 12  │   RootSignature**   │
 		// │  OpenGL      │                     │
 		// ╰──────────────┴─────────────────────╯
+
+		export struct PipelineLayoutDesc
+		{
+			uint32_t layoutCount;
+		};
 
 		export class IPipelineLayout :public SObject
 		{

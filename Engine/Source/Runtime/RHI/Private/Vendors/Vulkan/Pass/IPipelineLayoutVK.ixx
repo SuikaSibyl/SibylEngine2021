@@ -11,12 +11,12 @@ namespace SIByL
 		export class IPipelineLayoutVK :public IPipelineLayout
 		{
 		public:
-			IPipelineLayoutVK() = default;
+			IPipelineLayoutVK(PipelineLayoutDesc const& desc, ILogicalDeviceVK* logical_device);
 			IPipelineLayoutVK(IPipelineLayoutVK&&) = default;
 			virtual ~IPipelineLayoutVK();
 
 			auto getVkPipelineLayout() noexcept -> VkPipelineLayout*;
-			auto createPipelineLayout() noexcept -> void;
+			auto createPipelineLayout(PipelineLayoutDesc const& desc) noexcept -> void;
 		private:
 			ILogicalDeviceVK* logicalDevice;
 			VkPipelineLayout pipelineLayout;

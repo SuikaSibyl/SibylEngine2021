@@ -20,6 +20,13 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		IPipelineVK::IPipelineVK(PipelineDesc const& _desc, ILogicalDeviceVK* logical_device)
+			: logicalDevice(logical_device)
+			, desc(_desc)
+		{
+			createVkPipeline();
+		}
+
 		IPipelineVK::~IPipelineVK()
 		{
 			if (graphicsPipeline)

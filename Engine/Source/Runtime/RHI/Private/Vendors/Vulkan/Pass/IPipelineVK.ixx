@@ -18,7 +18,7 @@ namespace SIByL
 		export class IPipelineVK :public IPipeline
 		{
 		public:
-			IPipelineVK() = default;
+			IPipelineVK(PipelineDesc const& desc, ILogicalDeviceVK* logical_device);
 			IPipelineVK(IPipelineVK&&) = default;
 			virtual ~IPipelineVK();
 
@@ -27,6 +27,7 @@ namespace SIByL
 		private:
 			ILogicalDeviceVK* logicalDevice;
 			VkPipeline graphicsPipeline;
+			PipelineDesc desc;
 			auto createVkPipeline() noexcept -> void;
 		};
 	}

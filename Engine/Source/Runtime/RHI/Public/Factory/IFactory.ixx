@@ -10,6 +10,9 @@ import RHI.ILogicalDevice;
 import RHI.ISwapChain;
 import RHI.IShader;
 import RHI.IFixedFunctions;
+import RHI.IPipelineLayout;
+import RHI.IRenderPass;
+import RHI.IPipeline;
 
 namespace SIByL
 {
@@ -64,6 +67,9 @@ namespace SIByL
 			auto createDepthStencil(DepthStencilDesc const& desc) noexcept -> MemScope<IDepthStencil>;
 			auto createColorBlending(ColorBlendingDesc const& desc) noexcept -> MemScope<IColorBlending>;
 			auto createDynamicState(std::vector<PipelineState> const& states) noexcept -> MemScope<IDynamicState>;
+			auto createPipelineLayout(PipelineLayoutDesc const& desc) noexcept -> MemScope<IPipelineLayout>;
+			auto createRenderPass(RenderPassDesc const& desc) noexcept -> MemScope<IRenderPass>;
+			auto createPipeline(PipelineDesc const& desc) noexcept -> MemScope<IPipeline>;
 
 		private:
 			API api;
