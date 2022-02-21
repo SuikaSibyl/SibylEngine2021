@@ -1,6 +1,7 @@
 export module RHI.GraphicContext;
 import Core.SObject;
 import Core.Window;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -19,9 +20,11 @@ namespace SIByL
 			virtual ~IGraphicContext() = default;
 
 			virtual auto attachWindow(IWindow* window) noexcept -> void = 0;
+			auto setAPI(API const& _api) noexcept -> void { api = _api; }
+			auto getAPI() noexcept -> API { return api; }
 
 		private:
-
+			API api;
 		};
 	}
 }

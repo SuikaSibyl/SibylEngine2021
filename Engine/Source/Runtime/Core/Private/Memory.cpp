@@ -8,8 +8,8 @@ import Core.Allocator;
 
 namespace SIByL::Core
 {
-	size_t* Memory::pBlockSizeLookup;
-	Allocator* Memory::pAllocators;
+	//size_t* Memory::pBlockSizeLookup;
+	//Allocator* Memory::pAllocators;
 
 	static const uint32_t kBlockSizes[] = {
 		// 4-increments
@@ -61,8 +61,8 @@ namespace SIByL::Core
 
 	Memory::~Memory()
 	{
-		delete[] pAllocators;
-		delete[] pBlockSizeLookup;
+		if(pAllocators) delete[] pAllocators;
+		if(pBlockSizeLookup) delete[] pBlockSizeLookup;
 	}
 
 	auto Memory::instance() noexcept -> Memory*

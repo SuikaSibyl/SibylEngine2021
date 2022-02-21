@@ -25,13 +25,18 @@ namespace SIByL::RHI
 		vkDestroyDevice(device, nullptr);
 		return true;
 	}
+	
+	auto ILogicalDeviceVK::getPhysicalDevice() noexcept -> IPhysicalDevice*
+	{
+		return (IPhysicalDevice*)physicalDevice;
+	}
 
 	auto ILogicalDeviceVK::getDeviceHandle() noexcept -> VkDevice&
 	{
 		return device;
 	}
 
-	auto ILogicalDeviceVK::getPhysicalDevice() noexcept -> IPhysicalDeviceVK*
+	auto ILogicalDeviceVK::getPhysicalDeviceVk() noexcept -> IPhysicalDeviceVK*
 	{
 		return physicalDevice;
 	}

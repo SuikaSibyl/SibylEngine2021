@@ -11,14 +11,16 @@ import RHI.IPhysicalDevice.VK;
 import RHI.ITexture;
 import RHI.ITexture.VK;
 import RHI.IResource.VK;
+import RHI.ITextureView;
+import RHI.ITextureView.VK;
 
 namespace SIByL::RHI
 {
 	ISwapChainVK::ISwapChainVK(ILogicalDeviceVK* logical_device)
 	{
-		physicalDevice = logical_device->getPhysicalDevice();
+		physicalDevice = logical_device->getPhysicalDeviceVk();
 		logicalDevice = logical_device;
-		windowAttached = physicalDevice->getGraphicContext()->getAttachedWindow();
+		windowAttached = physicalDevice->getGraphicContextVK()->getAttachedWindow();
 		createSwapChain();
 	}
 
@@ -26,6 +28,11 @@ namespace SIByL::RHI
 	{
 		if (swapChain)
 			vkDestroySwapchainKHR(logicalDevice->getDeviceHandle(), swapChain, nullptr);
+	}
+	
+	auto ISwapChainVK::getExtend() noexcept -> Extend
+	{
+		return { swapChainExtent.width, swapChainExtent.height };
 	}
 
 	auto ISwapChainVK::createSwapChain() noexcept -> void
@@ -43,7 +50,7 @@ namespace SIByL::RHI
 		// Desc
 		VkSwapchainCreateInfoKHR createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-		createInfo.surface = physicalDevice->getGraphicContext()->getSurface();
+		createInfo.surface = physicalDevice->getGraphicContextVK()->getSurface();
 		createInfo.minImageCount = imageCount;
 		createInfo.imageFormat = surfaceFormat.format;
 		createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -82,14 +89,14 @@ namespace SIByL::RHI
 		swapChainImageFormat = surfaceFormat.format;
 		swapChainExtent = extent;
 
-		std::vector<ITextureVK> swapChain_Textures;
 		for (uint32_t i = 0; i < imageCount; i++)
 		{
 			IResourceVK resource;
 			resource.setVKFormat(swapChainImageFormat);
 			resource.setVKImageViewType(VK_IMAGE_VIEW_TYPE_2D);
 			ITextureVK texture(images[i], std::move(resource), logicalDevice);
-			swapChain_Textures.emplace_back(std::move(texture));
+			swapchainViews.emplace_back(texture.createView({}));
+			swapChainTextures.emplace_back(std::move(texture));
 		}
 	}
 

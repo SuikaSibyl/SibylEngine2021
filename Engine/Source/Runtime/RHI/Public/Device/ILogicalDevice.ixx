@@ -2,6 +2,7 @@ module;
 
 export module RHI.ILogicalDevice;
 import Core.SObject;
+import RHI.IPhysicalDevice;
 
 namespace SIByL
 {
@@ -19,7 +20,7 @@ namespace SIByL
 		{
 		public:
 			virtual ~ILogicalDevice() = default;
-
+			virtual auto getPhysicalDevice() noexcept -> IPhysicalDevice* = 0;
 		};
 	}
 }

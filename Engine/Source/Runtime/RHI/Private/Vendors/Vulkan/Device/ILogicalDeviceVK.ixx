@@ -18,9 +18,10 @@ namespace SIByL
 
 			virtual auto initialize() -> bool;
 			virtual auto destroy() -> bool;
+			virtual auto getPhysicalDevice() noexcept -> IPhysicalDevice* override;
 
 			auto getDeviceHandle() noexcept -> VkDevice&;
-			auto getPhysicalDevice() noexcept -> IPhysicalDeviceVK*;
+			auto getPhysicalDeviceVk() noexcept -> IPhysicalDeviceVK*;
 
 		private:
 			IPhysicalDeviceVK* physicalDevice;

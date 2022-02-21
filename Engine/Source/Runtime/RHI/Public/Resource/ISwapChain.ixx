@@ -2,6 +2,7 @@ module;
 
 export module RHI.ISwapChain;
 import RHI.IResource;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -19,7 +20,7 @@ namespace SIByL
 		{
 		public:
 			virtual ~ISwapChain() = default;
-			
+			virtual auto getExtend() noexcept -> Extend = 0;
 		};
 	}
 }

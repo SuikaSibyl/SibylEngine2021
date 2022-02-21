@@ -30,7 +30,6 @@ namespace SIByL
 		// Render pass			: the attachments referenced by the pipeline stagesand their usage
 		export struct IPipelineDesc
 		{
-			ILogicalDevice* logicalDevice;
 			std::vector<IShader*> shaders;
 			IVertexLayout* vertexLayout;
 			IInputAssembly* inputAssembly;

@@ -28,7 +28,7 @@ namespace SIByL
 
 		auto ICommandPoolVK::createVkCommandPool() noexcept -> void
 		{
-			IPhysicalDeviceVK* physical_device = logicalDevice->getPhysicalDevice();
+			IPhysicalDeviceVK* physical_device = logicalDevice->getPhysicalDeviceVk();
 			IPhysicalDeviceVK::QueueFamilyIndices queueFamilyIndices = physical_device->findQueueFamilies();
 
 			VkCommandPoolCreateInfo poolInfo{};

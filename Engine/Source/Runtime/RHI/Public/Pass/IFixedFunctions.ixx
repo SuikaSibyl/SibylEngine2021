@@ -107,6 +107,14 @@ namespace SIByL
 		// │  DirectX 12  │                                             │
 		// │  OpenGL      │                                             │
 		// ╰──────────────┴─────────────────────────────────────────────╯
+
+		export struct RasterizerDesc
+		{
+			PolygonMode polygonMode;
+			float lineWidth;
+			CullMode cullMode;
+		};
+
 		export class IRasterizer
 		{
 		public:
@@ -124,6 +132,12 @@ namespace SIByL
 		// │  DirectX 12  │                                          │
 		// │  OpenGL      │                                          │
 		// ╰──────────────┴──────────────────────────────────────────╯
+
+		export struct MultiSampleDesc
+		{
+			bool enable;
+		};
+
 		export class IMultisampling
 		{
 		public:
@@ -141,6 +155,13 @@ namespace SIByL
 		// │  DirectX 12  │                                          │
 		// │  OpenGL      │                                          │
 		// ╰──────────────┴──────────────────────────────────────────╯
+		export struct DepthStencilDesc
+		{
+			bool useTest;
+			bool depthTest;
+			bool stencilTest;
+		};
+
 		export class IDepthStencil
 		{
 		public:
@@ -158,6 +179,17 @@ namespace SIByL
 		// │  DirectX 12  │                                         │
 		// │  OpenGL      │                                         │
 		// ╰──────────────┴─────────────────────────────────────────╯
+		export struct ColorBlendingDesc
+		{
+			BlendOperator colorOperator;
+			BlendFactor srcColorFactor;
+			BlendFactor dstColorFactor;
+			BlendOperator alphaOperator;
+			BlendFactor srcAlphaFactor;
+			BlendFactor dstAlphaFactor;
+			bool blendEnable;
+		};
+
 		export class IColorBlending
 		{
 		public:

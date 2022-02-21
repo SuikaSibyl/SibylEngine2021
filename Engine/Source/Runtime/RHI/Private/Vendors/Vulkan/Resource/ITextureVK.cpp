@@ -6,10 +6,13 @@ import Core.Log;
 import RHI.ITexture;
 import RHI.IResource.VK;
 import RHI.ILogicalDevice.VK;
+import RHI.ITextureView;
+import RHI.ITextureView.VK;
+import Core.MemoryManager;
 
 namespace SIByL::RHI
 {
-	auto createImageViews(IResourceVK* resource, VkImage* image, ILogicalDeviceVK* logical_device, VkImageView* image_view) noexcept -> void
+	auto createImageViews(TextureViewDesc const& desc, IResourceVK* resource, VkImage* image, ILogicalDeviceVK* logical_device, VkImageView* image_view) noexcept -> void
 	{
 		VkImageViewCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -49,6 +52,14 @@ namespace SIByL::RHI
 
 		_texture.image = nullptr;
 		_texture.imageView = nullptr;
+	}
+
+	auto ITextureVK::createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView>
+	{
+		MemScope<ITextureViewVK> view = MemNew<ITextureViewVK>(logicalDevice);
+		createImageViews(desc, &resource, &image, logicalDevice, view->getpVkImageView());
+		MemScope<ITextureView> general_view = MemCast<ITextureView>(view);
+		return general_view;
 	}
 
 	ITextureVK::~ITextureVK()

@@ -1,4 +1,5 @@
 module;
+#include <vector>
 #include <cstdint>
 #include <vulkan/vulkan.h>
 export module RHI.IEnum.VK;
@@ -8,4 +9,9 @@ namespace SIByL::RHI
 {
 	export inline auto getVkTopology(TopologyKind type) noexcept -> VkPrimitiveTopology;
 	export inline auto getVkShaderStage(ShaderStage stage) noexcept -> VkShaderStageFlagBits;
+	export inline auto getVkPolygonMode(PolygonMode mode) noexcept -> VkPolygonMode;
+	export inline auto getVkCullMode(CullMode mode) noexcept -> VkCullModeFlagBits;
+	export inline auto getVkBlendOperator(BlendOperator mode) noexcept -> VkBlendOp;
+	export inline auto getVkBlendFactor(BlendFactor mode) noexcept -> VkBlendFactor;
+	export inline auto getVkDynamicState(PipelineState state) noexcept -> VkDynamicState;
 }

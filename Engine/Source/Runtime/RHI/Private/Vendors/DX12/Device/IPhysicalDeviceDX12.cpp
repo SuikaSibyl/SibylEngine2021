@@ -76,8 +76,13 @@ namespace SIByL::RHI
 	{
 		return enableDebugLayer;
 	}
+	
+	auto IPhysicalDeviceDX12::getGraphicContext() noexcept -> IGraphicContext*
+	{
+		return (IGraphicContext*)graphicContext;
+	}
 
-	auto IPhysicalDeviceDX12::getGraphicContext() noexcept -> IGraphicContextDX12*
+	auto IPhysicalDeviceDX12::getGraphicContextDX12() noexcept -> IGraphicContextDX12*
 	{
 		return graphicContext;
 	}

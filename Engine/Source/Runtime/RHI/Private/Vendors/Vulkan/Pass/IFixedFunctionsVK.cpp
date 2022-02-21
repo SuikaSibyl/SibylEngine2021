@@ -7,6 +7,11 @@ import RHI.IEnum.VK;
 
 namespace SIByL::RHI
 {
+	IVertexLayoutVK::IVertexLayoutVK()
+	{
+		createVkInputState();
+	}
+
 	auto IVertexLayoutVK::getVkInputState() noexcept -> VkPipelineVertexInputStateCreateInfo*
 	{
 		return &vertexInputInfo;
@@ -19,6 +24,12 @@ namespace SIByL::RHI
 		vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
 		vertexInputInfo.vertexAttributeDescriptionCount = 0;
 		vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+	}
+
+	IInputAssemblyVK::IInputAssemblyVK(TopologyKind topology_kind)
+		:IInputAssembly(topology_kind)
+	{
+		createVkInputAssembly();
 	}
 
 	auto IInputAssemblyVK::createVkInputAssembly() noexcept -> void
@@ -54,6 +65,16 @@ namespace SIByL::RHI
 		return scissor;
 	}
 
+	IViewportsScissorsVK::IViewportsScissorsVK(
+		unsigned int width_viewport,
+		unsigned int height_viewport,
+		unsigned int width_scissor,
+		unsigned int height_scissor)
+	{
+		VkExtent2D extend{ width_scissor ,height_scissor };
+		createVkPipelineViewportStateCreateInfo(width_viewport, height_viewport, &extend);
+	}
+
 	auto IViewportsScissorsVK::getVkPipelineViewportStateCreateInfo() noexcept -> VkPipelineViewportStateCreateInfo*
 	{
 		return &viewportState;
@@ -72,7 +93,7 @@ namespace SIByL::RHI
 		viewportState.pScissors = &scissor;
 	}
 
-	auto createRasterizerState() noexcept -> VkPipelineRasterizationStateCreateInfo
+	auto createRasterizerState(RasterizerDesc const& desc) noexcept -> VkPipelineRasterizationStateCreateInfo
 	{
 		VkPipelineRasterizationStateCreateInfo rasterizer{};
 		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -82,9 +103,9 @@ namespace SIByL::RHI
 		// VK_POLYGON_MODE_FILL: fill the area of the polygon with fragments
 		// VK_POLYGON_MODE_LINE: polygon edges are drawn as lines
 		// VK_POLYGON_MODE_POINT : polygon vertices are drawn as points
-		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+		rasterizer.polygonMode = getVkPolygonMode(desc.polygonMode);
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+		rasterizer.cullMode = getVkCullMode(desc.cullMode);
 		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
@@ -93,6 +114,11 @@ namespace SIByL::RHI
 
 		return rasterizer;
 	}
+	
+	IRasterizerVK::IRasterizerVK(RasterizerDesc const& desc)
+	{
+		createRasterizerStateInfo(desc);
+	}
 
 	auto IRasterizerVK::getVkPipelineRasterizationStateCreateInfo() noexcept
 		-> VkPipelineRasterizationStateCreateInfo*
@@ -100,9 +126,14 @@ namespace SIByL::RHI
 		return &rasterizer;
 	}
 
-	auto IRasterizerVK::createRasterizerStateInfo() noexcept -> void
+	auto IRasterizerVK::createRasterizerStateInfo(RasterizerDesc const& desc) noexcept -> void
 	{
-		rasterizer = createRasterizerState();
+		rasterizer = createRasterizerState(desc);
+	}
+
+	IMultisamplingVK::IMultisamplingVK(MultiSampleDesc const& desc)
+	{
+		createMultisampingInfo(desc);
 	}
 
 	auto IMultisamplingVK::getVkPipelineMultisampleStateCreateInfo() noexcept
@@ -111,7 +142,7 @@ namespace SIByL::RHI
 		return &multisampling;
 	}
 
-	auto IMultisamplingVK::createMultisampingInfo() noexcept -> void
+	auto IMultisamplingVK::createMultisampingInfo(MultiSampleDesc const& desc) noexcept -> void
 	{
 		multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 		multisampling.sampleShadingEnable = VK_FALSE;
@@ -122,10 +153,21 @@ namespace SIByL::RHI
 		multisampling.alphaToOneEnable = VK_FALSE; // Optional
 	}
 
+	IDepthStencilVK::IDepthStencilVK(DepthStencilDesc const& desc)
+	{
+		
+	}
+
 	auto IDepthStencilVK::getVkPipelineDepthStencilStateCreateInfo() noexcept
 		-> VkPipelineDepthStencilStateCreateInfo*
 	{
+		if (!initialized) return nullptr;
 		return &depthStencil;
+	}
+
+	IColorBlendingVK::IColorBlendingVK(ColorBlendingDesc const& desc)
+	{
+		createColorBlendObjects(desc);
 	}
 
 	auto IColorBlendingVK::getVkPipelineColorBlendAttachmentState() noexcept
@@ -140,17 +182,17 @@ namespace SIByL::RHI
 		return &colorBlending;
 	}
 
-	auto IColorBlendingVK::createColorBlendObjects() noexcept -> void
+	auto IColorBlendingVK::createColorBlendObjects(ColorBlendingDesc const& desc) noexcept -> void
 	{
 		// VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 		colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		colorBlendAttachment.blendEnable = VK_FALSE;
-		colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-		colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-		colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-		colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
-		colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO; // Optional
-		colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
+		colorBlendAttachment.blendEnable = desc.blendEnable ? VK_TRUE : VK_FALSE;
+		colorBlendAttachment.srcColorBlendFactor = getVkBlendFactor(desc.srcColorFactor); // Optional
+		colorBlendAttachment.dstColorBlendFactor = getVkBlendFactor(desc.dstColorFactor); // Optional
+		colorBlendAttachment.colorBlendOp = getVkBlendOperator(desc.colorOperator); // Optional
+		colorBlendAttachment.srcAlphaBlendFactor = getVkBlendFactor(desc.srcAlphaFactor); // Optional
+		colorBlendAttachment.dstAlphaBlendFactor = getVkBlendFactor(desc.dstAlphaFactor); // Optional
+		colorBlendAttachment.alphaBlendOp = getVkBlendOperator(desc.alphaOperator); // Optional
 		
 		// VkPipelineColorBlendStateCreateInfo colorBlending{};
 		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -164,12 +206,17 @@ namespace SIByL::RHI
 		colorBlending.blendConstants[3] = 0.0f; // Optional
 	}
 
-	auto IDynamicStateVK::createDynamicState() noexcept -> void
+	IDynamicStateVK::IDynamicStateVK(std::vector<PipelineState> const& states)
 	{
-		dynamicStates = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_LINE_WIDTH
-		};
+		createDynamicState(states);
+	}
+
+	auto IDynamicStateVK::createDynamicState(std::vector<PipelineState> const& states) noexcept -> void
+	{
+		for (int i = 0; i < states.size(); i++)
+		{
+			dynamicStates.emplace_back(getVkDynamicState(states[i]));
+		}
 
 		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		dynamicState.dynamicStateCount = dynamicStates.size();

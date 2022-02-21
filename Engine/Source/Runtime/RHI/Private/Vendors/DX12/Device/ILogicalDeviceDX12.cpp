@@ -14,7 +14,7 @@ namespace SIByL::RHI
 	ILogicalDeviceDX12::ILogicalDeviceDX12(IPhysicalDevice* physical_device)
 	{
 		physicalDevice = dynamic_cast<IPhysicalDeviceDX12*>(physical_device);
-		graphicContext = physicalDevice->getGraphicContext();
+		graphicContext = physicalDevice->getGraphicContextDX12();
 	}
 
 	ILogicalDeviceDX12::~ILogicalDeviceDX12()
@@ -38,9 +38,14 @@ namespace SIByL::RHI
 		return device;
 	}
 
-	auto ILogicalDeviceDX12::getPhysicalDevice() noexcept -> IPhysicalDeviceDX12*
+	auto ILogicalDeviceDX12::getPhysicalDeviceDX12() noexcept -> IPhysicalDeviceDX12*
 	{
 		return physicalDevice;
+	}
+
+	auto ILogicalDeviceDX12::getPhysicalDevice() noexcept -> IPhysicalDevice*
+	{
+		return (IPhysicalDevice*)physicalDevice;
 	}
 
 	auto ILogicalDeviceDX12::createLogicalDevice(IPhysicalDeviceDX12* physicalDevice) noexcept -> void

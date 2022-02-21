@@ -13,14 +13,6 @@ namespace SIByL
 {
 	inline namespace Core
 	{
-		export struct DescWindow
-		{
-			EWindowVendor vendor;
-			uint32_t const& width;
-			uint32_t const& height;
-			std::string_view name;
-		};
-
 		export class IWindow :public SObject
 		{
 		public:
@@ -36,6 +28,14 @@ namespace SIByL
 			virtual auto isVSync() const noexcept -> bool = 0;
 			virtual auto setEventCallback(EventCallbackFn const& callback) noexcept -> void = 0;
 			virtual auto getInput() const noexcept -> IInput* = 0;
+		};
+
+		export struct WindowLayerDesc
+		{
+			EWindowVendor vendor;
+			uint32_t const& width;
+			uint32_t const& height;
+			std::string_view name;
 		};
 
 		export class WindowLayer: public ILayer

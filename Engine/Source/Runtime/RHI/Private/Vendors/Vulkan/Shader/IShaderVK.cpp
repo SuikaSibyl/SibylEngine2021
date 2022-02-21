@@ -1,4 +1,5 @@
 module;
+#include <string>
 #include <vulkan/vulkan.h>
 module RHI.IShader.VK;
 import Core.SObject;
@@ -6,13 +7,26 @@ import Core.Log;
 import RHI.IShader;
 import RHI.IEnum;
 import RHI.IEnum.VK;
+import RHI.ILogicalDevice.VK;
 
 namespace SIByL::RHI
 {
+	IShaderVK::IShaderVK(ILogicalDeviceVK* logical_device)
+		: logicalDevice(logical_device)
+	{
+
+	}
+
 	IShaderVK::~IShaderVK()
 	{
 		if (shaderModule)
 			vkDestroyShaderModule(logicalDevice->getDeviceHandle(), shaderModule, nullptr);
+	}
+	
+	auto IShaderVK::injectDesc(ShaderDesc const& desc) noexcept -> void
+	{
+		stage = desc.stage;
+		entryPoint = desc.entryPoint;
 	}
 
 	auto IShaderVK::getVkShaderModule() noexcept -> VkShaderModule&
@@ -42,7 +56,7 @@ namespace SIByL::RHI
 		shaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStageInfo.stage = getVkShaderStage(stage);
 		shaderStageInfo.module = shaderModule;
-		shaderStageInfo.pName = "entryPointName";
+		shaderStageInfo.pName = entryPoint.c_str();
 		return;
 	}
 }

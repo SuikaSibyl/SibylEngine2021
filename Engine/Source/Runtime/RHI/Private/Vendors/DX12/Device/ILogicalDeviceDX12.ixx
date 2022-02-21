@@ -1,6 +1,7 @@
 module;
 #include <d3d12.h>
 export module RHI.ILogicalDevice.DX12;
+import Core.MemoryManager;
 import RHI.ILogicalDevice;
 import RHI.IPhysicalDevice;
 import RHI.IPhysicalDevice.DX12;
@@ -10,6 +11,8 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		class IShader;
+
 		export class ILogicalDeviceDX12 :public ILogicalDevice
 		{
 		public:
@@ -20,7 +23,8 @@ namespace SIByL
 			virtual auto destroy() -> bool;
 
 			auto getDeviceHandle() noexcept -> ID3D12Device*;
-			auto getPhysicalDevice() noexcept -> IPhysicalDeviceDX12*;
+			auto getPhysicalDeviceDX12() noexcept -> IPhysicalDeviceDX12*;
+			virtual auto getPhysicalDevice() noexcept -> IPhysicalDevice* override;
 
 		private:
 			IGraphicContextDX12* graphicContext;

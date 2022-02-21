@@ -67,4 +67,152 @@ namespace SIByL::RHI
 #endif // _DEBUG'
 		return VK_SHADER_STAGE_ALL;
 	}
+
+	inline auto getVkPolygonMode(PolygonMode mode) noexcept -> VkPolygonMode
+	{
+		switch (mode)
+		{
+		case SIByL::RHI::PolygonMode::POINT:
+			return VK_POLYGON_MODE_POINT;
+			break;
+		case SIByL::RHI::PolygonMode::LINE:
+			return VK_POLYGON_MODE_LINE;
+			break;
+		case SIByL::RHI::PolygonMode::FILL:
+			return VK_POLYGON_MODE_FILL;
+			break;
+		default:
+			break;
+		}
+		return VK_POLYGON_MODE_MAX_ENUM;
+	}
+
+	inline auto getVkCullMode(CullMode mode) noexcept -> VkCullModeFlagBits
+	{
+		switch (mode)
+		{
+		case SIByL::RHI::CullMode::FRONT:
+			return VK_CULL_MODE_FRONT_BIT;
+			break;
+		case SIByL::RHI::CullMode::BACK:
+			return VK_CULL_MODE_BACK_BIT;
+			break;
+		case SIByL::RHI::CullMode::NONE:
+			return VK_CULL_MODE_NONE;
+			break;
+		default:
+			break;
+		}
+		return VK_CULL_MODE_FLAG_BITS_MAX_ENUM;
+	}
+
+	inline auto getVkBlendOperator(BlendOperator mode) noexcept -> VkBlendOp
+	{
+		switch (mode)
+		{
+		case SIByL::RHI::BlendOperator::MAX:
+			return VK_BLEND_OP_MAX;
+			break;
+		case SIByL::RHI::BlendOperator::MIN:
+			return VK_BLEND_OP_MIN;
+			break;
+		case SIByL::RHI::BlendOperator::REVERSE_SUBTRACT:
+			return VK_BLEND_OP_REVERSE_SUBTRACT;
+			break;
+		case SIByL::RHI::BlendOperator::SUBTRACT:
+			return VK_BLEND_OP_SUBTRACT;
+			break;
+		case SIByL::RHI::BlendOperator::ADD:
+			return VK_BLEND_OP_ADD;
+			break;
+		default:
+			break;
+		}
+		return VK_BLEND_OP_MAX_ENUM;
+	}
+
+	inline auto getVkBlendFactor(BlendFactor factor) noexcept -> VkBlendFactor
+	{
+		switch (factor)
+		{
+		case SIByL::RHI::BlendFactor::ONE_MINUS_SRC1_ALPHA:
+			return VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::SRC1_ALPHA:
+			return VK_BLEND_FACTOR_SRC1_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_SRC1_COLOR:
+			return VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::SRC1_COLOR:
+			return VK_BLEND_FACTOR_SRC1_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::SRC_ALPHA_SATURATE:
+			return VK_BLEND_FACTOR_SRC_ALPHA_SATURATE;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+			return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::CONSTANT_ALPHA:
+			return VK_BLEND_FACTOR_CONSTANT_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+			return VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::CONSTANT_COLOR:
+			return VK_BLEND_FACTOR_CONSTANT_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_DST_ALPHA:
+			return VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::DST_ALPHA:
+			return VK_BLEND_FACTOR_DST_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_SRC_ALPHA:
+			return VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::SRC_ALPHA:
+			return VK_BLEND_FACTOR_SRC_ALPHA;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_DST_COLOR:
+			return VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::DST_COLOR:
+			return VK_BLEND_FACTOR_DST_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::ONE_MINUS_SRC_COLOR:
+			return VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::SRC_COLOR:
+			return VK_BLEND_FACTOR_SRC_COLOR;
+			break;
+		case SIByL::RHI::BlendFactor::ZERO:
+			return VK_BLEND_FACTOR_ZERO;
+			break;
+		case SIByL::RHI::BlendFactor::ONE:
+			return VK_BLEND_FACTOR_ONE;
+			break;
+		default:
+			break;
+		}
+		return VK_BLEND_FACTOR_MAX_ENUM;
+	}
+
+	inline auto getVkDynamicState(PipelineState state) noexcept -> VkDynamicState
+	{
+		switch (state)
+		{
+		case SIByL::RHI::PipelineState::LINE_WIDTH:
+			return VK_DYNAMIC_STATE_LINE_WIDTH;
+			break;
+		case SIByL::RHI::PipelineState::VIEWPORT:
+			return VK_DYNAMIC_STATE_VIEWPORT;
+			break;
+		default:
+			break;
+		}
+		return VK_DYNAMIC_STATE_MAX_ENUM;
+	}
+
+
 }

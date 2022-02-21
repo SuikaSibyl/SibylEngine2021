@@ -3,6 +3,7 @@ module;
 #include <vector>
 export module RHI.IFixedFunctions.VK;
 import RHI.IFixedFunctions;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -11,7 +12,7 @@ namespace SIByL
 		export class IVertexLayoutVK :public IVertexLayout
 		{
 		public:
-			IVertexLayoutVK() = default;
+			IVertexLayoutVK();
 			IVertexLayoutVK(IVertexLayoutVK&&) = default;
 			virtual ~IVertexLayoutVK() = default;
 
@@ -24,7 +25,7 @@ namespace SIByL
 		export class IInputAssemblyVK :public IInputAssembly
 		{
 		public:
-			IInputAssemblyVK() = default;
+			IInputAssemblyVK(TopologyKind topology_kind);
 			IInputAssemblyVK(IInputAssemblyVK&&) = default;
 			virtual ~IInputAssemblyVK() = default;
 
@@ -37,7 +38,11 @@ namespace SIByL
 		export class IViewportsScissorsVK :public IViewportsScissors
 		{
 		public:
-			IViewportsScissorsVK() = default;
+			IViewportsScissorsVK(
+				unsigned int width_viewport, 
+				unsigned int height_viewport,
+				unsigned int width_scissor,
+				unsigned int height_scissor);
 			IViewportsScissorsVK(IViewportsScissorsVK&&) = default;
 			virtual ~IViewportsScissorsVK() = default;
 
@@ -54,35 +59,35 @@ namespace SIByL
 		export class IRasterizerVK :public IRasterizer
 		{
 		public:
-			IRasterizerVK() = default;
+			IRasterizerVK(RasterizerDesc const& desc);
 			IRasterizerVK(IRasterizerVK&&) = default;
 			virtual ~IRasterizerVK() = default;
 
 			auto getVkPipelineRasterizationStateCreateInfo() noexcept
 				-> VkPipelineRasterizationStateCreateInfo*;
 		private:
-			auto createRasterizerStateInfo() noexcept -> void;
+			auto createRasterizerStateInfo(RasterizerDesc const& desc) noexcept -> void;
 			VkPipelineRasterizationStateCreateInfo rasterizer{};
 		};
 
 		export class IMultisamplingVK :public IMultisampling
 		{
 		public:
-			IMultisamplingVK() = default;
+			IMultisamplingVK(MultiSampleDesc const& desc);
 			IMultisamplingVK(IMultisamplingVK&&) = default;
 			virtual ~IMultisamplingVK() = default;
 
 			auto getVkPipelineMultisampleStateCreateInfo() noexcept
 				-> VkPipelineMultisampleStateCreateInfo*;
 		private:
-			auto createMultisampingInfo() noexcept -> void;
+			auto createMultisampingInfo(MultiSampleDesc const& desc) noexcept -> void;
 			VkPipelineMultisampleStateCreateInfo multisampling{};
 		};
 
 		export class IDepthStencilVK :public IDepthStencil
 		{
 		public:
-			IDepthStencilVK() = default;
+			IDepthStencilVK(DepthStencilDesc const& desc);
 			IDepthStencilVK(IDepthStencilVK&&) = default;
 			virtual ~IDepthStencilVK() = default;
 
@@ -90,13 +95,14 @@ namespace SIByL
 				-> VkPipelineDepthStencilStateCreateInfo*;
 
 		private:
+			bool initialized = false;
 			VkPipelineDepthStencilStateCreateInfo depthStencil{};
 		};
 
 		export class IColorBlendingVK :public IColorBlending
 		{
 		public:
-			IColorBlendingVK() = default;
+			IColorBlendingVK(ColorBlendingDesc const& desc);
 			IColorBlendingVK(IColorBlendingVK&&) = default;
 			virtual ~IColorBlendingVK() = default;
 
@@ -105,7 +111,7 @@ namespace SIByL
 			auto getVkPipelineColorBlendStateCreateInfo() noexcept
 				-> VkPipelineColorBlendStateCreateInfo*;
 		private:
-			auto createColorBlendObjects() noexcept -> void;
+			auto createColorBlendObjects(ColorBlendingDesc const& desc) noexcept -> void;
 			VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 			VkPipelineColorBlendStateCreateInfo colorBlending{};
 		};
@@ -113,12 +119,12 @@ namespace SIByL
 		export class IDynamicStateVK :public IDynamicState
 		{
 		public:
-			IDynamicStateVK() = default;
+			IDynamicStateVK(std::vector<PipelineState> const& states);
 			IDynamicStateVK(IDynamicStateVK&&) = default;
 			virtual ~IDynamicStateVK() = default;
 
 		private:
-			auto createDynamicState() noexcept -> void;
+			auto createDynamicState(std::vector<PipelineState> const& states) noexcept -> void;
 			std::vector<VkDynamicState> dynamicStates;
 			VkPipelineDynamicStateCreateInfo dynamicState{};
 		};

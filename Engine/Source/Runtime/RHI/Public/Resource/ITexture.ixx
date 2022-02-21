@@ -2,6 +2,8 @@ module;
 
 export module RHI.ITexture;
 import Core.SObject;
+import Core.MemoryManager;
+import RHI.ITextureView;
 
 namespace SIByL
 {
@@ -33,7 +35,7 @@ namespace SIByL
 			ITexture(ITexture const&) = delete;
 			virtual ~ITexture() = default;
 
-
+			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> = 0;
 		};
 	}
 }

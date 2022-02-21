@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\Common\IEnum.cpp" />
+    <ClCompile Include="Private\Common\IFactory.cpp" />
     <ClCompile Include="Private\Common\IFixedFunctions.cpp" />
     <ClCompile Include="Private\Slang\ICompileSession.cpp" />
     <ClCompile Include="Private\Slang\IGlobalSession.cpp" />
@@ -164,6 +165,8 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\ILogicalDeviceVK.cpp" />
@@ -187,6 +190,8 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureViewVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureViewVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderVK.cpp" />
@@ -196,6 +201,7 @@
     <ClCompile Include="Public\Command\ICommandPool.ixx" />
     <ClCompile Include="Public\Command\IFence.ixx" />
     <ClCompile Include="Public\Command\IQueue.ixx" />
+    <ClCompile Include="Public\Factory\IFactory.ixx" />
     <ClCompile Include="Public\Device\IGraphicContext.ixx" />
     <ClCompile Include="Public\Device\ILogicalDevice.ixx" />
     <ClCompile Include="Public\Device\IPhysicalDevice.ixx" />
@@ -211,6 +217,7 @@
     <ClCompile Include="Public\Resource\ISwapChain.ixx" />
     <ClCompile Include="Public\Resource\IResource.ixx" />
     <ClCompile Include="Public\Resource\ITexture.ixx" />
+    <ClCompile Include="Public\Resource\ITextureView.ixx" />
     <ClCompile Include="Public\Resource\IWindowSurface.ixx" />
     <ClCompile Include="Public\Shader\ICompileSession.ixx" />
     <ClCompile Include="Public\Resource\IEnum.ixx" />

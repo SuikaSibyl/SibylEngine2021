@@ -6,6 +6,12 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		export enum class API :uint32_t
+		{
+			VULKAN,
+			DX12,
+		};
+
 		export enum class DataType : uint32_t
 		{
 			None,
@@ -89,6 +95,64 @@ namespace SIByL
 		{
 			GRAPHICS,
 			PRESENTATION,
+		};
+
+		export enum class PolygonMode : uint32_t
+		{
+			FILL,
+			LINE,
+			POINT,
+		};
+
+		export enum class CullMode : uint32_t
+		{
+			NONE,
+			BACK,
+			FRONT,
+		};
+
+		export enum class BlendOperator : uint32_t
+		{
+			ADD,
+			SUBTRACT,
+			REVERSE_SUBTRACT,
+			MIN,
+			MAX,
+		};
+
+		export enum class BlendFactor : uint32_t
+		{
+			ONE,
+			ZERO,
+			SRC_COLOR,
+			ONE_MINUS_SRC_COLOR,
+			DST_COLOR,
+			ONE_MINUS_DST_COLOR,
+			SRC_ALPHA,
+			ONE_MINUS_SRC_ALPHA,
+			DST_ALPHA,
+			ONE_MINUS_DST_ALPHA,
+			CONSTANT_COLOR,
+			ONE_MINUS_CONSTANT_COLOR,
+			CONSTANT_ALPHA,
+			ONE_MINUS_CONSTANT_ALPHA,
+			SRC_ALPHA_SATURATE,
+			SRC1_COLOR,
+			ONE_MINUS_SRC1_COLOR,
+			SRC1_ALPHA,
+			ONE_MINUS_SRC1_ALPHA,
+		};
+
+		export struct Extend
+		{
+			unsigned int width;
+			unsigned int height;
+		};
+
+		export enum class PipelineState : uint32_t
+		{
+			VIEWPORT,
+			LINE_WIDTH,
 		};
 	}
 }

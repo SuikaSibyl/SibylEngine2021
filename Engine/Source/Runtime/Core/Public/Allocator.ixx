@@ -55,7 +55,7 @@ namespace SIByL
             BlockHeader* nextBlock(BlockHeader* pBlock);
 
             // the page list
-            PageHeader* pPageList;
+            PageHeader* pPageList = nullptr;
 
             // the free block list
             BlockHeader* pFreeList;

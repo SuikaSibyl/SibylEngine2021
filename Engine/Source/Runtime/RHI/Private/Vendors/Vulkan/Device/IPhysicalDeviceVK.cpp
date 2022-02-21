@@ -112,6 +112,11 @@ namespace SIByL::RHI
 	{
 		return enableDebugLayer;
 	}
+	
+	auto IPhysicalDeviceVK::getGraphicContext() noexcept -> IGraphicContext*
+	{
+		return (IGraphicContext*)graphicContext;
+	}
 
 	auto IPhysicalDeviceVK::queryAllPhysicalDevice() noexcept -> void
 	{
@@ -199,7 +204,7 @@ namespace SIByL::RHI
 		return querySwapChainSupport(physicalDevice);
 	}
 
-	auto IPhysicalDeviceVK::getGraphicContext()->IGraphicContextVK*
+	auto IPhysicalDeviceVK::getGraphicContextVK()->IGraphicContextVK*
 	{
 		return graphicContext;
 	}

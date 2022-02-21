@@ -1,5 +1,6 @@
 export module RHI.IPhysicalDevice;
 import Core.SObject;
+import RHI.GraphicContext;
 
 namespace SIByL
 {
@@ -18,6 +19,7 @@ namespace SIByL
 			virtual ~IPhysicalDevice() = default;
 
 			virtual auto isDebugLayerEnabled() noexcept -> bool { return true; }
+			virtual auto getGraphicContext() noexcept -> IGraphicContext* = 0;
 		};
 	}
 }

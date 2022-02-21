@@ -21,7 +21,9 @@ namespace SIByL
 			virtual auto destroy() -> bool;
 			virtual auto isDebugLayerEnabled() noexcept -> bool;
 			// IPhysicalDeviceDX12
-			auto getGraphicContext() noexcept -> IGraphicContextDX12*;
+			virtual auto getGraphicContext() noexcept -> IGraphicContext* override;
+
+			auto getGraphicContextDX12() noexcept -> IGraphicContextDX12*;
 			auto getAdapter() noexcept -> IDXGIAdapter4*;
 
 		private:

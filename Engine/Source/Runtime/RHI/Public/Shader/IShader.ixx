@@ -16,6 +16,12 @@ namespace SIByL
 		// │  DirectX 12  │   ID3DBlob         │
 		// │  OpenGL      │   GLuint           │
 		// ╰──────────────┴────────────────────╯
+		export struct ShaderDesc
+		{
+			ShaderStage stage;
+			std::string entryPoint;
+		};
+
 
 		export class IShader : public SObject
 		{
@@ -24,9 +30,7 @@ namespace SIByL
 			IShader() = default;
 			IShader(IShader&&) = default;
 			virtual ~IShader() = default;
-
-		protected:
-			ShaderStage stage;
+			virtual auto injectDesc(ShaderDesc const& desc) noexcept -> void = 0;
 		};
 	}
 }

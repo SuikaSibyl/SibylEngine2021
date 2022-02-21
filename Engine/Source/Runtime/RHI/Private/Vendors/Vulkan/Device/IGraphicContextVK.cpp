@@ -230,13 +230,6 @@ namespace SIByL
 			}
 		}
 
-		auto IGraphicContextVK::createSurface() -> void
-		{
-			//if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
-			//	SE_CORE_ERROR("failed to create window surface!");
-			//}
-		}
-
 		auto IGraphicContextVK::destroy() -> bool
 		{
 			if (enableValidationLayers) {

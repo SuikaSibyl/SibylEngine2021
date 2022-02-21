@@ -179,6 +179,9 @@ xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang-llvm.dll $(Solut
     <ProjectReference Include="..\Engine\Source\Runtime\RHI\RHI.vcxproj">
       <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Engine\Source\Runtime\UAT\UAT.vcxproj">
+      <Project>{14a16d2e-1749-4189-9cbc-b82dee407444}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

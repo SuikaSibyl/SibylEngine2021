@@ -153,6 +153,8 @@
   <ItemGroup>
     <ClCompile Include="Private\Allocator.cpp" />
     <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\Buffer.cpp" />
+    <ClCompile Include="Private\File.cpp" />
     <ClCompile Include="Private\Layer.cpp" />
     <ClCompile Include="Private\LayerStack.cpp" />
     <ClCompile Include="Private\Log.cpp">
@@ -171,9 +173,11 @@
     <ClCompile Include="Public\Allocator.ixx" />
     <ClCompile Include="Public\Application.ixx" />
     <ClCompile Include="Public\Assert.ixx" />
+    <ClCompile Include="Public\Buffer.ixx" />
     <ClCompile Include="Public\Core.ixx" />
     <ClCompile Include="Public\Enums.ixx" />
     <ClCompile Include="Public\Event.ixx" />
+    <ClCompile Include="Public\File.ixx" />
     <ClCompile Include="Public\Input.ixx" />
     <ClCompile Include="Public\Layer.ixx" />
     <ClCompile Include="Public\LayerStack.ixx" />

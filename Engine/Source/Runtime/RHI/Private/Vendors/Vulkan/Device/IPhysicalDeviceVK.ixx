@@ -19,6 +19,7 @@ namespace SIByL
 
 			virtual auto initialize() -> bool;
 			virtual auto isDebugLayerEnabled() noexcept -> bool;
+			virtual auto getGraphicContext() noexcept -> IGraphicContext* override;
 
 		public:
 			struct QueueFamilyIndices {
@@ -40,7 +41,7 @@ namespace SIByL
 			auto findQueueFamilies()->QueueFamilyIndices;
 			auto getDeviceExtensions() noexcept -> std::vector<const char*> const&;
 			auto querySwapChainSupport() -> SwapChainSupportDetails;
-			auto getGraphicContext()->IGraphicContextVK*;
+			auto getGraphicContextVK()->IGraphicContextVK*;
 
 		private:
 			bool enableDebugLayer;
