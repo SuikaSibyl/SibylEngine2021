@@ -1,7 +1,10 @@
 module;
-
+#include <cstdint>
+#include <vector>
 export module RHI.IFramebuffer;
 import RHI.IResource;
+import RHI.ITextureView;
+import RHI.IRenderPass;
 
 namespace SIByL
 {
@@ -13,6 +16,13 @@ namespace SIByL
 		// │  DirectX 12  │   ID3D12Resource    │
 		// │  OpenGL      │   GLuint            │
 		// ╰──────────────┴─────────────────────╯
+
+		export struct FramebufferDesc
+		{
+			uint32_t width, height;
+			IRenderPass* renderPass;
+			std::vector<ITextureView*> attachments;
+		};
 
 		export class IFramebuffer :public IResource
 		{

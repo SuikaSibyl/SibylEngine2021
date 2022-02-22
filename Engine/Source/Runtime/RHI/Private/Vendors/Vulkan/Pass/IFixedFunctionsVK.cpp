@@ -34,7 +34,6 @@ namespace SIByL::RHI
 
 	auto IInputAssemblyVK::createVkInputAssembly() noexcept -> void
 	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		inputAssembly.topology = getVkTopology(topologyKind);
 		inputAssembly.primitiveRestartEnable = VK_FALSE;

@@ -9,6 +9,7 @@ module;
 #include <string_view>
 #include <filesystem>
 module Main;
+
 import Core.Assert;
 import Core.Test;
 import Core.Window;
@@ -22,6 +23,8 @@ import Core.LayerStack;
 import Core.Application;
 import Core.MemoryManager;
 import Core.File;
+import Core.Log;
+
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
 import RHI.ILogicalDevice;
@@ -33,6 +36,10 @@ import RHI.IFactory;
 import RHI.IShader;
 import RHI.IFixedFunctions;
 import RHI.IPipeline;
+import RHI.IFramebuffer;
+import RHI.ICommandPool;
+import RHI.ICommandBuffer;
+
 import UAT.IUniversalApplication;
 
 using namespace SIByL;
@@ -138,25 +145,53 @@ public:
 		};
 		pipeline = resourceFactory->createPipeline(pipeline_desc);
 
+		for (int i = 0; i < swapchain->getSwapchainCount(); i++)
+		{
+			RHI::FramebufferDesc framebuffer_desc =
+			{
+				extend.width,
+				extend.height,
+				render_pass.get(),
+				{swapchain->getITextureView(i)},
+			};
+			framebuffers.emplace_back(resourceFactory->createFramebuffer(framebuffer_desc));
+		}
+
+		commandPool = resourceFactory->createCommandPool(RHI::QueueType::GRAPHICS);
+		for (int i = 0; i < swapchain->getSwapchainCount(); i++)
+		{
+			commandbuffers.emplace_back(resourceFactory->createCommandBuffer(commandPool.get()));
+		}
+
+		commandbuffers[0]->beginRecording();
+		commandbuffers[0]->cmdBeginRenderPass(render_pass.get(), framebuffers[0].get());
+		commandbuffers[0]->cmdBindPipeline(pipeline.get());
+		commandbuffers[0]->cmdDraw(3, 1, 0, 0);
+		commandbuffers[0]->cmdEndRenderPass();
+		commandbuffers[0]->endRecording();
+		SE_CORE_INFO("OnAwake End");
 	}
 
 	virtual void onUpdate() override
 	{
-
+		SE_CORE_INFO("Update");
 	}
 
 private:
 	Scope<RHI::IGraphicContext> graphicContext;
 	Scope<RHI::IPhysicalDevice> physicalDevice;
-
 	Scope<RHI::ILogicalDevice> logicalDevice;
 	Scope<RHI::ISwapChain> swapchain;
 
 	MemScope<RHI::IResourceFactory> resourceFactory;
 	MemScope<RHI::IShader> shaderVert;
 	MemScope<RHI::IShader> shaderFrag;
-
 	MemScope<RHI::IPipeline> pipeline;
+
+	std::vector<MemScope<RHI::IFramebuffer>> framebuffers;
+
+	MemScope<RHI::ICommandPool> commandPool;
+	std::vector<MemScope<RHI::ICommandBuffer>> commandbuffers;
 };
 
 auto SE_CREATE_APP() noexcept -> SIByL::IApplication*

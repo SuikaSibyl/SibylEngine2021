@@ -3,6 +3,8 @@ module;
 export module RHI.ISwapChain;
 import RHI.IResource;
 import RHI.IEnum;
+import RHI.ITexture;
+import RHI.ITextureView;
 
 namespace SIByL
 {
@@ -21,6 +23,9 @@ namespace SIByL
 		public:
 			virtual ~ISwapChain() = default;
 			virtual auto getExtend() noexcept -> Extend = 0;
+			virtual auto getSwapchainCount() noexcept -> unsigned int = 0;
+			virtual auto getITexture(unsigned int idx) noexcept ->ITexture* = 0;
+			virtual auto getITextureView(unsigned int idx) noexcept ->ITextureView* = 0;
 		};
 	}
 }

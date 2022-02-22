@@ -9,6 +9,10 @@ import RHI.IRenderPass;
 import RHI.IRenderPass.VK;
 import RHI.ILogicalDevice;
 import RHI.ILogicalDevice.VK;
+import RHI.ITexture;
+import RHI.IRenderPass;
+import RHI.ITextureView;
+import RHI.ITextureView.VK;
 
 namespace SIByL
 {
@@ -17,7 +21,7 @@ namespace SIByL
 		export class IFramebufferVK :public IFramebuffer
 		{
 		public:
-			IFramebufferVK() = default;
+			IFramebufferVK(FramebufferDesc const&, ILogicalDeviceVK*);
 			IFramebufferVK(IFramebufferVK&&) = default;
 			virtual ~IFramebufferVK();
 
@@ -25,10 +29,9 @@ namespace SIByL
 			auto getSize(uint32_t& width, uint32_t& height) noexcept -> void;
 		private:
 			auto createFramebuffers() noexcept -> void;
-			IRenderPassVK* renderPass;
 			ILogicalDeviceVK* logicalDevice;
 			VkFramebuffer framebuffer;
-			uint32_t width, height;
+			FramebufferDesc desc;
 			std::vector<VkImageView> attachments;
 		};
 	}

@@ -49,6 +49,8 @@ namespace SIByL::RHI
 	{
 		image = _texture.image;
 		imageView = _texture.imageView;
+		resource = std::move(_texture.resource);
+		logicalDevice = _texture.logicalDevice;
 
 		_texture.image = nullptr;
 		_texture.imageView = nullptr;
@@ -60,6 +62,11 @@ namespace SIByL::RHI
 		createImageViews(desc, &resource, &image, logicalDevice, view->getpVkImageView());
 		MemScope<ITextureView> general_view = MemCast<ITextureView>(view);
 		return general_view;
+	}
+
+	auto ITextureVK::getVkImageView() noexcept -> VkImageView*
+	{
+		return &imageView;
 	}
 
 	ITextureVK::~ITextureVK()

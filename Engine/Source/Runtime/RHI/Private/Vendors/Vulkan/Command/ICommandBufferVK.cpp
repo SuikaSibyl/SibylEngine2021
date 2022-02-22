@@ -18,6 +18,13 @@ import RHI.IPipeline.VK;
 
 namespace SIByL::RHI
 {
+	ICommandBufferVK::ICommandBufferVK(ICommandPoolVK* command_pool, ILogicalDeviceVK* logical_device)
+		: commandPool(command_pool)
+		, logicalDevice(logical_device)
+	{
+		createVkCommandBuffer();
+	}
+
 	auto ICommandBufferVK::beginRecording() noexcept -> void
 	{
 		VkCommandBufferBeginInfo beginInfo{};

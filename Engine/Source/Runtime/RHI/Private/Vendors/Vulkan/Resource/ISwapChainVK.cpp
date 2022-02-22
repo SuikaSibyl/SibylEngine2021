@@ -6,11 +6,12 @@ module;
 #include <utility>
 module RHI.ISwapChain.VK;
 import Core.Log;
+import RHI.IEnum;
 import RHI.ISwapChain;
 import RHI.IPhysicalDevice.VK;
+import RHI.IResource.VK;
 import RHI.ITexture;
 import RHI.ITexture.VK;
-import RHI.IResource.VK;
 import RHI.ITextureView;
 import RHI.ITextureView.VK;
 
@@ -33,6 +34,27 @@ namespace SIByL::RHI
 	auto ISwapChainVK::getExtend() noexcept -> Extend
 	{
 		return { swapChainExtent.width, swapChainExtent.height };
+	}
+
+	auto ISwapChainVK::getSwapchainCount() noexcept -> unsigned int
+	{
+		return swapChainTextures.size();
+	}
+	
+	auto ISwapChainVK::getITexture(unsigned int idx) noexcept ->ITexture*
+	{
+		if (idx<0 || idx > swapChainTextures.size())
+			return nullptr;
+		
+		return &(swapChainTextures[idx]);
+	}
+
+	auto ISwapChainVK::getITextureView(unsigned int idx) noexcept ->ITextureView*
+	{
+		if (idx<0 || idx > swapChainTextures.size())
+			return nullptr;
+
+		return swapchainViews[idx].get();
 	}
 
 	auto ISwapChainVK::createSwapChain() noexcept -> void

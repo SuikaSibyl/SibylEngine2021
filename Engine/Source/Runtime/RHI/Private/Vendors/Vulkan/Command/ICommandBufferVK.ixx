@@ -22,7 +22,7 @@ namespace SIByL
 		export class ICommandBufferVK :public ICommandBuffer
 		{
 		public:
-			ICommandBufferVK() = default;
+			ICommandBufferVK(ICommandPoolVK*, ILogicalDeviceVK*);
 			ICommandBufferVK(ICommandBufferVK const&) = delete;
 			ICommandBufferVK(ICommandBufferVK&&) = delete;
 			virtual ~ICommandBufferVK() = default;

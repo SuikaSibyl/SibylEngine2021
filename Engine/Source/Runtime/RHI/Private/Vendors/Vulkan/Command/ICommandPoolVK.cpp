@@ -15,6 +15,13 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		ICommandPoolVK::ICommandPoolVK(QueueType _type, ILogicalDeviceVK* logical_device)
+			: logicalDevice(logical_device)
+			, type(_type)
+		{
+			createVkCommandPool();
+		}
+
 		ICommandPoolVK::~ICommandPoolVK()
 		{
 			if(commandPool)

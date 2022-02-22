@@ -23,6 +23,9 @@ import RHI.IFixedFunctions;
 import RHI.IPipelineLayout;
 import RHI.IRenderPass;
 import RHI.IPipeline;
+import RHI.IFramebuffer;
+import RHI.ICommandPool;
+import RHI.ICommandBuffer;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -33,6 +36,9 @@ import RHI.IFixedFunctions.VK;
 import RHI.IPipelineLayout.VK;
 import RHI.IRenderPass.VK;
 import RHI.IPipeline.VK;
+import RHI.IFramebuffer.VK;
+import RHI.ICommandPool.VK;
+import RHI.ICommandBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -377,5 +383,62 @@ namespace SIByL::RHI
 			break;
 		}
 		return rp;
+	}
+
+	auto IResourceFactory::createFramebuffer(FramebufferDesc const& desc) noexcept -> MemScope<IFramebuffer>
+	{
+		MemScope<IFramebuffer> fb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IFramebufferVK> fb_vk = MemNew<IFramebufferVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			fb = MemCast<IFramebuffer>(fb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return fb;
+	}
+
+	auto IResourceFactory::createCommandPool(QueueType type) noexcept -> MemScope<ICommandPool>
+	{
+		MemScope<ICommandPool> cp = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ICommandPoolVK> cp_vk = MemNew<ICommandPoolVK>(type, (ILogicalDeviceVK*)logicalDevice);
+			cp = MemCast<ICommandPool>(cp_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return cp;
+	}
+
+	auto IResourceFactory::createCommandBuffer(ICommandPool* cmd_pool) noexcept -> MemScope<ICommandBuffer>
+	{
+		MemScope<ICommandBuffer> cb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ICommandBufferVK> cb_vk = MemNew<ICommandBufferVK>((ICommandPoolVK*)cmd_pool, (ILogicalDeviceVK*)logicalDevice);
+			cb = MemCast<ICommandBuffer>(cb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return cb;
 	}
 }

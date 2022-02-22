@@ -13,6 +13,9 @@ import RHI.IFixedFunctions;
 import RHI.IPipelineLayout;
 import RHI.IRenderPass;
 import RHI.IPipeline;
+import RHI.IFramebuffer;
+import RHI.ICommandPool;
+import RHI.ICommandBuffer;
 
 namespace SIByL
 {
@@ -70,6 +73,9 @@ namespace SIByL
 			auto createPipelineLayout(PipelineLayoutDesc const& desc) noexcept -> MemScope<IPipelineLayout>;
 			auto createRenderPass(RenderPassDesc const& desc) noexcept -> MemScope<IRenderPass>;
 			auto createPipeline(PipelineDesc const& desc) noexcept -> MemScope<IPipeline>;
+			auto createFramebuffer(FramebufferDesc const& desc) noexcept -> MemScope<IFramebuffer>;
+			auto createCommandPool(QueueType type) noexcept -> MemScope<ICommandPool>;
+			auto createCommandBuffer(ICommandPool* cmd_pool) noexcept -> MemScope<ICommandBuffer>;
 
 		private:
 			API api;

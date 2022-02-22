@@ -15,10 +15,20 @@ namespace SIByL
 			IResource(IResource&&) = default;
 			virtual ~IResource() = default;
 
+			virtual IResource& operator= (IResource&& rho);
+
         protected:
             ResourceType type;
             ResourceState state;
             ResourceFormat format;
 		};
+
+		IResource& IResource::operator= (IResource&& rho)
+		{
+			type = rho.type;
+			state = rho.state;
+			format = rho.format;
+			return *this;
+		}
 	}
 }

@@ -22,9 +22,6 @@ namespace SIByL
 			ICommandPool(ICommandPool const&) = delete;
 			ICommandPool(ICommandPool&&) = delete;
 			virtual ~ICommandPool() = default;
-
-		protected:
-			QueueType type;
 		};
 	}
 }

@@ -15,13 +15,13 @@ namespace SIByL::RHI
 			return VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 			break;
 		case SIByL::RHI::TopologyKind::TriangleList:
-			return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 			break;
 		case SIByL::RHI::TopologyKind::LineStrip:
 			return VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
 			break;
 		case SIByL::RHI::TopologyKind::LineList:
-			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+			return VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 			break;
 		case SIByL::RHI::TopologyKind::PointList:
 			return VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP;

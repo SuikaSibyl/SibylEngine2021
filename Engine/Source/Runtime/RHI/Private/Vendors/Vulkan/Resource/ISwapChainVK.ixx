@@ -24,6 +24,9 @@ namespace SIByL
 			virtual ~ISwapChainVK();
 
 			virtual auto getExtend() noexcept -> Extend override;
+			virtual auto getSwapchainCount() noexcept -> unsigned int override;
+			virtual auto getITexture(unsigned int idx) noexcept ->ITexture* override;
+			virtual auto getITextureView(unsigned int idx) noexcept ->ITextureView* override;
 
 		private:
 			VkSwapchainKHR swapChain;

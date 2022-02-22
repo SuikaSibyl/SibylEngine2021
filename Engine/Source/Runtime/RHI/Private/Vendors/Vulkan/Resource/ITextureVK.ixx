@@ -22,6 +22,7 @@ namespace SIByL
 			virtual ~ITextureVK();
 
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> override;
+			auto getVkImageView() noexcept -> VkImageView*;
 
 		private:
 			ILogicalDeviceVK* logicalDevice;
