@@ -152,6 +152,7 @@
     <ClCompile Include="Private\Common\IEnum.cpp" />
     <ClCompile Include="Private\Common\IFactory.cpp" />
     <ClCompile Include="Private\Common\IFixedFunctions.cpp" />
+    <ClCompile Include="Private\Common\Resource\IBuffer.cpp" />
     <ClCompile Include="Private\Slang\ICompileSession.cpp" />
     <ClCompile Include="Private\Slang\IGlobalSession.cpp" />
     <ClCompile Include="Private\Slang\SlangUtility.ixx" />
@@ -225,6 +226,7 @@
     <ClCompile Include="Public\Resource\IEnum.ixx" />
     <ClCompile Include="Public\Shader\IGlobalSession.ixx" />
     <ClCompile Include="Public\Shader\IShader.ixx" />
+    <ClCompile Include="Public\Structure\IVertex.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

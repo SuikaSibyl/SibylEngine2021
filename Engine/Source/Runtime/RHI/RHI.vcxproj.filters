@@ -243,6 +243,12 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Structure\IVertex.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Common\Resource\IBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h">
