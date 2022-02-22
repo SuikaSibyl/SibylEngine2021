@@ -52,6 +52,7 @@ namespace SIByL::Core
         if (!pFreeList) {
             // allocate a new page
             PageHeader* pNewPage = reinterpret_cast<PageHeader*>(new uint8_t[pageSize]);
+            pNewPage->pNext = nullptr;
 
             ++numPages;
             numBlocks += blocksPerPage;
@@ -123,9 +124,6 @@ namespace SIByL::Core
 #if defined(_DEBUG)
     void Allocator::fillFreePage(PageHeader* pPage)
     {
-        // page header
-        pPage->pNext = nullptr;
-
         // blocks
         BlockHeader* pBlock = pPage->Blocks();
         for (uint32_t i = 0; i < blocksPerPage; i++)

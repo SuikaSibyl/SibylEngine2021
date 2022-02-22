@@ -208,7 +208,7 @@ public:
 		// Timer update
 		{
 			timer.tick();
-			//SE_CORE_INFO("FPS: {0}", timer.getFPS());
+			SE_CORE_INFO("FPS: {0}", timer.getFPS());
 		}
 		// drawFrame
 		{
