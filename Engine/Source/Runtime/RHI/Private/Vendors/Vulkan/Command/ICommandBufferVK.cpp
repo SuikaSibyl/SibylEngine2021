@@ -15,6 +15,10 @@ import RHI.IFramebuffer;
 import RHI.IFramebuffer.VK;
 import RHI.IPipeline;
 import RHI.IPipeline.VK;
+import RHI.ISemaphore;
+import RHI.ISemaphore.VK;
+import RHI.IFence;
+import RHI.IFence.VK;
 
 namespace SIByL::RHI
 {
@@ -23,6 +27,34 @@ namespace SIByL::RHI
 		, logicalDevice(logical_device)
 	{
 		createVkCommandBuffer();
+	}
+
+	auto ICommandBufferVK::reset() noexcept -> void
+	{
+		vkResetCommandBuffer(commandBuffer, 0);
+	}
+
+	auto ICommandBufferVK::submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void
+	{
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+		VkSemaphore waitSemaphores[] = { *((ISemaphoreVK*)wait)->getVkSemaphore() };
+		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+		submitInfo.waitSemaphoreCount = 1;
+		submitInfo.pWaitSemaphores = waitSemaphores;
+		submitInfo.pWaitDstStageMask = waitStages;
+		
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+		
+		VkSemaphore signalSemaphores[] = { *((ISemaphoreVK*)signal)->getVkSemaphore() };
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = signalSemaphores;
+
+		if (vkQueueSubmit(*(logicalDevice->getVkGraphicQueue()), 1, &submitInfo, *((IFenceVK*)fence)->getVkFence()) != VK_SUCCESS) {
+			SE_CORE_ERROR("failed to submit draw command buffer!");
+		}
 	}
 
 	auto ICommandBufferVK::beginRecording() noexcept -> void

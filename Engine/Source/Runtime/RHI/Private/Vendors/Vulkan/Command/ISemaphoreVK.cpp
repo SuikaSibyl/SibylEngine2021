@@ -11,9 +11,23 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		ISemaphoreVK::ISemaphoreVK()
+		ISemaphoreVK::ISemaphoreVK(ILogicalDeviceVK* logical_device)
+			:logicalDevice(logical_device)
 		{
+			createSemaphores();
+		}
 
+		ISemaphoreVK::~ISemaphoreVK()
+		{
+			if (semaphore)
+			{
+				vkDestroySemaphore(logicalDevice->getDeviceHandle(), semaphore, nullptr);
+			}
+		}
+
+		auto ISemaphoreVK::getVkSemaphore() noexcept -> VkSemaphore*
+		{
+			return &semaphore;
 		}
 
 		auto ISemaphoreVK::createSemaphores() noexcept -> void

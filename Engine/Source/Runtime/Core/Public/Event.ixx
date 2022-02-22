@@ -161,12 +161,15 @@ namespace SIByL
 		export class WindowResizeEvent :public Event
 		{
 		public:
-			WindowResizeEvent(unsigned int width, unsigned int height)
-				:m_Width(width), m_Height(height)
+			WindowResizeEvent(unsigned int width, unsigned int height, void* window)
+				:m_Width(width), m_Height(height), window(window)
 			{}
 
 			inline unsigned int GetWidth() const { return m_Width; }
 			inline unsigned int GetHeight() const { return m_Height; }
+			inline unsigned int* GetWidthPtr() { return &m_Width; }
+			inline unsigned int* GetHeightPtr() { return &m_Height; }
+			inline void* GetWindowPtr() { return window; }
 
 			std::string toString() const override
 			{
@@ -180,6 +183,7 @@ namespace SIByL
 
 		private:
 			unsigned int m_Width, m_Height;
+			void* window;
 		};
 
 		export class WindowCloseEvent :public Event

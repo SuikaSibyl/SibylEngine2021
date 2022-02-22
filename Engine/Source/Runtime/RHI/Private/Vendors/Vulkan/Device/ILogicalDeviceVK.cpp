@@ -31,6 +31,11 @@ namespace SIByL::RHI
 		return (IPhysicalDevice*)physicalDevice;
 	}
 
+	auto ILogicalDeviceVK::waitIdle() noexcept -> void
+	{
+		vkDeviceWaitIdle(device);
+	}
+
 	auto ILogicalDeviceVK::getDeviceHandle() noexcept -> VkDevice&
 	{
 		return device;
@@ -39,6 +44,16 @@ namespace SIByL::RHI
 	auto ILogicalDeviceVK::getPhysicalDeviceVk() noexcept -> IPhysicalDeviceVK*
 	{
 		return physicalDevice;
+	}
+
+	auto ILogicalDeviceVK::getVkGraphicQueue() noexcept -> VkQueue*
+	{
+		return &graphicsQueue;
+	}
+	
+	auto ILogicalDeviceVK::getVkPresentQueue() noexcept -> VkQueue*
+	{
+		return &presentQueue;
 	}
 
 	auto ILogicalDeviceVK::createLogicalDevice(IPhysicalDeviceVK* physicalDevice) noexcept -> void

@@ -9,15 +9,18 @@ import Core.Log;
 import RHI.IEnum;
 import RHI.ISwapChain;
 import RHI.IPhysicalDevice.VK;
+import RHI.IResource;
 import RHI.IResource.VK;
 import RHI.ITexture;
 import RHI.ITexture.VK;
 import RHI.ITextureView;
 import RHI.ITextureView.VK;
+import RHI.ISemaphore;
+import RHI.ISemaphore.VK;
 
 namespace SIByL::RHI
 {
-	ISwapChainVK::ISwapChainVK(ILogicalDeviceVK* logical_device)
+	ISwapChainVK::ISwapChainVK(SwapchainDesc const& desc, ILogicalDeviceVK* logical_device)
 	{
 		physicalDevice = logical_device->getPhysicalDeviceVk();
 		logicalDevice = logical_device;
@@ -55,6 +58,33 @@ namespace SIByL::RHI
 			return nullptr;
 
 		return swapchainViews[idx].get();
+	}
+	
+	auto ISwapChainVK::acquireNextImage(ISemaphore* semaphore) noexcept -> uint32_t
+	{
+		uint32_t imageIndex;
+		vkAcquireNextImageKHR(logicalDevice->getDeviceHandle(), swapChain, UINT64_MAX, 
+			*((ISemaphoreVK*)semaphore)->getVkSemaphore(), VK_NULL_HANDLE, &imageIndex);
+		return imageIndex;
+	}
+	
+	auto ISwapChainVK::present(uint32_t const& idx, ISemaphore* semaphore) noexcept -> void
+	{
+		VkSemaphore signalSemaphores[] = { *((ISemaphoreVK*)semaphore)->getVkSemaphore() };
+
+		VkPresentInfoKHR presentInfo{};
+		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+		presentInfo.waitSemaphoreCount = 1;
+		presentInfo.pWaitSemaphores = signalSemaphores;
+		
+		VkSwapchainKHR swapChains[] = { swapChain };
+		presentInfo.swapchainCount = 1;
+		presentInfo.pSwapchains = swapChains;
+		presentInfo.pImageIndices = &idx;
+		presentInfo.pResults = nullptr; // Optional
+
+		vkQueuePresentKHR(*(logicalDevice->getVkPresentQueue()), &presentInfo);
 	}
 
 	auto ISwapChainVK::createSwapChain() noexcept -> void

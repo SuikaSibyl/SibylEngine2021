@@ -5,6 +5,8 @@ import RHI.IResource;
 import RHI.IRenderPass;
 import RHI.IFramebuffer;
 import RHI.IPipeline;
+import RHI.ISemaphore;
+import RHI.IFence;
 
 namespace SIByL
 {
@@ -31,6 +33,8 @@ namespace SIByL
 			ICommandBuffer(ICommandBuffer&&) = default;
 			virtual ~ICommandBuffer() = default;
 
+			virtual auto reset() noexcept -> void = 0;
+			virtual auto submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void = 0;
 			virtual auto beginRecording() noexcept -> void = 0;
 			virtual auto endRecording() noexcept -> void = 0;
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void = 0;

@@ -26,6 +26,8 @@ import RHI.IPipeline;
 import RHI.IFramebuffer;
 import RHI.ICommandPool;
 import RHI.ICommandBuffer;
+import RHI.ISemaphore;
+import RHI.IFence;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -39,6 +41,8 @@ import RHI.IPipeline.VK;
 import RHI.IFramebuffer.VK;
 import RHI.ICommandPool.VK;
 import RHI.ICommandBuffer.VK;
+import RHI.ISemaphore.VK;
+import RHI.IFence.VK;
 
 namespace SIByL::RHI
 {
@@ -95,28 +99,33 @@ namespace SIByL::RHI
 		return res;
 	}
 
-	auto IFactory::createSwapchain(SwapchainDesc const& desc) noexcept -> ISwapChain*
-	{
-		ISwapChain* swapchain = nullptr;
-		switch (desc.logicalDevice->getPhysicalDevice()->getGraphicContext()->getAPI())
-		{
-		case API::VULKAN:
-			swapchain = SNew<ISwapChainVK>((ILogicalDeviceVK*)desc.logicalDevice);
-			break;
-		case API::DX12:
-			break;
-		default:
-			break;
-		}
-		return swapchain;
-	}
-
 	IResourceFactory::IResourceFactory(ILogicalDevice* logical_device)
 	{
 		logicalDevice = logical_device;
 		physicalDevice = logicalDevice->getPhysicalDevice();
 		graphicContext = physicalDevice->getGraphicContext();
 		api = graphicContext->getAPI();
+	}
+
+	auto IResourceFactory::createSwapchain(SwapchainDesc const& desc) noexcept -> MemScope<ISwapChain>
+	{
+		MemScope<ISwapChain> sc = nullptr;
+
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{			
+			MemScope<ISwapChainVK> sc_vk = MemNew<ISwapChainVK>(desc, static_cast<RHI::ILogicalDeviceVK*>(logicalDevice));
+			sc = MemCast<ISwapChain>(sc_vk);
+		}
+		break;
+		default:
+			break;
+		}
+
+		return sc;
 	}
 
 	auto IResourceFactory::createShaderFromBinary(Buffer const& binary, ShaderDesc const& desc) noexcept -> MemScope<IShader>
@@ -440,5 +449,43 @@ namespace SIByL::RHI
 			break;
 		}
 		return cb;
+	}
+
+	auto IResourceFactory::createSemaphore() noexcept -> MemScope<ISemaphore>
+	{
+		MemScope<ISemaphore> semaphore = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ISemaphoreVK> semaphore_vk = MemNew<ISemaphoreVK>((ILogicalDeviceVK*)logicalDevice);
+			semaphore = MemCast<ISemaphore>(semaphore_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return semaphore;
+	}
+
+	auto IResourceFactory::createFence() noexcept -> MemScope<IFence>
+	{
+		MemScope<IFence> fence = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IFenceVK> fence_vk = MemNew<IFenceVK>((ILogicalDeviceVK*)logicalDevice);
+			fence = MemCast<IFence>(fence_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return fence;
 	}
 }

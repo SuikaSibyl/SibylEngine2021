@@ -43,6 +43,7 @@ namespace SIByL::Core
 
 	void IApplication::shutdown()
 	{
+		onShutdown();
 		for (ILayer* layer : layer_stack)
 		{
 			layer->onShutdown();
@@ -54,6 +55,8 @@ namespace SIByL::Core
 		// application handling
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(IApplication::onWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(IApplication::onWindowResizeSafe));
+
 		if (e.handled)
 			return;
 
@@ -67,6 +70,20 @@ namespace SIByL::Core
 	}
 
 	bool IApplication::onWindowClose(WindowCloseEvent& e)
+	{
+		return false;
+	}
+
+	auto IApplication::onWindowResizeSafe(WindowResizeEvent& e) -> bool
+	{
+		if (e.GetWidth() == 0 && e.GetHeight() == 0)
+		{
+			((IWindow*)e.GetWindowPtr())->waitUntilNotMinimized(*e.GetWidthPtr(), *e.GetHeightPtr());
+		}
+		return onWindowResize(e);
+	}
+
+	auto IApplication::onWindowResize(WindowResizeEvent& e) -> bool
 	{
 		return false;
 	}

@@ -1,5 +1,5 @@
 module;
-
+#include <cstdint>
 export module RHI.IFence;
 import Core.SObject;
 
@@ -25,6 +25,8 @@ namespace SIByL
 			IFence(IFence&&) = delete;
 			virtual ~IFence() = default;
 
+			virtual auto wait() noexcept -> void = 0;
+			virtual auto reset() noexcept -> void = 0;
 		};
 	}
 }

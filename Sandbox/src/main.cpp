@@ -8,6 +8,7 @@ module;
 #include <EntryPoint.h>
 #include <string_view>
 #include <filesystem>
+#include <chrono>
 module Main;
 
 import Core.Assert;
@@ -24,6 +25,7 @@ import Core.Application;
 import Core.MemoryManager;
 import Core.File;
 import Core.Log;
+import Core.Time;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -39,10 +41,14 @@ import RHI.IPipeline;
 import RHI.IFramebuffer;
 import RHI.ICommandPool;
 import RHI.ICommandBuffer;
+import RHI.ISemaphore;
+import RHI.IFence;
 
 import UAT.IUniversalApplication;
 
 using namespace SIByL;
+
+const int MAX_FRAMES_IN_FLIGHT = 2;
 
 class SandboxApp :public IUniversalApplication
 {
@@ -66,7 +72,7 @@ public:
 		graphicContext->attachWindow(window_layer->getWindow());
 		physicalDevice.reset(RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
 		logicalDevice.reset(RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
-		swapchain.reset(RHI::IFactory::createSwapchain({ logicalDevice.get() }));
+
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
 		AssetLoader shaderLoader;
@@ -77,9 +83,33 @@ public:
 		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 
+		swapchain = resourceFactory->createSwapchain({});
+		createModifableResource();
+
+		commandPool = resourceFactory->createCommandPool(RHI::QueueType::GRAPHICS);
+		commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		imageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
+		renderFinishedSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
+		inFlightFence.resize(MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			commandbuffers[i] = resourceFactory->createCommandBuffer(commandPool.get());
+			imageAvailableSemaphore[i] = resourceFactory->createSemaphore();
+			renderFinishedSemaphore[i] = resourceFactory->createSemaphore();
+			inFlightFence[i] = resourceFactory->createFence();
+		}
+
+		timer.start();
+
+		SE_CORE_INFO("OnAwake End");
+	}
+	
+	void createModifableResource()
+	{
+		RHI::Extend extend = swapchain->getExtend();
+
 		MemScope<RHI::IVertexLayout> vertex_layout = resourceFactory->createVertexLayout();
 		MemScope<RHI::IInputAssembly> input_assembly = resourceFactory->createInputAssembly(RHI::TopologyKind::TriangleList);
-		RHI::Extend extend = swapchain->getExtend();
 		MemScope<RHI::IViewportsScissors> viewport_scissors = resourceFactory->createViewportsScissors(extend, extend);
 		RHI::RasterizerDesc rasterizer_desc =
 		{
@@ -127,7 +157,7 @@ public:
 			RHI::SampleCount::COUNT_1_BIT,
 			RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB,
 		};
-		MemScope<RHI::IRenderPass> render_pass = resourceFactory->createRenderPass(renderpass_desc);
+		renderPass = resourceFactory->createRenderPass(renderpass_desc);
 
 		RHI::PipelineDesc pipeline_desc =
 		{
@@ -141,7 +171,7 @@ public:
 			color_blending.get(),
 			dynamic_states.get(),
 			pipeline_layout.get(),
-			render_pass.get(),
+			renderPass.get(),
 		};
 		pipeline = resourceFactory->createPipeline(pipeline_desc);
 
@@ -151,47 +181,88 @@ public:
 			{
 				extend.width,
 				extend.height,
-				render_pass.get(),
+				renderPass.get(),
 				{swapchain->getITextureView(i)},
 			};
 			framebuffers.emplace_back(resourceFactory->createFramebuffer(framebuffer_desc));
 		}
+	}
 
-		commandPool = resourceFactory->createCommandPool(RHI::QueueType::GRAPHICS);
-		for (int i = 0; i < swapchain->getSwapchainCount(); i++)
-		{
-			commandbuffers.emplace_back(resourceFactory->createCommandBuffer(commandPool.get()));
-		}
+	virtual auto onWindowResize(WindowResizeEvent& e) -> bool override
+	{
+		logicalDevice->waitIdle();
 
-		commandbuffers[0]->beginRecording();
-		commandbuffers[0]->cmdBeginRenderPass(render_pass.get(), framebuffers[0].get());
-		commandbuffers[0]->cmdBindPipeline(pipeline.get());
-		commandbuffers[0]->cmdDraw(3, 1, 0, 0);
-		commandbuffers[0]->cmdEndRenderPass();
-		commandbuffers[0]->endRecording();
-		SE_CORE_INFO("OnAwake End");
+		framebuffers.clear();
+		pipeline = nullptr;
+		renderPass = nullptr;
+		swapchain = nullptr;
+
+		swapchain = resourceFactory->createSwapchain({ e.GetWidth(), e.GetHeight() });
+		createModifableResource();
+
+		return false;
 	}
 
 	virtual void onUpdate() override
 	{
-		SE_CORE_INFO("Update");
+		// Timer update
+		{
+			timer.tick();
+			//SE_CORE_INFO("FPS: {0}", timer.getFPS());
+		}
+		// drawFrame
+		{
+			//  1. Wait for the previous frame to finish
+			inFlightFence[currentFrame]->wait();
+			inFlightFence[currentFrame]->reset();
+			//	2. Acquire an image from the swap chain
+			uint32_t imageIndex = swapchain->acquireNextImage(imageAvailableSemaphore[currentFrame].get());
+			//	3. Record a command buffer which draws the scene onto that image
+			commandbuffers[currentFrame]->reset();
+			commandbuffers[currentFrame]->beginRecording();
+			commandbuffers[currentFrame]->cmdBeginRenderPass(renderPass.get(), framebuffers[imageIndex].get());
+			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
+			commandbuffers[currentFrame]->cmdDraw(3, 1, 0, 0);
+			commandbuffers[currentFrame]->cmdEndRenderPass();
+			commandbuffers[currentFrame]->endRecording();
+			//	4. Submit the recorded command buffer
+			commandbuffers[currentFrame]->submit(imageAvailableSemaphore[currentFrame].get(), renderFinishedSemaphore[currentFrame].get(), inFlightFence[currentFrame].get());
+			//	5. Present the swap chain image
+			swapchain->present(imageIndex, renderFinishedSemaphore[currentFrame].get());
+		}
+		// update current frame
+		{
+			currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		}
+	}
+
+	virtual void onShutdown() override
+	{
+		logicalDevice->waitIdle();
 	}
 
 private:
+	Timer timer;
+	uint32_t currentFrame = 0;
+
 	Scope<RHI::IGraphicContext> graphicContext;
 	Scope<RHI::IPhysicalDevice> physicalDevice;
 	Scope<RHI::ILogicalDevice> logicalDevice;
-	Scope<RHI::ISwapChain> swapchain;
 
 	MemScope<RHI::IResourceFactory> resourceFactory;
 	MemScope<RHI::IShader> shaderVert;
 	MemScope<RHI::IShader> shaderFrag;
-	MemScope<RHI::IPipeline> pipeline;
 
+	MemScope<RHI::ISwapChain> swapchain;
+	MemScope<RHI::IRenderPass> renderPass;
+	MemScope<RHI::IPipeline> pipeline;
 	std::vector<MemScope<RHI::IFramebuffer>> framebuffers;
 
 	MemScope<RHI::ICommandPool> commandPool;
 	std::vector<MemScope<RHI::ICommandBuffer>> commandbuffers;
+	std::vector<MemScope<RHI::ISemaphore>> imageAvailableSemaphore;
+	std::vector<MemScope<RHI::ISemaphore>> renderFinishedSemaphore;
+	std::vector<MemScope<RHI::IFence>> inFlightFence;
 };
 
 auto SE_CREATE_APP() noexcept -> SIByL::IApplication*

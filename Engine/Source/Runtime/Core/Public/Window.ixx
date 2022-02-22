@@ -28,6 +28,7 @@ namespace SIByL
 			virtual auto isVSync() const noexcept -> bool = 0;
 			virtual auto setEventCallback(EventCallbackFn const& callback) noexcept -> void = 0;
 			virtual auto getInput() const noexcept -> IInput* = 0;
+			virtual auto waitUntilNotMinimized(unsigned int& width, unsigned int height) const noexcept -> void = 0;
 		};
 
 		export struct WindowLayerDesc

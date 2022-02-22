@@ -13,10 +13,10 @@ namespace SIByL
 		export class ISemaphoreVK :public ISemaphore
 		{
 		public:
-			ISemaphoreVK();
-			ISemaphoreVK(ISemaphoreVK const&) = delete;
-			ISemaphoreVK(ISemaphoreVK&&) = delete;
-			virtual ~ISemaphoreVK() = default;
+			ISemaphoreVK(ILogicalDeviceVK* logical_device);
+			virtual ~ISemaphoreVK();
+
+			auto getVkSemaphore() noexcept -> VkSemaphore*;
 
 		private:
 			ILogicalDeviceVK* logicalDevice;

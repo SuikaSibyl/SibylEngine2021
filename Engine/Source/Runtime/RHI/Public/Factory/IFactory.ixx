@@ -16,6 +16,8 @@ import RHI.IPipeline;
 import RHI.IFramebuffer;
 import RHI.ICommandPool;
 import RHI.ICommandBuffer;
+import RHI.ISemaphore;
+import RHI.IFence;
 
 namespace SIByL
 {
@@ -36,18 +38,12 @@ namespace SIByL
 			IPhysicalDevice* physicalDevice;
 		};
 
-		export struct SwapchainDesc
-		{
-			ILogicalDevice* logicalDevice;
-		};
-
 		export class IFactory
 		{
 		public:
 			static auto createGraphicContext(GraphicContextDesc const& desc) noexcept -> IGraphicContext*;
 			static auto createPhysicalDevice(PhysicalDeviceDesc const& desc) noexcept -> IPhysicalDevice*;
 			static auto createLogicalDevice(LogicalDeviceDesc const& desc) noexcept -> ILogicalDevice*;
-			static auto createSwapchain(SwapchainDesc const& desc) noexcept -> ISwapChain*;
 		};
 
 		export class IResourceFactory
@@ -57,6 +53,7 @@ namespace SIByL
 
 			auto createShaderFromBinary(Buffer const& binary, ShaderDesc const& desc) noexcept -> MemScope<IShader>;
 
+			auto createSwapchain(SwapchainDesc const& desc) noexcept -> MemScope<ISwapChain>;
 			auto createVertexLayout() noexcept -> MemScope<IVertexLayout>;
 			auto createInputAssembly(TopologyKind const& kind) noexcept -> MemScope<IInputAssembly>;
 			auto createViewportsScissors(
@@ -76,6 +73,8 @@ namespace SIByL
 			auto createFramebuffer(FramebufferDesc const& desc) noexcept -> MemScope<IFramebuffer>;
 			auto createCommandPool(QueueType type) noexcept -> MemScope<ICommandPool>;
 			auto createCommandBuffer(ICommandPool* cmd_pool) noexcept -> MemScope<ICommandBuffer>;
+			auto createSemaphore() noexcept -> MemScope<ISemaphore>;
+			auto createFence() noexcept -> MemScope<IFence>;
 
 		private:
 			API api;

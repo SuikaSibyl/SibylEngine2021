@@ -27,6 +27,7 @@ namespace SIByL
 			virtual auto isVSync() const noexcept -> bool override;
 			virtual auto setEventCallback(EventCallbackFn const& callback) noexcept -> void override;
 			virtual auto getInput() const noexcept -> IInput* override;
+			virtual auto waitUntilNotMinimized(unsigned int& width, unsigned int height) const noexcept -> void override;
 
 			auto getFramebufferSize(uint32_t& width, uint32_t& height) const noexcept -> void;
 

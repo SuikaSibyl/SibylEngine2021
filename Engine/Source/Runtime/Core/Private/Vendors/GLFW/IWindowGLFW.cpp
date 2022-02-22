@@ -43,7 +43,7 @@ namespace SIByL::Core
 		glfwSetWindowSizeCallback(glfw_window, [](GLFWwindow* window, int width, int height)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-				WindowResizeEvent event(width, height);
+				WindowResizeEvent event(width, height, (void*)data.window);
 				data.width = width;
 				data.height = height;
 				data.event_callback(event);
@@ -191,6 +191,18 @@ namespace SIByL::Core
 	auto IWindowGLFW::getInput() const noexcept -> IInput*
 	{
 		return input;
+	}
+	
+	auto IWindowGLFW::waitUntilNotMinimized(unsigned int& width, unsigned int height) const noexcept -> void
+	{
+		int _width = (int)width;
+		int _height = (int)height;
+		while (_width == 0 || _height == 0) {
+			glfwGetFramebufferSize(glfw_window, &_width, &_height);
+			glfwWaitEvents();
+		}
+		width = static_cast<uint32_t>(_width);
+		height = static_cast<uint32_t>(_height);
 	}
 
 	auto IWindowGLFW::getFramebufferSize(uint32_t& width, uint32_t& height) const noexcept -> void

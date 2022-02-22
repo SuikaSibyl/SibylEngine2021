@@ -23,7 +23,10 @@ namespace SIByL
 
 			virtual void onAwake() {}
 			virtual void onUpdate() {}
+			virtual void onShutdown() {}
 			virtual bool onWindowClose(WindowCloseEvent& e);
+			auto onWindowResizeSafe(WindowResizeEvent& e) -> bool;
+			virtual auto onWindowResize(WindowResizeEvent& e) -> bool;
 
 			void awake();
 			void mainLoop();

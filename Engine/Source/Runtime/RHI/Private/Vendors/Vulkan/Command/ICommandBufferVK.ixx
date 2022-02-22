@@ -14,6 +14,9 @@ import RHI.IFramebuffer;
 import RHI.IFramebuffer.VK;
 import RHI.IPipeline;
 import RHI.IPipeline.VK;
+import RHI.ISemaphore;
+import RHI.ISemaphore.VK;
+import RHI.IFence;
 
 namespace SIByL
 {
@@ -27,6 +30,8 @@ namespace SIByL
 			ICommandBufferVK(ICommandBufferVK&&) = delete;
 			virtual ~ICommandBufferVK() = default;
 			// ICommandBuffer
+			virtual auto reset() noexcept -> void override;
+			virtual auto submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void override;
 			virtual auto beginRecording() noexcept -> void override;
 			virtual auto endRecording() noexcept -> void override;
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void override;

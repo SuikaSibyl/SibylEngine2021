@@ -21,6 +21,7 @@ namespace SIByL
 		public:
 			virtual ~ILogicalDevice() = default;
 			virtual auto getPhysicalDevice() noexcept -> IPhysicalDevice* = 0;
+			virtual auto waitIdle() noexcept -> void = 0;
 		};
 	}
 }

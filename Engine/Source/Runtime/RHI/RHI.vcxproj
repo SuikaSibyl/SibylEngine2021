@@ -165,6 +165,8 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp" />

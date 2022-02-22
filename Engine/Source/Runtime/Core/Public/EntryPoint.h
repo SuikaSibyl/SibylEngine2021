@@ -8,6 +8,7 @@ int main(int argc, char** argv)
 
 	app->awake();
 	app->mainLoop();
+	app->shutdown();
 	delete app; // app->shutdown();
 
 	return 0;

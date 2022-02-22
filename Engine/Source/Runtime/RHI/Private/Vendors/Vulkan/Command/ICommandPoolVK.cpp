@@ -55,7 +55,7 @@ namespace SIByL
 			// - Hint that command buffers are rerecorded with new commands very often(may change memory allocation behavior)
 			// VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT : 
 			// - Allow command buffers to be rerecorded individually, without this flag they all have to be reset together
-			poolInfo.flags = 0; // Optional
+			poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
 			if (vkCreateCommandPool(logicalDevice->getDeviceHandle(), &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
 				SE_CORE_ERROR("VULKAN :: failed to create command pool!");

@@ -237,6 +237,12 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureViewVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h">
