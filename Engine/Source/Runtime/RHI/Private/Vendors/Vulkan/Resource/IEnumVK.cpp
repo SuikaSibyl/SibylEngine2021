@@ -264,5 +264,51 @@ namespace SIByL::RHI
 		}
 		return VK_FORMAT_UNDEFINED;
 	}
+	
+	inline auto getVkDataFormat(DataType datatype) noexcept -> VkFormat
+	{
+		switch (datatype)
+		{
+		case SIByL::RHI::DataType::Bool:
+			return VK_FORMAT_R8_SINT;
+			break;
+		case SIByL::RHI::DataType::Int4:
+			return VK_FORMAT_R32G32B32A32_SINT;
+			break;
+		case SIByL::RHI::DataType::Int3:
+			return VK_FORMAT_R32G32B32_SINT;
+			break;
+		case SIByL::RHI::DataType::Int2:
+			return VK_FORMAT_R32G32_SINT;
+			break;
+		case SIByL::RHI::DataType::Int:
+			return VK_FORMAT_R32_SINT;
+			break;
+		case SIByL::RHI::DataType::Mat4:
+			return VK_FORMAT_R32G32B32A32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Mat3:
+			return VK_FORMAT_R32G32B32A32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float4:
+			return VK_FORMAT_R32G32B32A32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float3:
+			return VK_FORMAT_R32G32B32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float2:
+			return VK_FORMAT_R32G32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float:
+			return VK_FORMAT_R32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::None:
+			return VK_FORMAT_MAX_ENUM;
+			break;
+		default:
+			break;
+		}
+		return VK_FORMAT_MAX_ENUM;
+	}
 
 }

@@ -28,6 +28,8 @@ import RHI.ICommandPool;
 import RHI.ICommandBuffer;
 import RHI.ISemaphore;
 import RHI.IFence;
+import RHI.IBuffer;
+import RHI.IVertexBuffer;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -43,6 +45,7 @@ import RHI.ICommandPool.VK;
 import RHI.ICommandBuffer.VK;
 import RHI.ISemaphore.VK;
 import RHI.IFence.VK;
+import RHI.IVertexBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -152,7 +155,7 @@ namespace SIByL::RHI
 		return shader;
 	}
 
-	auto IResourceFactory::createVertexLayout() noexcept -> MemScope<IVertexLayout>
+	auto IResourceFactory::createVertexLayout(BufferLayout& _layout) noexcept -> MemScope<IVertexLayout>
 	{
 		MemScope<IVertexLayout> layout = nullptr;
 		switch (api)
@@ -161,7 +164,7 @@ namespace SIByL::RHI
 			break;
 		case SIByL::RHI::API::VULKAN:
 		{
-			MemScope<IVertexLayoutVK> layout_vk = MemNew<IVertexLayoutVK>();
+			MemScope<IVertexLayoutVK> layout_vk = MemNew<IVertexLayoutVK>(_layout);
 			layout = MemCast<IVertexLayout>(layout_vk);
 		}
 		break;
@@ -487,5 +490,24 @@ namespace SIByL::RHI
 			break;
 		}
 		return fence;
+	}
+
+	auto IResourceFactory::createVertexBuffer(Buffer* buffer) noexcept -> MemScope<IVertexBuffer>
+	{
+		MemScope<IVertexBuffer> vb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IVertexBufferVK> vb_vk = MemNew<IVertexBufferVK>(buffer, (ILogicalDeviceVK*)logicalDevice);
+			vb = MemCast<IVertexBuffer>(vb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return vb;
 	}
 }

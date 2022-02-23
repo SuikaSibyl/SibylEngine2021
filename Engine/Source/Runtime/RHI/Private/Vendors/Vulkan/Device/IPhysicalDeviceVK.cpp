@@ -209,4 +209,18 @@ namespace SIByL::RHI
 		return graphicContext;
 	}
 
+	auto IPhysicalDeviceVK::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlagBits properties) noexcept -> uint32_t
+	{
+		VkPhysicalDeviceMemoryProperties memProperties;
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+			if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+				return i;
+			}
+		}
+		
+		SE_CORE_ERROR("VULKAN :: failed to find suitable memory type!");
+	}
+
 }

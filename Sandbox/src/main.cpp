@@ -8,7 +8,7 @@ module;
 #include <EntryPoint.h>
 #include <string_view>
 #include <filesystem>
-#include <chrono>
+#include <glm/glm.hpp>
 module Main;
 
 import Core.Assert;
@@ -43,6 +43,8 @@ import RHI.ICommandPool;
 import RHI.ICommandBuffer;
 import RHI.ISemaphore;
 import RHI.IFence;
+import RHI.IVertexBuffer;
+import RHI.IBuffer;
 
 import UAT.IUniversalApplication;
 
@@ -53,9 +55,9 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 class SandboxApp :public IUniversalApplication
 {
 public:
-	struct S1
-	{
-		int i;
+	struct Vertex {
+		glm::vec2 pos;
+		glm::vec3 color;
 	};
 
 	virtual void onAwake() override
@@ -74,7 +76,7 @@ public:
 		logicalDevice.reset(RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
-
+		// shader resources
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
 		Buffer shader_vert, shader_frag;
@@ -82,7 +84,16 @@ public:
 		shaderLoader.syncReadAll("frag.spv", shader_frag);
 		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
+		// vertex buffer
+		const std::vector<Vertex> vertices = {
+			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+		};
+		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), 4);
+		vertexBuffer = resourceFactory->createVertexBuffer(&vertex_proxy);
 
+		// create swapchain & related ...
 		swapchain = resourceFactory->createSwapchain({});
 		createModifableResource();
 
@@ -108,7 +119,12 @@ public:
 	{
 		RHI::Extend extend = swapchain->getExtend();
 
-		MemScope<RHI::IVertexLayout> vertex_layout = resourceFactory->createVertexLayout();
+		RHI::BufferLayout vertex_buffer_layout =
+		{
+			{RHI::DataType::Float2, "Position"},
+			{RHI::DataType::Float3, "Color"},
+		};
+		MemScope<RHI::IVertexLayout> vertex_layout = resourceFactory->createVertexLayout(vertex_buffer_layout);
 		MemScope<RHI::IInputAssembly> input_assembly = resourceFactory->createInputAssembly(RHI::TopologyKind::TriangleList);
 		MemScope<RHI::IViewportsScissors> viewport_scissors = resourceFactory->createViewportsScissors(extend, extend);
 		RHI::RasterizerDesc rasterizer_desc =
@@ -222,6 +238,7 @@ public:
 			commandbuffers[currentFrame]->beginRecording();
 			commandbuffers[currentFrame]->cmdBeginRenderPass(renderPass.get(), framebuffers[imageIndex].get());
 			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
+			commandbuffers[currentFrame]->cmdBindVertexBuffer(vertexBuffer.get());
 			commandbuffers[currentFrame]->cmdDraw(3, 1, 0, 0);
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 			commandbuffers[currentFrame]->endRecording();
@@ -252,6 +269,8 @@ private:
 	MemScope<RHI::IResourceFactory> resourceFactory;
 	MemScope<RHI::IShader> shaderVert;
 	MemScope<RHI::IShader> shaderFrag;
+
+	MemScope<RHI::IVertexBuffer> vertexBuffer;
 
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;

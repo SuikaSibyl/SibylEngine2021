@@ -24,7 +24,7 @@ namespace SIByL
 			BufferLayout(std::initializer_list<BufferElement> const& _elements);
 			using iter = std::vector<BufferElement>::iterator;
 			auto getElements() noexcept -> std::vector<BufferElement>&;
-			auto getStride() noexcept -> uint32_t;
+			auto getStride() const noexcept -> uint32_t;
 			auto begin() noexcept -> iter;
 			auto end() noexcept -> iter;
 

@@ -4,12 +4,41 @@ module;
 module RHI.IFixedFunctions.VK;
 import RHI.IFixedFunctions;
 import RHI.IEnum.VK;
+import RHI.IBuffer;
 
 namespace SIByL::RHI
 {
-	IVertexLayoutVK::IVertexLayoutVK()
+	auto getBindingDescription(BufferLayout const& layout) noexcept -> VkVertexInputBindingDescription
 	{
-		createVkInputState();
+		VkVertexInputBindingDescription bindingDescription{};
+		bindingDescription.binding = 0;
+		bindingDescription.stride = layout.getStride();
+		bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+		return bindingDescription;
+	}
+
+	auto getAttributeDescriptions(BufferLayout& layout) noexcept -> std::vector<VkVertexInputAttributeDescription>
+	{
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(layout.getElements().size());
+		int idx = 0;
+		int location = 0;
+		for (auto iter = layout.begin(); iter != layout.end(); iter++)
+		{
+			attributeDescriptions[idx].binding = 0;
+			attributeDescriptions[idx].location = location;
+			attributeDescriptions[idx].format = VK_FORMAT_R32G32B32_SFLOAT;
+			attributeDescriptions[idx].offset = iter->offset;
+
+			idx += 1;
+			location += (sizeofDataType(iter->type) + 15) / 16;
+		}
+		return attributeDescriptions;
+	}
+
+	IVertexLayoutVK::IVertexLayoutVK(BufferLayout& layout)
+	{
+		createVkInputState(layout);
 	}
 
 	auto IVertexLayoutVK::getVkInputState() noexcept -> VkPipelineVertexInputStateCreateInfo*
@@ -17,13 +46,16 @@ namespace SIByL::RHI
 		return &vertexInputInfo;
 	}
 
-	auto IVertexLayoutVK::createVkInputState() noexcept -> void
+	auto IVertexLayoutVK::createVkInputState(BufferLayout& layout) noexcept -> void
 	{
+		bindingDescription = std::move(getBindingDescription(layout));
+		attributeDescriptions = std::move(getAttributeDescriptions(layout));
+
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexBindingDescriptionCount = 0;
-		vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-		vertexInputInfo.vertexAttributeDescriptionCount = 0;
-		vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+		vertexInputInfo.vertexBindingDescriptionCount = 1;
+		vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; // Optional
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); // Optional
 	}
 
 	IInputAssemblyVK::IInputAssemblyVK(TopologyKind topology_kind)

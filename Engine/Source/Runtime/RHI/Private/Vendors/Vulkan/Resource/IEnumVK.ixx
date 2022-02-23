@@ -16,5 +16,5 @@ namespace SIByL::RHI
 	export inline auto getVkDynamicState(PipelineState state) noexcept -> VkDynamicState;
 	export inline auto getVkSampleCount(SampleCount count) noexcept -> VkSampleCountFlagBits;
 	export inline auto getVKFormat(ResourceFormat format) noexcept -> VkFormat;
-
+	export inline auto getVkDataFormat(DataType datatype) noexcept -> VkFormat;
 }

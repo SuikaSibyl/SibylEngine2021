@@ -11,6 +11,7 @@ namespace SIByL
 		public:
 			Buffer();
 			Buffer(size_t const& _size, size_t const& _alignment);
+			Buffer(void* outer_buffer, size_t const& _size, size_t const& _alignment);
 			Buffer(Buffer const& rhs);
 			Buffer(Buffer && rhs);
 			virtual ~Buffer();
@@ -26,6 +27,9 @@ namespace SIByL
 			char* data;
 			size_t size;
 			size_t alignment;
+			bool isProxy = false;
+
+			void release();
 		};
 	}
 }

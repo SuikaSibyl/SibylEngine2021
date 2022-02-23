@@ -26,6 +26,11 @@ namespace SIByL
 			auto getVkGraphicQueue() noexcept -> VkQueue*;
 			auto getVkPresentQueue() noexcept -> VkQueue*;
 
+			auto allocMemory(
+				VkMemoryRequirements* memRequirements,
+				VkBuffer* vertexBuffer,
+				VkDeviceMemory* vertexBufferMemory) noexcept -> void;
+
 		private:
 			IPhysicalDeviceVK* physicalDevice;
 			VkDevice device;

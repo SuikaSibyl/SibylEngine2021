@@ -7,6 +7,7 @@ import RHI.IFramebuffer;
 import RHI.IPipeline;
 import RHI.ISemaphore;
 import RHI.IFence;
+import RHI.IVertexBuffer;
 
 namespace SIByL
 {
@@ -40,6 +41,7 @@ namespace SIByL
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void = 0;
 			virtual auto cmdEndRenderPass() noexcept -> void = 0;
 			virtual auto cmdBindPipeline(IPipeline* pipeline) noexcept -> void = 0;
+			virtual auto cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void = 0;
 			virtual auto cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
 				uint32_t const& first_vertex, uint32_t const& first_instance) noexcept -> void = 0;
 		};

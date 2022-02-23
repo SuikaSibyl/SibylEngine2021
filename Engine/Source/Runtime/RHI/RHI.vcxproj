@@ -197,6 +197,8 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureViewVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IVertexBufferVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IVertexBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderVK.ixx" />
     <ClCompile Include="Public\Command\ICommandBuffer.ixx" />
@@ -221,12 +223,12 @@
     <ClCompile Include="Public\Resource\IResource.ixx" />
     <ClCompile Include="Public\Resource\ITexture.ixx" />
     <ClCompile Include="Public\Resource\ITextureView.ixx" />
+    <ClCompile Include="Public\Resource\IVertexBuffer.ixx" />
     <ClCompile Include="Public\Resource\IWindowSurface.ixx" />
     <ClCompile Include="Public\Shader\ICompileSession.ixx" />
     <ClCompile Include="Public\Resource\IEnum.ixx" />
     <ClCompile Include="Public\Shader\IGlobalSession.ixx" />
     <ClCompile Include="Public\Shader\IShader.ixx" />
-    <ClCompile Include="Public\Structure\IVertex.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

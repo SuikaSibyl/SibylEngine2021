@@ -18,6 +18,8 @@ import RHI.ICommandPool;
 import RHI.ICommandBuffer;
 import RHI.ISemaphore;
 import RHI.IFence;
+import RHI.IBuffer;
+import RHI.IVertexBuffer;
 
 namespace SIByL
 {
@@ -54,7 +56,7 @@ namespace SIByL
 			auto createShaderFromBinary(Buffer const& binary, ShaderDesc const& desc) noexcept -> MemScope<IShader>;
 
 			auto createSwapchain(SwapchainDesc const& desc) noexcept -> MemScope<ISwapChain>;
-			auto createVertexLayout() noexcept -> MemScope<IVertexLayout>;
+			auto createVertexLayout(BufferLayout& layout) noexcept -> MemScope<IVertexLayout>;
 			auto createInputAssembly(TopologyKind const& kind) noexcept -> MemScope<IInputAssembly>;
 			auto createViewportsScissors(
 				unsigned int width_viewport,
@@ -75,6 +77,7 @@ namespace SIByL
 			auto createCommandBuffer(ICommandPool* cmd_pool) noexcept -> MemScope<ICommandBuffer>;
 			auto createSemaphore() noexcept -> MemScope<ISemaphore>;
 			auto createFence() noexcept -> MemScope<IFence>;
+			auto createVertexBuffer(Buffer* buffer) noexcept -> MemScope<IVertexBuffer>;
 
 		private:
 			API api;

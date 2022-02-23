@@ -243,10 +243,16 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Structure\IVertex.ixx">
+    <ClCompile Include="Private\Common\Resource\IBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Common\Resource\IBuffer.cpp">
+    <ClCompile Include="Public\Resource\IVertexBuffer.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IVertexBufferVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IVertexBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

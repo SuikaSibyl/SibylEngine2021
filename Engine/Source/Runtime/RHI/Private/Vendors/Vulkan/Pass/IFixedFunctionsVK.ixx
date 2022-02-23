@@ -4,6 +4,7 @@ module;
 export module RHI.IFixedFunctions.VK;
 import RHI.IFixedFunctions;
 import RHI.IEnum;
+import RHI.IBuffer;
 
 namespace SIByL
 {
@@ -12,13 +13,15 @@ namespace SIByL
 		export class IVertexLayoutVK :public IVertexLayout
 		{
 		public:
-			IVertexLayoutVK();
+			IVertexLayoutVK(BufferLayout& layout);
 			IVertexLayoutVK(IVertexLayoutVK&&) = default;
 			virtual ~IVertexLayoutVK() = default;
 
 			auto getVkInputState() noexcept -> VkPipelineVertexInputStateCreateInfo*;
 		private:
-			auto createVkInputState() noexcept -> void;
+			auto createVkInputState(BufferLayout& layout) noexcept -> void;
+			VkVertexInputBindingDescription bindingDescription{};
+			std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
 			VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		};
 

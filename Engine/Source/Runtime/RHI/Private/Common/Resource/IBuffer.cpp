@@ -28,7 +28,7 @@ namespace SIByL::RHI
 		return elements;
 	}
 
-	auto BufferLayout::getStride() noexcept -> uint32_t
+	auto BufferLayout::getStride() const noexcept -> uint32_t
 	{
 		return stride;
 	}

@@ -19,6 +19,8 @@ import RHI.ISemaphore;
 import RHI.ISemaphore.VK;
 import RHI.IFence;
 import RHI.IFence.VK;
+import RHI.IVertexBuffer;
+import RHI.IVertexBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -107,6 +109,13 @@ namespace SIByL::RHI
 	{
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, 
 			*static_cast<IPipelineVK*>(pipeline)->getVkPipeline());
+	}
+
+	auto ICommandBufferVK::cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void
+	{
+		VkBuffer vertexBuffers[] = { *((IVertexBufferVK*)buffer)->getVkBuffer()};
+		VkDeviceSize offsets[] = { 0 };
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 	}
 
 	auto ICommandBufferVK::cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,

@@ -2,7 +2,9 @@ module;
 #include <cstdint>
 #include <string>
 #include <string_view>
-export module RHI.IVertex;
+#include <vector>
+export module RHI.IVertexBuffer;
+import RHI.IResource;
 import RHI.IEnum;
 import RHI.IBuffer;
 
@@ -10,9 +12,11 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		export struct IVertex
+		export class IVertexBuffer :public IBuffer
 		{
 		public:
+
+		private:
 
 		};
 	}

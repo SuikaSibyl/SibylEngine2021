@@ -56,6 +56,25 @@ namespace SIByL::RHI
 		return &presentQueue;
 	}
 
+	auto ILogicalDeviceVK::allocMemory(
+		VkMemoryRequirements* memRequirements,
+		VkBuffer* vertexBuffer,
+		VkDeviceMemory* vertexBufferMemory) noexcept -> void
+	{
+		VkMemoryAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements->size;
+		allocInfo.memoryTypeIndex = physicalDevice->findMemoryType(
+			memRequirements->memoryTypeBits, 
+			VkMemoryPropertyFlagBits(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT));
+		
+		if (vkAllocateMemory(device, &allocInfo, nullptr, vertexBufferMemory) != VK_SUCCESS) {
+			SE_CORE_ERROR("VULKAN :: failed to allocate vertex buffer memory!");
+		}
+
+		vkBindBufferMemory(device, *vertexBuffer, *vertexBufferMemory, 0);
+	}
+
 	auto ILogicalDeviceVK::createLogicalDevice(IPhysicalDeviceVK* physicalDevice) noexcept -> void
 	{
 		IPhysicalDeviceVK::QueueFamilyIndices indices = physicalDevice -> findQueueFamilies();
