@@ -64,6 +64,9 @@ public:
 
 	virtual void onAwake() override
 	{
+		RHI::SLANG::ICompileSession comipeSession;
+		comipeSession.loadModule("hello-world", "computeMain");
+
 		WindowLayerDesc window_layer_desc = {
 			SIByL::EWindowVendor::GLFW,
 			1280,

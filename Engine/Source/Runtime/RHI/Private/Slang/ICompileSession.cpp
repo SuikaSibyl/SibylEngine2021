@@ -70,6 +70,11 @@ namespace SIByL::RHI::SLANG
 
 		// get layout
 		slang::ProgramLayout* layout = program->getLayout();
+		unsigned int parameterCount = layout->getTypeParameterCount();
+		unsigned int entryPointCount = layout->getEntryPointCount();
+		slang::TypeLayoutReflection* paramsTypeLayout = layout->getGlobalParamsTypeLayout();
+		unsigned int columnCount = paramsTypeLayout->getColumnCount();
+		unsigned int categoryCount = paramsTypeLayout->getCategoryCount();
 
 		// get kernal
 		char* kernalBytecode = (char*)Memory::instance()->allocate(kernelBlob->getBufferSize());

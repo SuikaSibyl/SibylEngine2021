@@ -1,5 +1,6 @@
 module;
 #include <vulkan/vulkan.h>
+#include <vector>
 export module RHI.IPipelineLayout.VK;
 import RHI.IPipelineLayout;
 import RHI.ILogicalDevice.VK;
