@@ -20,6 +20,7 @@ import RHI.ISemaphore;
 import RHI.IFence;
 import RHI.IBuffer;
 import RHI.IVertexBuffer;
+import RHI.IIndexBuffer;
 
 namespace SIByL
 {
@@ -78,6 +79,7 @@ namespace SIByL
 			auto createSemaphore() noexcept -> MemScope<ISemaphore>;
 			auto createFence() noexcept -> MemScope<IFence>;
 			auto createVertexBuffer(Buffer* buffer) noexcept -> MemScope<IVertexBuffer>;
+			auto createIndexBuffer(Buffer* buffer, uint32_t element_size) noexcept -> MemScope<IIndexBuffer>;
 
 		private:
 			API api;

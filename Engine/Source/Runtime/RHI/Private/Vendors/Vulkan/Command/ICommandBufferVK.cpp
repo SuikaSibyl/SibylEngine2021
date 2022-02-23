@@ -22,6 +22,8 @@ import RHI.IFence;
 import RHI.IFence.VK;
 import RHI.IVertexBuffer;
 import RHI.IVertexBuffer.VK;
+import RHI.IIndexBuffer;
+import RHI.IIndexBuffer.VK;
 import RHI.IBuffer;
 import RHI.IBuffer.VK;
 
@@ -131,10 +133,21 @@ namespace SIByL::RHI
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 	}
 
+	auto ICommandBufferVK::cmdBindIndexBuffer(IIndexBuffer* buffer) noexcept -> void
+	{
+		vkCmdBindIndexBuffer(commandBuffer, *((IIndexBufferVK*)buffer)->getVkBuffer(), 0, ((IIndexBufferVK*)buffer)->getVkIndexType());
+	}
+
 	auto ICommandBufferVK::cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
 		uint32_t const& first_vertex, uint32_t const& first_instance) noexcept -> void
 	{
 		vkCmdDraw(commandBuffer, vertex_count, instance_count, first_vertex, first_instance);
+	}
+	
+	auto ICommandBufferVK::cmdDrawIndexed(uint32_t const& index_count, uint32_t const& instance_count,
+		uint32_t const& first_index, uint32_t const& index_offset, uint32_t const& first_instance) noexcept -> void
+	{
+		vkCmdDrawIndexed(commandBuffer, index_count, instance_count, first_index, index_offset, first_instance);
 	}
 
 	auto ICommandBufferVK::cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void

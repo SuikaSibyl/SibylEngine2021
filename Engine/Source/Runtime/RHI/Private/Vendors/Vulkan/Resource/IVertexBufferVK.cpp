@@ -27,24 +27,6 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		auto getVertexBufferCreateInfo(Buffer* buffer) noexcept -> VkBufferCreateInfo
-		{
-			VkBufferCreateInfo bufferInfo{};
-			bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-			bufferInfo.size = buffer->getSize();
-			bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-			bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-			return bufferInfo;
-		}
-
-		auto createVertexBuffer(ILogicalDeviceVK* logical_device, Buffer* buffer, VkBuffer* vertexBuffer) noexcept -> void
-		{
-			VkBufferCreateInfo bufferInfo = getVertexBufferCreateInfo(buffer);
-			if (vkCreateBuffer(logical_device->getDeviceHandle(), &bufferInfo, nullptr, vertexBuffer) != VK_SUCCESS) {
-				SE_CORE_ERROR("VULKAN :: failed to create vertex buffer!");
-			}
-		}
-
 		IVertexBufferVK::IVertexBufferVK(Buffer* _buffer, ILogicalDeviceVK* logical_device)
 			: logicalDevice(logical_device)
 		{

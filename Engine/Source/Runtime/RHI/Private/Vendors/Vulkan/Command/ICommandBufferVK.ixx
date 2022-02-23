@@ -18,6 +18,7 @@ import RHI.ISemaphore;
 import RHI.ISemaphore.VK;
 import RHI.IFence;
 import RHI.IVertexBuffer;
+import RHI.IIndexBuffer;
 import RHI.IBuffer;
 
 namespace SIByL
@@ -41,9 +42,12 @@ namespace SIByL
 			virtual auto cmdEndRenderPass() noexcept -> void override;
 			virtual auto cmdBindPipeline(IPipeline* pipeline) noexcept -> void override;
 			virtual auto cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void override;
+			virtual auto cmdBindIndexBuffer(IIndexBuffer* buffer) noexcept -> void override;
 			virtual auto cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
 				uint32_t const& first_vertex, uint32_t const& first_instance) noexcept -> void override;
 			virtual auto cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void override;
+			virtual auto cmdDrawIndexed(uint32_t const& index_count, uint32_t const& instance_count,
+				uint32_t const& first_index, uint32_t const& index_offset, uint32_t const& first_instance) noexcept -> void override;
 
 		private:
 			auto createVkCommandBuffer() noexcept -> void;

@@ -46,6 +46,7 @@ import RHI.IFence;
 import RHI.IVertexBuffer;
 import RHI.IBuffer;
 import RHI.IDeviceGlobal;
+import RHI.IIndexBuffer;
 
 import UAT.IUniversalApplication;
 
@@ -87,12 +88,19 @@ public:
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		// vertex buffer
 		const std::vector<Vertex> vertices = {
-			{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 		};
 		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), 4);
 		vertexBuffer = resourceFactory->createVertexBuffer(&vertex_proxy);
+		// index buffer
+		const std::vector<uint16_t> indices = {
+			0, 1, 2, 2, 3, 0
+		};
+		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), 4);
+		indexBuffer = resourceFactory->createIndexBuffer(&index_proxy, sizeof(uint16_t));
 
 		// create swapchain & related ...
 		swapchain = resourceFactory->createSwapchain({});
@@ -240,7 +248,8 @@ public:
 			commandbuffers[currentFrame]->cmdBeginRenderPass(renderPass.get(), framebuffers[imageIndex].get());
 			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
 			commandbuffers[currentFrame]->cmdBindVertexBuffer(vertexBuffer.get());
-			commandbuffers[currentFrame]->cmdDraw(3, 1, 0, 0);
+			commandbuffers[currentFrame]->cmdBindIndexBuffer(indexBuffer.get());
+			commandbuffers[currentFrame]->cmdDrawIndexed(6, 1, 0, 0, 0);
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 			commandbuffers[currentFrame]->endRecording();
 			//	4. Submit the recorded command buffer
@@ -273,6 +282,7 @@ private:
 	MemScope<RHI::IShader> shaderFrag;
 
 	MemScope<RHI::IVertexBuffer> vertexBuffer;
+	MemScope<RHI::IIndexBuffer> indexBuffer;
 
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;

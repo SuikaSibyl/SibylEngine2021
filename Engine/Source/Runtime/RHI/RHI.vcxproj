@@ -192,6 +192,7 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IFrameBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IFrameBufferVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IIndexBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IIndexBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.ixx" />

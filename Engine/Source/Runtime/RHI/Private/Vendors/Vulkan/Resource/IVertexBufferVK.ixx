@@ -22,6 +22,7 @@ namespace SIByL
 		public:
 			IVertexBufferVK(Buffer* buffer, ILogicalDeviceVK* logical_device);
 			virtual ~IVertexBufferVK();
+
 			auto getVkBuffer() noexcept ->VkBuffer*;
 
 		private:

@@ -30,6 +30,7 @@ import RHI.ISemaphore;
 import RHI.IFence;
 import RHI.IBuffer;
 import RHI.IVertexBuffer;
+import RHI.IIndexBuffer;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -46,6 +47,7 @@ import RHI.ICommandBuffer.VK;
 import RHI.ISemaphore.VK;
 import RHI.IFence.VK;
 import RHI.IVertexBuffer.VK;
+import RHI.IIndexBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -509,5 +511,24 @@ namespace SIByL::RHI
 			break;
 		}
 		return vb;
+	}
+
+	auto IResourceFactory::createIndexBuffer(Buffer* buffer, uint32_t element_size) noexcept -> MemScope<IIndexBuffer>
+	{
+		MemScope<IIndexBuffer> ib = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IIndexBufferVK> ib_vk = MemNew<IIndexBufferVK>(buffer, element_size, (ILogicalDeviceVK*)logicalDevice);
+			ib = MemCast<IIndexBuffer>(ib_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return ib;
 	}
 }
