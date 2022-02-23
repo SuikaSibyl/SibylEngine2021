@@ -311,4 +311,82 @@ namespace SIByL::RHI
 		return VK_FORMAT_MAX_ENUM;
 	}
 
+	#define MACRO_BUFFER_USAGE_BITMAP(USAGE) \
+		if ((uint32_t)usage & (uint32_t)SIByL::RHI::BufferUsageFlagBits::USAGE)\
+		{\
+			flags |= VK_BUFFER_USAGE_##USAGE;\
+		}\
+
+	inline auto getVkBufferUsage(uint32_t usage) noexcept -> VkBufferUsageFlags
+	{
+		uint32_t flags{};
+		MACRO_BUFFER_USAGE_BITMAP(SHADER_DEVICE_ADDRESS_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(INDIRECT_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(VERTEX_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(INDEX_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(STORAGE_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(UNIFORM_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(STORAGE_TEXEL_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(UNIFORM_TEXEL_BUFFER_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(TRANSFER_DST_BIT)
+		MACRO_BUFFER_USAGE_BITMAP(TRANSFER_SRC_BIT)
+		return (VkBufferUsageFlags)flags;
+	}
+
+	inline auto getVkBufferShareMode(BufferShareMode usage) noexcept -> VkSharingMode
+	{
+		switch (usage)
+		{
+		case SIByL::RHI::BufferShareMode::CONCURRENT:
+			return VK_SHARING_MODE_CONCURRENT;
+			break;
+		case SIByL::RHI::BufferShareMode::EXCLUSIVE:
+			return VK_SHARING_MODE_EXCLUSIVE;
+			break;
+		default:
+			break;
+		}
+		return VK_SHARING_MODE_MAX_ENUM;
+	}
+
+	inline auto flagBitSwitch(uint32_t const& input, uint32_t const& flag, uint32_t const& vendor_flag, uint32_t& target) noexcept -> void
+	{
+		if (input & flag)
+		{
+			target |= vendor_flag;
+		}
+	}
+
+	inline auto getVkMemoryProperty(MemoryPropertyFlags usage) noexcept -> VkMemoryPropertyFlags
+	{
+		uint32_t flags{};
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::DEVICE_LOCAL_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::HOST_VISIBLE_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::HOST_COHERENT_BIT, VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::HOST_CACHED_BIT, VK_MEMORY_PROPERTY_HOST_CACHED_BIT, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::LAZILY_ALLOCATED_BIT, VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::PROTECTED_BIT, VK_MEMORY_PROPERTY_PROTECTED_BIT, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::DEVICE_COHERENT_BIT_AMD, VK_MEMORY_PROPERTY_DEVICE_COHERENT_BIT_AMD, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::DEVICE_UNCACHED_BIT_AMD, VK_MEMORY_PROPERTY_DEVICE_UNCACHED_BIT_AMD, flags);
+		flagBitSwitch(usage, (uint32_t)SIByL::RHI::MemoryPropertyFlagBits::RDMA_CAPABLE_BIT_NV, VK_MEMORY_PROPERTY_RDMA_CAPABLE_BIT_NV, flags);
+		return (VkMemoryPropertyFlags)flags;
+	}
+
+	inline auto getVkCommandPoolCreateFlags(CommandPoolAttributeFlags _flag) noexcept -> VkCommandPoolCreateFlags
+	{
+		uint32_t flags{};
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::CommandPoolAttributeFlagBits::RESET, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::CommandPoolAttributeFlagBits::TRANSIENT, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT, flags);
+		return (VkMemoryPropertyFlags)flags;
+	}
+
+	inline auto getVkCommandBufferUsageFlags(CommandBufferUsageFlags _flag) noexcept -> VkCommandBufferUsageFlags
+	{
+		uint32_t flags{};
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT, VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE_BIT, VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::CommandBufferUsageFlagBits::SIMULTANEOUS_USE_BIT, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT, flags);
+		return (VkCommandBufferUsageFlags)flags;
+	}
+
 }

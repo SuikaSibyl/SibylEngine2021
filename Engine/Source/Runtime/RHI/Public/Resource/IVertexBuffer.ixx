@@ -12,9 +12,10 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		export class IVertexBuffer :public IBuffer
+		export class IVertexBuffer
 		{
 		public:
+			virtual ~IVertexBuffer() = default;
 
 		private:
 

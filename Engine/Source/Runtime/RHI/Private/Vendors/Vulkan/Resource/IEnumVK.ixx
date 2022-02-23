@@ -17,4 +17,10 @@ namespace SIByL::RHI
 	export inline auto getVkSampleCount(SampleCount count) noexcept -> VkSampleCountFlagBits;
 	export inline auto getVKFormat(ResourceFormat format) noexcept -> VkFormat;
 	export inline auto getVkDataFormat(DataType datatype) noexcept -> VkFormat;
+	export inline auto getVkBufferUsage(uint32_t usage) noexcept -> VkBufferUsageFlags;
+	export inline auto getVkBufferShareMode(BufferShareMode usage) noexcept -> VkSharingMode;
+	export inline auto getVkMemoryProperty(MemoryPropertyFlags usage) noexcept -> VkMemoryPropertyFlags;
+	export inline auto getVkCommandPoolCreateFlags(CommandPoolAttributeFlags flags) noexcept -> VkCommandPoolCreateFlags;
+	export inline auto getVkCommandBufferUsageFlags(CommandBufferUsageFlags flags) noexcept -> VkCommandBufferUsageFlags;
+
 }

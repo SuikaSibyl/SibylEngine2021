@@ -18,6 +18,7 @@ import RHI.ISemaphore;
 import RHI.ISemaphore.VK;
 import RHI.IFence;
 import RHI.IVertexBuffer;
+import RHI.IBuffer;
 
 namespace SIByL
 {
@@ -32,8 +33,9 @@ namespace SIByL
 			virtual ~ICommandBufferVK() = default;
 			// ICommandBuffer
 			virtual auto reset() noexcept -> void override;
+			virtual auto submit() noexcept -> void override;
 			virtual auto submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void override;
-			virtual auto beginRecording() noexcept -> void override;
+			virtual auto beginRecording(CommandBufferUsageFlags flags = 0) noexcept -> void override;
 			virtual auto endRecording() noexcept -> void override;
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void override;
 			virtual auto cmdEndRenderPass() noexcept -> void override;
@@ -41,6 +43,7 @@ namespace SIByL
 			virtual auto cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void override;
 			virtual auto cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
 				uint32_t const& first_vertex, uint32_t const& first_instance) noexcept -> void override;
+			virtual auto cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void override;
 
 		private:
 			auto createVkCommandBuffer() noexcept -> void;

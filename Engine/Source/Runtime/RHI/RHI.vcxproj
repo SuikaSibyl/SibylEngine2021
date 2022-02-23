@@ -149,8 +149,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\Common\Factory\IDeviceGlobal.cpp" />
     <ClCompile Include="Private\Common\IEnum.cpp" />
-    <ClCompile Include="Private\Common\IFactory.cpp" />
+    <ClCompile Include="Private\Common\Factory\IFactory.cpp" />
     <ClCompile Include="Private\Common\IFixedFunctions.cpp" />
     <ClCompile Include="Private\Common\Resource\IBuffer.cpp" />
     <ClCompile Include="Private\Slang\ICompileSession.cpp" />
@@ -185,10 +186,13 @@
     <ClCompile Include="Private\Vendors\Vulkan\Pass\IRenderPassVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Pass\IRenderPassVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IBufferVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IFrameBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IFrameBufferVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IIndexBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IResourceVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISwapChainVK.cpp" />
@@ -206,6 +210,7 @@
     <ClCompile Include="Public\Command\ICommandPool.ixx" />
     <ClCompile Include="Public\Command\IFence.ixx" />
     <ClCompile Include="Public\Command\IQueue.ixx" />
+    <ClCompile Include="Public\Factory\IDeviceGlobal.ixx" />
     <ClCompile Include="Public\Factory\IFactory.ixx" />
     <ClCompile Include="Public\Device\IGraphicContext.ixx" />
     <ClCompile Include="Public\Device\ILogicalDevice.ixx" />
@@ -219,6 +224,7 @@
     <ClCompile Include="Public\Resource\IBuffer.ixx" />
     <ClCompile Include="Public\Resource\IFramebuffer.ixx" />
     <ClCompile Include="Public\Command\ISemaphore.ixx" />
+    <ClCompile Include="Public\Resource\IIndexBuffer.ixx" />
     <ClCompile Include="Public\Resource\ISwapChain.ixx" />
     <ClCompile Include="Public\Resource\IResource.ixx" />
     <ClCompile Include="Public\Resource\ITexture.ixx" />

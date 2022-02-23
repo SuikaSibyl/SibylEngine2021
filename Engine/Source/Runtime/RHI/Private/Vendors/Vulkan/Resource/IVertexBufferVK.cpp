@@ -8,12 +8,20 @@ module;
 module RHI.IVertexBuffer.VK;
 import Core.Buffer;
 import Core.Log;
+import Core.MemoryManager;
+
 import RHI.IResource;
 import RHI.IEnum;
 import RHI.IBuffer;
 import RHI.IVertexBuffer;
 import RHI.IEnum.VK;
 import RHI.ILogicalDevice.VK;
+import RHI.IBuffer;
+import RHI.IBuffer.VK;
+import RHI.IDeviceGlobal;
+import RHI.ICommandPool;
+import RHI.ICommandBuffer;
+import RHI.IFactory;
 
 namespace SIByL
 {
@@ -37,35 +45,54 @@ namespace SIByL
 			}
 		}
 
-		IVertexBufferVK::IVertexBufferVK(Buffer* buffer, ILogicalDeviceVK* logical_device)
+		IVertexBufferVK::IVertexBufferVK(Buffer* _buffer, ILogicalDeviceVK* logical_device)
 			: logicalDevice(logical_device)
 		{
-			createVertexBuffer(logicalDevice, buffer, &vertexBuffer);
-
-			// alloc memory
-			VkMemoryRequirements memRequirements;
-			vkGetBufferMemoryRequirements(logicalDevice->getDeviceHandle(), vertexBuffer, &memRequirements);
-			logicalDevice->allocMemory(&memRequirements, &vertexBuffer, &vertexBufferMemory);
+			// create staging buffer
+			BufferDesc stagingBufferDesc =
+			{
+				(unsigned int)_buffer->getSize(),
+				(BufferUsageFlags)BufferUsageFlagBits::TRANSFER_SRC_BIT,
+				BufferShareMode::EXCLUSIVE,
+				(uint32_t)MemoryPropertyFlagBits::HOST_VISIBLE_BIT | (uint32_t)MemoryPropertyFlagBits::HOST_COHERENT_BIT
+			};
+			IBufferVK stagingBuffer(stagingBufferDesc, logicalDevice);
 
 			// copy memory
 			void* data;
-			vkMapMemory(logicalDevice->getDeviceHandle(), vertexBufferMemory, 0, buffer->getSize(), 0, &data);
-			memcpy(data, buffer->getData(), (size_t)buffer->getSize());
-			vkUnmapMemory(logicalDevice->getDeviceHandle(), vertexBufferMemory);
+			vkMapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()), 0, stagingBuffer.getSize(), 0, &data);
+			memcpy(data, _buffer->getData(), (unsigned int)_buffer->getSize());
+			vkUnmapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()));
 
+			// create vertex buffer
+			BufferDesc bufferDesc =
+			{
+				(unsigned int)_buffer->getSize(),
+				(BufferUsageFlags)BufferUsageFlagBits::VERTEX_BUFFER_BIT | (BufferUsageFlags)BufferUsageFlagBits::TRANSFER_DST_BIT,
+				BufferShareMode::EXCLUSIVE,
+				(uint32_t)MemoryPropertyFlagBits::DEVICE_LOCAL_BIT
+			};
+			buffer = std::move(IBufferVK(bufferDesc, logicalDevice));
+
+			// copy
+			PerDeviceGlobal* global = DeviceToGlobal::getGlobal((ILogicalDevice*)logicalDevice);
+			ICommandPool* transientPool = global->getTransientCommandPool();
+			MemScope<ICommandBuffer> commandbuffer = global->getResourceFactory()->createCommandBuffer(transientPool);
+			commandbuffer->beginRecording((uint32_t)CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+			commandbuffer->cmdCopyBuffer((IBuffer*)&stagingBuffer, (IBuffer*)&buffer, 0, 0, buffer.getSize());
+			commandbuffer->endRecording();
+			commandbuffer->submit();
+			logicalDevice->waitIdle();
 		}
 
 		auto IVertexBufferVK::getVkBuffer() noexcept ->VkBuffer*
 		{
-			return &vertexBuffer;
+			return buffer.getVkBuffer();
 		}
 
 		IVertexBufferVK::~IVertexBufferVK()
 		{
-			if(vertexBuffer)
-				vkDestroyBuffer(logicalDevice->getDeviceHandle(), vertexBuffer, nullptr);
-			if (vertexBufferMemory)
-				vkFreeMemory(logicalDevice->getDeviceHandle(), vertexBufferMemory, nullptr);
+
 		}
 	}
 }

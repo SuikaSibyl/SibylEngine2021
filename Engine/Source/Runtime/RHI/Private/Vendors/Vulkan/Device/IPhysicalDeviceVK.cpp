@@ -209,7 +209,7 @@ namespace SIByL::RHI
 		return graphicContext;
 	}
 
-	auto IPhysicalDeviceVK::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlagBits properties) noexcept -> uint32_t
+	auto IPhysicalDeviceVK::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) noexcept -> uint32_t
 	{
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);

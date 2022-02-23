@@ -219,7 +219,7 @@
     <ClCompile Include="Public\Factory\IFactory.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Common\IFactory.cpp">
+    <ClCompile Include="Private\Common\Factory\IFactory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.ixx">
@@ -253,6 +253,24 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IVertexBufferVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IBufferVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IBufferVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Factory\IDeviceGlobal.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Common\Factory\IDeviceGlobal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Resource\IIndexBuffer.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IIndexBufferVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

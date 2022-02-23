@@ -1,6 +1,6 @@
 module;
-#include <vulkan/vulkan.h>
 #include <vector>
+#include <vulkan/vulkan.h>
 module RHI.IFixedFunctions.VK;
 import RHI.IFixedFunctions;
 import RHI.IEnum.VK;
@@ -103,7 +103,7 @@ namespace SIByL::RHI
 		unsigned int height_scissor)
 	{
 		VkExtent2D extend{ width_scissor ,height_scissor };
-		createVkPipelineViewportStateCreateInfo(width_viewport, height_viewport, &extend);
+		createVkPipelineViewportStateCreateInfo((float)width_viewport, (float)height_viewport, &extend);
 	}
 
 	auto IViewportsScissorsVK::getVkPipelineViewportStateCreateInfo() noexcept -> VkPipelineViewportStateCreateInfo*
@@ -250,7 +250,7 @@ namespace SIByL::RHI
 		}
 
 		dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-		dynamicState.dynamicStateCount = dynamicStates.size();
+		dynamicState.dynamicStateCount = (uint32_t)dynamicStates.size();
 		dynamicState.pDynamicStates = dynamicStates.data();
 	}
 }

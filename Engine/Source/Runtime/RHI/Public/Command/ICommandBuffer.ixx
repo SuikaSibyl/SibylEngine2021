@@ -1,5 +1,5 @@
 module;
-#include <cstdint>;
+#include <cstdint>
 export module RHI.ICommandBuffer;
 import RHI.IResource;
 import RHI.IRenderPass;
@@ -8,6 +8,7 @@ import RHI.IPipeline;
 import RHI.ISemaphore;
 import RHI.IFence;
 import RHI.IVertexBuffer;
+import RHI.IBuffer;
 
 namespace SIByL
 {
@@ -35,8 +36,9 @@ namespace SIByL
 			virtual ~ICommandBuffer() = default;
 
 			virtual auto reset() noexcept -> void = 0;
+			virtual auto submit() noexcept -> void = 0;
 			virtual auto submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void = 0;
-			virtual auto beginRecording() noexcept -> void = 0;
+			virtual auto beginRecording(CommandBufferUsageFlags flags = 0) noexcept -> void = 0;
 			virtual auto endRecording() noexcept -> void = 0;
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void = 0;
 			virtual auto cmdEndRenderPass() noexcept -> void = 0;
@@ -44,6 +46,7 @@ namespace SIByL
 			virtual auto cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void = 0;
 			virtual auto cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
 				uint32_t const& first_vertex, uint32_t const& first_instance) noexcept -> void = 0;
+			virtual auto cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void = 0;
 		};
 	}
 }

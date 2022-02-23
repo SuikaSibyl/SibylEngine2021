@@ -97,6 +97,13 @@ namespace SIByL
 			PRESENTATION,
 		};
 
+		export enum class CommandPoolAttributeFlagBits : uint32_t
+		{
+			TRANSIENT = 0x00000001,
+			RESET = 0x00000002,
+		};
+		export using CommandPoolAttributeFlags = uint32_t;
+
 		export enum class PolygonMode : uint32_t
 		{
 			FILL,
@@ -165,5 +172,51 @@ namespace SIByL
 			COUNT_32_BIT,
 			COUNT_64_BIT,
 		};
+
+		export enum class BufferUsageFlagBits : uint32_t
+		{
+			TRANSFER_SRC_BIT = 0x00000001,
+			TRANSFER_DST_BIT = 0x00000002,
+			UNIFORM_TEXEL_BUFFER_BIT = 0x00000004,
+			STORAGE_TEXEL_BUFFER_BIT = 0x00000008,
+			UNIFORM_BUFFER_BIT = 0x00000010,
+			STORAGE_BUFFER_BIT = 0x00000020,
+			INDEX_BUFFER_BIT = 0x00000040,
+			VERTEX_BUFFER_BIT = 0x00000080,
+			INDIRECT_BUFFER_BIT = 0x00000100,
+			SHADER_DEVICE_ADDRESS_BIT = 0x00020000,
+			FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+		};
+		export using BufferUsageFlags = uint32_t;
+
+		export enum class BufferShareMode :uint32_t
+		{
+			EXCLUSIVE = 0,
+			CONCURRENT = 1,
+		};
+
+		export enum class MemoryPropertyFlagBits :uint32_t 
+		{
+			DEVICE_LOCAL_BIT = 0x00000001,
+			HOST_VISIBLE_BIT = 0x00000002,
+			HOST_COHERENT_BIT = 0x00000004,
+			HOST_CACHED_BIT = 0x00000008,
+			LAZILY_ALLOCATED_BIT = 0x00000010,
+			PROTECTED_BIT = 0x00000020,
+			DEVICE_COHERENT_BIT_AMD = 0x00000040,
+			DEVICE_UNCACHED_BIT_AMD = 0x00000080,
+			RDMA_CAPABLE_BIT_NV = 0x00000100,
+			FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+		};
+		export using MemoryPropertyFlags = uint32_t;
+
+		export enum class CommandBufferUsageFlagBits :uint32_t
+		{
+			ONE_TIME_SUBMIT_BIT,
+			RENDER_PASS_CONTINUE_BIT,
+			SIMULTANEOUS_USE_BIT,
+		};
+		export using CommandBufferUsageFlags = uint32_t;
+
 	}
 }

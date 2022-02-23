@@ -42,7 +42,7 @@ namespace SIByL
 			auto getDeviceExtensions() noexcept -> std::vector<const char*> const&;
 			auto querySwapChainSupport() -> SwapChainSupportDetails;
 			auto getGraphicContextVK()->IGraphicContextVK*;
-			auto findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlagBits properties) noexcept -> uint32_t;
+			auto findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) noexcept -> uint32_t;
 
 		private:
 			bool enableDebugLayer;

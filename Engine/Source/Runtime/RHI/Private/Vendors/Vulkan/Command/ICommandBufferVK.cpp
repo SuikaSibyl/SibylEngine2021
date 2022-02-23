@@ -9,6 +9,7 @@ import RHI.ICommandPool;
 import RHI.ILogicalDevice;
 import RHI.ILogicalDevice.VK;
 import RHI.IEnum;
+import RHI.IEnum.VK;
 import RHI.IRenderPass;
 import RHI.IRenderPass.VK;
 import RHI.IFramebuffer;
@@ -21,6 +22,8 @@ import RHI.IFence;
 import RHI.IFence.VK;
 import RHI.IVertexBuffer;
 import RHI.IVertexBuffer.VK;
+import RHI.IBuffer;
+import RHI.IBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -34,6 +37,16 @@ namespace SIByL::RHI
 	auto ICommandBufferVK::reset() noexcept -> void
 	{
 		vkResetCommandBuffer(commandBuffer, 0);
+	}
+	
+	auto ICommandBufferVK::submit() noexcept -> void
+	{
+		VkSubmitInfo submitInfo{};
+		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount = 1;
+		submitInfo.pCommandBuffers = &commandBuffer;
+		
+		vkQueueSubmit(*(logicalDevice->getVkGraphicQueue()), 1, &submitInfo, VK_NULL_HANDLE);
 	}
 
 	auto ICommandBufferVK::submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void
@@ -59,14 +72,14 @@ namespace SIByL::RHI
 		}
 	}
 
-	auto ICommandBufferVK::beginRecording() noexcept -> void
+	auto ICommandBufferVK::beginRecording(CommandBufferUsageFlags flags) noexcept -> void
 	{
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		// VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT: The command buffer will be rerecorded right after executing it once.
 		// VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT : This is a secondary command buffer that will be entirely within a single render pass.
 		// VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT : The command buffer can be resubmitted while it is also already pending execution.
-		beginInfo.flags = 0; // Optional
+		beginInfo.flags = getVkCommandBufferUsageFlags(flags); // Optional
 		beginInfo.pInheritanceInfo = nullptr; // Optional
 
 		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
@@ -122,6 +135,15 @@ namespace SIByL::RHI
 		uint32_t const& first_vertex, uint32_t const& first_instance) noexcept -> void
 	{
 		vkCmdDraw(commandBuffer, vertex_count, instance_count, first_vertex, first_instance);
+	}
+
+	auto ICommandBufferVK::cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void
+	{
+		VkBufferCopy copyRegion{};
+		copyRegion.srcOffset = src_offset; // Optional
+		copyRegion.dstOffset = dst_offset; // Optional
+		copyRegion.size = size;
+		vkCmdCopyBuffer(commandBuffer, *((IBufferVK*)src)->getVkBuffer(), *((IBufferVK*)dst)->getVkBuffer(), 1, &copyRegion);
 	}
 
 	auto ICommandBufferVK::createVkCommandBuffer() noexcept -> void

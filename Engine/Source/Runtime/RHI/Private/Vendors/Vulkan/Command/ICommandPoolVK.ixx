@@ -13,7 +13,7 @@ namespace SIByL
 		export class ICommandPoolVK :public ICommandPool
 		{
 		public:
-			ICommandPoolVK(QueueType type, ILogicalDeviceVK* logical_device);
+			ICommandPoolVK(CommandPoolDesc const& desc, ILogicalDeviceVK* logical_device);
 			ICommandPoolVK(ICommandPoolVK const&) = delete;
 			ICommandPoolVK(ICommandPoolVK&&) = delete;
 			virtual ~ICommandPoolVK();

@@ -73,7 +73,7 @@ namespace SIByL
 			auto createRenderPass(RenderPassDesc const& desc) noexcept -> MemScope<IRenderPass>;
 			auto createPipeline(PipelineDesc const& desc) noexcept -> MemScope<IPipeline>;
 			auto createFramebuffer(FramebufferDesc const& desc) noexcept -> MemScope<IFramebuffer>;
-			auto createCommandPool(QueueType type) noexcept -> MemScope<ICommandPool>;
+			auto createCommandPool(CommandPoolDesc const& desc) noexcept -> MemScope<ICommandPool>;
 			auto createCommandBuffer(ICommandPool* cmd_pool) noexcept -> MemScope<ICommandBuffer>;
 			auto createSemaphore() noexcept -> MemScope<ISemaphore>;
 			auto createFence() noexcept -> MemScope<IFence>;

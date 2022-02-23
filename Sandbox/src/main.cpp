@@ -45,6 +45,7 @@ import RHI.ISemaphore;
 import RHI.IFence;
 import RHI.IVertexBuffer;
 import RHI.IBuffer;
+import RHI.IDeviceGlobal;
 
 import UAT.IUniversalApplication;
 
@@ -80,13 +81,13 @@ public:
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
 		Buffer shader_vert, shader_frag;
-		shaderLoader.syncReadAll("vert.spv", shader_vert);
+		shaderLoader.syncReadAll("shader_vb.spv", shader_vert);
 		shaderLoader.syncReadAll("frag.spv", shader_frag);
 		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		// vertex buffer
 		const std::vector<Vertex> vertices = {
-			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
 			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
 			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 		};
@@ -97,7 +98,7 @@ public:
 		swapchain = resourceFactory->createSwapchain({});
 		createModifableResource();
 
-		commandPool = resourceFactory->createCommandPool(RHI::QueueType::GRAPHICS);
+		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
 		commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		imageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
 		renderFinishedSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
@@ -191,7 +192,7 @@ public:
 		};
 		pipeline = resourceFactory->createPipeline(pipeline_desc);
 
-		for (int i = 0; i < swapchain->getSwapchainCount(); i++)
+		for (unsigned int i = 0; i < swapchain->getSwapchainCount(); i++)
 		{
 			RHI::FramebufferDesc framebuffer_desc =
 			{
@@ -256,6 +257,7 @@ public:
 	virtual void onShutdown() override
 	{
 		logicalDevice->waitIdle();
+		RHI::DeviceToGlobal::releaseGlobal();
 	}
 
 private:

@@ -416,7 +416,7 @@ namespace SIByL::RHI
 		return fb;
 	}
 
-	auto IResourceFactory::createCommandPool(QueueType type) noexcept -> MemScope<ICommandPool>
+	auto IResourceFactory::createCommandPool(CommandPoolDesc const& desc) noexcept -> MemScope<ICommandPool>
 	{
 		MemScope<ICommandPool> cp = nullptr;
 		switch (api)
@@ -425,7 +425,7 @@ namespace SIByL::RHI
 			break;
 		case SIByL::RHI::API::VULKAN:
 		{
-			MemScope<ICommandPoolVK> cp_vk = MemNew<ICommandPoolVK>(type, (ILogicalDeviceVK*)logicalDevice);
+			MemScope<ICommandPoolVK> cp_vk = MemNew<ICommandPoolVK>(desc, (ILogicalDeviceVK*)logicalDevice);
 			cp = MemCast<ICommandPool>(cp_vk);
 		}
 		break;

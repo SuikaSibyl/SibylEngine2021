@@ -14,6 +14,11 @@ namespace SIByL
 		// │  DirectX 12  │   ID3D12CommandAllocator   │
 		// │  OpenGL      │   N/A					   │
 		// ╰──────────────┴────────────────────────────╯
+		export struct CommandPoolDesc
+		{
+			QueueType type;
+			CommandPoolAttributeFlags attributes;
+		};
 
 		export class ICommandPool :public SObject
 		{

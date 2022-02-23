@@ -11,6 +11,9 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		// Buffer Layout Infomations
+		// typically not necessary for allocation, but need for a view
+
 		export struct BufferElement
 		{
 			DataType type;
@@ -40,6 +43,13 @@ namespace SIByL
 		// │  DirectX 12  │   ID3D12Resource                 │
 		// │  OpenGL      │   Varies by OS                   │
 		// ╰──────────────┴──────────────────────────────────╯
+		export struct BufferDesc
+		{
+			uint32_t size;
+			BufferUsageFlags usage;
+			BufferShareMode shareMode;
+			MemoryPropertyFlags memoryProperty;
+		};
 
 		export class IBuffer :public IResource
 		{
@@ -48,7 +58,7 @@ namespace SIByL
 			IBuffer(IBuffer&&) = default;
 			virtual ~IBuffer() = default;
 
-
+			virtual auto getSize() noexcept -> uint32_t = 0;
 		};
 	}
 }

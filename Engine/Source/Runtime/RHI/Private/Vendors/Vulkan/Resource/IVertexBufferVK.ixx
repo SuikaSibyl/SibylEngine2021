@@ -11,6 +11,7 @@ import RHI.IEnum;
 import RHI.IBuffer;
 import RHI.IVertexBuffer;
 import RHI.ILogicalDevice.VK;
+import RHI.IBuffer.VK;
 
 namespace SIByL
 {
@@ -24,8 +25,7 @@ namespace SIByL
 			auto getVkBuffer() noexcept ->VkBuffer*;
 
 		private:
-			VkBuffer vertexBuffer;
-			VkDeviceMemory vertexBufferMemory;
+			IBufferVK buffer;
 			ILogicalDeviceVK* logicalDevice;
 		};
 	}
