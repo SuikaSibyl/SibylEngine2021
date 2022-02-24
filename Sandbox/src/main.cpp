@@ -96,7 +96,7 @@ public:
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
 		Buffer shader_vert, shader_frag;
-		shaderLoader.syncReadAll("shader_vb.spv", shader_vert);
+		shaderLoader.syncReadAll("vs_ubo.spv", shader_vert);
 		shaderLoader.syncReadAll("frag.spv", shader_frag);
 		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
@@ -115,39 +115,42 @@ public:
 		};
 		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), 4);
 		indexBuffer = resourceFactory->createIndexBuffer(&index_proxy, sizeof(uint16_t));
-		// uniform buffer
-		uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-		{
-			uniformBuffers[i] = resourceFactory->createUniformBuffer(sizeof(MAX_FRAMES_IN_FLIGHT));
-		}
-		// create desc layout
-		RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-		{
-			{
-				{ 0, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+		
+		// uniform process
+		{				
+			// uniform buffer
+			uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+				uniformBuffers[i] = resourceFactory->createUniformBuffer(sizeof(UniformBufferObject));
+
+			// create pool
+			RHI::DescriptorPoolDesc descriptor_pool_desc =
+			{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT}}, // set types
+				MAX_FRAMES_IN_FLIGHT }; // total sets
+			descriptorPool = resourceFactory->createDescriptorPool(descriptor_pool_desc);
+
+			// create desc layout
+			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
+			{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr }} };
+			desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
+
+			// create sets
+			descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			RHI::DescriptorSetDesc descriptor_set_desc =
+			{	descriptorPool.get(),
+				desciptor_set_layout.get() };
+			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+				descriptorSets[i] = resourceFactory->createDescriptorSet(descriptor_set_desc);
+
+			// configure descriptors in sets
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+				descriptorSets[i]->update(uniformBuffers[i].get(), 0, 0);
 			}
-		};
-		desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
-		// create desc
-		RHI::DescriptorPoolDesc descriptor_pool_desc =
-		{
-			{
-				{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT}
-			},
-			MAX_FRAMES_IN_FLIGHT,
-		};
-		descriptorPool = resourceFactory->createDescriptorPool(descriptor_pool_desc);
-		// create desc sets
-		descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-		RHI::DescriptorSetDesc descriptor_set_desc =
-		{
-			descriptorPool.get(),
-			desciptor_set_layout.get()
-		};
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-		{
-			descriptorSets[i] = resourceFactory->createDescriptorSet(descriptor_set_desc);
+
+			// create pipeline layouts
+			RHI::PipelineLayoutDesc pipelineLayout_desc =
+			{ {desciptor_set_layout.get()} };
+			pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
 		}
 
 		// create swapchain & related ...
@@ -221,12 +224,6 @@ public:
 		MemScope<RHI::IDynamicState> dynamic_states = resourceFactory->createDynamicState(pipelinestates_desc);
 
 
-		RHI::PipelineLayoutDesc pipelineLayout_desc =
-		{
-			0,
-		};
-		MemScope<RHI::IPipelineLayout> pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
-
 		RHI::RenderPassDesc renderpass_desc =
 		{
 			RHI::SampleCount::COUNT_1_BIT,
@@ -280,6 +277,11 @@ public:
 
 	virtual void onUpdate() override
 	{
+		// 1. Wait for the previous frame to finish
+		{
+			inFlightFence[currentFrame]->wait();
+			inFlightFence[currentFrame]->reset();
+		}
 		// Timer update
 		{
 			timer.tick();
@@ -288,20 +290,17 @@ public:
 		// update uniform buffer
 		{
 			float time = (float)timer.getTotalTimeSeconds();
+			auto [width, height] = swapchain->getExtend();
 			UniformBufferObject ubo;
 			ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 			ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			auto [width, height] = swapchain->getExtend();
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 10.0f);
 			ubo.proj[1][1] *= -1;
-			Buffer ubo_proxy((void*) & ubo, sizeof(ubo), 4);
+			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
 			uniformBuffers[currentFrame]->updateBuffer(&ubo_proxy);
 		}
 		// drawFrame
 		{
-			//  1. Wait for the previous frame to finish
-			inFlightFence[currentFrame]->wait();
-			inFlightFence[currentFrame]->reset();
 			//	2. Acquire an image from the swap chain
 			uint32_t imageIndex = swapchain->acquireNextImage(imageAvailableSemaphore[currentFrame].get());
 			//	3. Record a command buffer which draws the scene onto that image
@@ -311,6 +310,9 @@ public:
 			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
 			commandbuffers[currentFrame]->cmdBindVertexBuffer(vertexBuffer.get());
 			commandbuffers[currentFrame]->cmdBindIndexBuffer(indexBuffer.get());
+			RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
+			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
+				pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
 			commandbuffers[currentFrame]->cmdDrawIndexed(6, 1, 0, 0, 0);
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 			commandbuffers[currentFrame]->endRecording();
@@ -349,6 +351,7 @@ private:
 
 	MemScope<RHI::IDescriptorPool> descriptorPool;
 	MemScope<RHI::IDescriptorSetLayout> desciptor_set_layout;
+	MemScope<RHI::IPipelineLayout> pipeline_layout;
 	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
 	MemScope<RHI::ISwapChain> swapchain;

@@ -256,5 +256,13 @@ namespace SIByL
 			SUBPASS_SHADING_BIT = 0x00004000,
 		};
 		export using ShaderStageFlags = uint32_t;
+
+		export enum class PipelineBintPoint :uint32_t
+		{
+			GRAPHICS,
+			COMPUTE,
+			RAY_TRACING,
+			SUBPASS_SHADING,
+		};
 	}
 }

@@ -1,7 +1,9 @@
 module;
 #include <cstdint>
+#include <vector>
 export module RHI.IPipelineLayout;
 import Core.SObject;
+import RHI.IDescriptorSetLayout;
 
 namespace SIByL
 {
@@ -18,7 +20,7 @@ namespace SIByL
 
 		export struct PipelineLayoutDesc
 		{
-			uint32_t layoutCount;
+			std::vector<IDescriptorSetLayout*> layouts;
 		};
 
 		export class IPipelineLayout :public SObject

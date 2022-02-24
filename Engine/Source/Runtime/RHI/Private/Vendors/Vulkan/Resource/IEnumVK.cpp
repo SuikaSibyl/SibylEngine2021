@@ -464,4 +464,27 @@ namespace SIByL::RHI
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::SUBPASS_SHADING_BIT, VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI, flags);
 		return (VkShaderStageFlags)flags;
 	}
+
+	inline auto getVkPipelineBindPoint(PipelineBintPoint point) noexcept -> VkPipelineBindPoint
+	{
+		switch (point)
+		{
+		case SIByL::RHI::PipelineBintPoint::SUBPASS_SHADING:
+			return VK_PIPELINE_BIND_POINT_SUBPASS_SHADING_HUAWEI;
+			break;
+		case SIByL::RHI::PipelineBintPoint::RAY_TRACING:
+			return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
+			break;
+		case SIByL::RHI::PipelineBintPoint::COMPUTE:
+			return VK_PIPELINE_BIND_POINT_COMPUTE;
+			break;
+		case SIByL::RHI::PipelineBintPoint::GRAPHICS:
+			return VK_PIPELINE_BIND_POINT_GRAPHICS;
+			break;
+		default:
+			break;
+		}
+		return VK_PIPELINE_BIND_POINT_MAX_ENUM;
+	}
+
 }

@@ -276,28 +276,28 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IIndexBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Resource\IDescriptorPool.ixx">
+    <ClCompile Include="Public\Descriptor\IDescriptorPool.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorPoolVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorPoolVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorPoolVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorPoolVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Resource\IDescriptorSet.ixx">
+    <ClCompile Include="Public\Descriptor\IDescriptorSet.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorSetVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Resource\IDescriptorSetLayout.ixx">
+    <ClCompile Include="Public\Descriptor\IDescriptorSetLayout.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetLayoutVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorSetLayoutVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetLayoutVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorSetLayoutVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Resource\ISampler.ixx">
@@ -315,7 +315,7 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IUniformBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorSetVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

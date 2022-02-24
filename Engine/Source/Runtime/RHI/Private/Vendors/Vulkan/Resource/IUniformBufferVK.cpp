@@ -24,20 +24,16 @@ namespace SIByL::RHI
 			(unsigned int)size,
 			(BufferUsageFlags)BufferUsageFlagBits::UNIFORM_BUFFER_BIT,
 			BufferShareMode::EXCLUSIVE,
-			(MemoryPropertyFlags)MemoryPropertyFlagBits::HOST_VISIBLE_BIT | (MemoryPropertyFlags)MemoryPropertyFlagBits::HOST_COHERENT_BIT
+			(uint32_t)MemoryPropertyFlagBits::HOST_VISIBLE_BIT | (uint32_t)MemoryPropertyFlagBits::HOST_COHERENT_BIT
 		};
 		buffer = std::move(IBufferVK(bufferDesc, logicalDevice));
 	}
 
 	auto IUniformBufferVK::updateBuffer(Buffer* _buffer) noexcept -> void
 	{
-		//vkMapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()), 0, stagingBuffer.getSize(), 0, &data);
-		//memcpy(data, _buffer->getData(), (unsigned int)_buffer->getSize());
-		//vkUnmapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()));
-
 		void* data;
 		vkMapMemory(logicalDevice->getDeviceHandle(), *(buffer.getVkDeviceMemory()), 0, buffer.getSize(), 0, &data);
-		memcpy(data, &_buffer, _buffer->getSize());
+		memcpy(data, _buffer->getData(), (unsigned int)_buffer->getSize());
 		vkUnmapMemory(logicalDevice->getDeviceHandle(), *(buffer.getVkDeviceMemory()));
 	}
 

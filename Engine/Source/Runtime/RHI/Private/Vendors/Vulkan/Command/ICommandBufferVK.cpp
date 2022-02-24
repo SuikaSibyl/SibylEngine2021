@@ -26,6 +26,10 @@ import RHI.IIndexBuffer;
 import RHI.IIndexBuffer.VK;
 import RHI.IBuffer;
 import RHI.IBuffer.VK;
+import RHI.IPipelineLayout;
+import RHI.IDescriptorSet;
+import RHI.IPipelineLayout.VK;
+import RHI.IDescriptorSet.VK;
 
 namespace SIByL::RHI
 {
@@ -174,5 +178,20 @@ namespace SIByL::RHI
 		if (vkAllocateCommandBuffers(logicalDevice->getDeviceHandle(), &allocInfo, &commandBuffer) != VK_SUCCESS) {
 			SE_CORE_ERROR("VULKAN :: failed to allocate command buffers!");
 		}
+	}
+
+	auto ICommandBufferVK::cmdBindDescriptorSets(PipelineBintPoint point, IPipelineLayout* pipeline_layout, uint32_t const& idx_first_descset,
+		uint32_t const& count_sets_to_bind, IDescriptorSet** sets, uint32_t const& offset_count, uint32_t const* offsets) noexcept -> void
+	{
+		std::vector<VkDescriptorSet> tmp_sets(count_sets_to_bind);
+		for (uint32_t i = 0; i < count_sets_to_bind; i++)
+		{
+			tmp_sets[i] = *(((IDescriptorSetVK*)sets[i])->getVkDescriptorSet());
+		}
+
+		//VkPipelineBindPoint test = getVkPipelineBindPoint(point);
+		vkCmdBindDescriptorSets(commandBuffer, getVkPipelineBindPoint(point), 
+			*((IPipelineLayoutVK*)pipeline_layout)->getVkPipelineLayout(), 
+			idx_first_descset, count_sets_to_bind, tmp_sets.data(), offset_count, offsets);
 	}
 }

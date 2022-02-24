@@ -10,6 +10,8 @@ import RHI.IFence;
 import RHI.IVertexBuffer;
 import RHI.IIndexBuffer;
 import RHI.IBuffer;
+import RHI.IPipelineLayout;
+import RHI.IDescriptorSet;
 
 namespace SIByL
 {
@@ -51,6 +53,7 @@ namespace SIByL
 			virtual auto cmdDrawIndexed(uint32_t const& index_count, uint32_t const& instance_count,
 				uint32_t const& first_index, uint32_t const& index_offset, uint32_t const& first_instance) noexcept -> void = 0;
 			virtual auto cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void = 0;
+			virtual auto cmdBindDescriptorSets(PipelineBintPoint point, IPipelineLayout* pipeline_layout, uint32_t const& idx_first_descset, uint32_t const& count_sets_to_bind, IDescriptorSet** sets, uint32_t const&, uint32_t const*) noexcept -> void = 0;
 		};
 	}
 }

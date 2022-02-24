@@ -27,8 +27,6 @@ namespace SIByL
 		public:
 			IDescriptorPool() = default;
 			virtual ~IDescriptorPool() = default;
-
-		private:
 		};
 	}
 }
