@@ -31,6 +31,10 @@ import RHI.IFence;
 import RHI.IBuffer;
 import RHI.IVertexBuffer;
 import RHI.IIndexBuffer;
+import RHI.IDescriptorSetLayout;
+import RHI.IUniformBuffer;
+import RHI.IDescriptorPool;
+import RHI.IDescriptorSet;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -48,6 +52,10 @@ import RHI.ISemaphore.VK;
 import RHI.IFence.VK;
 import RHI.IVertexBuffer.VK;
 import RHI.IIndexBuffer.VK;
+import RHI.IDescriptorSetLayout.VK;
+import RHI.IUniformBuffer.VK;
+import RHI.IDescriptorPool.VK;
+import RHI.IDescriptorSet.VK;
 
 namespace SIByL::RHI
 {
@@ -530,5 +538,81 @@ namespace SIByL::RHI
 			break;
 		}
 		return ib;
+	}
+
+	auto IResourceFactory::createDescriptorSetLayout(DescriptorSetLayoutDesc const& desc) noexcept -> MemScope<IDescriptorSetLayout>
+	{
+		MemScope<IDescriptorSetLayout> dl = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IDescriptorSetLayoutVK> dl_vk = MemNew<IDescriptorSetLayoutVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			dl = MemCast<IDescriptorSetLayout>(dl_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return dl;
+	}
+
+	auto IResourceFactory::createUniformBuffer(uint32_t const& size) noexcept -> MemScope<IUniformBuffer>
+	{
+		MemScope<IUniformBuffer> ub = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IUniformBufferVK> ub_vk = MemNew<IUniformBufferVK>(size, (ILogicalDeviceVK*)logicalDevice);
+			ub = MemCast<IUniformBuffer>(ub_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return ub;
+	}
+
+	auto IResourceFactory::createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>
+	{
+		MemScope<IDescriptorPool> dp = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IDescriptorPoolVK> dp_vk = MemNew<IDescriptorPoolVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			dp = MemCast<IDescriptorPool>(dp_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return dp;
+	}
+
+	auto IResourceFactory::createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>
+	{
+		MemScope<IDescriptorSet> ds = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IDescriptorSetVK> ds_vk = MemNew<IDescriptorSetVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			ds = MemCast<IDescriptorSet>(ds_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return ds;
 	}
 }

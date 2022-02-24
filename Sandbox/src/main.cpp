@@ -9,6 +9,8 @@ module;
 #include <string_view>
 #include <filesystem>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 module Main;
 
 import Core.Assert;
@@ -47,6 +49,9 @@ import RHI.IVertexBuffer;
 import RHI.IBuffer;
 import RHI.IDeviceGlobal;
 import RHI.IIndexBuffer;
+import RHI.IDescriptorSetLayout;
+import RHI.IDescriptorPool;
+import RHI.IDescriptorSet;
 
 import UAT.IUniversalApplication;
 
@@ -60,6 +65,12 @@ public:
 	struct Vertex {
 		glm::vec2 pos;
 		glm::vec3 color;
+	};
+
+	struct UniformBufferObject {
+		glm::mat4 model;
+		glm::mat4 view;
+		glm::mat4 proj;
 	};
 
 	virtual void onAwake() override
@@ -104,10 +115,45 @@ public:
 		};
 		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), 4);
 		indexBuffer = resourceFactory->createIndexBuffer(&index_proxy, sizeof(uint16_t));
+		// uniform buffer
+		uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			uniformBuffers[i] = resourceFactory->createUniformBuffer(sizeof(MAX_FRAMES_IN_FLIGHT));
+		}
+		// create desc layout
+		RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
+		{
+			{
+				{ 0, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+			}
+		};
+		desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
+		// create desc
+		RHI::DescriptorPoolDesc descriptor_pool_desc =
+		{
+			{
+				{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT}
+			},
+			MAX_FRAMES_IN_FLIGHT,
+		};
+		descriptorPool = resourceFactory->createDescriptorPool(descriptor_pool_desc);
+		// create desc sets
+		descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+		RHI::DescriptorSetDesc descriptor_set_desc =
+		{
+			descriptorPool.get(),
+			desciptor_set_layout.get()
+		};
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			descriptorSets[i] = resourceFactory->createDescriptorSet(descriptor_set_desc);
+		}
 
 		// create swapchain & related ...
 		swapchain = resourceFactory->createSwapchain({});
 		createModifableResource();
+
 
 		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
 		commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -174,6 +220,7 @@ public:
 		};
 		MemScope<RHI::IDynamicState> dynamic_states = resourceFactory->createDynamicState(pipelinestates_desc);
 
+
 		RHI::PipelineLayoutDesc pipelineLayout_desc =
 		{
 			0,
@@ -238,6 +285,18 @@ public:
 			timer.tick();
 			SE_CORE_INFO("FPS: {0}", timer.getFPS());
 		}
+		// update uniform buffer
+		{
+			float time = (float)timer.getTotalTimeSeconds();
+			UniformBufferObject ubo;
+			ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			auto [width, height] = swapchain->getExtend();
+			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 10.0f);
+			ubo.proj[1][1] *= -1;
+			Buffer ubo_proxy((void*) & ubo, sizeof(ubo), 4);
+			uniformBuffers[currentFrame]->updateBuffer(&ubo_proxy);
+		}
 		// drawFrame
 		{
 			//  1. Wait for the previous frame to finish
@@ -286,6 +345,11 @@ private:
 
 	MemScope<RHI::IVertexBuffer> vertexBuffer;
 	MemScope<RHI::IIndexBuffer> indexBuffer;
+	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;
+
+	MemScope<RHI::IDescriptorPool> descriptorPool;
+	MemScope<RHI::IDescriptorSetLayout> desciptor_set_layout;
+	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;

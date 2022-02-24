@@ -61,4 +61,8 @@ namespace SIByL
 		return (double)0.001 * (std::chrono::duration_cast<std::chrono::microseconds>(currTime - baseTime).count());
 	}
 
+	auto Timer::getTotalTimeSeconds() noexcept -> double
+	{
+		return (double)0.001 * getTotalTime();
+	}
 }

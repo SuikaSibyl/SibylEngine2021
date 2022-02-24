@@ -22,5 +22,7 @@ namespace SIByL::RHI
 	export inline auto getVkMemoryProperty(MemoryPropertyFlags usage) noexcept -> VkMemoryPropertyFlags;
 	export inline auto getVkCommandPoolCreateFlags(CommandPoolAttributeFlags flags) noexcept -> VkCommandPoolCreateFlags;
 	export inline auto getVkCommandBufferUsageFlags(CommandBufferUsageFlags flags) noexcept -> VkCommandBufferUsageFlags;
+	export inline auto getVkDescriptorType(DescriptorType type) noexcept -> VkDescriptorType;
+	export inline auto getVkShaderStageFlags(ShaderStageFlags type) noexcept -> VkShaderStageFlags;
 
 }

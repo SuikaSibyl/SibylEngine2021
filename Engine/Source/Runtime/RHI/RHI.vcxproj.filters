@@ -276,6 +276,48 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IIndexBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Resource\IDescriptorPool.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorPoolVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorPoolVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Resource\IDescriptorSet.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Resource\IDescriptorSetLayout.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetLayoutVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetLayoutVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Resource\ISampler.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Common\Resource\IDescriptorSetLayout.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Resource\IUniformBuffer.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IUniformBufferVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IUniformBufferVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\IDescriptorSetVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h">

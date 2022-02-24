@@ -21,6 +21,10 @@ import RHI.IFence;
 import RHI.IBuffer;
 import RHI.IVertexBuffer;
 import RHI.IIndexBuffer;
+import RHI.IDescriptorSetLayout;
+import RHI.IUniformBuffer;
+import RHI.IDescriptorPool;
+import RHI.IDescriptorSet;
 
 namespace SIByL
 {
@@ -80,6 +84,10 @@ namespace SIByL
 			auto createFence() noexcept -> MemScope<IFence>;
 			auto createVertexBuffer(Buffer* buffer) noexcept -> MemScope<IVertexBuffer>;
 			auto createIndexBuffer(Buffer* buffer, uint32_t element_size) noexcept -> MemScope<IIndexBuffer>;
+			auto createDescriptorSetLayout(DescriptorSetLayoutDesc const& desc) noexcept -> MemScope<IDescriptorSetLayout>;
+			auto createUniformBuffer(uint32_t const& size) noexcept -> MemScope<IUniformBuffer>;
+			auto createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>;
+			auto createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>;
 
 		private:
 			API api;

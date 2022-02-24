@@ -22,6 +22,7 @@ namespace SIByL
 			auto getFPS() noexcept -> unsigned int;
 			auto getMsPF() noexcept -> double;
 			auto getTotalTime() noexcept -> double;
+			auto getTotalTimeSeconds() noexcept -> double;
 
 		private:
 			unsigned int framePerSecond = 0;

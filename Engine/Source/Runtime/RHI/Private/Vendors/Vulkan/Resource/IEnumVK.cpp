@@ -389,4 +389,79 @@ namespace SIByL::RHI
 		return (VkCommandBufferUsageFlags)flags;
 	}
 
+	inline auto getVkDescriptorType(DescriptorType type) noexcept -> VkDescriptorType
+	{
+		switch (type)
+		{
+		case SIByL::RHI::DescriptorType::MUTABLE_VALVE:
+			return VK_DESCRIPTOR_TYPE_MUTABLE_VALVE;
+			break;
+		case SIByL::RHI::DescriptorType::ACCELERATION_STRUCTURE_NV:
+			return VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_NV;
+			break;
+		case SIByL::RHI::DescriptorType::ACCELERATION_STRUCTURE_KHR:
+			return VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+			break;
+		case SIByL::RHI::DescriptorType::INLINE_UNIFORM_BLOCK_EXT:
+			return VK_DESCRIPTOR_TYPE_INLINE_UNIFORM_BLOCK_EXT;
+			break;
+		case SIByL::RHI::DescriptorType::INPUT_ATTACHMENT:
+			return VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT;
+			break;
+		case SIByL::RHI::DescriptorType::STORAGE_BUFFER_DYNAMIC:
+			return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+			break;
+		case SIByL::RHI::DescriptorType::UNIFORM_BUFFER_DYNAMIC:
+			return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC;
+			break;
+		case SIByL::RHI::DescriptorType::STORAGE_BUFFER:
+			return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+			break;
+		case SIByL::RHI::DescriptorType::UNIFORM_BUFFER:
+			return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			break;
+		case SIByL::RHI::DescriptorType::STORAGE_TEXEL_BUFFER:
+			return VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER;
+			break;
+		case SIByL::RHI::DescriptorType::UNIFORM_TEXEL_BUFFER:
+			return VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER;
+			break;
+		case SIByL::RHI::DescriptorType::STORAGE_IMAGE:
+			return VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+			break;
+		case SIByL::RHI::DescriptorType::SAMPLED_IMAGE:
+			return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+			break;
+		case SIByL::RHI::DescriptorType::COMBINED_IMAGE_SAMPLER:
+			return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			break;
+		case SIByL::RHI::DescriptorType::SAMPLER:
+			return VK_DESCRIPTOR_TYPE_SAMPLER;
+			break;
+		default:
+			break;
+		}
+		return VK_DESCRIPTOR_TYPE_MAX_ENUM;
+	}
+
+	inline auto getVkShaderStageFlags(ShaderStageFlags _flag) noexcept -> VkShaderStageFlags
+	{
+		uint32_t flags{};
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::VERTEX_BIT, VK_SHADER_STAGE_VERTEX_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::TESSELLATION_CONTROL_BIT, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::TESSELLATION_EVALUATION_BIT, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::GEOMETRY_BIT, VK_SHADER_STAGE_GEOMETRY_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::FRAGMENT_BIT, VK_SHADER_STAGE_FRAGMENT_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::COMPUTE_BIT, VK_SHADER_STAGE_COMPUTE_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::RAYGEN_BIT, VK_SHADER_STAGE_RAYGEN_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::ANY_HIT_BIT, VK_SHADER_STAGE_ANY_HIT_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::CLOSEST_HIT_BIT, VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::MISS_BIT, VK_SHADER_STAGE_MISS_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::INTERSECTION_BIT, VK_SHADER_STAGE_INTERSECTION_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::CALLABLE_BIT, VK_SHADER_STAGE_CALLABLE_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::TASK_BIT, VK_SHADER_STAGE_TASK_BIT_NV, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::MESH_BIT, VK_SHADER_STAGE_MESH_BIT_NV, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ShaderStageFlagBits::SUBPASS_SHADING_BIT, VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI, flags);
+		return (VkShaderStageFlags)flags;
+	}
 }
