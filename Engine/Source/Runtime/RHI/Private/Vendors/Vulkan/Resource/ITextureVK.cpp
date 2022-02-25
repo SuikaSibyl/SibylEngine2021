@@ -3,12 +3,14 @@ module;
 #include <utility>
 module RHI.ITexture.VK;
 import Core.Log;
+import Core.MemoryManager;
 import RHI.ITexture;
 import RHI.IResource.VK;
 import RHI.ILogicalDevice.VK;
 import RHI.ITextureView;
 import RHI.ITextureView.VK;
-import Core.MemoryManager;
+import RHI.IBuffer;
+import RHI.IBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -38,6 +40,72 @@ namespace SIByL::RHI
 		}
 	}
 
+	auto createVkImage(
+		uint32_t const& width, 
+		uint32_t const& height,
+		VkImage* texture_image,
+		VkDeviceMemory* device_memory,
+		ILogicalDeviceVK* logical_device) noexcept -> void
+	{
+		VkImageCreateInfo imageInfo{};
+		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageInfo.imageType = VK_IMAGE_TYPE_2D;
+		imageInfo.extent.width = static_cast<uint32_t>(width);
+		imageInfo.extent.height = static_cast<uint32_t>(height);
+		imageInfo.extent.depth = 1;
+		imageInfo.mipLevels = 1;
+		imageInfo.arrayLayers = 1;
+		imageInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
+		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.flags = 0; // Optional
+
+		if (vkCreateImage(logical_device->getDeviceHandle(), &imageInfo, nullptr, texture_image) != VK_SUCCESS) {
+			SE_CORE_ERROR("VULKAN :: failed to create image!");
+		}
+
+		VkMemoryRequirements memRequirements;
+		vkGetImageMemoryRequirements(logical_device->getDeviceHandle(), *texture_image, &memRequirements);
+
+		VkMemoryAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+		allocInfo.allocationSize = memRequirements.size;
+		allocInfo.memoryTypeIndex = logical_device->getPhysicalDeviceVk()->
+			findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+		if (vkAllocateMemory(logical_device->getDeviceHandle(), &allocInfo, nullptr, device_memory) != VK_SUCCESS) {
+			SE_CORE_ERROR("failed to allocate image memory!");
+		}
+
+		vkBindImageMemory(logical_device->getDeviceHandle(), *texture_image, *device_memory, 0);
+	}
+
+	ITextureVK::ITextureVK(Image* image, ILogicalDeviceVK* _logical_device)
+		:logicalDevice(_logical_device)
+	{
+		// create staging buffer
+		BufferDesc stagingBufferDesc =
+		{
+			(unsigned int)image->getSize(),
+			(BufferUsageFlags)BufferUsageFlagBits::TRANSFER_SRC_BIT,
+			BufferShareMode::EXCLUSIVE,
+			(uint32_t)MemoryPropertyFlagBits::HOST_VISIBLE_BIT | (uint32_t)MemoryPropertyFlagBits::HOST_COHERENT_BIT
+		};
+		IBufferVK stagingBuffer(stagingBufferDesc, logicalDevice);
+
+		// copy memory
+		void* data;
+		vkMapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()), 0, stagingBuffer.getSize(), 0, &data);
+		memcpy(data, image->getData(), (unsigned int)image->getSize());
+		vkUnmapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()));
+
+
+
+	}
+
 	ITextureVK::ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device)
 		: image(_image)
 		, resource(std::move(_resource))
@@ -48,12 +116,11 @@ namespace SIByL::RHI
 	ITextureVK::ITextureVK(ITextureVK&& _texture)
 	{
 		image = _texture.image;
-		imageView = _texture.imageView;
 		resource = std::move(_texture.resource);
 		logicalDevice = _texture.logicalDevice;
+		externalImage = _texture.externalImage;
 
 		_texture.image = nullptr;
-		_texture.imageView = nullptr;
 	}
 
 	auto ITextureVK::createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView>
@@ -64,20 +131,15 @@ namespace SIByL::RHI
 		return general_view;
 	}
 
-	auto ITextureVK::getVkImageView() noexcept -> VkImageView*
-	{
-		return &imageView;
-	}
-
 	ITextureVK::~ITextureVK()
 	{
 		if (image && !externalImage)
 		{
-			// destroy image
+			vkDestroyImage(logicalDevice->getDeviceHandle(), image, nullptr);
 		}
-		if (imageView)
+		if (deviceMemory && !externalImage)
 		{
-			vkDestroyImageView(logicalDevice->getDeviceHandle(), imageView, nullptr);
+			vkFreeMemory(logicalDevice->getDeviceHandle(), deviceMemory, nullptr);
 		}
 	}
 }

@@ -487,4 +487,63 @@ namespace SIByL::RHI
 		return VK_PIPELINE_BIND_POINT_MAX_ENUM;
 	}
 
+	inline auto getVkImageType(ResourceType type) noexcept -> VkImageType
+	{
+		switch (type)
+		{
+		case SIByL::RHI::ResourceType::Texture2DMultisample:
+			return VK_IMAGE_TYPE_2D;
+			break;
+		case SIByL::RHI::ResourceType::TextureCube:
+			return VK_IMAGE_TYPE_2D;
+			break;
+		case SIByL::RHI::ResourceType::Texture3D:
+			return VK_IMAGE_TYPE_3D;
+			break;
+		case SIByL::RHI::ResourceType::Texture2D:
+			return VK_IMAGE_TYPE_2D;
+			break;
+		case SIByL::RHI::ResourceType::Texture1D:
+			return VK_IMAGE_TYPE_1D;
+			break;
+		default:
+			break;
+		}
+		return VK_IMAGE_TYPE_MAX_ENUM;
+	}
+
+	inline auto getVkImageTiling(ImageTiling type) noexcept -> VkImageTiling
+	{
+		switch (type)
+		{
+		case SIByL::RHI::ImageTiling::DRM_FORMAT_MODIFIER:
+			return VK_IMAGE_TILING_DRM_FORMAT_MODIFIER_EXT;
+			break;
+		case SIByL::RHI::ImageTiling::LINEAR:
+			return VK_IMAGE_TILING_LINEAR;
+			break;
+		case SIByL::RHI::ImageTiling::OPTIMAL:
+			return VK_IMAGE_TILING_OPTIMAL;
+			break;
+		default:
+			break;
+		}
+		return VK_IMAGE_TILING_MAX_ENUM;
+	}
+
+	inline auto getVkImageUsageFlags(ImageUsageFlags _flag) noexcept -> VkImageUsageFlags
+	{
+		uint32_t flags{};
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::TRANSFER_SRC_BIT, VK_IMAGE_USAGE_TRANSFER_SRC_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::TRANSFER_DST_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::SAMPLED_BIT, VK_IMAGE_USAGE_SAMPLED_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::COLOR_ATTACHMENT_BIT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::TRANSIENT_ATTACHMENT_BIT, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::INPUT_ATTACHMENT_BIT, VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::FRAGMENT_DENSITY_MAP_BIT, VK_IMAGE_USAGE_FRAGMENT_DENSITY_MAP_BIT_EXT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::FRAGMENT_SHADING_RATE_ATTACHMENT_BIT, VK_IMAGE_USAGE_FRAGMENT_SHADING_RATE_ATTACHMENT_BIT_KHR, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::INPUT_ATTACHMENT_BIT, VK_IMAGE_USAGE_INPUT_ATTACHMENT_BIT, flags);
+		return (VkImageUsageFlags)flags;
+	}
 }

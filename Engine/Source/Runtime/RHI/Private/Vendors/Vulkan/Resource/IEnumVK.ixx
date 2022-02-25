@@ -25,4 +25,7 @@ namespace SIByL::RHI
 	export inline auto getVkDescriptorType(DescriptorType type) noexcept -> VkDescriptorType;
 	export inline auto getVkShaderStageFlags(ShaderStageFlags type) noexcept -> VkShaderStageFlags;
 	export inline auto getVkPipelineBindPoint(PipelineBintPoint point) noexcept -> VkPipelineBindPoint;
+	export inline auto getVkImageType(ResourceType type) noexcept -> VkImageType;
+	export inline auto getVkImageTiling(ImageTiling type) noexcept -> VkImageTiling;
+	export inline auto getVkImageUsageFlags(ImageUsageFlags flags) noexcept -> VkImageUsageFlags;
 }

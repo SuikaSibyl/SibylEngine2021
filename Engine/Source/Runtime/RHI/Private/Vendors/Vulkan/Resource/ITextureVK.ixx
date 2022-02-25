@@ -2,6 +2,7 @@ module;
 #include <vulkan/vulkan.h>
 export module RHI.ITexture.VK;
 import Core.MemoryManager;
+import Core.Image;
 import RHI.ITexture;
 import RHI.IResource.VK;
 import RHI.ILogicalDevice.VK;
@@ -16,18 +17,18 @@ namespace SIByL
 		{
 		public:
 			ITextureVK() = default;
+			ITextureVK(Image* image, ILogicalDeviceVK* _logical_device);
 			ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device);
 			ITextureVK(ITextureVK const&) = delete;
 			ITextureVK(ITextureVK &&);
 			virtual ~ITextureVK();
 
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> override;
-			auto getVkImageView() noexcept -> VkImageView*;
 
 		private:
 			ILogicalDeviceVK* logicalDevice;
 			VkImage image;
-			VkImageView imageView;
+			VkDeviceMemory deviceMemory;
 			IResourceVK resource;
 			bool externalImage = false;
 		};
