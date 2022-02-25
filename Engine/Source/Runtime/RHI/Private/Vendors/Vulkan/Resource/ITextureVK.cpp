@@ -4,6 +4,8 @@ module;
 module RHI.ITexture.VK;
 import Core.Log;
 import Core.MemoryManager;
+import RHI.IEnum;
+import RHI.IEnum.VK;
 import RHI.ITexture;
 import RHI.IResource.VK;
 import RHI.ILogicalDevice.VK;
@@ -11,6 +13,12 @@ import RHI.ITextureView;
 import RHI.ITextureView.VK;
 import RHI.IBuffer;
 import RHI.IBuffer.VK;
+import RHI.IDeviceGlobal;
+import RHI.ICommandPool;
+import RHI.ICommandBuffer;
+import RHI.ICommandPool.VK;
+import RHI.ICommandBuffer.VK;
+import RHI.IFactory;
 
 namespace SIByL::RHI
 {
@@ -41,26 +49,25 @@ namespace SIByL::RHI
 	}
 
 	auto createVkImage(
-		uint32_t const& width, 
-		uint32_t const& height,
+		TextureDesc const& desc,
 		VkImage* texture_image,
 		VkDeviceMemory* device_memory,
 		ILogicalDeviceVK* logical_device) noexcept -> void
 	{
 		VkImageCreateInfo imageInfo{};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-		imageInfo.imageType = VK_IMAGE_TYPE_2D;
-		imageInfo.extent.width = static_cast<uint32_t>(width);
-		imageInfo.extent.height = static_cast<uint32_t>(height);
+		imageInfo.imageType = getVkImageType(desc.type);
+		imageInfo.extent.width = static_cast<uint32_t>(desc.width);
+		imageInfo.extent.height = static_cast<uint32_t>(desc.height);
 		imageInfo.extent.depth = 1;
 		imageInfo.mipLevels = 1;
 		imageInfo.arrayLayers = 1;
-		imageInfo.format = VK_FORMAT_R8G8B8A8_SRGB;
-		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.format = getVKFormat(desc.format);
+		imageInfo.tiling = getVkImageTiling(desc.tiling);
+		imageInfo.initialLayout = getVkImageLayout(desc.layout);
+		imageInfo.usage = getVkImageUsageFlags(desc.usages);
+		imageInfo.sharingMode = getVkBufferShareMode(desc.shareMode);
+		imageInfo.samples = getVkSampleCount(desc.sampleCount);
 		imageInfo.flags = 0; // Optional
 
 		if (vkCreateImage(logical_device->getDeviceHandle(), &imageInfo, nullptr, texture_image) != VK_SUCCESS) {
@@ -102,8 +109,30 @@ namespace SIByL::RHI
 		memcpy(data, image->getData(), (unsigned int)image->getSize());
 		vkUnmapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()));
 
+		// create Image
+		desc =
+		{
+			ResourceType::Texture2D,
+			ResourceFormat::FORMAT_R8G8B8A8_SRGB,
+			ImageTiling::OPTIMAL,
+			ImageUsageFlags(ImageUsageFlagBits::TRANSFER_DST_BIT) | ImageUsageFlags(ImageUsageFlagBits::SAMPLED_BIT),
+			BufferShareMode::EXCLUSIVE,
+			SampleCount::COUNT_1_BIT,
+			ImageLayout::UNDEFINED,
+			image->getWidth(),
+			image->getHeight()
+		};
+		createVkImage(desc, &this->image, &deviceMemory, logicalDevice);
 
-
+		// copy
+		PerDeviceGlobal* global = DeviceToGlobal::getGlobal((ILogicalDevice*)logicalDevice);
+		ICommandPool* transientPool = global->getTransientCommandPool();
+		MemScope<ICommandBuffer> commandbuffer = global->getResourceFactory()->createCommandBuffer(transientPool);
+		commandbuffer->beginRecording((uint32_t)CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+		//commandbuffer->cmdCopyBuffer((IBuffer*)&stagingBuffer, (IBuffer*)&buffer, 0, 0, buffer.getSize());
+		commandbuffer->endRecording();
+		commandbuffer->submit();
+		logicalDevice->waitIdle();
 	}
 
 	ITextureVK::ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device)
@@ -121,6 +150,34 @@ namespace SIByL::RHI
 		externalImage = _texture.externalImage;
 
 		_texture.image = nullptr;
+	}
+
+	auto ITextureVK::transitionImageLayout(ImageLayout new_layout) noexcept -> void
+	{
+		PerDeviceGlobal* global = DeviceToGlobal::getGlobal((ILogicalDevice*)logicalDevice);
+		ICommandPool* transientPool = global->getTransientCommandPool();
+		MemScope<ICommandBuffer> commandbuffer = global->getResourceFactory()->createCommandBuffer(transientPool);
+		commandbuffer->beginRecording((uint32_t)CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+
+		VkImageMemoryBarrier barrier{};
+		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		barrier.oldLayout = getVkImageLayout(desc.layout);
+		barrier.newLayout = getVkImageLayout(new_layout);
+		barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		barrier.image = image;
+		barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		barrier.subresourceRange.baseMipLevel = 0;
+		barrier.subresourceRange.levelCount = 1;
+		barrier.subresourceRange.baseArrayLayer = 0;
+		barrier.subresourceRange.layerCount = 1;
+		barrier.srcAccessMask = 0; // TODO
+		barrier.dstAccessMask = 0; // TODO
+
+
+		commandbuffer->endRecording();
+		commandbuffer->submit();
+		logicalDevice->waitIdle();
 	}
 
 	auto ITextureVK::createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView>

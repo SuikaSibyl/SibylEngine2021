@@ -78,22 +78,19 @@
     <ClCompile Include="Public\Resource\ITexture.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Command\ISemaphore.ixx">
+    <ClCompile Include="Public\Sync\ISemaphore.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Resource\IBarrier.ixx">
+    <ClCompile Include="Public\Sync\IBarrier.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Command\IQueue.ixx">
+    <ClCompile Include="Public\Command\ICommandQueue.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Command\ICommandPool.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\OpenGL\Device\IGraphicContextGL.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\Resource\IWindowSurface.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Resource\IFramebuffer.ixx">
@@ -111,7 +108,7 @@
     <ClCompile Include="Public\Command\ICommandList.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Command\IFence.ixx">
+    <ClCompile Include="Public\Sync\IFence.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureVK.ixx">
@@ -177,7 +174,7 @@
     <ClCompile Include="Public\Pass\IFixedFunctions.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Resource\IEnum.ixx">
+    <ClCompile Include="Public\Misc\IEnum.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Common\IEnum.cpp">
@@ -189,10 +186,10 @@
     <ClCompile Include="Private\Vendors\Vulkan\Pass\IFixedFunctionsVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Misc\IEnumVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Resource\IEnumVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Misc\IEnumVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Common\IFixedFunctions.cpp">
@@ -216,16 +213,16 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Factory\IFactory.ixx">
+    <ClCompile Include="Public\Misc\IFactory.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Common\Factory\IFactory.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\ISemaphoreVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Command\ISemaphoreVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\ISemaphoreVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Resource\ITextureView.ixx">
@@ -237,10 +234,10 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ITextureViewVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.ixx">
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\IFenceVK.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Vendors\Vulkan\Command\IFenceVK.cpp">
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\IFenceVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Common\Resource\IBuffer.cpp">
@@ -261,7 +258,7 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Factory\IDeviceGlobal.ixx">
+    <ClCompile Include="Public\Misc\IDeviceGlobal.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Common\Factory\IDeviceGlobal.cpp">
@@ -316,6 +313,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\Vendors\Vulkan\Descriptor\IDescriptorSetVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Sync\IEvent.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Sync\IMemoryBarrier.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

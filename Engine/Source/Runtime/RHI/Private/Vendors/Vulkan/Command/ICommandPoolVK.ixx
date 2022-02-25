@@ -5,6 +5,7 @@ import RHI.ICommandPool;
 import RHI.ILogicalDevice;
 import RHI.ILogicalDevice.VK;
 import RHI.IEnum;
+import RHI.ICommandBuffer;
 
 namespace SIByL
 {

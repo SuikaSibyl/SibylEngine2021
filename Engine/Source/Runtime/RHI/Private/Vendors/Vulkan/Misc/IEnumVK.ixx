@@ -28,4 +28,5 @@ namespace SIByL::RHI
 	export inline auto getVkImageType(ResourceType type) noexcept -> VkImageType;
 	export inline auto getVkImageTiling(ImageTiling type) noexcept -> VkImageTiling;
 	export inline auto getVkImageUsageFlags(ImageUsageFlags flags) noexcept -> VkImageUsageFlags;
+	export inline auto getVkImageLayout(ImageLayout layout) noexcept -> VkImageLayout;
 }

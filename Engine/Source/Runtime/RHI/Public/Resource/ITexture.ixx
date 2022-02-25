@@ -1,9 +1,10 @@
 module;
-
+#include <vulkan/vulkan.h>
 export module RHI.ITexture;
 import Core.SObject;
 import Core.MemoryManager;
 import RHI.ITextureView;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -27,6 +28,19 @@ namespace SIByL
 		// │  OpenGL      │   GLuint                      │
 		// ╰──────────────┴───────────────────────────────╯
 
+		export struct TextureDesc
+		{
+			ResourceType type;
+			ResourceFormat format;
+			ImageTiling tiling;
+			ImageUsageFlags usages;
+			BufferShareMode shareMode;
+			SampleCount sampleCount;
+			ImageLayout layout;
+			uint32_t width;
+			uint32_t height;
+		};
+
 		export class ITexture :public SObject
 		{
 		public:
@@ -35,6 +49,7 @@ namespace SIByL
 			ITexture(ITexture const&) = delete;
 			virtual ~ITexture() = default;
 
+			virtual auto transitionImageLayout(ImageLayout new_layout) noexcept -> void = 0;
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> = 0;
 		};
 	}

@@ -23,9 +23,11 @@ namespace SIByL
 			ITextureVK(ITextureVK &&);
 			virtual ~ITextureVK();
 
+			virtual auto transitionImageLayout(ImageLayout new_layout) noexcept -> void override;
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> override;
 
 		private:
+			TextureDesc desc;
 			ILogicalDeviceVK* logicalDevice;
 			VkImage image;
 			VkDeviceMemory deviceMemory;

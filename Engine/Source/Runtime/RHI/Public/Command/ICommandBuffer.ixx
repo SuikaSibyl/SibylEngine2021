@@ -17,19 +17,55 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		// A Command Buffer is an asynchronous computing unit, 
+		// ╔══════════════════════════╗
+		// ║      Command Buffer      ║
+		// ╚══════════════════════════╝
+		// A Command Buffer is a object used to record commands.
+		// 
+		// ╭──────────────┬─────────────────────────────────────────────────╮
+		// │  Vulkan	  │   vk::CommandBuffer                             │
+		// │  DirectX 12  │   ID3D12GraphicsCommandList                     │
+		// │  OpenGL      │   Intenal to Driver or with GL_NV_command_list  │
+		// ╰──────────────┴─────────────────────────────────────────────────╯
+		// 
+		//  ╭╱───────────────╲╮
+		//  ╳    Hierarchy    ╳
+		//  ╰╲───────────────╱╯
+		// For Vulkan, there are two levels, primary & secondary
+		// Secondary command buffers can be executed by primary command buffers.
+		// Therefore, they are not directly submitted to queues
+		// 
+		//  ╭╱───────────────╲╮
+		//  ╳    Commands     ╳
+		//  ╰╲───────────────╱╯
+		// Recorded commands include commands to :
+		//  ► bind pipelines & descriptor sets to the command buffer
+		//  ► modify dynamic state
+		//  ► draw
+		//  ► dispatch
+		//  ► execute secondary command buffers
+		//  ► copy buffers and images
+		// 
+		//  ╭╱───────────────╲╮
+		//  ╳    Lifecycle    ╳
+		//  ╰╲───────────────╱╯
+		// ► Initial: after allocated, can only be moved to the recording state or freed
+		// ► Recording: from initial state, cmd* commands can be used to record
+		// ► Executable: from recording state, can be submitted, reset, or recorded to another command buffer
+		// ► Pending: after submission, applications must not modify the buffer in any way, after exectued, to executable / invalid states
+		// ► Invalid: can only be reset or freed
+		// 
+		// ╭─────────────────╮
+		// │  Command Queue  │
+		// ╰─────────────────╯
+		// Command buffers can be subsequently submitted to a device queue for execution
+		// 
 		// where you describe procedures for the GPU to execute,
 		// such as draw calls, copying data from CPU-GPU accessible memory to GPU exclusive memory,
 		// and set various aspects of the graphics pipeline dynamically such as the current scissor.
 		// 
 		// Previously you would declare what you wanted the GPU to execute procedurally and it would do those tasks, 
 		// but GPUs are inherently asynchronous, so the driver would have been responsible for figuring out when to schedule tasks to the GPU.
-		//
-		// ╭──────────────┬─────────────────────────────────────────────────╮
-		// │  Vulkan	  │   vk::CommandBuffer                             │
-		// │  DirectX 12  │   ID3D12GraphicsCommandList                     │
-		// │  OpenGL      │   Intenal to Driver or with GL_NV_command_list  │
-		// ╰──────────────┴─────────────────────────────────────────────────╯
 
 		export class ICommandBuffer :public IResource
 		{

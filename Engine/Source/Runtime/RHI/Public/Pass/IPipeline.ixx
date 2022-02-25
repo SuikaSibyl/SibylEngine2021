@@ -12,6 +12,9 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		// ╔═════════════════════╗
+		// ║      Pipelines      ║
+		// ╚═════════════════════╝
 		// Pipelines are an overarching description of what will be executed 
 		// when performing a raster draw call, compute dispatch, or ray tracing dispatch.
 		// 
@@ -28,6 +31,8 @@ namespace SIByL
 		// Fixed-function state : all of the structures that define the fixed - function stages of the pipeline, like input assembly, rasterizer, viewportand color blending
 		// Pipeline layout		: the uniformand push values referenced by the shader that can be updated at draw time
 		// Render pass			: the attachments referenced by the pipeline stagesand their usage
+
+
 		export struct PipelineDesc
 		{
 			std::vector<IShader*> shaders;
