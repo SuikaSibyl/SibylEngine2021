@@ -18,13 +18,16 @@ namespace SIByL
 		public:
 			ITextureVK() = default;
 			ITextureVK(Image* image, ILogicalDeviceVK* _logical_device);
+			ITextureVK(TextureDesc const&, ILogicalDeviceVK* _logical_device);
 			ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device);
 			ITextureVK(ITextureVK const&) = delete;
 			ITextureVK(ITextureVK &&);
 			virtual ~ITextureVK();
 
-			virtual auto transitionImageLayout(ImageLayout new_layout) noexcept -> void override;
+			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void override;
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> override;
+			auto getVkImage() noexcept -> VkImage* { return &image; }
+			virtual auto getDescription() noexcept -> TextureDesc const& override { return desc; }
 
 		private:
 			TextureDesc desc;
@@ -33,6 +36,16 @@ namespace SIByL
 			VkDeviceMemory deviceMemory;
 			IResourceVK resource;
 			bool externalImage = false;
+		};
+
+		export inline auto getVkImageAspectFlags(ImageAspectFlags) noexcept -> VkImageAspectFlags;
+		export struct IBufferImageCopyVK :public IBufferImageCopy
+		{
+		public:
+			IBufferImageCopyVK(BufferImageCopyDesc const&);
+			auto getVkBufferImageCopy() noexcept -> VkBufferImageCopy* { return &copy; }
+		private:
+			VkBufferImageCopy copy;
 		};
 	}
 }

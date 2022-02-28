@@ -98,6 +98,7 @@ namespace SIByL::RHI
 		// Desc Vk Physical Device Features
 		// - the set of device features that we'll be using
 		VkPhysicalDeviceFeatures deviceFeatures{};
+		deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 		// Desc Vk Device Create Info
 		VkDeviceCreateInfo createInfo{};

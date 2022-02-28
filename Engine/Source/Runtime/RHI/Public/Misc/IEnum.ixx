@@ -70,6 +70,9 @@ namespace SIByL
 			FORMAT_B8G8R8A8_RGB,
 			FORMAT_B8G8R8A8_SRGB,
 			FORMAT_R8G8B8A8_SRGB,
+			FORMAT_D32_SFLOAT, 
+			FORMAT_D32_SFLOAT_S8_UINT, 
+			FORMAT_D24_UNORM_S8_UINT
 		};
 
 		export enum class TopologyKind : uint32_t

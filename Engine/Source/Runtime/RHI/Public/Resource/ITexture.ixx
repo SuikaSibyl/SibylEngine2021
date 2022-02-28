@@ -49,8 +49,9 @@ namespace SIByL
 			ITexture(ITexture const&) = delete;
 			virtual ~ITexture() = default;
 
-			virtual auto transitionImageLayout(ImageLayout new_layout) noexcept -> void = 0;
+			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void = 0;
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> = 0;
+			virtual auto getDescription() noexcept -> TextureDesc const& = 0;
 		};
 
 		export enum class ImageAspectFlagBits :uint32_t
@@ -77,5 +78,22 @@ namespace SIByL
 			uint32_t layerCount;
 		};
 
+		export struct BufferImageCopyDesc
+		{
+			// src from buffer
+			uint64_t bufferOffset;
+			uint32_t bufferRowLength;
+			uint32_t bufferImageHeight;
+			// dst to image
+			// - subresource
+			ImageAspectFlags aspectMask;
+			uint32_t mipLevel;
+			uint32_t baseArrayLayer;
+			uint32_t layerCount;
+			int32_t imageOffsetX, imageOffsetY, imageOffsetZ;
+			uint32_t imageExtentX, imageExtentY, imageExtentZ;
+		};
+		export struct IBufferImageCopy
+		{};
 	}
 }

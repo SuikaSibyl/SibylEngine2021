@@ -80,7 +80,10 @@ namespace SIByL::RHI
 			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 		}
 
-		return indices.isComplete() && extensionsSupported && swapChainAdequate;
+		VkPhysicalDeviceFeatures supportedFeatures;
+		vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+		return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 	}
 
 	auto IPhysicalDeviceVK::rateDeviceSuitability(VkPhysicalDevice device) -> int
@@ -223,4 +226,19 @@ namespace SIByL::RHI
 		SE_CORE_ERROR("VULKAN :: failed to find suitable memory type!");
 	}
 
+	auto IPhysicalDeviceVK::findSupportedFormat(std::vector<VkFormat> const& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) noexcept -> VkFormat
+	{
+		for (VkFormat format : candidates) {
+			VkFormatProperties props;
+			vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+
+			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+				return format;
+			}
+			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+				return format;
+			}
+		}
+		SE_CORE_ERROR("VULKAN :: Physical Device :: failed to find supported format!");
+	}
 }

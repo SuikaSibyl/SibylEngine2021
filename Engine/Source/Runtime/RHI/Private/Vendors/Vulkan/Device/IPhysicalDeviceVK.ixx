@@ -16,7 +16,7 @@ namespace SIByL
 		public:
 			IPhysicalDeviceVK(IGraphicContext* context);
 			virtual ~IPhysicalDeviceVK() = default;
-
+			// IPhysicalDevice
 			virtual auto initialize() -> bool;
 			virtual auto isDebugLayerEnabled() noexcept -> bool;
 			virtual auto getGraphicContext() noexcept -> IGraphicContext* override;
@@ -60,7 +60,7 @@ namespace SIByL
 			auto findQueueFamilies(VkPhysicalDevice device)->QueueFamilyIndices;
 			auto checkDeviceExtensionSupport(VkPhysicalDevice device) -> bool;
 			auto querySwapChainSupport(VkPhysicalDevice device) -> SwapChainSupportDetails;
-
+			auto findSupportedFormat(std::vector<VkFormat> const& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) noexcept -> VkFormat;
 		};
 	}
 }

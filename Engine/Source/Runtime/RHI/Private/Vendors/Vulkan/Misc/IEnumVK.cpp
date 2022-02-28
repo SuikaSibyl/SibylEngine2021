@@ -259,6 +259,15 @@ namespace SIByL::RHI
 		case ResourceFormat::FORMAT_R8G8B8A8_SRGB:
 			return VK_FORMAT_R8G8B8A8_SRGB;
 			break;
+		case ResourceFormat::FORMAT_D32_SFLOAT:
+			return VK_FORMAT_D32_SFLOAT;
+			break;
+		case ResourceFormat::FORMAT_D24_UNORM_S8_UINT:
+			return VK_FORMAT_D24_UNORM_S8_UINT;
+			break;
+		case ResourceFormat::FORMAT_D32_SFLOAT_S8_UINT:
+			return VK_FORMAT_D32_SFLOAT_S8_UINT;
+			break;
 		default:
 			break;
 		}

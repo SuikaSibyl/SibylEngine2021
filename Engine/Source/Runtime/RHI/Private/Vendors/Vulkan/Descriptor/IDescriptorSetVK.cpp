@@ -10,10 +10,14 @@ import RHI.IDescriptorSetLayout;
 import RHI.IDescriptorSetLayout.VK;
 import RHI.IUniformBuffer;
 import RHI.IUniformBuffer.VK;
+import RHI.ITextureView;
+import RHI.ITextureView.VK;
+import RHI.ISampler;
+import RHI.ISampler.VK;
 
 namespace SIByL::RHI
 {
-	auto createDescriptorSetLayout(
+	auto createDescriptorSet(
 		IDescriptorPoolVK* descriptor_pool,
 		VkDescriptorSetLayout* layout,
 		VkDescriptorSet* set,
@@ -35,7 +39,7 @@ namespace SIByL::RHI
 		: logicalDevice(logical_device)
 		, descriptorPool((IDescriptorPoolVK*)desc.descriptorPool)
 	{
-		createDescriptorSetLayout(
+		createDescriptorSet(
 			(IDescriptorPoolVK*)desc.descriptorPool,
 			((IDescriptorSetLayoutVK*)desc.layout)->getVkDescriptorSetLayout(),
 			&set,
@@ -69,6 +73,27 @@ namespace SIByL::RHI
 		descriptorWrite.descriptorCount = 1;
 		descriptorWrite.pBufferInfo = &bufferInfo;
 		descriptorWrite.pImageInfo = nullptr; // Optional
+		descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+		vkUpdateDescriptorSets(logicalDevice->getDeviceHandle(), 1, &descriptorWrite, 0, nullptr);
+	}
+
+	auto IDescriptorSetVK::update(ITextureView* texture_view, ISampler* sampler, uint32_t const& binding, uint32_t const& array_element) noexcept -> void
+	{
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = *((ITextureViewVK*)texture_view)->getpVkImageView();
+		imageInfo.sampler = *((ISamplerVK*)sampler)->getVkSampler();
+		
+		VkWriteDescriptorSet descriptorWrite{};
+		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrite.dstSet = set;
+		descriptorWrite.dstBinding = binding;
+		descriptorWrite.dstArrayElement = array_element;
+		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrite.descriptorCount = 1;
+		descriptorWrite.pBufferInfo = nullptr;
+		descriptorWrite.pImageInfo = &imageInfo; // Optional
 		descriptorWrite.pTexelBufferView = nullptr; // Optional
 
 		vkUpdateDescriptorSets(logicalDevice->getDeviceHandle(), 1, &descriptorWrite, 0, nullptr);

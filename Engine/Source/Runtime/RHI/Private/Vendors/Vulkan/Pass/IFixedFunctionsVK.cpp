@@ -2,6 +2,7 @@ module;
 #include <vector>
 #include <vulkan/vulkan.h>
 module RHI.IFixedFunctions.VK;
+import Core.Log;
 import RHI.IFixedFunctions;
 import RHI.IEnum.VK;
 import RHI.IBuffer;
@@ -18,6 +19,29 @@ namespace SIByL::RHI
 		return bindingDescription;
 	}
 
+	auto getVkFormat(DataType type) noexcept -> VkFormat
+	{
+		switch (type)
+		{
+		case SIByL::RHI::DataType::Float4:
+			return VK_FORMAT_R32G32B32A32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float3:
+			return VK_FORMAT_R32G32B32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float2:
+			return VK_FORMAT_R32G32_SFLOAT;
+			break;
+		case SIByL::RHI::DataType::Float:
+			return VK_FORMAT_R32_SFLOAT;
+			break;
+		default:
+			break;
+		}
+		SE_CORE_ERROR("VULKAN :: Unsupported Vertex Data Format");
+		return VK_FORMAT_UNDEFINED;
+	}
+
 	auto getAttributeDescriptions(BufferLayout& layout) noexcept -> std::vector<VkVertexInputAttributeDescription>
 	{
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(layout.getElements().size());
@@ -27,7 +51,7 @@ namespace SIByL::RHI
 		{
 			attributeDescriptions[idx].binding = 0;
 			attributeDescriptions[idx].location = location;
-			attributeDescriptions[idx].format = VK_FORMAT_R32G32B32_SFLOAT;
+			attributeDescriptions[idx].format = getVkFormat(iter->type);
 			attributeDescriptions[idx].offset = iter->offset;
 
 			idx += 1;

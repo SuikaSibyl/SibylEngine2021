@@ -25,6 +25,7 @@ namespace SIByL::RHI
 		{
 			descriptors[idx].type = getVkDescriptorType(pair.first);
 			descriptors[idx].descriptorCount = pair.second;
+			idx++;
 		}
 		
 		VkDescriptorPoolCreateInfo poolInfo{};

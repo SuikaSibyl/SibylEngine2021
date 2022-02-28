@@ -3,6 +3,8 @@ module;
 export module RHI.IFactory;
 import Core.MemoryManager;
 import Core.Buffer;
+import Core.Image;
+
 import RHI.IEnum;
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -25,6 +27,11 @@ import RHI.IDescriptorSetLayout;
 import RHI.IUniformBuffer;
 import RHI.IDescriptorPool;
 import RHI.IDescriptorSet;
+import RHI.IBarrier;
+import RHI.IMemoryBarrier;
+import RHI.ITexture;
+import RHI.ITextureView;
+import RHI.ISampler;
 
 namespace SIByL
 {
@@ -88,6 +95,13 @@ namespace SIByL
 			auto createUniformBuffer(uint32_t const& size) noexcept -> MemScope<IUniformBuffer>;
 			auto createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>;
 			auto createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>;
+			auto createImageMemoryBarrier(ImageMemoryBarrierDesc const& desc) noexcept -> MemScope<IImageMemoryBarrier>;
+			auto createBarrier(BarrierDesc const& desc) noexcept -> MemScope<IBarrier>;
+			auto createBufferImageCopy(BufferImageCopyDesc const& desc) noexcept -> MemScope<IBufferImageCopy>;
+			auto createTexture(Image* image) noexcept -> MemScope<ITexture>;
+			auto createTexture(TextureDesc const&) noexcept -> MemScope<ITexture>;
+			auto createTextureView(ITexture* texture) noexcept -> MemScope<ITextureView>;
+			auto createSampler(SamplerDesc const&) noexcept -> MemScope<ISampler>;
 
 		private:
 			API api;

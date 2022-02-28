@@ -8,6 +8,8 @@ module;
 #include <EntryPoint.h>
 #include <string_view>
 #include <filesystem>
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -28,6 +30,7 @@ import Core.MemoryManager;
 import Core.File;
 import Core.Log;
 import Core.Time;
+import Core.Image;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -52,6 +55,9 @@ import RHI.IIndexBuffer;
 import RHI.IDescriptorSetLayout;
 import RHI.IDescriptorPool;
 import RHI.IDescriptorSet;
+import RHI.ITexture;
+import RHI.ITextureView;
+import RHI.ISampler;
 
 import UAT.IUniversalApplication;
 
@@ -63,8 +69,9 @@ class SandboxApp :public IUniversalApplication
 {
 public:
 	struct Vertex {
-		glm::vec2 pos;
+		glm::vec3 pos;
 		glm::vec3 color;
+		glm::vec2 uv;
 	};
 
 	struct UniformBufferObject {
@@ -96,26 +103,38 @@ public:
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
 		Buffer shader_vert, shader_frag;
-		shaderLoader.syncReadAll("vs_ubo.spv", shader_vert);
-		shaderLoader.syncReadAll("frag.spv", shader_frag);
+		shaderLoader.syncReadAll("vs_sampler.spv", shader_vert);
+		shaderLoader.syncReadAll("fs_sampler.spv", shader_frag);
 		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		// vertex buffer
 		const std::vector<Vertex> vertices = {
-			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+
+			{ {-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+			{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
 		};
 		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), 4);
 		vertexBuffer = resourceFactory->createVertexBuffer(&vertex_proxy);
 		// index buffer
 		const std::vector<uint16_t> indices = {
-			0, 1, 2, 2, 3, 0
+			0, 1, 2, 2, 3, 0,
+			4, 5, 6, 6, 7, 4
 		};
 		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), 4);
 		indexBuffer = resourceFactory->createIndexBuffer(&index_proxy, sizeof(uint16_t));
-		
+
+		// load image
+		Image image("./assets/texture.jpg");
+		texture = resourceFactory->createTexture(&image);
+		textureView = resourceFactory->createTextureView(texture.get());
+		sampler = resourceFactory->createSampler({});
+
 		// uniform process
 		{				
 			// uniform buffer
@@ -125,13 +144,15 @@ public:
 
 			// create pool
 			RHI::DescriptorPoolDesc descriptor_pool_desc =
-			{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT}}, // set types
+			{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT},
+			   {RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, MAX_FRAMES_IN_FLIGHT}}, // set types
 				MAX_FRAMES_IN_FLIGHT }; // total sets
 			descriptorPool = resourceFactory->createDescriptorPool(descriptor_pool_desc);
 
 			// create desc layout
 			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-			{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr }} };
+			{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+			   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr }} };
 			desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
 
 			// create sets
@@ -145,6 +166,7 @@ public:
 			// configure descriptors in sets
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 				descriptorSets[i]->update(uniformBuffers[i].get(), 0, 0);
+				descriptorSets[i]->update(textureView.get(), sampler.get(), 1, 0);
 			}
 
 			// create pipeline layouts
@@ -180,10 +202,25 @@ public:
 	{
 		RHI::Extend extend = swapchain->getExtend();
 
+		depthTexture = resourceFactory->createTexture(
+			{
+			RHI::ResourceType::Texture2D, //ResourceType type;
+			RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, //ResourceFormat format;
+			RHI::ImageTiling::OPTIMAL, //ImageTiling tiling;
+			(uint32_t)RHI::ImageUsageFlagBits::DEPTH_STENCIL_ATTACHMENT_BIT, //ImageUsageFlags usages;
+			RHI::BufferShareMode::EXCLUSIVE, //BufferShareMode shareMode;
+			RHI::SampleCount::COUNT_1_BIT, //SampleCount sampleCount;
+			RHI::ImageLayout::UNDEFINED, //ImageLayout layout;
+			extend.width, //uint32_t width;
+			extend.height //uint32_t height;
+			});
+		depthView = resourceFactory->createTextureView(depthTexture.get());
+
 		RHI::BufferLayout vertex_buffer_layout =
 		{
-			{RHI::DataType::Float2, "Position"},
+			{RHI::DataType::Float3, "Position"},
 			{RHI::DataType::Float3, "Color"},
+			{RHI::DataType::Float2, "UV"},
 		};
 		MemScope<RHI::IVertexLayout> vertex_layout = resourceFactory->createVertexLayout(vertex_buffer_layout);
 		MemScope<RHI::IInputAssembly> input_assembly = resourceFactory->createInputAssembly(RHI::TopologyKind::TriangleList);
@@ -313,7 +350,7 @@ public:
 			RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
 			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
 				pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
-			commandbuffers[currentFrame]->cmdDrawIndexed(6, 1, 0, 0, 0);
+			commandbuffers[currentFrame]->cmdDrawIndexed(12, 1, 0, 0, 0);
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 			commandbuffers[currentFrame]->endRecording();
 			//	4. Submit the recorded command buffer
@@ -348,6 +385,12 @@ private:
 	MemScope<RHI::IVertexBuffer> vertexBuffer;
 	MemScope<RHI::IIndexBuffer> indexBuffer;
 	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;
+
+	MemScope<RHI::ITexture> texture;
+	MemScope<RHI::ITextureView> textureView;
+	MemScope<RHI::ISampler> sampler;
+	MemScope<RHI::ITexture> depthTexture;
+	MemScope<RHI::ITextureView> depthView;
 
 	MemScope<RHI::IDescriptorPool> descriptorPool;
 	MemScope<RHI::IDescriptorSetLayout> desciptor_set_layout;

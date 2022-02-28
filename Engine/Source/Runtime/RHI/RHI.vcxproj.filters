@@ -333,6 +333,12 @@
     <ClCompile Include="Private\Vendors\Vulkan\Sync\IMemoryBarrierVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISamplerVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISamplerVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h">

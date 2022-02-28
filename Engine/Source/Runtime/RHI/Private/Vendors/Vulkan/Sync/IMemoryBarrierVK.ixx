@@ -1,7 +1,7 @@
 module;
 #include <cstdint>
 #include <vulkan/vulkan.h>
-export module RHI.IMemoryBarrierVK;
+export module RHI.IMemoryBarrier.VK;
 import RHI.IMemoryBarrier;
 import RHI.IEnum;
 import RHI.ICommandQueue;
@@ -11,7 +11,7 @@ namespace SIByL
 {
 	namespace RHI
 	{
-        export class IImageMemoryBarrierVK
+        export class IImageMemoryBarrierVK: public IImageMemoryBarrier
         {
         public:
             IImageMemoryBarrierVK(ImageMemoryBarrierDesc const&);
@@ -21,5 +21,7 @@ namespace SIByL
         private:
             VkImageMemoryBarrier barrier{};
         };
+
+        export auto getVkAccessFlags(AccessFlags) noexcept -> VkAccessFlags;
 	}
 }

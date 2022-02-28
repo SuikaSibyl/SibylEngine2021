@@ -104,7 +104,7 @@ namespace SIByL
             COMMAND_PREPROCESS_WRITE_BIT = 0x00040000,
             NONE = 0,
 		};
-        export using AccessFlags = AccessFlagBits;
+        export using AccessFlags = uint32_t;
 
         // ╔══════════════════════════════╗
         // ║     Memory Barrier Desc      ║

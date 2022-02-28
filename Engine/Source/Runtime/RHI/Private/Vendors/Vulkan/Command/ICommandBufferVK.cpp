@@ -30,6 +30,12 @@ import RHI.IPipelineLayout;
 import RHI.IDescriptorSet;
 import RHI.IPipelineLayout.VK;
 import RHI.IDescriptorSet.VK;
+import RHI.IBarrier;
+import RHI.IBarrier.VK;
+import RHI.IMemoryBarrier;
+import RHI.IMemoryBarrier.VK;
+import RHI.ITexture;
+import RHI.ITexture.VK;
 
 namespace SIByL::RHI
 {
@@ -194,4 +200,31 @@ namespace SIByL::RHI
 			*((IPipelineLayoutVK*)pipeline_layout)->getVkPipelineLayout(), 
 			idx_first_descset, count_sets_to_bind, tmp_sets.data(), offset_count, offsets);
 	}
+
+	auto ICommandBufferVK::cmdPipelineBarrier(IBarrier* barrier) noexcept -> void
+	{
+		IBarrierVK* barrier_vk = (IBarrierVK*)barrier;
+		vkCmdPipelineBarrier(
+			commandBuffer,
+			barrier_vk->getSrcStageMask(),
+			barrier_vk->getDstStageMask(),
+			barrier_vk->getDependencyFlags(),
+			barrier_vk->getMemoryBarrierCount(), barrier_vk->getMemoryBarrierData(),
+			barrier_vk->getBufferMemoryBarrierCount(), barrier_vk->getBufferMemoryBarrierData(),
+			barrier_vk->getImageMemoryBarrierCount(), barrier_vk->getImageMemoryBarrierData()
+		);
+	}
+
+	auto ICommandBufferVK::cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy* info) noexcept -> void
+	{
+		vkCmdCopyBufferToImage(
+			commandBuffer,
+			*((IBufferVK*)buffer)->getVkBuffer(),
+			*((ITextureVK*)image)->getVkImage(),
+			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+			1,
+			((IBufferImageCopyVK*)info)->getVkBufferImageCopy()
+		);
+	}
+
 }

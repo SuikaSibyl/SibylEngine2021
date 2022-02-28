@@ -4,6 +4,8 @@ module;
 module RHI.IBarrier.VK;
 import RHI.IBarrier;
 import RHI.IEnum;
+import RHI.IMemoryBarrier;
+import RHI.IMemoryBarrier.VK;
 
 namespace SIByL::RHI
 {
@@ -13,12 +15,18 @@ namespace SIByL::RHI
 	IBarrierVK::IBarrierVK(BarrierDesc const& desc)
 	{
 		srcStageMask = getVkPipelineStageFlags(desc.srcStageMask);
-		srcStageMask = getVkPipelineStageFlags(desc.dstStageMask);
+		dstStageMask = getVkPipelineStageFlags(desc.dstStageMask);
 		dependencyFlags = getVkDependencyTypeFlags(desc.dependencyType);
 
 		// TODO
 		// - memory barrier
 		// - buffer memory barrier
+		// - image memory barrier
+		imageMemoryBarriers.resize(desc.imageMemoryBarriers.size());
+		for (int i = 0; i < imageMemoryBarriers.size(); i++)
+		{
+			imageMemoryBarriers[i] = *((IImageMemoryBarrierVK*)desc.imageMemoryBarriers[i])->getVkImageMemoryBarrier();
+		}
 	}
 
 	auto IBarrierVK::getMemoryBarrierData() noexcept -> VkMemoryBarrier*
@@ -31,7 +39,7 @@ namespace SIByL::RHI
 
 	auto IBarrierVK::getBufferMemoryBarrierData() noexcept -> VkBufferMemoryBarrier*
 	{
-		if (getMemoryBarrierCount())
+		if (getBufferMemoryBarrierCount())
 			return bufferMemoryBarriers.data();
 		else
 			return nullptr;
@@ -39,7 +47,7 @@ namespace SIByL::RHI
 
 	auto IBarrierVK::getImageMemoryBarrierData() noexcept -> VkImageMemoryBarrier*
 	{
-		if (getMemoryBarrierCount())
+		if (getImageMemoryBarrierCount())
 			return imageMemoryBarriers.data();
 		else
 			return nullptr;

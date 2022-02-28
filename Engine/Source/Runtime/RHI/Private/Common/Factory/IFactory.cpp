@@ -11,6 +11,7 @@ import Core.SObject;
 import Core.SPointer;
 import Core.MemoryManager;
 import Core.Buffer;
+import Core.Image;
 
 import RHI.IEnum;
 
@@ -35,6 +36,11 @@ import RHI.IDescriptorSetLayout;
 import RHI.IUniformBuffer;
 import RHI.IDescriptorPool;
 import RHI.IDescriptorSet;
+import RHI.IBarrier;
+import RHI.IMemoryBarrier;
+import RHI.ITexture;
+import RHI.ITextureView;
+import RHI.ISampler;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -56,6 +62,11 @@ import RHI.IDescriptorSetLayout.VK;
 import RHI.IUniformBuffer.VK;
 import RHI.IDescriptorPool.VK;
 import RHI.IDescriptorSet.VK;
+import RHI.IBarrier.VK;
+import RHI.IMemoryBarrier.VK;
+import RHI.ITexture.VK;
+import RHI.ITextureView.VK;
+import RHI.ISampler.VK;
 
 namespace SIByL::RHI
 {
@@ -615,4 +626,138 @@ namespace SIByL::RHI
 		}
 		return ds;
 	}
+
+	auto IResourceFactory::createImageMemoryBarrier(ImageMemoryBarrierDesc const& desc) noexcept -> MemScope<IImageMemoryBarrier>
+	{
+		MemScope<IImageMemoryBarrier> imb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IImageMemoryBarrierVK> imb_vk = MemNew<IImageMemoryBarrierVK>(desc);
+			imb = MemCast<IImageMemoryBarrier>(imb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return imb;
+	}
+
+	auto IResourceFactory::createBarrier(BarrierDesc const& desc) noexcept -> MemScope<IBarrier>
+	{
+		MemScope<IBarrier> barrier = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IBarrierVK> barrier_vk = MemNew<IBarrierVK>(desc);
+			barrier = MemCast<IBarrier>(barrier_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return barrier;
+	}
+
+	auto IResourceFactory::createBufferImageCopy(BufferImageCopyDesc const& desc) noexcept -> MemScope<IBufferImageCopy>
+	{
+		MemScope<IBufferImageCopy> bic = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IBufferImageCopyVK> bic_vk = MemNew<IBufferImageCopyVK>(desc);
+			bic = MemCast<IBufferImageCopy>(bic_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return bic;
+	}
+
+	auto IResourceFactory::createTexture(Image* image) noexcept -> MemScope<ITexture>
+	{
+		MemScope<ITexture> tx = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ITextureVK> tx_vk = MemNew<ITextureVK>(image, (ILogicalDeviceVK*)logicalDevice);
+			tx = MemCast<ITexture>(tx_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return tx;
+	}
+
+	auto IResourceFactory::createTexture(TextureDesc const& desc) noexcept -> MemScope<ITexture>
+	{
+		MemScope<ITexture> tx = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ITextureVK> tx_vk = MemNew<ITextureVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			tx = MemCast<ITexture>(tx_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return tx;
+	}
+
+	auto IResourceFactory::createTextureView(ITexture* texture) noexcept -> MemScope<ITextureView>
+	{
+		MemScope<ITextureView> tv = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ITextureViewVK> tv_vk = MemNew<ITextureViewVK>(texture, (ILogicalDeviceVK*)logicalDevice);
+			tv = MemCast<ITextureView>(tv_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return tv;
+	}
+
+	auto IResourceFactory::createSampler(SamplerDesc const& desc) noexcept -> MemScope<ISampler>
+	{
+		MemScope<ISampler> sampler = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ISamplerVK> sampler_vk = MemNew<ISamplerVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			sampler = MemCast<ISampler>(sampler_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return sampler;
+	}
+
 }

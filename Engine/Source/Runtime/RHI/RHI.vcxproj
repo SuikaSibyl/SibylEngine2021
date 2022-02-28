@@ -168,6 +168,8 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISamplerVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Resource\ISamplerVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\IBarrierVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\IBarrierVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\IFenceVK.cpp" />
