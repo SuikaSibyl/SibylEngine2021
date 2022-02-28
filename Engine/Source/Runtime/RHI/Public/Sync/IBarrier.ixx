@@ -1,7 +1,8 @@
 module;
+#include <vector>
 #include <cstdint>
 export module RHI.IBarrier;
-import Core.SObject;
+import RHI.IMemoryBarrier;
 
 namespace SIByL
 {
@@ -59,12 +60,11 @@ namespace SIByL
 		//
 		// GPU memory write is fistly "available", and only "visible" after cache flushing
 		// That is where we should use a MemoryBarrier
-
-		export class IBarrier :public SObject
+		struct BarrierDesc;
+		export class IBarrier
 		{
 		public:
 			IBarrier() = default;
-			IBarrier(IBarrier&&) = default;
 			virtual ~IBarrier() = default;
 
 		private:
@@ -130,5 +130,36 @@ namespace SIByL
 			COMMAND_PREPROCESS_BIT = 0x00020000,
 		};
 		export using PipelineStageFlags = uint32_t;
+
+		// ╔════════════════════════════╗
+		// ║      Dependency Flags      ║
+		// ╚════════════════════════════╝
+		// Basically, we could use the NONE flag.
+
+		export enum class DependencyTypeFlagBits:uint32_t
+		{
+			NONE = 0x00000000,
+			BY_REGION_BIT = 0x00000001,
+			VIEW_LOCAL_BIT = 0x00000002,
+			DEVICE_GROUP_BIT = 0x00000004,
+		};
+		export using DependencyTypeFlags = uint32_t;
+
+		// ╔════════════════════════╗
+		// ║      Barrier Desc      ║
+		// ╚════════════════════════╝
+		// The Desc will be used to initialize a barrier
+		using namespace std;
+		export struct BarrierDesc
+		{
+			// Necessary (Execution Barrier)
+			PipelineStageFlags	srcStageMask;
+			PipelineStageFlags	dstStageMask;
+			DependencyTypeFlags dependencyType;
+			// Optional (Memory Barriers)
+			vector<IMemoryBarrier*> memoryBarriers;
+			vector<IBufferMemoryBarrier*> bufferMemoryBarriers;
+			vector<IImageMemoryBarrier*> imageMemoryBarriers;
+		};
 	}
 }

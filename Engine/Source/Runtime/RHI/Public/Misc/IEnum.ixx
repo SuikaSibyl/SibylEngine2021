@@ -312,5 +312,7 @@ namespace SIByL
 			READ_ONLY_OPTIMAL,
 			ATTACHMENT_OPTIMAL,
 		};
+
+		export inline auto flagBitSwitch(uint32_t const& input, uint32_t const& flag, uint32_t const& vendor_flag, uint32_t& target) noexcept -> void;
 	}
 }

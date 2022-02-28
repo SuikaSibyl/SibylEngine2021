@@ -52,5 +52,30 @@ namespace SIByL
 			virtual auto transitionImageLayout(ImageLayout new_layout) noexcept -> void = 0;
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> = 0;
 		};
+
+		export enum class ImageAspectFlagBits :uint32_t
+		{
+			COLOR_BIT = 0x00000001,
+			DEPTH_BIT = 0x00000002,
+			STENCIL_BIT = 0x00000004,
+			METADATA_BIT = 0x00000008,
+			PLANE_0_BIT = 0x00000010,
+			PLANE_1_BIT = 0x00000020,
+			PLANE_2_BIT = 0x00000040,
+			MEMORY_PLANE_0_BIT = 0x00000080,
+			MEMORY_PLANE_1_BIT = 0x00000100,
+			MEMORY_PLANE_2_BIT = 0x00000200,
+			MEMORY_PLANE_3_BIT = 0x00000400,
+		};
+		export using ImageAspectFlags = uint32_t;
+
+		export struct ImageSubresourceRange {
+			ImageAspectFlags aspectMask;
+			uint32_t baseMipLevel;
+			uint32_t levelCount;
+			uint32_t baseArrayLayer;
+			uint32_t layerCount;
+		};
+
 	}
 }

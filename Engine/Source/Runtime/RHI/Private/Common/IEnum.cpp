@@ -39,5 +39,13 @@ namespace SIByL
 			}
 			return 0;
 		};
+
+		inline auto flagBitSwitch(uint32_t const& input, uint32_t const& flag, uint32_t const& vendor_flag, uint32_t& target) noexcept -> void
+		{
+			if (input & flag)
+			{
+				target |= vendor_flag;
+			}
+		}
 	}
 }

@@ -1,6 +1,6 @@
 module;
 
-export module RHI.IQueue;
+export module RHI.ICommandQueue;
 import Core.SObject;
 
 namespace SIByL

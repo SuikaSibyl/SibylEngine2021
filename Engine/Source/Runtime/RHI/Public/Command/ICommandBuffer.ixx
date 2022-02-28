@@ -66,7 +66,16 @@ namespace SIByL
 		// 
 		// Previously you would declare what you wanted the GPU to execute procedurally and it would do those tasks, 
 		// but GPUs are inherently asynchronous, so the driver would have been responsible for figuring out when to schedule tasks to the GPU.
-
+		//
+		//  ╭╱───────────────────────────────╲╮
+		//  ╳    Implicit Memory Guarantee    ╳
+		//  ╰╲───────────────────────────────╱╯
+		// Submitting commands to a queue makes all memory acess 
+		// performed by host visible to all stages and access masks.
+		// 
+		// Basically submitting a batch issues a cache invalidation on 
+		// host visible memory.
+		//
 		export class ICommandBuffer :public IResource
 		{
 		public:

@@ -349,14 +349,6 @@ namespace SIByL::RHI
 		return VK_SHARING_MODE_MAX_ENUM;
 	}
 
-	inline auto flagBitSwitch(uint32_t const& input, uint32_t const& flag, uint32_t const& vendor_flag, uint32_t& target) noexcept -> void
-	{
-		if (input & flag)
-		{
-			target |= vendor_flag;
-		}
-	}
-
 	inline auto getVkMemoryProperty(MemoryPropertyFlags usage) noexcept -> VkMemoryPropertyFlags
 	{
 		uint32_t flags{};

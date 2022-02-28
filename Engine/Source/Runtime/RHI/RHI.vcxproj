@@ -168,8 +168,12 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandBufferVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\IBarrierVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\IBarrierVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\IFenceVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\IFenceVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\IMemoryBarrierVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Sync\IMemoryBarrierVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\ISemaphoreVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Sync\ISemaphoreVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Device\IGraphicContextVK.cpp" />
