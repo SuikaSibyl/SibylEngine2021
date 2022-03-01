@@ -13,6 +13,7 @@ namespace SIByL
 		export class IGraphicContextVK :public IGraphicContext
 		{
 		public:
+			IGraphicContextVK();
 			static auto getVKInstance() -> VkInstance&;
 			// SObject
 			virtual auto initialize() -> bool;

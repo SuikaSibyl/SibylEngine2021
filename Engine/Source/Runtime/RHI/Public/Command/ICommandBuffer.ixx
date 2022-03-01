@@ -93,6 +93,7 @@ namespace SIByL
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void = 0;
 			virtual auto cmdEndRenderPass() noexcept -> void = 0;
 			virtual auto cmdBindPipeline(IPipeline* pipeline) noexcept -> void = 0;
+			virtual auto cmdBindComputePipeline(IPipeline* pipeline) noexcept -> void = 0;
 			virtual auto cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void = 0;
 			virtual auto cmdBindIndexBuffer(IIndexBuffer* buffer) noexcept -> void = 0;
 			virtual auto cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
@@ -103,6 +104,7 @@ namespace SIByL
 			virtual auto cmdBindDescriptorSets(PipelineBintPoint point, IPipelineLayout* pipeline_layout, uint32_t const& idx_first_descset, uint32_t const& count_sets_to_bind, IDescriptorSet** sets, uint32_t const&, uint32_t const*) noexcept -> void = 0;
 			virtual auto cmdPipelineBarrier(IBarrier* barrier) noexcept -> void = 0;
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void = 0;
+			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void = 0;
 		};
 	}
 }

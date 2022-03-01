@@ -14,14 +14,14 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		auto createImageView(VkImage image, VkFormat format, VkImageView* imageView, ILogicalDeviceVK* logical_device) noexcept -> void
+		auto createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView* imageView, ILogicalDeviceVK* logical_device) noexcept -> void
 		{
 			VkImageViewCreateInfo viewInfo{};
 			viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			viewInfo.image = image;
 			viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
 			viewInfo.format = format;
-			viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			viewInfo.subresourceRange.aspectMask = aspectMask;
 			viewInfo.subresourceRange.baseMipLevel = 0;
 			viewInfo.subresourceRange.levelCount = 1;
 			viewInfo.subresourceRange.baseArrayLayer = 0;
@@ -39,7 +39,28 @@ namespace SIByL
 		ITextureViewVK::ITextureViewVK(ITexture* texture, ILogicalDeviceVK* _logical_device)
 			:logicalDevice(_logical_device)
 		{
-			createImageView(*((ITextureVK*)texture)->getVkImage(), getVKFormat(((ITextureVK*)texture)->getDescription().format), &imageView, logicalDevice);
+			ResourceFormat format = ((ITextureVK*)texture)->getDescription().format;
+			VkImageAspectFlags accessMask = {};
+			switch (format)
+			{
+			case SIByL::RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT:
+			case SIByL::RHI::ResourceFormat::FORMAT_D32_SFLOAT_S8_UINT:
+				accessMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+				break;
+			case SIByL::RHI::ResourceFormat::FORMAT_D32_SFLOAT:
+				accessMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+				break;
+			case SIByL::RHI::ResourceFormat::FORMAT_R8G8B8A8_SRGB:
+			case SIByL::RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB:
+			case SIByL::RHI::ResourceFormat::FORMAT_B8G8R8A8_RGB:
+				accessMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				break;
+			default:
+				SE_CORE_ERROR("VULKAN :: Image layout transition :: unsupported layout transition!");
+				break;
+			}
+
+			createImageView(*((ITextureVK*)texture)->getVkImage(), getVKFormat(((ITextureVK*)texture)->getDescription().format), accessMask, &imageView, logicalDevice);
 		}
 
 		ITextureViewVK::~ITextureViewVK()

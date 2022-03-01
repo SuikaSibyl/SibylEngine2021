@@ -1,0 +1,19 @@
+ #version 450
+ 
+layout(set = 0, binding = 0, std430) buffer Positions
+{
+    vec3 pos[];
+} positions;
+
+layout(set = 0, binding = 1, std430) buffer Velocity
+{
+    vec3 vel[];
+} velocities;
+
+layout (local_size_x =32) in;
+
+void main()
+{
+    positions.pos[gl_GlobalInvocationID.x] = vec3(gl_GlobalInvocationID.x,0, 0);
+    velocities.vel[gl_GlobalInvocationID.x] = vec3(sin(gl_GlobalInvocationID.x), cos(gl_GlobalInvocationID.x),0);
+}

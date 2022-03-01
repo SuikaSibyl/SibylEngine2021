@@ -31,6 +31,7 @@ import Core.File;
 import Core.Log;
 import Core.Time;
 import Core.Image;
+import Core.Color;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -58,6 +59,8 @@ import RHI.IDescriptorSet;
 import RHI.ITexture;
 import RHI.ITextureView;
 import RHI.ISampler;
+import RHI.IStorageBuffer;
+import RHI.IBarrier;
 
 import UAT.IUniversalApplication;
 
@@ -93,20 +96,25 @@ public:
 		};
 		WindowLayer* window_layer = attachWindowLayer(window_layer_desc);
 
-		graphicContext.reset(RHI::IFactory::createGraphicContext({ RHI::API::VULKAN }));
+		// create device
+		graphicContext = (RHI::IFactory::createGraphicContext({ RHI::API::VULKAN }));
 		graphicContext->attachWindow(window_layer->getWindow());
-		physicalDevice.reset(RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
-		logicalDevice.reset(RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
-
+		physicalDevice = (RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
+		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
+
 		// shader resources
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
-		Buffer shader_vert, shader_frag;
-		shaderLoader.syncReadAll("vs_sampler.spv", shader_vert);
+		Buffer shader_vert, shader_frag, shader_comp, shader_comp_init;
+		shaderLoader.syncReadAll("vs_particle.spv", shader_vert);
 		shaderLoader.syncReadAll("fs_sampler.spv", shader_frag);
+		shaderLoader.syncReadAll("particle.spv", shader_comp);
+		shaderLoader.syncReadAll("init.spv", shader_comp_init);
 		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
+		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
+		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
 		// vertex buffer
 		const std::vector<Vertex> vertices = {
 			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
@@ -145,14 +153,16 @@ public:
 			// create pool
 			RHI::DescriptorPoolDesc descriptor_pool_desc =
 			{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT},
-			   {RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, MAX_FRAMES_IN_FLIGHT}}, // set types
-				MAX_FRAMES_IN_FLIGHT }; // total sets
+			   {RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, MAX_FRAMES_IN_FLIGHT},
+			   {RHI::DescriptorType::STORAGE_BUFFER, 4 * MAX_FRAMES_IN_FLIGHT}}, // set types
+				2 * MAX_FRAMES_IN_FLIGHT }; // total sets
 			descriptorPool = resourceFactory->createDescriptorPool(descriptor_pool_desc);
 
 			// create desc layout
 			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
 			{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-			   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr }} };
+			   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
+			   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr }} };
 			desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
 
 			// create sets
@@ -174,11 +184,65 @@ public:
 			{ {desciptor_set_layout.get()} };
 			pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
 		}
+		// compute stuff
+		{
+			// create storage buffers
+			storageBuffer_1 = resourceFactory->createStorageBuffer(sizeof(float) * 3 * 32);
+			storageBuffer_2 = resourceFactory->createStorageBuffer(sizeof(float) * 3 * 32);
+
+			// create descriptor set layout
+			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
+			{ {{ 0, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+			   { 1, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT, nullptr }} };
+			compute_desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
+
+			// create pipeline layout
+			RHI::PipelineLayoutDesc pipelineLayout_desc =
+			{ {compute_desciptor_set_layout.get()} };
+			compute_pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
+
+			// create comput pipeline
+			RHI::ComputePipelineDesc pipeline_desc =
+			{
+				compute_pipeline_layout.get(),
+				shaderCompute.get()
+			};
+			
+			// create descriptor set
+			compute_descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			RHI::DescriptorSetDesc descriptor_set_desc =
+			{	descriptorPool.get(),
+				compute_desciptor_set_layout.get() };
+			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+				compute_descriptorSets[i] = resourceFactory->createDescriptorSet(descriptor_set_desc);
+
+			// configure descriptors in sets
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+				compute_descriptorSets[i]->update(storageBuffer_1.get(), 0, 0);
+				compute_descriptorSets[i]->update(storageBuffer_2.get(), 1, 0);
+				descriptorSets[i]->update(storageBuffer_1.get(), 2, 0);
+			}
+
+			computePipeline = resourceFactory->createPipeline(pipeline_desc);
+			pipeline_desc.shader = shaderComputeInit.get();
+			initcomputePipeline = resourceFactory->createPipeline(pipeline_desc);
+
+			compute_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
+				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+				});
+
+			compute_barrier_2 = resourceFactory->createBarrier(RHI::BarrierDesc{
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
+				0,
+
+				});
+		}
 
 		// create swapchain & related ...
 		swapchain = resourceFactory->createSwapchain({});
 		createModifableResource();
-
 
 		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
 		commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -192,6 +256,23 @@ public:
 			renderFinishedSemaphore[i] = resourceFactory->createSemaphore();
 			inFlightFence[i] = resourceFactory->createFence();
 		}
+
+
+		// init storage buffer
+		RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getTransientCommandPool();
+		MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
+		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+
+		RHI::IDescriptorSet* compute_tmp_set = compute_descriptorSets[0].get();
+		transientCommandbuffer->cmdBindComputePipeline(initcomputePipeline.get());
+		transientCommandbuffer->cmdBindDescriptorSets(RHI::PipelineBintPoint::COMPUTE,
+			compute_pipeline_layout.get(), 0, 1, &compute_tmp_set, 0, nullptr);
+		transientCommandbuffer->cmdDispatch(1, 1, 1);
+
+		transientCommandbuffer->endRecording();
+		transientCommandbuffer->submit();
+		logicalDevice->waitIdle();
+
 
 		timer.start();
 
@@ -262,10 +343,33 @@ public:
 
 
 		RHI::RenderPassDesc renderpass_desc =
-		{
-			RHI::SampleCount::COUNT_1_BIT,
-			RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB,
-		};
+		{{
+				// color attachment
+				{
+					RHI::SampleCount::COUNT_1_BIT,
+					RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB,
+					RHI::AttachmentLoadOp::CLEAR,
+					RHI::AttachmentStoreOp::STORE,
+					RHI::AttachmentLoadOp::DONT_CARE,
+					RHI::AttachmentStoreOp::DONT_CARE,
+					RHI::ImageLayout::UNDEFINED,
+					RHI::ImageLayout::PRESENT_SRC,
+					{0,0,0,1}
+				},
+			},
+			{				// depth attachment
+				{
+					RHI::SampleCount::COUNT_1_BIT,
+					RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT,
+					RHI::AttachmentLoadOp::CLEAR,
+					RHI::AttachmentStoreOp::DONT_CARE,
+					RHI::AttachmentLoadOp::DONT_CARE,
+					RHI::AttachmentStoreOp::DONT_CARE,
+					RHI::ImageLayout::UNDEFINED,
+					RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA,
+					{1,0}
+				},
+			} };
 		renderPass = resourceFactory->createRenderPass(renderpass_desc);
 
 		RHI::PipelineDesc pipeline_desc =
@@ -291,7 +395,7 @@ public:
 				extend.width,
 				extend.height,
 				renderPass.get(),
-				{swapchain->getITextureView(i)},
+				{swapchain->getITextureView(i), depthView.get()},
 			};
 			framebuffers.emplace_back(resourceFactory->createFramebuffer(framebuffer_desc));
 		}
@@ -350,8 +454,16 @@ public:
 			RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
 			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
 				pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
-			commandbuffers[currentFrame]->cmdDrawIndexed(12, 1, 0, 0, 0);
+			commandbuffers[currentFrame]->cmdDrawIndexed(12, 32, 0, 0, 0);
 			commandbuffers[currentFrame]->cmdEndRenderPass();
+
+			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier.get());
+			RHI::IDescriptorSet* compute_tmp_set = compute_descriptorSets[currentFrame].get();
+			commandbuffers[currentFrame]->cmdBindComputePipeline(computePipeline.get());
+			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::COMPUTE,
+				compute_pipeline_layout.get(), 0, 1, &compute_tmp_set, 0, nullptr);
+			commandbuffers[currentFrame]->cmdDispatch(1, 1, 1);
+
 			commandbuffers[currentFrame]->endRecording();
 			//	4. Submit the recorded command buffer
 			commandbuffers[currentFrame]->submit(imageAvailableSemaphore[currentFrame].get(), renderFinishedSemaphore[currentFrame].get(), inFlightFence[currentFrame].get());
@@ -367,23 +479,27 @@ public:
 	virtual void onShutdown() override
 	{
 		logicalDevice->waitIdle();
-		RHI::DeviceToGlobal::releaseGlobal();
+		RHI::DeviceToGlobal::removeDevice(logicalDevice.get());
 	}
 
 private:
 	Timer timer;
 	uint32_t currentFrame = 0;
 
-	Scope<RHI::IGraphicContext> graphicContext;
-	Scope<RHI::IPhysicalDevice> physicalDevice;
-	Scope<RHI::ILogicalDevice> logicalDevice;
+	MemScope<RHI::IGraphicContext> graphicContext;
+	MemScope<RHI::IPhysicalDevice> physicalDevice;
+	MemScope<RHI::ILogicalDevice> logicalDevice;
 
 	MemScope<RHI::IResourceFactory> resourceFactory;
 	MemScope<RHI::IShader> shaderVert;
 	MemScope<RHI::IShader> shaderFrag;
+	MemScope<RHI::IShader> shaderCompute;
+	MemScope<RHI::IShader> shaderComputeInit;
 
 	MemScope<RHI::IVertexBuffer> vertexBuffer;
 	MemScope<RHI::IIndexBuffer> indexBuffer;
+	MemScope<RHI::IStorageBuffer> storageBuffer_1;
+	MemScope<RHI::IStorageBuffer> storageBuffer_2;
 	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;
 
 	MemScope<RHI::ITexture> texture;
@@ -397,9 +513,17 @@ private:
 	MemScope<RHI::IPipelineLayout> pipeline_layout;
 	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
+	MemScope<RHI::IBarrier> compute_barrier;
+	MemScope<RHI::IBarrier> compute_barrier_2;
+	MemScope<RHI::IPipelineLayout> compute_pipeline_layout;
+	MemScope<RHI::IDescriptorSetLayout> compute_desciptor_set_layout;
+	std::vector<MemScope<RHI::IDescriptorSet>> compute_descriptorSets;
+
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;
 	MemScope<RHI::IPipeline> pipeline;
+	MemScope<RHI::IPipeline> computePipeline;
+	MemScope<RHI::IPipeline> initcomputePipeline;
 	std::vector<MemScope<RHI::IFramebuffer>> framebuffers;
 
 	MemScope<RHI::ICommandPool> commandPool;

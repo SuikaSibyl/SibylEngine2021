@@ -1,0 +1,22 @@
+ #version 450
+ 
+ layout (local_size_x = 256) in;
+
+ layout(set = 0, binding = 0) buffer StorageBuffer
+ {
+    float data[];
+ } block;
+ 
+ void main()
+ {
+     //获取全局的ID，可以用来定位操作的数据，
+     //当然也可以通过gl_LocalInvocationID来获取当前工作组内的ID
+     uint gID = gl_GlobalInvocationID.x;
+     //利用全局ID对buffer进行写入
+     //可以这么做的原因是：
+     //我们将定义一块1024*sizeof(float)大小的buffer
+     //并把工作拆分为4组，每组负责256个float（与local_size_x对应）
+     //由于此shader一共会被调用1024次（4 x 256）
+     //他的globalID将会从0 -> 1023正好对应1024个float
+     block.data[gID] *= 2.0f; 
+ }

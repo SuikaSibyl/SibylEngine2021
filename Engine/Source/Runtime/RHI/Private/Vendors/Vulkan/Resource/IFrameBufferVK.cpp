@@ -4,6 +4,7 @@ module;
 #include <vulkan/vulkan.h>
 module RHI.IFramebuffer.VK;
 import Core.Log;
+import Core.Color;
 import RHI.IResource;
 import RHI.IFramebuffer;
 import RHI.IRenderPass;

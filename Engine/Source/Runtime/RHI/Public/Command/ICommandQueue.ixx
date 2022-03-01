@@ -1,7 +1,8 @@
 module;
-
+#include <cstdint>
 export module RHI.ICommandQueue;
 import Core.SObject;
+import RHI.IEnum;
 
 namespace SIByL
 {
@@ -33,7 +34,6 @@ namespace SIByL
 		public:
 			ICommandQueue() = default;
 			virtual ~ICommandQueue() = default;
-
 		};
 	}
 }

@@ -41,6 +41,7 @@ import RHI.IMemoryBarrier;
 import RHI.ITexture;
 import RHI.ITextureView;
 import RHI.ISampler;
+import RHI.IStorageBuffer;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -67,36 +68,41 @@ import RHI.IMemoryBarrier.VK;
 import RHI.ITexture.VK;
 import RHI.ITextureView.VK;
 import RHI.ISampler.VK;
+import RHI.IStorageBuffer.VK;
 
 namespace SIByL::RHI
 {
-	auto IFactory::createGraphicContext(GraphicContextDesc const& desc) noexcept -> IGraphicContext*
+	auto IFactory::createGraphicContext(GraphicContextDesc const& desc) noexcept -> MemScope<IGraphicContext>
 	{
-		IGraphicContext* res = nullptr;
+		MemScope<IGraphicContext> res = nullptr;
 		switch (desc.api)
 		{
 		case API::VULKAN:
+		{
+			MemScope<IGraphicContextVK> res_vk = MemNew<IGraphicContextVK>();
+			res = MemCast<IGraphicContext>(res_vk);
 			res = SNew<IGraphicContextVK>();
-			break;
+			res->setAPI(desc.api);
+		}
+		break;
 		case API::DX12:
 			break;
 		default:
 			break;
 		}
-		if (res != nullptr)
-		{
-			res->setAPI(desc.api);
-		}
 		return res;
 	}
 
-	auto IFactory::createPhysicalDevice(PhysicalDeviceDesc const& desc) noexcept -> IPhysicalDevice*
+	auto IFactory::createPhysicalDevice(PhysicalDeviceDesc const& desc) noexcept -> MemScope<IPhysicalDevice>
 	{
-		IPhysicalDevice* res = nullptr;
+		MemScope<IPhysicalDevice> res = nullptr;
 		switch (desc.context->getAPI())
 		{
 		case API::VULKAN:
-			res = SNew<IPhysicalDeviceVK>(desc.context);
+		{
+			MemScope<IPhysicalDeviceVK> res_vk = MemNew<IPhysicalDeviceVK>(desc.context);
+			res = MemCast<IPhysicalDevice>(res_vk);
+		}
 			break;
 		case API::DX12:
 			break;
@@ -106,14 +112,17 @@ namespace SIByL::RHI
 		return res;
 	}
 
-	auto IFactory::createLogicalDevice(LogicalDeviceDesc const& desc) noexcept -> ILogicalDevice*
+	auto IFactory::createLogicalDevice(LogicalDeviceDesc const& desc) noexcept -> MemScope<ILogicalDevice>
 	{
 		IPhysicalDevice* physical_device = desc.physicalDevice;
-		ILogicalDevice* res = nullptr;
+		MemScope<ILogicalDevice> res = nullptr;
 		switch (physical_device->getGraphicContext()->getAPI())
 		{
 		case API::VULKAN:
-			res = SNew<ILogicalDeviceVK>((IPhysicalDeviceVK*)physical_device);
+		{
+			MemScope<ILogicalDeviceVK> res_vk = MemNew<ILogicalDeviceVK>((IPhysicalDeviceVK*)physical_device);
+			res = MemCast<ILogicalDevice>(res_vk);
+		}
 			break;
 		case API::DX12:
 			break;
@@ -418,6 +427,25 @@ namespace SIByL::RHI
 		return rp;
 	}
 
+	auto IResourceFactory::createPipeline(ComputePipelineDesc const& desc) noexcept -> MemScope<IPipeline>
+	{
+		MemScope<IPipeline> rp = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IPipelineVK> rp_vk = MemNew<IPipelineVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			rp = MemCast<IPipeline>(rp_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return rp;
+	}
+
 	auto IResourceFactory::createFramebuffer(FramebufferDesc const& desc) noexcept -> MemScope<IFramebuffer>
 	{
 		MemScope<IFramebuffer> fb = nullptr;
@@ -587,6 +615,25 @@ namespace SIByL::RHI
 			break;
 		}
 		return ub;
+	}
+
+	auto IResourceFactory::createStorageBuffer(uint32_t const& size) noexcept -> MemScope<IStorageBuffer>
+	{
+		MemScope<IStorageBuffer> sb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IStorageBufferVK> sb_vk = MemNew<IStorageBufferVK>(size, (ILogicalDeviceVK*)logicalDevice);
+			sb = MemCast<IStorageBuffer>(sb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return sb;
 	}
 
 	auto IResourceFactory::createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>

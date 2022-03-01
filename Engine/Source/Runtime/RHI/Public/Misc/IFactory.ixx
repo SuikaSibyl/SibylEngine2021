@@ -32,6 +32,7 @@ import RHI.IMemoryBarrier;
 import RHI.ITexture;
 import RHI.ITextureView;
 import RHI.ISampler;
+import RHI.IStorageBuffer;
 
 namespace SIByL
 {
@@ -55,9 +56,9 @@ namespace SIByL
 		export class IFactory
 		{
 		public:
-			static auto createGraphicContext(GraphicContextDesc const& desc) noexcept -> IGraphicContext*;
-			static auto createPhysicalDevice(PhysicalDeviceDesc const& desc) noexcept -> IPhysicalDevice*;
-			static auto createLogicalDevice(LogicalDeviceDesc const& desc) noexcept -> ILogicalDevice*;
+			static auto createGraphicContext(GraphicContextDesc const& desc) noexcept -> MemScope<IGraphicContext>;
+			static auto createPhysicalDevice(PhysicalDeviceDesc const& desc) noexcept -> MemScope<IPhysicalDevice>;
+			static auto createLogicalDevice(LogicalDeviceDesc const& desc) noexcept -> MemScope<ILogicalDevice>;
 		};
 
 		export class IResourceFactory
@@ -84,6 +85,7 @@ namespace SIByL
 			auto createPipelineLayout(PipelineLayoutDesc const& desc) noexcept -> MemScope<IPipelineLayout>;
 			auto createRenderPass(RenderPassDesc const& desc) noexcept -> MemScope<IRenderPass>;
 			auto createPipeline(PipelineDesc const& desc) noexcept -> MemScope<IPipeline>;
+			auto createPipeline(ComputePipelineDesc const& desc) noexcept -> MemScope<IPipeline>;
 			auto createFramebuffer(FramebufferDesc const& desc) noexcept -> MemScope<IFramebuffer>;
 			auto createCommandPool(CommandPoolDesc const& desc) noexcept -> MemScope<ICommandPool>;
 			auto createCommandBuffer(ICommandPool* cmd_pool) noexcept -> MemScope<ICommandBuffer>;
@@ -93,6 +95,7 @@ namespace SIByL
 			auto createIndexBuffer(Buffer* buffer, uint32_t element_size) noexcept -> MemScope<IIndexBuffer>;
 			auto createDescriptorSetLayout(DescriptorSetLayoutDesc const& desc) noexcept -> MemScope<IDescriptorSetLayout>;
 			auto createUniformBuffer(uint32_t const& size) noexcept -> MemScope<IUniformBuffer>;
+			auto createStorageBuffer(uint32_t const& size) noexcept -> MemScope<IStorageBuffer>;
 			auto createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>;
 			auto createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>;
 			auto createImageMemoryBarrier(ImageMemoryBarrierDesc const& desc) noexcept -> MemScope<IImageMemoryBarrier>;

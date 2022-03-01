@@ -8,6 +8,7 @@ import RHI.IResource.VK;
 import RHI.ILogicalDevice.VK;
 import RHI.ITextureView;
 import RHI.ITextureView.VK;
+import RHI.IMemoryBarrier;
 
 namespace SIByL
 {
@@ -28,7 +29,7 @@ namespace SIByL
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> override;
 			auto getVkImage() noexcept -> VkImage* { return &image; }
 			virtual auto getDescription() noexcept -> TextureDesc const& override { return desc; }
-
+			
 		private:
 			TextureDesc desc;
 			ILogicalDeviceVK* logicalDevice;

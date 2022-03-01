@@ -146,12 +146,19 @@ namespace SIByL::RHI
 		transitionImageLayout(ImageLayout::TRANSFER_DST_OPTIMAL, ImageLayout::SHADER_READ_ONLY_OPTIMAL);
 	}
 
+	auto hasDepthComponent(ResourceFormat format) noexcept -> bool
+	{
+		return (format == ResourceFormat::FORMAT_D32_SFLOAT_S8_UINT || format ==  ResourceFormat::FORMAT_D32_SFLOAT || format == ResourceFormat::FORMAT_D24_UNORM_S8_UINT);
+	}
+
 	ITextureVK::ITextureVK(TextureDesc const& _desc, ILogicalDeviceVK* _logical_device)
 		: logicalDevice(_logical_device)
 		, desc(_desc)
 	{
 		createVkImage(desc, &this->image, &deviceMemory, logicalDevice);
-		transitionImageLayout(ImageLayout::UNDEFINED, ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA);
+		// layout changement
+		if (hasDepthComponent(desc.format))
+			transitionImageLayout(ImageLayout::UNDEFINED, ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA);
 	}
 
 	ITextureVK::ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device)

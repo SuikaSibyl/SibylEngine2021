@@ -14,6 +14,8 @@ import RHI.ITextureView;
 import RHI.ITextureView.VK;
 import RHI.ISampler;
 import RHI.ISampler.VK;
+import RHI.IStorageBuffer;
+import RHI.IStorageBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -70,6 +72,29 @@ namespace SIByL::RHI
 		descriptorWrite.dstBinding = binding;
 		descriptorWrite.dstArrayElement = array_element;
 		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrite.descriptorCount = 1;
+		descriptorWrite.pBufferInfo = &bufferInfo;
+		descriptorWrite.pImageInfo = nullptr; // Optional
+		descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+		vkUpdateDescriptorSets(logicalDevice->getDeviceHandle(), 1, &descriptorWrite, 0, nullptr);
+	}
+
+	auto IDescriptorSetVK::update(IStorageBuffer* storage_buffer, uint32_t const& binding, uint32_t const& array_element) noexcept -> void
+	{
+		IStorageBufferVK* storage_buffer_VK = (IStorageBufferVK*)storage_buffer;
+
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = *storage_buffer_VK->getVkBuffer();
+		bufferInfo.offset = 0;
+		bufferInfo.range = storage_buffer_VK->getSize();
+
+		VkWriteDescriptorSet descriptorWrite{};
+		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrite.dstSet = set;
+		descriptorWrite.dstBinding = binding;
+		descriptorWrite.dstArrayElement = array_element;
+		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 		descriptorWrite.descriptorCount = 1;
 		descriptorWrite.pBufferInfo = &bufferInfo;
 		descriptorWrite.pImageInfo = nullptr; // Optional

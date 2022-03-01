@@ -118,9 +118,8 @@ namespace SIByL::RHI
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = VkExtent2D{ width, height };
 
-		VkClearValue clearColor = { {{0.0f, 0.0f, 0.0f, 1.0f}} };
-		renderPassInfo.clearValueCount = 1;
-		renderPassInfo.pClearValues = &clearColor;
+		renderPassInfo.clearValueCount = static_cast<IRenderPassVK*>(render_pass)->getVkClearValueSize();
+		renderPassInfo.pClearValues = static_cast<IRenderPassVK*>(render_pass)->getVkClearValues();
 
 		vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
@@ -133,6 +132,12 @@ namespace SIByL::RHI
 	auto ICommandBufferVK::cmdBindPipeline(IPipeline* pipeline) noexcept -> void
 	{
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, 
+			*static_cast<IPipelineVK*>(pipeline)->getVkPipeline());
+	}
+
+	auto ICommandBufferVK::cmdBindComputePipeline(IPipeline* pipeline) noexcept -> void
+	{
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE,
 			*static_cast<IPipelineVK*>(pipeline)->getVkPipeline());
 	}
 
@@ -227,4 +232,8 @@ namespace SIByL::RHI
 		);
 	}
 
+	auto ICommandBufferVK::cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void
+	{
+		vkCmdDispatch(commandBuffer, x, y, z);
+	}
 }

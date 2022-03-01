@@ -7,6 +7,7 @@ import RHI.IDescriptorPool;
 import RHI.IUniformBuffer;
 import RHI.ITextureView;
 import RHI.ISampler;
+import RHI.IStorageBuffer;
 
 namespace SIByL
 {
@@ -31,6 +32,7 @@ namespace SIByL
 			virtual ~IDescriptorSet() = default;
 
 			virtual auto update(IUniformBuffer* uniform_buffer, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
+			virtual auto update(IStorageBuffer* uniform_buffer, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
 			virtual auto update(ITextureView* texture_view, ISampler* sampler, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
 
 		private:

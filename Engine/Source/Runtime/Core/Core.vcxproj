@@ -176,6 +176,7 @@
     <ClCompile Include="Public\Application.ixx" />
     <ClCompile Include="Public\Assert.ixx" />
     <ClCompile Include="Public\Buffer.ixx" />
+    <ClCompile Include="Public\Color.ixx" />
     <ClCompile Include="Public\Core.ixx" />
     <ClCompile Include="Public\Enums.ixx" />
     <ClCompile Include="Public\Event.ixx" />

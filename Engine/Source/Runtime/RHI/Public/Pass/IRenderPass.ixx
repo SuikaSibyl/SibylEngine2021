@@ -1,6 +1,9 @@
 module;
+#include <cstdint>
+#include <vector>
 export module RHI.IRenderPass;
 import Core.SObject;
+import Core.Color;
 import RHI.IEnum;
 
 namespace SIByL
@@ -18,12 +21,6 @@ namespace SIByL
 		// │  OpenGL      │                 │
 		// ╰──────────────┴─────────────────╯
 
-		export struct RenderPassDesc
-		{
-			SampleCount samples;
-			ResourceFormat format;
-		};
-
 		export class IRenderPass :public SObject
 		{
 		public:
@@ -32,6 +29,38 @@ namespace SIByL
 			virtual ~IRenderPass() = default;
 
 
+		};
+
+		export enum class AttachmentLoadOp :uint32_t
+		{
+			LOAD,
+			CLEAR,
+			DONT_CARE,
+		};
+		
+		export enum class AttachmentStoreOp :uint32_t
+		{
+			STORE,
+			DONT_CARE,
+		};
+
+		export struct AttachmentDesc
+		{
+			SampleCount samples;
+			ResourceFormat format;
+			AttachmentLoadOp loadOp;
+			AttachmentStoreOp storeOp;
+			AttachmentLoadOp stencilLoadOp;
+			AttachmentStoreOp stencilStoreOp;
+			ImageLayout initalLayout;
+			ImageLayout finalLayout;
+			ColorFloat4 clearColor;
+		};
+
+		export struct RenderPassDesc
+		{
+			std::vector<AttachmentDesc> colorAttachments;
+			std::vector<AttachmentDesc> depthstencialAttachments;
 		};
 	}
 }

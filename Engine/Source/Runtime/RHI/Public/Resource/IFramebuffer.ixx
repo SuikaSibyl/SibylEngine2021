@@ -2,6 +2,7 @@ module;
 #include <cstdint>
 #include <vector>
 export module RHI.IFramebuffer;
+import Core.Color;
 import RHI.IResource;
 import RHI.ITextureView;
 import RHI.IRenderPass;

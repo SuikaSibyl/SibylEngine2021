@@ -76,11 +76,14 @@ namespace SIByL
 			return windowAttached;
 		}
 
-		auto IGraphicContextVK::initialize() -> bool
+		IGraphicContextVK::IGraphicContextVK()
 		{
 			createInstance();
 			setupDebugMessenger();
+		}
 
+		auto IGraphicContextVK::initialize() -> bool
+		{
 			return true;
 		}
 

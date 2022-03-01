@@ -19,6 +19,7 @@ namespace SIByL
 		{
 		public:
 			IPipelineVK(PipelineDesc const& desc, ILogicalDeviceVK* logical_device);
+			IPipelineVK(ComputePipelineDesc const& desc, ILogicalDeviceVK* logical_device);
 			IPipelineVK(IPipelineVK&&) = default;
 			virtual ~IPipelineVK();
 
@@ -29,6 +30,7 @@ namespace SIByL
 			VkPipeline graphicsPipeline;
 			PipelineDesc desc;
 			auto createVkPipeline() noexcept -> void;
+			auto createVkComputePipeline(ComputePipelineDesc const& desc) noexcept -> void;
 		};
 	}
 }

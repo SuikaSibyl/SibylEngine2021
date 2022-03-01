@@ -25,6 +25,7 @@ namespace SIByL
 			auto getPhysicalDeviceVk() noexcept -> IPhysicalDeviceVK*;
 			auto getVkGraphicQueue() noexcept -> VkQueue*;
 			auto getVkPresentQueue() noexcept -> VkQueue*;
+			auto getVkComputeQueue() noexcept -> VkQueue*;
 
 			auto allocMemory(
 				VkMemoryRequirements* memRequirements,
@@ -36,6 +37,7 @@ namespace SIByL
 			VkDevice device;
 			VkQueue graphicsQueue;
 			VkQueue presentQueue;
+			VkQueue computeQueue;
 
 		private:
 			auto createLogicalDevice(IPhysicalDeviceVK* physicalDevice) noexcept -> void;

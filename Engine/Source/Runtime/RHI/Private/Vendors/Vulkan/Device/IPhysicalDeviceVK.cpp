@@ -19,12 +19,12 @@ namespace SIByL::RHI
 	IPhysicalDeviceVK::IPhysicalDeviceVK(IGraphicContext* context)
 	{
 		graphicContext = dynamic_cast<IGraphicContextVK*>(context);
+		enableDebugLayer = enableValidationLayers;
+		queryAllPhysicalDevice();
 	}
 
 	auto IPhysicalDeviceVK::initialize() -> bool
 	{
-		enableDebugLayer = enableValidationLayers;
-		queryAllPhysicalDevice();
 		return true;
 	}
 
@@ -180,6 +180,10 @@ namespace SIByL::RHI
 			// check graphic support
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 				indices.graphicsFamily = i;
+			}
+			// check queue support
+			if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
+				indices.computeFamily = i;
 			}
 			// check present support
 			VkBool32 presentSupport = false;

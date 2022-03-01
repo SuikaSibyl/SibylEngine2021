@@ -45,6 +45,7 @@ namespace SIByL
 			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void override;
 			virtual auto cmdEndRenderPass() noexcept -> void override;
 			virtual auto cmdBindPipeline(IPipeline* pipeline) noexcept -> void override;
+			virtual auto cmdBindComputePipeline(IPipeline* pipeline) noexcept -> void override;
 			virtual auto cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void override;
 			virtual auto cmdBindIndexBuffer(IIndexBuffer* buffer) noexcept -> void override;
 			virtual auto cmdDraw(uint32_t const& vertex_count, uint32_t const& instance_count,
@@ -56,6 +57,7 @@ namespace SIByL
 				uint32_t const& count_sets_to_bind, IDescriptorSet** sets, uint32_t const&, uint32_t const*) noexcept -> void override;
 			virtual auto cmdPipelineBarrier(IBarrier* barrier) noexcept -> void override;
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void override;
+			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void override;
 
 		private:
 			auto createVkCommandBuffer() noexcept -> void;

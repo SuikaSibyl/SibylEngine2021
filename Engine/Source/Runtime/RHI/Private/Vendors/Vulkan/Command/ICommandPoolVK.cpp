@@ -47,6 +47,9 @@ namespace SIByL
 			case SIByL::RHI::QueueType::GRAPHICS:
 				poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 				break;
+			case SIByL::RHI::QueueType::COMPUTE:
+				poolInfo.queueFamilyIndex = queueFamilyIndices.computeFamily.value();
+				break;
 			default:
 				break;
 			}

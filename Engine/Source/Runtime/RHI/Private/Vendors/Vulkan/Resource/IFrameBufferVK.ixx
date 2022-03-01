@@ -3,6 +3,7 @@ module;
 #include <vector>
 #include <vulkan/vulkan.h>
 export module RHI.IFramebuffer.VK;
+import Core.Color;
 import RHI.IResource;
 import RHI.IFramebuffer;
 import RHI.IRenderPass;

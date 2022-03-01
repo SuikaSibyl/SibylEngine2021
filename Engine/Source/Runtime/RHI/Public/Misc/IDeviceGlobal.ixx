@@ -27,6 +27,7 @@ namespace SIByL
 		public:
 			static auto getGlobal(ILogicalDevice* device) -> PerDeviceGlobal*;
 			static auto releaseGlobal() -> void;
+			static auto removeDevice(ILogicalDevice* device)->void;
 
 		private:
 			static DeviceToGlobal deviceGlobal;

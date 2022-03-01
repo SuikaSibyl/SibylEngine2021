@@ -98,6 +98,7 @@ namespace SIByL
 		{
 			GRAPHICS,
 			PRESENTATION,
+			COMPUTE,
 		};
 
 		export enum class CommandPoolAttributeFlagBits : uint32_t

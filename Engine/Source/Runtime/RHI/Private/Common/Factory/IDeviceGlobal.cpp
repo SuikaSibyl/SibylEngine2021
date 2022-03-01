@@ -45,6 +45,19 @@ namespace SIByL::RHI
 		return &deviceGlobal.map[device];
 	}
 
+	auto DeviceToGlobal::removeDevice(ILogicalDevice* device)->void
+	{
+		auto iter = deviceGlobal.map.begin();
+		for (; iter != deviceGlobal.map.end(); iter++)
+		{
+			if (iter->first == device)
+			{
+				deviceGlobal.map.erase(iter);
+				return;
+			}
+		}
+	}
+
 	auto DeviceToGlobal::releaseGlobal() -> void
 	{
 		deviceGlobal.map.clear();

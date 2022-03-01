@@ -27,6 +27,12 @@ namespace SIByL
 			createVkPipeline();
 		}
 
+		IPipelineVK::IPipelineVK(ComputePipelineDesc const& _desc, ILogicalDeviceVK* logical_device)
+			: logicalDevice(logical_device)
+		{
+			createVkComputePipeline(_desc);
+		}
+
 		IPipelineVK::~IPipelineVK()
 		{
 			if (graphicsPipeline)
@@ -38,6 +44,22 @@ namespace SIByL
 			return &graphicsPipeline;
 		}
 
+		auto getVkPipelineDepthStencilStateCreateInfo() noexcept -> VkPipelineDepthStencilStateCreateInfo
+		{
+			VkPipelineDepthStencilStateCreateInfo depthStencil{};
+			depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+			depthStencil.depthTestEnable = VK_TRUE;
+			depthStencil.depthWriteEnable = VK_TRUE;
+			depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+			depthStencil.depthBoundsTestEnable = VK_FALSE;
+			depthStencil.minDepthBounds = 0.0f; // Optional
+			depthStencil.maxDepthBounds = 1.0f; // Optional
+			depthStencil.stencilTestEnable = VK_FALSE;
+			depthStencil.front = {}; // Optional
+			depthStencil.back = {}; // Optional
+			return depthStencil;
+		}
+
 		auto IPipelineVK::createVkPipeline() noexcept -> void
 		{
 			std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
@@ -46,6 +68,8 @@ namespace SIByL
 			{
 				shaderStages[i] = *(static_cast<IShaderVK*>(desc.shaders[i]))->getVkShaderStageCreateInfo();
 			}
+
+			VkPipelineDepthStencilStateCreateInfo depth_stencil_create_info = getVkPipelineDepthStencilStateCreateInfo();
 
 			VkGraphicsPipelineCreateInfo pipelineInfo{};
 			pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -56,7 +80,7 @@ namespace SIByL
 			pipelineInfo.pViewportState = static_cast<IViewportsScissorsVK*>(desc.viewportsScissors)->getVkPipelineViewportStateCreateInfo();
 			pipelineInfo.pRasterizationState = static_cast<IRasterizerVK*>(desc.rasterizer)->getVkPipelineRasterizationStateCreateInfo();
 			pipelineInfo.pMultisampleState = static_cast<IMultisamplingVK*>(desc.multisampling)->getVkPipelineMultisampleStateCreateInfo();
-			pipelineInfo.pDepthStencilState = nullptr; // Optional
+			pipelineInfo.pDepthStencilState = &depth_stencil_create_info; // TODO :: Optional
 			pipelineInfo.pColorBlendState = static_cast<IColorBlendingVK*>(desc.colorBlending)->getVkPipelineColorBlendStateCreateInfo();
 			pipelineInfo.pDynamicState = nullptr; // Optional
 			pipelineInfo.layout = *(static_cast<IPipelineLayoutVK*>(desc.pipelineLayout)->getVkPipelineLayout());
@@ -66,6 +90,22 @@ namespace SIByL
 			pipelineInfo.basePipelineIndex = -1; // Optional
 
 			if (vkCreateGraphicsPipelines(logicalDevice->getDeviceHandle(), VK_NULL_HANDLE,
+				1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+				SE_CORE_ERROR("VULKAN :: failed to create graphics pipeline!");
+			}
+		}
+
+		auto IPipelineVK::createVkComputePipeline(ComputePipelineDesc const& desc) noexcept -> void
+		{
+			VkComputePipelineCreateInfo pipelineInfo{};
+			pipelineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+			pipelineInfo.stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+			pipelineInfo.stage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+			pipelineInfo.stage.module = (static_cast<IShaderVK*>(desc.shader))->getVkShaderModule();
+			pipelineInfo.stage.pName = "main";
+			pipelineInfo.layout = *(static_cast<IPipelineLayoutVK*>(desc.pipelineLayout)->getVkPipelineLayout());
+
+			if (vkCreateComputePipelines(logicalDevice->getDeviceHandle(), VK_NULL_HANDLE,
 				1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 				SE_CORE_ERROR("VULKAN :: failed to create graphics pipeline!");
 			}
