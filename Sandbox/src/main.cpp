@@ -78,6 +78,7 @@ public:
 	};
 
 	struct UniformBufferObject {
+		glm::vec4 cameraPos;
 		glm::mat4 model;
 		glm::mat4 view;
 		glm::mat4 proj;
@@ -121,18 +122,12 @@ public:
 			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
 			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
 			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-			{ {-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-			{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-			{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-			{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
 		};
 		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), 4);
 		vertexBuffer = resourceFactory->createVertexBuffer(&vertex_proxy);
 		// index buffer
 		const std::vector<uint16_t> indices = {
 			0, 1, 2, 2, 3, 0,
-			4, 5, 6, 6, 7, 4
 		};
 		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), 4);
 		indexBuffer = resourceFactory->createIndexBuffer(&index_proxy, sizeof(uint16_t));
@@ -187,8 +182,8 @@ public:
 		// compute stuff
 		{
 			// create storage buffers
-			storageBuffer_1 = resourceFactory->createStorageBuffer(sizeof(float) * 3 * 32);
-			storageBuffer_2 = resourceFactory->createStorageBuffer(sizeof(float) * 3 * 32);
+			storageBuffer_1 = resourceFactory->createStorageBuffer(sizeof(float) * 4 * 32);
+			storageBuffer_2 = resourceFactory->createStorageBuffer(sizeof(float) * 4 * 32);
 
 			// create descriptor set layout
 			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
@@ -310,7 +305,7 @@ public:
 		{
 			RHI::PolygonMode::FILL,
 			0.0f,
-			RHI::CullMode::BACK,
+			RHI::CullMode::NONE,
 		};
 		MemScope<RHI::IRasterizer> rasterizer = resourceFactory->createRasterizer(rasterizer_desc);
 		RHI::MultiSampleDesc multisampling_desc =
@@ -433,9 +428,10 @@ public:
 			float time = (float)timer.getTotalTimeSeconds();
 			auto [width, height] = swapchain->getExtend();
 			UniformBufferObject ubo;
-			ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 10.0f);
+			ubo.cameraPos = glm::vec4(5.0f, 0, 0, 0.0f);
+			ubo.model = glm::scale(glm::mat4(1.0f), glm::vec3(0.1, 0.1, 0.1));
+			ubo.view = glm::lookAt(glm::vec3(5.0f, 0, 0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
 			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
 			uniformBuffers[currentFrame]->updateBuffer(&ubo_proxy);
@@ -454,7 +450,7 @@ public:
 			RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
 			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
 				pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
-			commandbuffers[currentFrame]->cmdDrawIndexed(12, 32, 0, 0, 0);
+			commandbuffers[currentFrame]->cmdDrawIndexed(6, 32, 0, 0, 0);
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier.get());
