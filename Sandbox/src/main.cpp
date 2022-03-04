@@ -13,6 +13,7 @@ module;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "entt/entt.hpp"
 module Main;
 
 import Core.Assert;
@@ -62,6 +63,8 @@ import RHI.ISampler;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 
+import GFX.SceneTree;
+
 import UAT.IUniversalApplication;
 
 using namespace SIByL;
@@ -86,6 +89,10 @@ public:
 
 	virtual void onAwake() override
 	{
+		//GFX::SceneTree tree;
+		//GFX::SceneNode* node1 = tree.addNode("hello");
+		//tree.print2Console();
+
 		RHI::SLANG::ICompileSession comipeSession;
 		comipeSession.loadModule("hello-world", "computeMain");
 
@@ -116,6 +123,7 @@ public:
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
+
 		// vertex buffer
 		const std::vector<Vertex> vertices = {
 			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
@@ -125,6 +133,7 @@ public:
 		};
 		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), 4);
 		vertexBuffer = resourceFactory->createVertexBuffer(&vertex_proxy);
+
 		// index buffer
 		const std::vector<uint16_t> indices = {
 			0, 1, 2, 2, 3, 0,

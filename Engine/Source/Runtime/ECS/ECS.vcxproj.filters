@@ -15,22 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Public\GFXLayer\GFXLayer.ixx">
+    <ClCompile Include="Public\Core\Entity.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\GFXLayer\GFXLayer.cpp">
+    <ClCompile Include="Public\Core\UID.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Scene\Scene.ixx">
+    <ClCompile Include="Private\Core\UID.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Scene\SceneTree.ixx">
+    <ClCompile Include="Public\Components\TagComponent.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Scene\Scene.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\Scene\SceneTree.cpp">
+    <ClCompile Include="Private\Core\Entity.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
