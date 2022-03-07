@@ -63,7 +63,11 @@ import RHI.ISampler;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 
+import ECS.TagComponent;
+
 import GFX.SceneTree;
+import GFX.Scene;
+import GFX.Mesh;
 
 import UAT.IUniversalApplication;
 
@@ -89,15 +93,6 @@ public:
 
 	virtual void onAwake() override
 	{
-		GFX::SceneTree tree;
-		uint64_t hello_node = tree.addNode("hello", tree.getRootHandle());
-		uint64_t a_node = tree.addNode("A", hello_node);
-		uint64_t b_node = tree.addNode("B", tree.getRootHandle());
-		tree.print2Console();
-
-		tree.moveNode(hello_node, b_node);
-		tree.print2Console();
-
 		RHI::SLANG::ICompileSession comipeSession;
 		comipeSession.loadModule("hello-world", "computeMain");
 
@@ -116,6 +111,29 @@ public:
 		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
+
+		// vertex buffer
+		const std::vector<Vertex> vertices = {
+			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+		};
+		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), sizeof(Vertex));
+
+		// index buffer
+		const std::vector<uint16_t> indices = {
+			0, 1, 2, 2, 3, 0,
+		};
+		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), sizeof(uint16_t));
+
+		GFX::SceneNodeHandle particle_node = scene.tree.addNode("particle", scene.tree.root);
+		ECS::Entity particle_entity = scene.tree.getNodeEntity(particle_node);
+		particle_entity.addComponent<GFX::Mesh>(&vertex_proxy, &index_proxy, logicalDevice.get());
+		auto mesh_view = scene.tree.context.view<GFX::Mesh>();
+		scene.tree.print2Console();
+		scene.serialize("test_scene.scene");
+
 		// shader resources
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
@@ -128,23 +146,6 @@ public:
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
-
-		// vertex buffer
-		const std::vector<Vertex> vertices = {
-			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-		};
-		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), 4);
-		vertexBuffer = resourceFactory->createVertexBuffer(&vertex_proxy);
-
-		// index buffer
-		const std::vector<uint16_t> indices = {
-			0, 1, 2, 2, 3, 0,
-		};
-		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), 4);
-		indexBuffer = resourceFactory->createIndexBuffer(&index_proxy, sizeof(uint16_t));
 
 		// load image
 		Image image("./assets/texture.jpg");
@@ -459,12 +460,18 @@ public:
 			commandbuffers[currentFrame]->beginRecording();
 			commandbuffers[currentFrame]->cmdBeginRenderPass(renderPass.get(), framebuffers[imageIndex].get());
 			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
-			commandbuffers[currentFrame]->cmdBindVertexBuffer(vertexBuffer.get());
-			commandbuffers[currentFrame]->cmdBindIndexBuffer(indexBuffer.get());
-			RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
-			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
-				pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
-			commandbuffers[currentFrame]->cmdDrawIndexed(6, 32, 0, 0, 0);
+			
+			std::function<void(ECS::TagComponent&, GFX::Mesh&)> mesh_processor = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
+				commandbuffers[currentFrame]->cmdBindVertexBuffer(mesh.vertexBuffer.get());
+
+				commandbuffers[currentFrame]->cmdBindIndexBuffer(mesh.indexBuffer.get());
+				RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
+				commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
+					pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
+				commandbuffers[currentFrame]->cmdDrawIndexed(6, 32, 0, 0, 0);
+			};
+			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
+
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier.get());
@@ -496,6 +503,8 @@ private:
 	Timer timer;
 	uint32_t currentFrame = 0;
 
+	GFX::Scene scene;
+
 	MemScope<RHI::IGraphicContext> graphicContext;
 	MemScope<RHI::IPhysicalDevice> physicalDevice;
 	MemScope<RHI::ILogicalDevice> logicalDevice;
@@ -506,8 +515,6 @@ private:
 	MemScope<RHI::IShader> shaderCompute;
 	MemScope<RHI::IShader> shaderComputeInit;
 
-	MemScope<RHI::IVertexBuffer> vertexBuffer;
-	MemScope<RHI::IIndexBuffer> indexBuffer;
 	MemScope<RHI::IStorageBuffer> storageBuffer_1;
 	MemScope<RHI::IStorageBuffer> storageBuffer_2;
 	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;

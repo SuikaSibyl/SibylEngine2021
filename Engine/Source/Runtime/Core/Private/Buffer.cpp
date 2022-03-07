@@ -11,19 +11,19 @@ namespace SIByL
 		Buffer::Buffer()
 			: data(nullptr)
 			, size(0)
-			, alignment(alignof(uint32_t))
+			, stride(alignof(uint32_t))
 		{}
 
 		Buffer::Buffer(size_t const& _size, size_t const& _alignment)
 			: size(_size)
-			, alignment(_alignment)
+			, stride(_alignment)
 		{
 			data = (char*)Memory::instance()->allocate(size);
 		}
 
 		Buffer::Buffer(void* outer_buffer, size_t const& _size, size_t const& _alignment)
 			: size(_size)
-			, alignment(_alignment)
+			, stride(_alignment)
 			, isProxy(true)
 			, data((char*)outer_buffer)
 		{}
@@ -33,7 +33,7 @@ namespace SIByL
 			release();
 
 			size = rhs.size;
-			alignment = rhs.alignment;
+			stride = rhs.stride;
 			data = (char*)Memory::instance()->allocate(size);
 			isProxy = rhs.isProxy;
 			memcpy(data, rhs.data, size);
@@ -44,12 +44,12 @@ namespace SIByL
 			release();
 
 			size = rhs.size;
-			alignment = rhs.alignment;
+			stride = rhs.stride;
 			data = rhs.data;
 			isProxy = rhs.isProxy;
 
 			rhs.size = 0;
-			rhs.alignment = 4;
+			rhs.stride = 4;
 			rhs.data = nullptr;
 		}
 
@@ -69,7 +69,7 @@ namespace SIByL
 
 			if (data) Memory::instance()->free(data, size);
 			size = rhs.size;
-			alignment = rhs.alignment;
+			stride = rhs.stride;
 			data = (char*)Memory::instance()->allocate(size);
 			isProxy = rhs.isProxy;
 			memcpy(data, rhs.data, size);
@@ -83,10 +83,10 @@ namespace SIByL
 			if (data) Memory::instance()->free(data, size);
 			data = rhs.data;
 			size = rhs.size;
-			alignment = rhs.alignment;
+			stride = rhs.stride;
 			isProxy = rhs.isProxy;
 			rhs.size = 0;
-			rhs.alignment = 4;
+			rhs.stride = 4;
 			rhs.data = nullptr;
 			return *this;
 		}
@@ -94,6 +94,11 @@ namespace SIByL
 		auto Buffer::getData() const -> char*
 		{
 			return data;
+		}
+
+		auto Buffer::getStride() const->size_t
+		{
+			return stride;
 		}
 
 		auto Buffer::getpSize()->size_t*

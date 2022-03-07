@@ -27,6 +27,7 @@ namespace SIByL::GFX
 		std::unordered_map<SceneNodeHandle, SceneNode> nodes;
 
 		auto getRootHandle() noexcept -> SceneNodeHandle { return root; }
+		auto getNodeEntity(SceneNodeHandle const& handle) noexcept -> ECS::Entity& { return nodes[handle].entity; }
 
 		auto addNode(std::string const& name, uint64_t const& parent) noexcept -> uint64_t;
 		auto moveNode(uint64_t const& node, uint64_t const& parent) noexcept -> void;

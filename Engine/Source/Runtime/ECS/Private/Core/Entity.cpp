@@ -10,12 +10,7 @@ namespace SIByL::ECS
 	auto Context::createEntity(std::string const& name) noexcept -> Entity
 	{
 		Entity entity{ registry.create(),this };
-		entity.AddComponent<TagComponent>(name);
-		//entity.AddComponent<TransformComponent>();
-		//uint64_t uid = UniqueID::RequestUniqueID();
-		//entity.SetUid(uid);
-		//UniqueID::InsertUidEidPair(uid, entity);
-		//return entity;
+		entity.addComponent<TagComponent>(name);
 		return entity;
 	}
 

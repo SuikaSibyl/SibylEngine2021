@@ -25,7 +25,8 @@ namespace SIByL::GFX
 		nodes[uid] = SceneNode{ entity, uid, parent, {} };
 
 		// add children to parent
-		nodes[parent].children.emplace_back(uid);
+		if (parent != 0) // if not root
+			nodes[parent].children.emplace_back(uid);
 
 		return uid;
 	}
@@ -85,8 +86,8 @@ namespace SIByL::GFX
 	auto SceneTree::printNode2Console(SceneNodeHandle const& node, size_t bracket_num) noexcept -> void
 	{
 		std::string_view prefix{ long_braket.c_str(), bracket_num * 3};
-		ECS::TagComponent& tag = nodes[node].entity.GetComponent<ECS::TagComponent>();
-		SE_CORE_INFO("{0}{1} {2}", prefix, beg_braket, tag.Tag);
+		ECS::TagComponent& tag = nodes[node].entity.getComponent<ECS::TagComponent>();
+		SE_CORE_INFO("{0}{1} {2} :: {3}", prefix, beg_braket, tag.Tag, nodes[node].uid);
 		for (int i = 0; i < nodes[node].children.size(); i++)
 		{
 			printNode2Console(nodes[node].children[i], bracket_num + 1);

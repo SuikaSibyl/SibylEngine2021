@@ -24,10 +24,12 @@ namespace SIByL
 
 			auto fileExists(std::filesystem::path filePath) noexcept -> bool;
 			auto openFile(std::filesystem::path const& name) noexcept -> AssetFilePtr;
+			auto openFileWB(std::filesystem::path const& name) noexcept -> AssetFilePtr;
 			auto closeFile(AssetFilePtr& fp) noexcept -> void;
 			auto getSize(AssetFilePtr& fp) noexcept -> size_t;
 			auto syncReadAll(AssetFilePtr& fp, Buffer& buf) -> void;
 			auto syncReadAll(std::filesystem::path const& name, Buffer& buf) -> void;
+			auto syncWriteAll(std::filesystem::path const& name, Buffer& buf) -> void;
 
 		private:
 			std::vector<std::filesystem::path> searchPathes;

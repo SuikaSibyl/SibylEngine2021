@@ -58,6 +58,20 @@ namespace SIByL
 			return nullptr;
 		}
 
+		auto AssetLoader::openFileWB(std::filesystem::path const& name) noexcept -> AssetFilePtr
+		{
+			FILE* fp = nullptr;
+
+			for (int i = 0; i < searchPathes.size(); i++)
+			{
+				std::filesystem::path fullpath = searchPathes[i] / name;
+				fp = fopen(fullpath.string().c_str(), "wb");
+				if (fp) return (AssetFilePtr*)fp;
+			}
+
+			return nullptr;
+		}
+
 		auto AssetLoader::closeFile(AssetFilePtr& fp) noexcept -> void
 		{
 			fclose((FILE*)fp);
@@ -95,5 +109,16 @@ namespace SIByL
 				closeFile(fp);
 			}
 		}
+
+		auto AssetLoader::syncWriteAll(std::filesystem::path const& name, Buffer& buf) -> void
+		{
+			AssetFilePtr fp = openFileWB(name);
+			if (fp)
+			{
+				fwrite(buf.getData(), buf.getSize(), 1, static_cast<FILE*>(fp));
+				closeFile(fp);
+			}
+		}
+
 	}
 }

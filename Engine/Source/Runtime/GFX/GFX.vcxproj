@@ -80,14 +80,14 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/Runtime/Core/Public;$(SolutionDir)Engine/Source/Runtime/GFX/Private;$(SolutionDir)Engine/Source/Runtime/GFX/Public;$(SolutionDir)Engine/Source/ThirdParty/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/Runtime/Core/Public;$(SolutionDir)Engine/Source/Runtime/GFX/Private;$(SolutionDir)Engine/Source/Runtime/GFX/Public;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/Runtime/Core/Public;$(SolutionDir)Engine/Source/Runtime/GFX/Private;$(SolutionDir)Engine/Source/Runtime/GFX/Public;$(SolutionDir)Engine/Source/ThirdParty/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/Runtime/Core/Public;$(SolutionDir)Engine/Source/Runtime/GFX/Private;$(SolutionDir)Engine/Source/Runtime/GFX/Public;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -152,7 +152,11 @@
     <ClCompile Include="Private\GFXLayer\GFXLayer.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
+    <ClCompile Include="Public\Components\Mesh.ixx" />
     <ClCompile Include="Public\GFXLayer\GFXLayer.ixx" />
+    <ClCompile Include="Public\RDG\IPass.ixx" />
+    <ClCompile Include="Public\RDG\IResource.ixx" />
+    <ClCompile Include="Public\RDG\RenderGraph.ixx" />
     <ClCompile Include="Public\Scene\Scene.ixx" />
     <ClCompile Include="Public\Scene\SceneTree.ixx" />
   </ItemGroup>

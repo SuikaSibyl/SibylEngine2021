@@ -1,0 +1,14 @@
+SceneName: Scene
+SceneNodes:
+  - uid: 2267996141172934778
+    parent: 11454494956078614650
+    children:
+      []
+    components:
+      []
+  - uid: 11454494956078614650
+    parent: 0
+    children:
+      - 2267996141172934778
+    components:
+      []
