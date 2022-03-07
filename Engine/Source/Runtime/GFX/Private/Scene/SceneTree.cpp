@@ -2,6 +2,8 @@ module;
 #include <vector>
 #include <string>
 #include <string_view>
+#include <unordered_map>
+#include <algorithm>
 #include "entt/entt.hpp"
 module GFX.SceneTree;
 import Core.Log;
@@ -13,56 +15,62 @@ namespace SIByL::GFX
 {
 	SceneTree::SceneTree()
 	{
-		addNode("Scene", nullptr);
+		root = addNode("Scene", 0);
 	}
 
-	auto SceneTree::addNode(std::string const& name, SceneNode* parent) noexcept -> SceneNode*
+	auto SceneTree::addNode(std::string const& name, SceneNodeHandle const& parent) noexcept -> SceneNodeHandle
 	{
 		ECS::Entity entity = context.createEntity(name);
-		nodes.emplace_back(entity, parent);
-		return &nodes.back();
+		uint64_t uid = ECS::UniqueID::RequestUniqueID();
+		nodes[uid] = SceneNode{ entity, uid, parent, {} };
+
+		// add children to parent
+		nodes[parent].children.emplace_back(uid);
+
+		return uid;
 	}
 
-	auto SceneTree::moveNode(SceneNode* node, SceneNode* parent) noexcept -> void
+	auto SceneTree::moveNode(uint64_t const& handle, uint64_t const& parent) noexcept -> void
 	{
 		// remove node from its previous parent
-		SceneNode* prev_parent = node->parent;
-		for (auto iter = prev_parent->children.begin(); iter != prev_parent->children.end();)
+		// remove from parent
+		auto& parent_children = nodes[nodes[handle].parent].children;
+		for (int i = 0; i < parent_children.size(); i++)
 		{
-			if ((*iter) == node)
+			if (parent_children[i] = handle)
 			{
-				iter = prev_parent->children.erase(iter);
+				parent_children.erase(parent_children.begin() + i);
 				break;
 			}
-			else
-				iter++;
 		}
 		// add node to its new parent
-		parent->children.emplace_back(node);
+		nodes[parent].children.emplace_back(handle);
 		// change the node info
-		node->parent = parent;
+		nodes[handle].parent = parent;
 	}
 
-	auto SceneTree::removeNode(SceneNode* node) noexcept -> void
+	auto SceneTree::removeNode(uint64_t const& handle) noexcept -> void
 	{
-		if (node == &nodes[0]) return;
+		if (handle == root) return;
 		// remove children
-		context.destroyEntity(node->entity);
-		for (int i = 0; i < node->children.size(); i++)
+		context.destroyEntity(nodes[handle].entity);
+		for (int i = 0; i < nodes[handle].children.size(); i++)
 		{
-			removeNode(node->children[i]);
+			removeNode(nodes[handle].children[i]);
 		}
-		// remove from nodes
-		for (auto iter = nodes.begin(); iter != nodes.end();)
+		// remove from parent
+		auto& parent_children = nodes[nodes[handle].parent].children;
+		for (int i = 0; i < parent_children.size(); i++)
 		{
-			if (&(*iter) == node)
+			if (parent_children[i] = handle)
 			{
-				iter = nodes.erase(iter);
+				parent_children.erase(parent_children.begin() + i);
 				break;
 			}
-			else
-				iter++;
 		}
+		// remove from nodes
+		auto iter = nodes.find(handle);
+		if (iter != nodes.end()) iter = nodes.erase(iter);
 	}
 
 	std::string const beg_braket = "╭";
@@ -71,19 +79,18 @@ namespace SIByL::GFX
 
 	auto SceneTree::print2Console() noexcept -> void
 	{
-		printNode2Console(&nodes[0], 0);
+		printNode2Console(root, 0);
 	}
 
-	auto SceneTree::printNode2Console(SceneNode* node, size_t bracket_num) noexcept -> void
+	auto SceneTree::printNode2Console(SceneNodeHandle const& node, size_t bracket_num) noexcept -> void
 	{
-		std::string_view prefix{ long_braket.c_str(), bracket_num };
-		ECS::TagComponent& tag = node->entity.GetComponent<ECS::TagComponent>();
+		std::string_view prefix{ long_braket.c_str(), bracket_num * 3};
+		ECS::TagComponent& tag = nodes[node].entity.GetComponent<ECS::TagComponent>();
 		SE_CORE_INFO("{0}{1} {2}", prefix, beg_braket, tag.Tag);
-		//for (int i = 0; i < node->children.size(); i++)
-		//{
-		//	printNode2Console(node->children[i], bracket_num + 1);
-		//}
+		for (int i = 0; i < nodes[node].children.size(); i++)
+		{
+			printNode2Console(nodes[node].children[i], bracket_num + 1);
+		}
 		SE_CORE_INFO("{0}{1}", prefix, end_braket);
 	}
-
 }

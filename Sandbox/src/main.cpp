@@ -89,9 +89,14 @@ public:
 
 	virtual void onAwake() override
 	{
-		//GFX::SceneTree tree;
-		//GFX::SceneNode* node1 = tree.addNode("hello");
-		//tree.print2Console();
+		GFX::SceneTree tree;
+		uint64_t hello_node = tree.addNode("hello", tree.getRootHandle());
+		uint64_t a_node = tree.addNode("A", hello_node);
+		uint64_t b_node = tree.addNode("B", tree.getRootHandle());
+		tree.print2Console();
+
+		tree.moveNode(hello_node, b_node);
+		tree.print2Console();
 
 		RHI::SLANG::ICompileSession comipeSession;
 		comipeSession.loadModule("hello-world", "computeMain");

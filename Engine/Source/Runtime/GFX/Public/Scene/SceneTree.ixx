@@ -1,6 +1,7 @@
 module;
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include "entt/entt.hpp"
 export module GFX.SceneTree;
 import ECS.Entity;
@@ -11,21 +12,27 @@ namespace SIByL::GFX
 	export struct SceneNode
 	{
 		ECS::Entity entity;
-		SceneNode* parent;
-		std::vector<SceneNode*> children;
+		uint64_t uid;
+		uint64_t parent;
+		std::vector<uint64_t> children;
 	};
+
+	export using SceneNodeHandle = uint64_t;
 
 	export struct SceneTree
 	{
 		SceneTree();
 		ECS::Context context;
-		std::vector<SceneNode> nodes;
+		SceneNodeHandle root;
+		std::unordered_map<SceneNodeHandle, SceneNode> nodes;
 
-		auto addNode(std::string const& name, SceneNode* parent) noexcept -> SceneNode*;
-		auto moveNode(SceneNode* node, SceneNode* parent) noexcept -> void;
-		auto removeNode(SceneNode*) noexcept -> void;
+		auto getRootHandle() noexcept -> SceneNodeHandle { return root; }
+
+		auto addNode(std::string const& name, uint64_t const& parent) noexcept -> uint64_t;
+		auto moveNode(uint64_t const& node, uint64_t const& parent) noexcept -> void;
+		auto removeNode(uint64_t const&) noexcept -> void;
 
 		auto print2Console() noexcept -> void;
-		auto printNode2Console(SceneNode* node, size_t bracket_num) noexcept -> void;
+		auto printNode2Console(SceneNodeHandle const& node, size_t bracket_num) noexcept -> void;
 	};
 }
