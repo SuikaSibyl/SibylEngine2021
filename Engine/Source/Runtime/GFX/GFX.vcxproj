@@ -150,12 +150,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\GFXLayer\GFXLayer.cpp" />
+    <ClCompile Include="Private\RDG\RenderGraph.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
     <ClCompile Include="Public\GFXLayer\GFXLayer.ixx" />
-    <ClCompile Include="Public\RDG\IPass.ixx" />
-    <ClCompile Include="Public\RDG\IResource.ixx" />
+    <ClCompile Include="Public\RDG\Common.ixx" />
+    <ClCompile Include="Public\RDG\Pass\IComputePass.ixx" />
+    <ClCompile Include="Public\RDG\Pass\IPass.ixx" />
+    <ClCompile Include="Public\RDG\Pass\IRasterPass.ixx" />
+    <ClCompile Include="Public\RDG\Resource\IResource.ixx" />
     <ClCompile Include="Public\RDG\RenderGraph.ixx" />
     <ClCompile Include="Public\Scene\Scene.ixx" />
     <ClCompile Include="Public\Scene\SceneTree.ixx" />

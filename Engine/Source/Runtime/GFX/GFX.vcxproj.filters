@@ -36,13 +36,25 @@
     <ClCompile Include="Public\RDG\RenderGraph.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\IResource.ixx">
+    <ClCompile Include="Public\RDG\Resource\IResource.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\IPass.ixx">
+    <ClCompile Include="Public\RDG\Pass\IRasterPass.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Components\Mesh.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Pass\IPass.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Pass\IComputePass.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Common.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RDG\RenderGraph.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

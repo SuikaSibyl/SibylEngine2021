@@ -68,6 +68,8 @@ import ECS.TagComponent;
 import GFX.SceneTree;
 import GFX.Scene;
 import GFX.Mesh;
+import GFX.RDG.RenderGraph;
+
 
 import UAT.IUniversalApplication;
 
@@ -78,12 +80,6 @@ const int MAX_FRAMES_IN_FLIGHT = 2;
 class SandboxApp :public IUniversalApplication
 {
 public:
-	struct Vertex {
-		glm::vec3 pos;
-		glm::vec3 color;
-		glm::vec2 uv;
-	};
-
 	struct UniformBufferObject {
 		glm::vec4 cameraPos;
 		glm::mat4 model;
@@ -111,28 +107,11 @@ public:
 		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
+		scene.deserialize("test_scene.scene", logicalDevice.get());
 
-		// vertex buffer
-		const std::vector<Vertex> vertices = {
-			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-		};
-		Buffer vertex_proxy((void*)vertices.data(), vertices.size() * sizeof(Vertex), sizeof(Vertex));
 
-		// index buffer
-		const std::vector<uint16_t> indices = {
-			0, 1, 2, 2, 3, 0,
-		};
-		Buffer index_proxy((void*)indices.data(), indices.size() * sizeof(uint16_t), sizeof(uint16_t));
-
-		GFX::SceneNodeHandle particle_node = scene.tree.addNode("particle", scene.tree.root);
-		ECS::Entity particle_entity = scene.tree.getNodeEntity(particle_node);
-		particle_entity.addComponent<GFX::Mesh>(&vertex_proxy, &index_proxy, logicalDevice.get());
-		auto mesh_view = scene.tree.context.view<GFX::Mesh>();
-		scene.tree.print2Console();
-		scene.serialize("test_scene.scene");
+		GFX::RDG::RenderGraphBuilder rdg_builder;
+		auto particle_sb = rdg_builder.addStorageBuffer();
 
 		// shader resources
 		AssetLoader shaderLoader;

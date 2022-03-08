@@ -14,6 +14,7 @@ namespace SIByL
 		// │  DirectX 12  │                            │
 		// │  OpenGL      │                            │
 		// ╰──────────────┴────────────────────────────╯
+
 		export struct DescriptorSetLayoutPerBindingDesc
 		{
 			uint32_t binding;

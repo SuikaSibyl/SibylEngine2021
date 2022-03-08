@@ -2,6 +2,7 @@ module;
 #pragma warning(disable:4996)
 #include <iostream>
 #include <vector>
+#include <chrono>
 #include <filesystem>
 module Core.File;
 import Core.SObject;
@@ -100,6 +101,11 @@ namespace SIByL
 			fread(buf.getData(), buf.getSize(), 1, static_cast<FILE*>(fp));
 		}
 
+		auto AssetLoader::readBuffer(AssetFilePtr& fp, Buffer const& buf) -> void
+		{
+			fread(buf.getData(), buf.getSize(), 1, static_cast<FILE*>(fp));
+		}
+
 		auto AssetLoader::syncReadAll(std::filesystem::path const& name, Buffer& buf) -> void
 		{
 			AssetFilePtr fp = openFile(name);
@@ -120,5 +126,26 @@ namespace SIByL
 			}
 		}
 
+		auto AssetLoader::writeBuffer(AssetFilePtr& fp, Buffer const& buf) -> void
+		{
+			fwrite(buf.getData(), buf.getSize(), 1, static_cast<FILE*>(fp));
+		}
+
+		auto AssetLoader::findRelativePath(std::filesystem::path const& relative) noexcept -> std::filesystem::path
+		{
+			for (int i = 0; i < searchPathes.size(); i++)
+			{
+				std::filesystem::path fullpath = searchPathes[i] / relative;
+				if (std::filesystem::exists(fullpath)) return fullpath;
+			}
+			return {};
+		}
+
+		auto AssetLoader::getFileLastWriteTime(std::filesystem::path const& relative) noexcept -> uint64_t
+		{
+			auto ftime = std::filesystem::last_write_time(findRelativePath(relative));
+			auto duration = ftime.time_since_epoch();
+			return duration.count();
+		}
 	}
 }

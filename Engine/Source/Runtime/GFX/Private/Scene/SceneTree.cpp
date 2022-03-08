@@ -1,4 +1,5 @@
 module;
+#include <utility>
 #include <vector>
 #include <string>
 #include <string_view>
@@ -18,15 +19,28 @@ namespace SIByL::GFX
 		root = addNode("Scene", 0);
 	}
 
+	auto SceneTree::appointRoot(SceneNodeHandle const& new_root) noexcept -> void
+	{
+		removeNode(root);
+		root = new_root;
+	}
+
 	auto SceneTree::addNode(std::string const& name, SceneNodeHandle const& parent) noexcept -> SceneNodeHandle
 	{
-		ECS::Entity entity = context.createEntity(name);
 		uint64_t uid = ECS::UniqueID::RequestUniqueID();
-		nodes[uid] = SceneNode{ entity, uid, parent, {} };
+		addNode(name, uid, parent, {});
 
 		// add children to parent
 		if (parent != 0) // if not root
 			nodes[parent].children.emplace_back(uid);
+
+		return uid;
+	}
+
+	auto SceneTree::addNode(std::string const& name, uint64_t const& uid, uint64_t const& parent, std::vector<uint64_t>&& children) noexcept -> uint64_t
+	{
+		ECS::Entity entity = context.createEntity(name);
+		nodes[uid] = SceneNode{ entity, uid, parent, std::move(children)};
 
 		return uid;
 	}
@@ -52,7 +66,7 @@ namespace SIByL::GFX
 
 	auto SceneTree::removeNode(uint64_t const& handle) noexcept -> void
 	{
-		if (handle == root) return;
+		//if (handle == root) return;
 		// remove children
 		context.destroyEntity(nodes[handle].entity);
 		for (int i = 0; i < nodes[handle].children.size(); i++)
@@ -60,13 +74,16 @@ namespace SIByL::GFX
 			removeNode(nodes[handle].children[i]);
 		}
 		// remove from parent
-		auto& parent_children = nodes[nodes[handle].parent].children;
-		for (int i = 0; i < parent_children.size(); i++)
+		if (nodes[handle].parent != 0)
 		{
-			if (parent_children[i] = handle)
+			auto& parent_children = nodes[nodes[handle].parent].children;
+			for (int i = 0; i < parent_children.size(); i++)
 			{
-				parent_children.erase(parent_children.begin() + i);
-				break;
+				if (parent_children[i] = handle)
+				{
+					parent_children.erase(parent_children.begin() + i);
+					break;
+				}
 			}
 		}
 		// remove from nodes

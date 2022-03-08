@@ -153,8 +153,11 @@
   <ItemGroup>
     <ClCompile Include="Private\Allocator.cpp" />
     <ClCompile Include="Private\Application.cpp" />
+    <ClCompile Include="Private\Asset.ixx" />
     <ClCompile Include="Private\Buffer.cpp" />
+    <ClCompile Include="Private\Cache.cpp" />
     <ClCompile Include="Private\File.cpp" />
+    <ClCompile Include="Private\Hash.cpp" />
     <ClCompile Include="Private\Image.cpp" />
     <ClCompile Include="Private\Layer.cpp" />
     <ClCompile Include="Private\LayerStack.cpp" />
@@ -176,11 +179,13 @@
     <ClCompile Include="Public\Application.ixx" />
     <ClCompile Include="Public\Assert.ixx" />
     <ClCompile Include="Public\Buffer.ixx" />
+    <ClCompile Include="Public\Cache.ixx" />
     <ClCompile Include="Public\Color.ixx" />
     <ClCompile Include="Public\Core.ixx" />
     <ClCompile Include="Public\Enums.ixx" />
     <ClCompile Include="Public\Event.ixx" />
     <ClCompile Include="Public\File.ixx" />
+    <ClCompile Include="Public\Hash.ixx" />
     <ClCompile Include="Public\Image.ixx" />
     <ClCompile Include="Public\Input.ixx" />
     <ClCompile Include="Public\Layer.ixx" />
