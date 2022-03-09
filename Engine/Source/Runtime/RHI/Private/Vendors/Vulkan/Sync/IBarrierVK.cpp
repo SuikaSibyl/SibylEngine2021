@@ -18,8 +18,14 @@ namespace SIByL::RHI
 		dstStageMask = getVkPipelineStageFlags(desc.dstStageMask);
 		dependencyFlags = getVkDependencyTypeFlags(desc.dependencyType);
 
-		// TODO
 		// - memory barrier
+		memoryBarriers.resize(desc.memoryBarriers.size());
+		for (int i = 0; i < memoryBarriers.size(); i++)
+		{
+			memoryBarriers[i] = *((IMemoryBarrierVK*)desc.memoryBarriers[i])->getVkMemoryBarrier();
+		}
+
+		// TODO
 		// - buffer memory barrier
 		// - image memory barrier
 		imageMemoryBarriers.resize(desc.imageMemoryBarriers.size());

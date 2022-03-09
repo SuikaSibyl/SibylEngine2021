@@ -1,9 +1,5 @@
  #version 450
 
-layout(push_constant) uniform constants {
-    uint particleCount;
-} PushConstants;
-
 struct Particle
 {
     vec4 pos;
@@ -28,6 +24,7 @@ layout(set = 0, binding = 1, std430) buffer Counters
     Counter counter[];
 } counter;
 
+
 layout(set = 0, binding = 2, std430) buffer LiveIndexBuffer
 {
     uint[] indices;
@@ -38,19 +35,23 @@ layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
     uint[] indices;
 } deadPool;
 
-layout (local_size_x = 32) in;
+layout (local_size_x =32) in;
 
 void main()
 {
+    if(gl_GlobalInvocationID.x >= counter.counter[0].aliveCount) return;
+
     uint idx = gl_GlobalInvocationID.x;
-    if(idx >= PushConstants.particleCount) return;
-    
-    if(idx == 0)
+
+    if(idx==0)
     {
-        counter.counter[0].deadCount = PushConstants.particleCount;
-        counter.counter[0].aliveCount = 0;
-        counter.counter[0].maxCount = 2048;
+        if(counter.counter[0].deadCount > counter.counter[0].maxCount)
+            counter.counter[0].deadCount = 0;
     }
-    
-    deadPool.indices[idx] = PushConstants.particleCount - idx - 1;
+
+    memoryBarrier();
+
+    Particle particle = particles.particle[idx];
+    particle.pos.xyz = particle.pos.xyz + particle.vel.xyz * 0.02;
+    particles.particle[idx] = particle;
 }

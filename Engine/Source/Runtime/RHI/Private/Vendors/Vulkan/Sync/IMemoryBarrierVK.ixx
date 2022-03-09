@@ -11,6 +11,17 @@ namespace SIByL
 {
 	namespace RHI
 	{
+        export class IMemoryBarrierVK :public IMemoryBarrier
+        {
+        public:
+            IMemoryBarrierVK(MemoryBarrierDesc const&);
+            virtual ~IMemoryBarrierVK() = default;
+            auto getVkMemoryBarrier() noexcept -> VkMemoryBarrier*;
+
+        private:
+            VkMemoryBarrier barrier{};
+        };
+
         export class IImageMemoryBarrierVK: public IImageMemoryBarrier
         {
         public:

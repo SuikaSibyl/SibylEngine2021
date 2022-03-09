@@ -7,10 +7,15 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 proj;
 } ubo;
 
-layout(set = 0, binding = 2, std430) buffer Positions
+struct Particle
 {
-    vec4 pos[];
-} positions;
+    vec4 pos;
+    vec4 vel;
+};
+layout(set = 0, binding = 2, std430) buffer Particles
+{
+    Particle particle[];
+} particles;
 
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inColor;
@@ -20,7 +25,7 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
 
 void main() {
-    vec3 instance_pos = positions.pos[gl_InstanceIndex.x].xyz;
+    vec3 instance_pos = particles.particle[gl_InstanceIndex.x].pos.xyz;
 
     vec3 look = normalize(ubo.cameraPos.xyz);
     vec3 right = normalize(cross(vec3(0,1,0), look));

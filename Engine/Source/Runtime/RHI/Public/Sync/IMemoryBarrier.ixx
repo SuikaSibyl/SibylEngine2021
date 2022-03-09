@@ -111,7 +111,9 @@ namespace SIByL
         // ╚══════════════════════════════╝
         export struct MemoryBarrierDesc
         {
-
+            // memory barrier mask
+            AccessFlags srcAccessMask;
+            AccessFlags dstAccessMask;
         };
 
         // ╔════════════════════════════════════╗

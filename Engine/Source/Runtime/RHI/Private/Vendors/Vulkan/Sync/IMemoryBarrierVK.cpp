@@ -15,6 +15,18 @@ import RHI.ITexture.VK;
 
 namespace SIByL::RHI
 {
+    IMemoryBarrierVK::IMemoryBarrierVK(MemoryBarrierDesc const& desc)
+    {
+        barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+        barrier.srcAccessMask = getVkAccessFlags(desc.srcAccessMask);
+        barrier.dstAccessMask = getVkAccessFlags(desc.dstAccessMask);
+    }
+    
+    auto IMemoryBarrierVK::getVkMemoryBarrier() noexcept -> VkMemoryBarrier*
+    {
+        return &barrier;
+    }
+
     IImageMemoryBarrierVK::IImageMemoryBarrierVK(ImageMemoryBarrierDesc const& desc)
     {
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;

@@ -89,6 +89,12 @@ public:
 		glm::mat4 proj;
 	};
 
+	struct EmitConstant
+	{
+		unsigned int emitCount;
+		float time;
+	};
+
 	virtual void onAwake() override
 	{
 		RHI::SLANG::ICompileSession comipeSession;
@@ -127,18 +133,23 @@ public:
 
 
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
-		auto particle_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
-		auto intermediate_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
-		update_pass = rdg_builder.addComputePass(shaderCompute.get(), {particle_sb,intermediate_sb}, sizeof(float));
-		init_pass = rdg_builder.addComputePass(shaderComputeInit.get(), {particle_sb,intermediate_sb});
-		rdg_builder.build(resourceFactory.get());
+		//auto particle_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
+		//auto intermediate_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
+		//update_pass = rdg_builder.addComputePass(shaderCompute.get(), {particle_sb,intermediate_sb}, sizeof(float));
+		//init_pass = rdg_builder.addComputePass(shaderComputeInit.get(), {particle_sb,intermediate_sb});
 
-
-		Buffer portal_init;
+		// particle system
+		Buffer portal_init, portal_emit, portal_update;
 		shaderLoader.syncReadAll("portal_init.spv", portal_init);
+		shaderLoader.syncReadAll("portal_emit.spv", portal_emit);
+		shaderLoader.syncReadAll("portal_update.spv", portal_update);
 		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinary(portal_init, { RHI::ShaderStage::COMPUTE,"main" });
-		portal.init(sizeof(float) * 4 * 2, 2048, shaderPortalInit.get());
+		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinary(portal_emit, { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinary(portal_update, { RHI::ShaderStage::COMPUTE,"main" });
+		portal.init(sizeof(float) * 4 * 2, 2048, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 		portal.registerRenderGraph(&rdg_builder);
+
+		rdg_builder.build(resourceFactory.get());
 
 		// load image
 		Image image("./assets/texture.jpg");
@@ -191,7 +202,7 @@ public:
 		{
 			// configure descriptors in sets
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				descriptorSets[i]->update(((GFX::RDG::StorageBufferNode*)rdg.getResourceNode(particle_sb))->storageBuffer.get(), 2, 0);
+				descriptorSets[i]->update(((GFX::RDG::StorageBufferNode*)rdg.getResourceNode(portal.particleBuffer))->storageBuffer.get(), 2, 0);
 			}
 
 			compute_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
@@ -199,9 +210,15 @@ public:
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				});
 
+			compute_memory_barrier_0 = resourceFactory->createMemoryBarrier({
+					(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT | (uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
+					(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT | (uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
+				});
 			compute_barrier_0 = resourceFactory->createBarrier(RHI::BarrierDesc{
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+				0,
+				{compute_memory_barrier_0.get()}
 				});
 
 			compute_barrier_2 = resourceFactory->createBarrier(RHI::BarrierDesc{
@@ -229,21 +246,21 @@ public:
 			inFlightFence[i] = resourceFactory->createFence();
 		}
 
+		timer.start();
 
 		// init storage buffer
 		RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getTransientCommandPool();
 		MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
+		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 64, 1, 1, 0, 2048u);
 
-		rdg.getPassNode(init_pass)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
+		//rdg.getPassNode(init_pass)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
 
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();
 		logicalDevice->waitIdle();
 
-
-		timer.start();
 
 		SE_CORE_INFO("OnAwake End");
 	}
@@ -429,7 +446,7 @@ public:
 				RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
 				commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
 					pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
-				commandbuffers[currentFrame]->cmdDrawIndexed(6, 32, 0, 0, 0);
+				commandbuffers[currentFrame]->cmdDrawIndexed(6, 2048, 0, 0, 0);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
 
@@ -441,8 +458,15 @@ public:
 			deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
 			while (deltaTime > 20)
 			{
+				//commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
+				//rdg.getComputePassNode(update_pass)->executeWithConstant(commandbuffers[currentFrame].get(), 1, 1, 1, currentFrame, 2.0f);
+
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
-				rdg.getComputePassNode(update_pass)->executeWithConstant(commandbuffers[currentFrame].get(), 1, 1, 1, currentFrame, 2.0f);
+				EmitConstant constant_1{ 5u, 100 * (float)timer.getTotalTime() };
+				rdg.getComputePassNode(portal.emitPass)->executeWithConstant(commandbuffers[currentFrame].get(), 64, 1, 1, currentFrame, constant_1);
+				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
+				rdg.getComputePassNode(portal.updatePass)->execute(commandbuffers[currentFrame].get(), 64, 1, 1, currentFrame);
+
 				deltaTime -= 20;
 			}
 
@@ -484,8 +508,6 @@ private:
 	MemScope<RHI::IShader> shaderCompute;
 	MemScope<RHI::IShader> shaderComputeInit;
 
-	MemScope<RHI::IStorageBuffer> storageBuffer_1;
-	MemScope<RHI::IStorageBuffer> storageBuffer_2;
 	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;
 
 	MemScope<RHI::ITexture> texture;
@@ -499,6 +521,7 @@ private:
 	MemScope<RHI::IPipelineLayout> pipeline_layout;
 	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
+	MemScope<RHI::IMemoryBarrier> compute_memory_barrier_0;
 	MemScope<RHI::IBarrier> compute_barrier_0;
 	MemScope<RHI::IBarrier> compute_barrier;
 	MemScope<RHI::IBarrier> compute_barrier_2;
