@@ -69,7 +69,9 @@ import GFX.SceneTree;
 import GFX.Scene;
 import GFX.Mesh;
 import GFX.RDG.RenderGraph;
+import GFX.RDG.StorageBufferNode;
 
+import ParticleSystem.ParticleSystem;
 
 import UAT.IUniversalApplication;
 
@@ -110,9 +112,6 @@ public:
 		scene.deserialize("test_scene.scene", logicalDevice.get());
 
 
-		GFX::RDG::RenderGraphBuilder rdg_builder;
-		auto particle_sb = rdg_builder.addStorageBuffer();
-
 		// shader resources
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
@@ -125,6 +124,21 @@ public:
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
+
+
+		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
+		auto particle_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
+		auto intermediate_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
+		update_pass = rdg_builder.addComputePass(shaderCompute.get(), {particle_sb,intermediate_sb}, sizeof(float));
+		init_pass = rdg_builder.addComputePass(shaderComputeInit.get(), {particle_sb,intermediate_sb});
+		rdg_builder.build(resourceFactory.get());
+
+
+		Buffer portal_init;
+		shaderLoader.syncReadAll("portal_init.spv", portal_init);
+		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinary(portal_init, { RHI::ShaderStage::COMPUTE,"main" });
+		portal.init(sizeof(float) * 4 * 2, 2048, shaderPortalInit.get());
+		portal.registerRenderGraph(&rdg_builder);
 
 		// load image
 		Image image("./assets/texture.jpg");
@@ -175,49 +189,18 @@ public:
 		}
 		// compute stuff
 		{
-			// create storage buffers
-			storageBuffer_1 = resourceFactory->createStorageBuffer(sizeof(float) * 4 * 32);
-			storageBuffer_2 = resourceFactory->createStorageBuffer(sizeof(float) * 4 * 32);
-
-			// create descriptor set layout
-			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-			{ {{ 0, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-			   { 1, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT, nullptr }} };
-			compute_desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
-
-			// create pipeline layout
-			RHI::PipelineLayoutDesc pipelineLayout_desc =
-			{ {compute_desciptor_set_layout.get()} };
-			compute_pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
-
-			// create comput pipeline
-			RHI::ComputePipelineDesc pipeline_desc =
-			{
-				compute_pipeline_layout.get(),
-				shaderCompute.get()
-			};
-			
-			// create descriptor set
-			compute_descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-			RHI::DescriptorSetDesc descriptor_set_desc =
-			{	descriptorPool.get(),
-				compute_desciptor_set_layout.get() };
-			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-				compute_descriptorSets[i] = resourceFactory->createDescriptorSet(descriptor_set_desc);
-
 			// configure descriptors in sets
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				compute_descriptorSets[i]->update(storageBuffer_1.get(), 0, 0);
-				compute_descriptorSets[i]->update(storageBuffer_2.get(), 1, 0);
-				descriptorSets[i]->update(storageBuffer_1.get(), 2, 0);
+				descriptorSets[i]->update(((GFX::RDG::StorageBufferNode*)rdg.getResourceNode(particle_sb))->storageBuffer.get(), 2, 0);
 			}
-
-			computePipeline = resourceFactory->createPipeline(pipeline_desc);
-			pipeline_desc.shader = shaderComputeInit.get();
-			initcomputePipeline = resourceFactory->createPipeline(pipeline_desc);
 
 			compute_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
 				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+				});
+
+			compute_barrier_0 = resourceFactory->createBarrier(RHI::BarrierDesc{
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				});
 
@@ -252,11 +235,8 @@ public:
 		MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
-		RHI::IDescriptorSet* compute_tmp_set = compute_descriptorSets[0].get();
-		transientCommandbuffer->cmdBindComputePipeline(initcomputePipeline.get());
-		transientCommandbuffer->cmdBindDescriptorSets(RHI::PipelineBintPoint::COMPUTE,
-			compute_pipeline_layout.get(), 0, 1, &compute_tmp_set, 0, nullptr);
-		transientCommandbuffer->cmdDispatch(1, 1, 1);
+
+		rdg.getPassNode(init_pass)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
 
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();
@@ -405,6 +385,8 @@ public:
 		return false;
 	}
 
+	float test = 1.0f;
+
 	virtual void onUpdate() override
 	{
 		// 1. Wait for the previous frame to finish
@@ -454,11 +436,15 @@ public:
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier.get());
-			RHI::IDescriptorSet* compute_tmp_set = compute_descriptorSets[currentFrame].get();
-			commandbuffers[currentFrame]->cmdBindComputePipeline(computePipeline.get());
-			commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::COMPUTE,
-				compute_pipeline_layout.get(), 0, 1, &compute_tmp_set, 0, nullptr);
-			commandbuffers[currentFrame]->cmdDispatch(1, 1, 1);
+
+			static float deltaTime = 0;
+			deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
+			while (deltaTime > 20)
+			{
+				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
+				rdg.getComputePassNode(update_pass)->executeWithConstant(commandbuffers[currentFrame].get(), 1, 1, 1, currentFrame, 2.0f);
+				deltaTime -= 20;
+			}
 
 			commandbuffers[currentFrame]->endRecording();
 			//	4. Submit the recorded command buffer
@@ -483,6 +469,10 @@ private:
 	uint32_t currentFrame = 0;
 
 	GFX::Scene scene;
+	GFX::RDG::RenderGraph rdg;
+	GFX::RDG::NodeHandle init_pass;
+	GFX::RDG::NodeHandle update_pass;
+	ParticleSystem::ParticleSystem portal;
 
 	MemScope<RHI::IGraphicContext> graphicContext;
 	MemScope<RHI::IPhysicalDevice> physicalDevice;
@@ -509,17 +499,13 @@ private:
 	MemScope<RHI::IPipelineLayout> pipeline_layout;
 	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
+	MemScope<RHI::IBarrier> compute_barrier_0;
 	MemScope<RHI::IBarrier> compute_barrier;
 	MemScope<RHI::IBarrier> compute_barrier_2;
-	MemScope<RHI::IPipelineLayout> compute_pipeline_layout;
-	MemScope<RHI::IDescriptorSetLayout> compute_desciptor_set_layout;
-	std::vector<MemScope<RHI::IDescriptorSet>> compute_descriptorSets;
 
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;
 	MemScope<RHI::IPipeline> pipeline;
-	MemScope<RHI::IPipeline> computePipeline;
-	MemScope<RHI::IPipeline> initcomputePipeline;
 	std::vector<MemScope<RHI::IFramebuffer>> framebuffers;
 
 	MemScope<RHI::ICommandPool> commandPool;

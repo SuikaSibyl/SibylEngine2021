@@ -36,7 +36,7 @@
     <ClCompile Include="Public\RDG\RenderGraph.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\IResource.ixx">
+    <ClCompile Include="Public\RDG\Resource\ResourceNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\RDG\Pass\IRasterPass.ixx">
@@ -45,16 +45,25 @@
     <ClCompile Include="Public\Components\Mesh.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\Pass\IPass.ixx">
+    <ClCompile Include="Public\RDG\Pass\PassNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\Pass\IComputePass.ixx">
+    <ClCompile Include="Public\RDG\Pass\ComputePassNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\RDG\Common.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Private\RDG\RenderGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RDG\Pass\ComputePassNode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\StorageBufferNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\UniformBufferNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

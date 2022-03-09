@@ -1,0 +1,64 @@
+ #version 450
+
+layout(binding = 0) uniform InitUniformBuffer {
+    uint emitCount;
+    
+} ubo;
+
+struct Particle
+{
+    vec4 pos;
+    vec4 vel;
+};
+
+layout(set = 0, binding = 0, std430) buffer Particles
+{
+    Particle particle[];
+} particles;
+
+layout(set = 0, binding = 1, std430) buffer Counter
+{
+    uint aliveCount;
+    uint deadCount;
+    uint emitCount;
+    uint drawCount;
+} counter;
+
+layout(set = 0, binding = 2, std430) buffer LiveIndexBuffer
+{
+    uint[] indices;
+} livePool;
+
+layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
+{
+    uint[] indices;
+} deadPool;
+
+layout (local_size_x =32) in;
+
+float hash(float n) { return fract(sin(n) * 1e4); }
+float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
+//  3 out, 1 in...
+vec3 hash31(float p)
+{
+   vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
+   p3 += dot(p3, p3.yzx+33.33);
+   return fract((p3.xxy+p3.yzz)*p3.zyx); 
+}
+
+void main()
+{
+    Particle new_particle;
+    new_particle.pos = vec4(hash31(gl_GlobalInvocationID.x), 1.0);
+
+    if(gl_GlobalInvocationID.x >= ubo.emitCount) return;
+
+    // Move a dead particle to alive
+    uint deadCount = atomicAdd(counter.deadCount, -1);
+    if(deadCount <= 1) return; // If no space is available
+    uint newParticleIdx = deadPool.indices[deadCount-1];
+    particles.particle[newParticleIdx] = new_particle;
+    // add the new particle idx to live pool
+    uint aliveCount = atomicAdd(counter.aliveCount, 1);
+    livePool.indices[aliveCount] = newParticleIdx;
+}

@@ -3,6 +3,7 @@ module;
 #include <vector>
 export module RHI.IPipelineLayout;
 import Core.SObject;
+import RHI.IEnum;
 import RHI.IDescriptorSetLayout;
 
 namespace SIByL
@@ -17,10 +18,17 @@ namespace SIByL
 		// │  DirectX 12  │   RootSignature**   │
 		// │  OpenGL      │                     │
 		// ╰──────────────┴─────────────────────╯
+		export struct PushConstantDesc
+		{
+			uint32_t offset;
+			uint32_t size;
+			ShaderStageFlags stages;
+		};
 
 		export struct PipelineLayoutDesc
 		{
 			std::vector<IDescriptorSetLayout*> layouts;
+			std::vector<PushConstantDesc> pushConstants;
 		};
 
 		export class IPipelineLayout :public SObject
@@ -29,7 +37,6 @@ namespace SIByL
 			IPipelineLayout() = default;
 			IPipelineLayout(IPipelineLayout&&) = default;
 			virtual ~IPipelineLayout() = default;
-
 		};
 	}
 }

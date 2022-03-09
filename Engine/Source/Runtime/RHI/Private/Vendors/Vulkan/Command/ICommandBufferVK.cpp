@@ -236,4 +236,9 @@ namespace SIByL::RHI
 	{
 		vkCmdDispatch(commandBuffer, x, y, z);
 	}
+
+	auto ICommandBufferVK::cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void
+	{
+		vkCmdPushConstants(commandBuffer, *((IPipelineLayoutVK*)pipeline_layout)->getVkPipelineLayout(), getVkShaderStage(stage), 0, size, data);
+	}
 }

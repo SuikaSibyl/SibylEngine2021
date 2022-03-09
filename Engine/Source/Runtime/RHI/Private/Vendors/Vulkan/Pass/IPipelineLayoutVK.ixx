@@ -18,7 +18,9 @@ namespace SIByL
 
 			auto getVkPipelineLayout() noexcept -> VkPipelineLayout*;
 			auto createPipelineLayout(PipelineLayoutDesc const& desc) noexcept -> void;
+
 		private:
+			std::vector<VkPushConstantRange> pushConstants;
 			ILogicalDeviceVK* logicalDevice;
 			VkPipelineLayout pipelineLayout;
 		};

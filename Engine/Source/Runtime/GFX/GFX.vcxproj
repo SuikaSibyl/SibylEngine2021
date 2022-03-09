@@ -150,17 +150,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\GFXLayer\GFXLayer.cpp" />
+    <ClCompile Include="Private\RDG\Pass\ComputePassNode.cpp" />
     <ClCompile Include="Private\RDG\RenderGraph.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
     <ClCompile Include="Public\GFXLayer\GFXLayer.ixx" />
     <ClCompile Include="Public\RDG\Common.ixx" />
-    <ClCompile Include="Public\RDG\Pass\IComputePass.ixx" />
-    <ClCompile Include="Public\RDG\Pass\IPass.ixx" />
+    <ClCompile Include="Public\RDG\Pass\ComputePassNode.ixx" />
+    <ClCompile Include="Public\RDG\Pass\PassNode.ixx" />
     <ClCompile Include="Public\RDG\Pass\IRasterPass.ixx" />
-    <ClCompile Include="Public\RDG\Resource\IResource.ixx" />
+    <ClCompile Include="Public\RDG\Resource\ResourceNode.ixx" />
     <ClCompile Include="Public\RDG\RenderGraph.ixx" />
+    <ClCompile Include="Public\RDG\Resource\StorageBufferNode.ixx" />
+    <ClCompile Include="Public\RDG\Resource\UniformBufferNode.ixx" />
     <ClCompile Include="Public\Scene\Scene.ixx" />
     <ClCompile Include="Public\Scene\SceneTree.ixx" />
   </ItemGroup>

@@ -15,5 +15,5 @@ layout (local_size_x =32) in;
 void main()
 {
     positions.pos[gl_GlobalInvocationID.x] = vec4(0 ,0, 0,0);
-    velocities.vel[gl_GlobalInvocationID.x] = 10 * vec4(sin(gl_GlobalInvocationID.x),cos(gl_GlobalInvocationID.x),0,0);
+    velocities.vel[gl_GlobalInvocationID.x] = vec4(sin(gl_GlobalInvocationID.x),cos(gl_GlobalInvocationID.x),0,0);
 }

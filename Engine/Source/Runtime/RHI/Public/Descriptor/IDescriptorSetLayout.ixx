@@ -26,10 +26,6 @@ namespace SIByL
 
 		export struct DescriptorSetLayoutDesc
 		{
-			DescriptorSetLayoutDesc(std::initializer_list<DescriptorSetLayoutPerBindingDesc> const& per_binding_desc)
-				:perBindingDesc(per_binding_desc)
-			{}
-
 			std::vector<DescriptorSetLayoutPerBindingDesc> perBindingDesc;
 		};
 

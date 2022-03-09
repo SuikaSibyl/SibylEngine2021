@@ -105,6 +105,7 @@ namespace SIByL
 			virtual auto cmdPipelineBarrier(IBarrier* barrier) noexcept -> void = 0;
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void = 0;
 			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void = 0;
+			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void = 0;
 		};
 	}
 }

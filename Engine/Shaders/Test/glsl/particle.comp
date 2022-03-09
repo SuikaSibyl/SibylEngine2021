@@ -1,5 +1,10 @@
  #version 450
- 
+
+layout(push_constant) uniform constants
+{
+    float delta_time;
+} PushConstants;
+
 layout(set = 0, binding = 0, std430) buffer Positions
 {
     vec4 pos[];
@@ -16,6 +21,7 @@ void main()
 {
     vec3 current_pos = positions.pos[gl_GlobalInvocationID.x].xyz;
     vec3 velocity = velocities.vel[gl_GlobalInvocationID.x].xyz;
-    current_pos += 0.00001 * velocity;
+    float time = PushConstants.delta_time * 0.01;
+    current_pos += 0.01 * velocity * PushConstants.delta_time;
     positions.pos[gl_GlobalInvocationID.x].xyz = current_pos;
 }

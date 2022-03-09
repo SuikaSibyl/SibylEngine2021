@@ -58,6 +58,7 @@ namespace SIByL
 			virtual auto cmdPipelineBarrier(IBarrier* barrier) noexcept -> void override;
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void override;
 			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void override;
+			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void override;
 
 		private:
 			auto createVkCommandBuffer() noexcept -> void;

@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependency", "Dependency", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yaml", "Engine\Source\ThirdParty\yaml\yaml.vcxproj", "{D5738559-A252-4307-BF8F-9F44E106E922}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ParticleSystem", "Engine\Source\Runtime\ParticleSystem\ParticleSystem.vcxproj", "{6F305728-C599-430C-979C-E9C1E833F300}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -170,6 +172,22 @@ Global
 		{D5738559-A252-4307-BF8F-9F44E106E922}.ReleaseCuda|x64.Build.0 = ReleaseCuda|x64
 		{D5738559-A252-4307-BF8F-9F44E106E922}.ReleaseCuda|x86.ActiveCfg = ReleaseCuda|Win32
 		{D5738559-A252-4307-BF8F-9F44E106E922}.ReleaseCuda|x86.Build.0 = ReleaseCuda|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.Debug|x64.ActiveCfg = Debug|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.Debug|x64.Build.0 = Debug|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.Debug|x86.ActiveCfg = Debug|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.Debug|x86.Build.0 = Debug|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.DebugCuda|x64.ActiveCfg = Debug|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.DebugCuda|x64.Build.0 = Debug|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.DebugCuda|x86.ActiveCfg = Debug|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.DebugCuda|x86.Build.0 = Debug|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.Release|x64.ActiveCfg = Release|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.Release|x64.Build.0 = Release|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.Release|x86.ActiveCfg = Release|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.Release|x86.Build.0 = Release|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.ReleaseCuda|x64.ActiveCfg = Release|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.ReleaseCuda|x64.Build.0 = Release|x64
+		{6F305728-C599-430C-979C-E9C1E833F300}.ReleaseCuda|x86.ActiveCfg = Release|Win32
+		{6F305728-C599-430C-979C-E9C1E833F300}.ReleaseCuda|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -182,6 +200,7 @@ Global
 		{688C4381-BA51-4866-9827-EB59AE7008CB} = {7A21A15F-29D8-4406-A7D5-DD7B6CAA8BAB}
 		{92E7A182-38C2-4444-BE91-CE9FED5F178A} = {7A21A15F-29D8-4406-A7D5-DD7B6CAA8BAB}
 		{D5738559-A252-4307-BF8F-9F44E106E922} = {967D1110-DD62-45A7-B339-C04E90AF8F70}
+		{6F305728-C599-430C-979C-E9C1E833F300} = {7A21A15F-29D8-4406-A7D5-DD7B6CAA8BAB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {27B9800B-2764-4CEA-AC3A-22CF85804273}

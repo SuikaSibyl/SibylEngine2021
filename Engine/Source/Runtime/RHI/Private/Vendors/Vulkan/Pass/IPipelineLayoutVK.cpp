@@ -7,6 +7,7 @@ import RHI.IPipelineLayout;
 import RHI.IDescriptorSetLayout;
 import RHI.IDescriptorSetLayout.VK;
 import RHI.ILogicalDevice.VK;
+import RHI.IEnum.VK;
 
 namespace SIByL::RHI
 {
@@ -41,6 +42,19 @@ namespace SIByL::RHI
 		pipelineLayoutInfo.pSetLayouts = layouts.data(); // Optional
 		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+
+		if (desc.pushConstants.size() != 0)
+		{
+			pushConstants.resize(desc.pushConstants.size());
+			for (int i = 0; i < desc.pushConstants.size(); i++)
+			{
+				pushConstants[i].offset = desc.pushConstants[i].offset;
+				pushConstants[i].size = desc.pushConstants[i].size;
+				pushConstants[i].stageFlags = getVkShaderStageFlags(desc.pushConstants[i].stages);
+			}
+			pipelineLayoutInfo.pPushConstantRanges = pushConstants.data();
+			pipelineLayoutInfo.pushConstantRangeCount = desc.pushConstants.size();
+		}
 
 		if (vkCreatePipelineLayout(logicalDevice->getDeviceHandle(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
 			SE_CORE_ERROR("VULKAN :: failed to create pipeline layout!");
