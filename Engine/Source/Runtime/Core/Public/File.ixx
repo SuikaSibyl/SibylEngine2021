@@ -17,6 +17,7 @@ namespace SIByL
 			using AssetFilePtr = void*;
 
 			AssetLoader() = default;
+			AssetLoader(std::vector<std::filesystem::path> const& pathes);
 			virtual ~AssetLoader() = default;
 
 			auto addSearchPath(std::filesystem::path const& path) noexcept -> void;

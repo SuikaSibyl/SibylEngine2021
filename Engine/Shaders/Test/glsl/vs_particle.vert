@@ -29,16 +29,17 @@ void main() {
 
     vec3 look = normalize(ubo.cameraPos.xyz);
     vec3 right = normalize(cross(vec3(0,1,0), look));
-    vec3 up = normalize(cross(look, right));
+    vec3 up = normalize(cross(right, look));
     mat4 billboardMat = mat4(
         right.x,right.y,right.z,0,
         up.x,up.y,up.z,0,
         look.x,look.y,look.z,0,
         0,0,0,1);
 
-    vec4 modelPosition = ubo.model * vec4(inPosition,1.0);
+    vec4 modelPosition = billboardMat *  ubo.model * vec4(inPosition,1.0);
 
-    gl_Position = ubo.proj * ubo.view * billboardMat * (vec4(modelPosition.xyz + instance_pos, 1.0));
+    gl_Position = ubo.proj * ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
+    //gl_Position = ubo.proj * ubo.view * billboardMat * (vec4(modelPosition.xyz + instance_pos, 1.0));
     fragColor = inColor;
     fragTexCoord = inTexCoord;
 }

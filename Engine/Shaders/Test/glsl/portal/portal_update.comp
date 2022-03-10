@@ -35,6 +35,20 @@ layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
     uint[] indices;
 } deadPool;
 
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+
+layout(set = 0, binding = 4, std430) buffer IndirectDrawBuffer
+{
+    DrawIndexedIndirect[] content;
+} IndirectBuffer;
+
 layout (local_size_x =32) in;
 
 void main()
@@ -53,5 +67,20 @@ void main()
 
     Particle particle = particles.particle[idx];
     particle.pos.xyz = particle.pos.xyz + particle.vel.xyz * 0.02;
+    particle.pos.w -= 1;
+    if(particle.pos.w <= 0)
+    {
+        uint deadCount = atomicAdd(counter.counter[0].deadCount, 1);
+        deadPool.indices[deadCount] = idx;
+        uint aliveCount = atomicAdd(counter.counter[0].aliveCount, -1);
+        livePool.indices[idx] = livePool.indices[aliveCount-1];
+    }
     particles.particle[idx] = particle;
+
+    memoryBarrier();
+    if(idx==0)
+    {
+        uint aliveCount = atomicAdd(counter.counter[0].aliveCount, 0);
+        IndirectBuffer.content[0].instanceCount = aliveCount;
+    }
 }

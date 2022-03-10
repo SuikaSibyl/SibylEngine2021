@@ -66,5 +66,8 @@
     <ClCompile Include="Public\RDG\Resource\UniformBufferNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\IndirectDrawBufferNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

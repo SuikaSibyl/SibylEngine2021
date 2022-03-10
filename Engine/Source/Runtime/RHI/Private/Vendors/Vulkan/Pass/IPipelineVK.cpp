@@ -44,22 +44,6 @@ namespace SIByL
 			return &graphicsPipeline;
 		}
 
-		auto getVkPipelineDepthStencilStateCreateInfo() noexcept -> VkPipelineDepthStencilStateCreateInfo
-		{
-			VkPipelineDepthStencilStateCreateInfo depthStencil{};
-			depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-			depthStencil.depthTestEnable = VK_TRUE;
-			depthStencil.depthWriteEnable = VK_TRUE;
-			depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
-			depthStencil.depthBoundsTestEnable = VK_FALSE;
-			depthStencil.minDepthBounds = 0.0f; // Optional
-			depthStencil.maxDepthBounds = 1.0f; // Optional
-			depthStencil.stencilTestEnable = VK_FALSE;
-			depthStencil.front = {}; // Optional
-			depthStencil.back = {}; // Optional
-			return depthStencil;
-		}
-
 		auto IPipelineVK::createVkPipeline() noexcept -> void
 		{
 			std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
@@ -68,8 +52,6 @@ namespace SIByL
 			{
 				shaderStages[i] = *(static_cast<IShaderVK*>(desc.shaders[i]))->getVkShaderStageCreateInfo();
 			}
-
-			VkPipelineDepthStencilStateCreateInfo depth_stencil_create_info = getVkPipelineDepthStencilStateCreateInfo();
 
 			VkGraphicsPipelineCreateInfo pipelineInfo{};
 			pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -80,7 +62,7 @@ namespace SIByL
 			pipelineInfo.pViewportState = static_cast<IViewportsScissorsVK*>(desc.viewportsScissors)->getVkPipelineViewportStateCreateInfo();
 			pipelineInfo.pRasterizationState = static_cast<IRasterizerVK*>(desc.rasterizer)->getVkPipelineRasterizationStateCreateInfo();
 			pipelineInfo.pMultisampleState = static_cast<IMultisamplingVK*>(desc.multisampling)->getVkPipelineMultisampleStateCreateInfo();
-			pipelineInfo.pDepthStencilState = &depth_stencil_create_info; // TODO :: Optional
+			pipelineInfo.pDepthStencilState = static_cast<IDepthStencilVK*>(desc.depthStencil)->getVkPipelineDepthStencilStateCreateInfo();
 			pipelineInfo.pColorBlendState = static_cast<IColorBlendingVK*>(desc.colorBlending)->getVkPipelineColorBlendStateCreateInfo();
 			pipelineInfo.pDynamicState = nullptr; // Optional
 			pipelineInfo.layout = *(static_cast<IPipelineLayoutVK*>(desc.pipelineLayout)->getVkPipelineLayout());

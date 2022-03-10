@@ -15,13 +15,13 @@ import RHI.ILogicalDevice.VK;
 
 namespace SIByL::RHI
 {
-	IStorageBufferVK::IStorageBufferVK(uint32_t const& size, ILogicalDeviceVK* logical_device)
+	IStorageBufferVK::IStorageBufferVK(uint32_t const& size, ILogicalDeviceVK* logical_device, BufferUsageFlags const& extra_usage)
 		: logicalDevice(logical_device)
 	{
 		BufferDesc bufferDesc =
 		{
 			(unsigned int)size,
-			(BufferUsageFlags)BufferUsageFlagBits::STORAGE_BUFFER_BIT,
+			(BufferUsageFlags)BufferUsageFlagBits::STORAGE_BUFFER_BIT | extra_usage,
 			BufferShareMode::EXCLUSIVE,
 			(uint32_t)MemoryPropertyFlagBits::DEVICE_LOCAL_BIT
 		};

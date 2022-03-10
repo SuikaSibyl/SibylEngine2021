@@ -12,6 +12,14 @@ namespace SIByL
 {
 	inline namespace Core
 	{
+		AssetLoader::AssetLoader(std::vector<std::filesystem::path> const& pathes)
+		{
+			for (int i = 0; i < pathes.size(); i++)
+			{
+				addSearchPath(pathes[i]);
+			}
+		}
+
 		auto AssetLoader::addSearchPath(std::filesystem::path const& path) noexcept -> void
 		{
 			for (auto iter = searchPathes.begin(); iter != searchPathes.end();)

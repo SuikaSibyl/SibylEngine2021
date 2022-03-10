@@ -33,7 +33,7 @@ namespace SIByL::Core
 		return { (float)xpos, (float)ypos };
 	}
 
-	auto IInputGLFW::getMouseX(int button) noexcept -> bool
+	auto IInputGLFW::getMouseX() noexcept -> float
 	{
 		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
 		double xpos, ypos;
@@ -42,7 +42,7 @@ namespace SIByL::Core
 		return (float)xpos;
 	}
 
-	auto IInputGLFW::getMouseY(int button) noexcept -> bool
+	auto IInputGLFW::getMouseY() noexcept -> float
 	{
 		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
 		double xpos, ypos;

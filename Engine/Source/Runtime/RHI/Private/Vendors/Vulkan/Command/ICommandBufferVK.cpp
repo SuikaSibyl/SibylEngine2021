@@ -36,6 +36,7 @@ import RHI.IMemoryBarrier;
 import RHI.IMemoryBarrier.VK;
 import RHI.ITexture;
 import RHI.ITexture.VK;
+import RHI.IStorageBuffer.VK;
 
 namespace SIByL::RHI
 {
@@ -240,5 +241,10 @@ namespace SIByL::RHI
 	auto ICommandBufferVK::cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void
 	{
 		vkCmdPushConstants(commandBuffer, *((IPipelineLayoutVK*)pipeline_layout)->getVkPipelineLayout(), getVkShaderStage(stage), 0, size, data);
+	}
+
+	auto ICommandBufferVK::cmdDrawIndexedIndirect(IStorageBuffer* storageBuffer, uint32_t const& indiret_offset, uint32_t const& draw_count, uint32_t const& draw_stride) noexcept -> void
+	{
+		vkCmdDrawIndexedIndirect(commandBuffer, *((IStorageBufferVK*)storageBuffer)->getVkBuffer(), indiret_offset, draw_count, draw_stride);
 	}
 }

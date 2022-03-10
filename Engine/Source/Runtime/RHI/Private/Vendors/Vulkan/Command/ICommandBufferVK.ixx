@@ -24,6 +24,7 @@ import RHI.IPipelineLayout;
 import RHI.IDescriptorSet;
 import RHI.IBarrier;
 import RHI.ITexture;
+import RHI.IStorageBuffer.VK;
 
 namespace SIByL
 {
@@ -59,6 +60,7 @@ namespace SIByL
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void override;
 			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void override;
 			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void override;
+			virtual auto cmdDrawIndexedIndirect(IStorageBuffer* storageBuffer, uint32_t const& indiret_offset, uint32_t const& draw_count, uint32_t const& draw_stride) noexcept -> void override;
 
 		private:
 			auto createVkCommandBuffer() noexcept -> void;

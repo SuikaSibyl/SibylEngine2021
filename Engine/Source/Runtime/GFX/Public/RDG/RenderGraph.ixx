@@ -9,6 +9,7 @@ import GFX.RDG.Common;
 import GFX.RDG.PassNode;
 import GFX.RDG.ResourceNode;
 import GFX.RDG.ComputePassNode;
+import GFX.RDG.IndirectDrawBufferNode;
 
 namespace SIByL::GFX::RDG
 {
@@ -18,6 +19,7 @@ namespace SIByL::GFX::RDG
 	public:
 		auto getDescriptorPool() noexcept -> RHI::IDescriptorPool*;
 		auto getResourceNode(NodeHandle handle) noexcept -> ResourceNode*;
+		auto getIndirectDrawBufferNode(NodeHandle handle) noexcept -> IndirectDrawBufferNode*;
 		auto getPassNode(NodeHandle handle) noexcept -> PassNode*;
 		auto getComputePassNode(NodeHandle handle) noexcept -> ComputePassNode*;
 		auto getMaxFrameInFlight() noexcept -> uint32_t { return 2; }
@@ -40,6 +42,7 @@ namespace SIByL::GFX::RDG
 		auto addTexture() noexcept -> NodeHandle;
 		auto addUniformBuffer(size_t size) noexcept -> NodeHandle;
 		auto addStorageBuffer(size_t size) noexcept -> NodeHandle;
+		auto addIndirectDrawBuffer() noexcept -> NodeHandle;
 
 		auto addComputePass(RHI::IShader* shader, std::vector<NodeHandle>&& ios, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
 

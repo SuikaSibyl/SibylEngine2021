@@ -30,6 +30,7 @@ namespace SIByL::ParticleSystem
 		GFX::RDG::NodeHandle liveIndexBufferPrimary;
 		GFX::RDG::NodeHandle liveIndexBufferSecondary;
 		GFX::RDG::NodeHandle counterBuffer;
+		GFX::RDG::NodeHandle indirectDrawBuffer;
 
 		GFX::RDG::NodeHandle initPass;
 		GFX::RDG::NodeHandle emitPass;

@@ -208,15 +208,28 @@ namespace SIByL::RHI
 		multisampling.alphaToOneEnable = VK_FALSE; // Optional
 	}
 
+	auto getVkCompareOp(CompareOp op) noexcept -> VkCompareOp
+	{
+		return (VkCompareOp)op;
+	}
+
 	IDepthStencilVK::IDepthStencilVK(DepthStencilDesc const& desc)
 	{
-		
+		depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+		depthStencil.depthTestEnable = desc.depthTest ? VK_TRUE : VK_FALSE;
+		depthStencil.depthWriteEnable = desc.depthWrite ? VK_TRUE : VK_FALSE;
+		depthStencil.depthCompareOp = getVkCompareOp(desc.depthOp);
+		depthStencil.depthBoundsTestEnable = VK_FALSE;
+		depthStencil.minDepthBounds = 0.0f; // Optional
+		depthStencil.maxDepthBounds = 1.0f; // Optional
+		depthStencil.stencilTestEnable = VK_FALSE;
+		depthStencil.front = {}; // Optional
+		depthStencil.back = {}; // Optional
 	}
 
 	auto IDepthStencilVK::getVkPipelineDepthStencilStateCreateInfo() noexcept
 		-> VkPipelineDepthStencilStateCreateInfo*
 	{
-		if (!initialized) return nullptr;
 		return &depthStencil;
 	}
 

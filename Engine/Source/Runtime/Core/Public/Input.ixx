@@ -12,8 +12,8 @@ namespace SIByL
 			virtual auto isKeyPressed(int keycode) noexcept -> bool = 0;
 			virtual auto isMouseButtonPressed(int button) noexcept -> bool = 0;
 			virtual auto getMousePosition(int button) noexcept -> std::pair<float, float> = 0;
-			virtual auto getMouseX(int button) noexcept -> bool = 0;
-			virtual auto getMouseY(int button) noexcept -> bool = 0;
+			virtual auto getMouseX() noexcept -> float = 0;
+			virtual auto getMouseY() noexcept -> float = 0;
 		};
 	}
 }

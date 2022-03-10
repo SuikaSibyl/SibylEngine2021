@@ -1,5 +1,5 @@
 module;
-
+#include <cstdint>
 export module GFX.RDG.ResourceNode;
 import RHI.IEnum;
 import RHI.IFactory;

@@ -3,6 +3,8 @@
 layout(push_constant) uniform constants {
     uint emitCount;
     float time;
+    float offset_x;
+    float offset_y;
 } PushConstants;
 
 struct Particle
@@ -70,8 +72,12 @@ void main()
     if(deadCount <= 1 || deadCount > counter.counter[0].maxCount) return; // If no space is available
 
     Particle new_particle;
-    new_particle.pos = vec4(hash32(vec2(gl_GlobalInvocationID.x, PushConstants.time)), 1.0);
-    new_particle.vel = vec4(hash32(vec2(gl_GlobalInvocationID.x, 1 + PushConstants.time)), 1.0);
+    float theta = 2 * 3.1415926f * gl_GlobalInvocationID.x / PushConstants.emitCount + PushConstants.time * 0.1f;
+    new_particle.pos = vec4(PushConstants.offset_x,PushConstants.offset_y,0, 1.0);
+    new_particle.vel = vec4(cos(theta), sin(theta), 0, 1.0);
+    //new_particle.pos = vec4(hash32(vec2(gl_GlobalInvocationID.x, PushConstants.time)), 1.0);
+    //new_particle.vel = vec4(hash32(vec2(gl_GlobalInvocationID.x, 1 + PushConstants.time)), 1.0);
+    new_particle.pos.w = 200;
 
     uint newParticleIdx = deadPool.indices[deadCount-1];
     particles.particle[newParticleIdx] = new_particle;

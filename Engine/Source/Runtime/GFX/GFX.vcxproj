@@ -160,6 +160,7 @@
     <ClCompile Include="Public\RDG\Pass\ComputePassNode.ixx" />
     <ClCompile Include="Public\RDG\Pass\PassNode.ixx" />
     <ClCompile Include="Public\RDG\Pass\IRasterPass.ixx" />
+    <ClCompile Include="Public\RDG\Resource\IndirectDrawBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\ResourceNode.ixx" />
     <ClCompile Include="Public\RDG\RenderGraph.ixx" />
     <ClCompile Include="Public\RDG\Resource\StorageBufferNode.ixx" />

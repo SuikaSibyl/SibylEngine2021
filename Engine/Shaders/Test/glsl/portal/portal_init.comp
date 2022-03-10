@@ -38,6 +38,20 @@ layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
     uint[] indices;
 } deadPool;
 
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+
+layout(set = 0, binding = 4, std430) buffer IndirectDrawBuffer
+{
+    DrawIndexedIndirect[] content;
+} IndirectBuffer;
+
 layout (local_size_x = 32) in;
 
 void main()
@@ -45,12 +59,20 @@ void main()
     uint idx = gl_GlobalInvocationID.x;
     if(idx >= PushConstants.particleCount) return;
     
+    deadPool.indices[idx] = PushConstants.particleCount - idx - 1;
+
     if(idx == 0)
     {
         counter.counter[0].deadCount = PushConstants.particleCount;
         counter.counter[0].aliveCount = 0;
-        counter.counter[0].maxCount = 2048;
+        counter.counter[0].maxCount = PushConstants.particleCount;
+        
+        DrawIndexedIndirect indirectBuffer;
+        indirectBuffer.indexCount = 6;
+        indirectBuffer.instanceCount = 0;
+        indirectBuffer.firstIndex = 0;
+        indirectBuffer.vertexOffset = 0;
+        indirectBuffer.firstInstance = 0;
+        IndirectBuffer.content[0] = indirectBuffer;
     }
-    
-    deadPool.indices[idx] = PushConstants.particleCount - idx - 1;
 }

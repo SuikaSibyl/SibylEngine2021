@@ -14,6 +14,7 @@ module;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "entt/entt.hpp"
+#include <math.h>
 module Main;
 
 import Core.Assert;
@@ -33,6 +34,7 @@ import Core.Log;
 import Core.Time;
 import Core.Image;
 import Core.Color;
+import Core.Input;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -93,20 +95,19 @@ public:
 	{
 		unsigned int emitCount;
 		float time;
+		float x;
+		float y;
 	};
 
 	virtual void onAwake() override
 	{
-		RHI::SLANG::ICompileSession comipeSession;
-		comipeSession.loadModule("hello-world", "computeMain");
-
 		WindowLayerDesc window_layer_desc = {
 			SIByL::EWindowVendor::GLFW,
 			1280,
 			720,
 			"Hello"
 		};
-		WindowLayer* window_layer = attachWindowLayer(window_layer_desc);
+		window_layer = attachWindowLayer(window_layer_desc);
 
 		// create device
 		graphicContext = (RHI::IFactory::createGraphicContext({ RHI::API::VULKAN }));
@@ -131,22 +132,12 @@ public:
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
 
-
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
-		//auto particle_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
-		//auto intermediate_sb = rdg_builder.addStorageBuffer(sizeof(float) * 4 * 32);
-		//update_pass = rdg_builder.addComputePass(shaderCompute.get(), {particle_sb,intermediate_sb}, sizeof(float));
-		//init_pass = rdg_builder.addComputePass(shaderComputeInit.get(), {particle_sb,intermediate_sb});
-
 		// particle system
-		Buffer portal_init, portal_emit, portal_update;
-		shaderLoader.syncReadAll("portal_init.spv", portal_init);
-		shaderLoader.syncReadAll("portal_emit.spv", portal_emit);
-		shaderLoader.syncReadAll("portal_update.spv", portal_update);
-		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinary(portal_init, { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinary(portal_emit, { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinary(portal_update, { RHI::ShaderStage::COMPUTE,"main" });
-		portal.init(sizeof(float) * 4 * 2, 2048, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
+		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		portal.init(sizeof(float) * 4 * 2, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 		portal.registerRenderGraph(&rdg_builder);
 
 		rdg_builder.build(resourceFactory.get());
@@ -221,6 +212,17 @@ public:
 				{compute_memory_barrier_0.get()}
 				});
 
+			compute_drawcall_memory_barrier = resourceFactory->createMemoryBarrier({
+					(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT | (uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
+					(uint32_t)RHI::AccessFlagBits::INDIRECT_COMMAND_READ_BIT
+				});
+			compute_drawcall_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+				(uint32_t)RHI::PipelineStageFlagBits::DRAW_INDIRECT_BIT,
+				0,
+				{compute_drawcall_memory_barrier.get()}
+				});
+
 			compute_barrier_2 = resourceFactory->createBarrier(RHI::BarrierDesc{
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
@@ -253,7 +255,7 @@ public:
 		MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
-		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 64, 1, 1, 0, 2048u);
+		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 64, 1, 1, 0, 100000u);
 
 		//rdg.getPassNode(init_pass)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
 
@@ -306,18 +308,20 @@ public:
 		MemScope<RHI::IMultisampling> multisampling = resourceFactory->createMultisampling(multisampling_desc);
 		RHI::DepthStencilDesc depthstencil_desc =
 		{
-			false
+			true,
+			false,
+			RHI::CompareOp::LESS
 		};
 		MemScope<RHI::IDepthStencil> depthstencil = resourceFactory->createDepthStencil(depthstencil_desc);
 		RHI::ColorBlendingDesc colorBlending_desc =
 		{
 			RHI::BlendOperator::ADD,
 			RHI::BlendFactor::ONE,
-			RHI::BlendFactor::ZERO,
+			RHI::BlendFactor::ONE,
 			RHI::BlendOperator::ADD,
 			RHI::BlendFactor::ONE,
-			RHI::BlendFactor::ZERO,
-			false,
+			RHI::BlendFactor::ONE,
+			true,
 		};
 		MemScope<RHI::IColorBlending> color_blending = resourceFactory->createColorBlending(colorBlending_desc);
 		std::vector<RHI::PipelineState> pipelinestates_desc =
@@ -421,9 +425,9 @@ public:
 			float time = (float)timer.getTotalTimeSeconds();
 			auto [width, height] = swapchain->getExtend();
 			UniformBufferObject ubo;
-			ubo.cameraPos = glm::vec4(5.0f, 0, 0, 0.0f);
+			ubo.cameraPos = glm::vec4(5.0f * cosf(time), 0.0f, 5.0f * sinf(time), 0.0f);
 			ubo.model = glm::scale(glm::mat4(1.0f), glm::vec3(0.1, 0.1, 0.1));
-			ubo.view = glm::lookAt(glm::vec3(5.0f, 0, 0), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.view = glm::lookAt(glm::vec3(5.0f * cosf(time), 0.0f, 5.0f * sinf(time)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
 			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
@@ -431,11 +435,23 @@ public:
 		}
 		// drawFrame
 		{
+			float width = window_layer->getWindow()->getWidth();
+			float height = window_layer->getWindow()->getHeight();
+			float x = window_layer->getWindow()->getInput()->getMouseX();
+			float y = window_layer->getWindow()->getInput()->getMouseY();
+			x = 2 * (x - width / 2) / height;
+			y = 2 * (height / 2 - y) / height;
+			x *= 2.071067811;
+			y *= 2.071067811;
+
 			//	2. Acquire an image from the swap chain
 			uint32_t imageIndex = swapchain->acquireNextImage(imageAvailableSemaphore[currentFrame].get());
 			//	3. Record a command buffer which draws the scene onto that image
 			commandbuffers[currentFrame]->reset();
 			commandbuffers[currentFrame]->beginRecording();
+
+			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_drawcall_barrier.get());
+
 			commandbuffers[currentFrame]->cmdBeginRenderPass(renderPass.get(), framebuffers[imageIndex].get());
 			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
 			
@@ -446,7 +462,8 @@ public:
 				RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
 				commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
 					pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
-				commandbuffers[currentFrame]->cmdDrawIndexed(6, 2048, 0, 0, 0);
+
+				commandbuffers[currentFrame]->cmdDrawIndexedIndirect(rdg.getIndirectDrawBufferNode(portal.indirectDrawBuffer)->storageBuffer.get(), 0, 1, sizeof(unsigned int) * 5);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
 
@@ -458,11 +475,8 @@ public:
 			deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
 			while (deltaTime > 20)
 			{
-				//commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
-				//rdg.getComputePassNode(update_pass)->executeWithConstant(commandbuffers[currentFrame].get(), 1, 1, 1, currentFrame, 2.0f);
-
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
-				EmitConstant constant_1{ 5u, 100 * (float)timer.getTotalTime() };
+				EmitConstant constant_1{ 400u / 50, 100 * (float)timer.getTotalTime(), x, y };
 				rdg.getComputePassNode(portal.emitPass)->executeWithConstant(commandbuffers[currentFrame].get(), 64, 1, 1, currentFrame, constant_1);
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
 				rdg.getComputePassNode(portal.updatePass)->execute(commandbuffers[currentFrame].get(), 64, 1, 1, currentFrame);
@@ -491,6 +505,7 @@ public:
 private:
 	Timer timer;
 	uint32_t currentFrame = 0;
+	WindowLayer* window_layer;
 
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
@@ -522,7 +537,9 @@ private:
 	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
 	MemScope<RHI::IMemoryBarrier> compute_memory_barrier_0;
+	MemScope<RHI::IMemoryBarrier> compute_drawcall_memory_barrier;
 	MemScope<RHI::IBarrier> compute_barrier_0;
+	MemScope<RHI::IBarrier> compute_drawcall_barrier;
 	MemScope<RHI::IBarrier> compute_barrier;
 	MemScope<RHI::IBarrier> compute_barrier_2;
 

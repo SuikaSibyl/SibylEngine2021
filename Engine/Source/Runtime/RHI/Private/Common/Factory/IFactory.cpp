@@ -12,7 +12,7 @@ import Core.SPointer;
 import Core.MemoryManager;
 import Core.Buffer;
 import Core.Image;
-
+import Core.File;
 import RHI.IEnum;
 
 import RHI.GraphicContext;
@@ -159,6 +159,14 @@ namespace SIByL::RHI
 		}
 
 		return sc;
+	}
+
+	AssetLoader shaderLoader({ "../Engine/Binaries/Runtime/spirv" });
+	auto IResourceFactory::createShaderFromBinaryFile(std::filesystem::path path, ShaderDesc const& desc) noexcept -> MemScope<IShader>
+	{
+		Buffer shader_binary;
+		shaderLoader.syncReadAll(path, shader_binary);
+		return createShaderFromBinary(shader_binary, desc);
 	}
 
 	auto IResourceFactory::createShaderFromBinary(Buffer const& binary, ShaderDesc const& desc) noexcept -> MemScope<IShader>
@@ -627,6 +635,25 @@ namespace SIByL::RHI
 		case SIByL::RHI::API::VULKAN:
 		{
 			MemScope<IStorageBufferVK> sb_vk = MemNew<IStorageBufferVK>(size, (ILogicalDeviceVK*)logicalDevice);
+			sb = MemCast<IStorageBuffer>(sb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return sb;
+	}
+
+	auto IResourceFactory::createIndirectDrawBuffer() noexcept -> MemScope<IStorageBuffer>
+	{
+		MemScope<IStorageBuffer> sb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IStorageBufferVK> sb_vk = MemNew<IStorageBufferVK>(sizeof(unsigned int) * 5, (ILogicalDeviceVK*)logicalDevice, (BufferUsageFlags)BufferUsageFlagBits::INDIRECT_BUFFER_BIT);
 			sb = MemCast<IStorageBuffer>(sb_vk);
 		}
 		break;

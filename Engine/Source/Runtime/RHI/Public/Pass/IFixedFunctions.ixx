@@ -1,5 +1,5 @@
 module;
-
+#include <cstdint>
 export module RHI.IFixedFunctions;
 import Core.SObject;
 import RHI.IEnum;
@@ -155,10 +155,24 @@ namespace SIByL
 		// │  DirectX 12  │                                          │
 		// │  OpenGL      │                                          │
 		// ╰──────────────┴──────────────────────────────────────────╯
+
+		export enum struct CompareOp :uint32_t
+		{
+			NEVER = 0,
+			LESS = 1,
+			EQUAL = 2,
+			LESS_OR_EQUAL = 3,
+			GREATER = 4,
+			NOT_EQUAL = 5,
+			GREATER_OR_EQUAL = 6,
+			ALWAYS = 7,
+		};
+
 		export struct DepthStencilDesc
 		{
-			bool useTest;
 			bool depthTest;
+			bool depthWrite;
+			CompareOp depthOp;
 			bool stencilTest;
 		};
 

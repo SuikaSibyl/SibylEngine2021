@@ -11,6 +11,7 @@ import GFX.RDG.ResourceNode;
 import GFX.RDG.StorageBufferNode;
 import GFX.RDG.ComputePassNode;
 import GFX.RDG.UniformBufferNode;
+import GFX.RDG.IndirectDrawBufferNode;
 
 namespace SIByL::GFX::RDG
 {
@@ -26,6 +27,11 @@ namespace SIByL::GFX::RDG
 			return resources[handle].get();
 		}
 		return nullptr;
+	}
+	
+	auto RenderGraph::getIndirectDrawBufferNode(NodeHandle handle) noexcept -> IndirectDrawBufferNode*
+	{
+		return (IndirectDrawBufferNode*)getResourceNode(handle);
 	}
 	
 	auto RenderGraph::getPassNode(NodeHandle handle) noexcept -> PassNode*
@@ -65,6 +71,18 @@ namespace SIByL::GFX::RDG
 		storageBufferCount++;
 		MemScope<StorageBufferNode> sbn = MemNew<StorageBufferNode>();
 		sbn->size = size;
+		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
+		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
+		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
+		attached.resources[handle] = std::move(res);
+		return handle;
+	}
+
+	auto RenderGraphBuilder::addIndirectDrawBuffer() noexcept -> NodeHandle
+	{
+		storageBufferCount++;
+		MemScope<IndirectDrawBufferNode> sbn = MemNew<IndirectDrawBufferNode>();
+		sbn->size = sizeof(unsigned int) * 5;
 		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
 		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
 		NodeHandle handle = ECS::UniqueID::RequestUniqueID();

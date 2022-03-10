@@ -1,5 +1,6 @@
 module;
 #include <vector>
+#include <filesystem>
 export module RHI.IFactory;
 import Core.MemoryManager;
 import Core.Buffer;
@@ -96,6 +97,7 @@ namespace SIByL
 			auto createDescriptorSetLayout(DescriptorSetLayoutDesc const& desc) noexcept -> MemScope<IDescriptorSetLayout>;
 			auto createUniformBuffer(uint32_t const& size) noexcept -> MemScope<IUniformBuffer>;
 			auto createStorageBuffer(uint32_t const& size) noexcept -> MemScope<IStorageBuffer>;
+			auto createIndirectDrawBuffer() noexcept -> MemScope<IStorageBuffer>;
 			auto createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>;
 			auto createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>;
 			auto createMemoryBarrier(MemoryBarrierDesc const& desc) noexcept -> MemScope<IMemoryBarrier>;
@@ -106,6 +108,8 @@ namespace SIByL
 			auto createTexture(TextureDesc const&) noexcept -> MemScope<ITexture>;
 			auto createTextureView(ITexture* texture) noexcept -> MemScope<ITextureView>;
 			auto createSampler(SamplerDesc const&) noexcept -> MemScope<ISampler>;
+
+			auto createShaderFromBinaryFile(std::filesystem::path path, ShaderDesc const& desc) noexcept -> MemScope<IShader>;
 
 		private:
 			API api;
