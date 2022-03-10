@@ -255,7 +255,7 @@ public:
 		MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
-		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 64, 1, 1, 0, 100000u);
+		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
 
 		//rdg.getPassNode(init_pass)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
 
@@ -425,9 +425,9 @@ public:
 			float time = (float)timer.getTotalTimeSeconds();
 			auto [width, height] = swapchain->getExtend();
 			UniformBufferObject ubo;
-			ubo.cameraPos = glm::vec4(5.0f * cosf(time), 0.0f, 5.0f * sinf(time), 0.0f);
-			ubo.model = glm::scale(glm::mat4(1.0f), glm::vec3(0.1, 0.1, 0.1));
-			ubo.view = glm::lookAt(glm::vec3(5.0f * cosf(time), 0.0f, 5.0f * sinf(time)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.cameraPos = glm::vec4(5.0f * cosf(time), 1.0f, 5.0f * sinf(time), 0.0f);
+			ubo.model = glm::scale(glm::mat4(1.0f), glm::vec3(0.01, 0.01, 0.01));
+			ubo.view = glm::lookAt(glm::vec3(5.0f * cosf(time), 1.0f, 5.0f * sinf(time)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
 			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
@@ -443,6 +443,8 @@ public:
 			y = 2 * (height / 2 - y) / height;
 			x *= 2.071067811;
 			y *= 2.071067811;
+			x = 0;
+			y = 1;
 
 			//	2. Acquire an image from the swap chain
 			uint32_t imageIndex = swapchain->acquireNextImage(imageAvailableSemaphore[currentFrame].get());
@@ -476,10 +478,10 @@ public:
 			while (deltaTime > 20)
 			{
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
-				EmitConstant constant_1{ 400u / 50, 100 * (float)timer.getTotalTime(), x, y };
-				rdg.getComputePassNode(portal.emitPass)->executeWithConstant(commandbuffers[currentFrame].get(), 64, 1, 1, currentFrame, constant_1);
+				EmitConstant constant_1{ 400000u / 50, (float)timer.getTotalTime(), x, y };
+				rdg.getComputePassNode(portal.emitPass)->executeWithConstant(commandbuffers[currentFrame].get(), 200, 1, 1, currentFrame, constant_1);
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
-				rdg.getComputePassNode(portal.updatePass)->execute(commandbuffers[currentFrame].get(), 64, 1, 1, currentFrame);
+				rdg.getComputePassNode(portal.updatePass)->execute(commandbuffers[currentFrame].get(), 200, 1, 1, currentFrame);
 
 				deltaTime -= 20;
 			}

@@ -42,7 +42,16 @@ layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
     uint[] indices;
 } deadPool;
 
-layout (local_size_x =32) in;
+// RANDOM 
+//note: uniformly distributed, normalized rand, [0;1[
+float nrand( float n )
+{
+	return fract(sin(91.2228 * n)* 43758.5453);
+}
+float nrand( vec2 n )
+{
+	return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+}
 
 float hash(float n) { return fract(sin(n) * 1e4); }
 float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
@@ -62,23 +71,48 @@ vec3 hash32(vec2 p)
     return fract((p3.xxy+p3.yzz)*p3.zyx);
 }
 
+float lerp(float x, float y, float s)
+{
+    return x + s * (y-x);
+}
+
+layout (local_size_x =512) in;
 void main()
 {
     if(gl_GlobalInvocationID.x >= PushConstants.emitCount) return;
+
     // Move a dead particle to alive
-    
     if(counter.counter[0].deadCount==0) return;
     uint deadCount = atomicAdd(counter.counter[0].deadCount, -1);
     if(deadCount <= 1 || deadCount > counter.counter[0].maxCount) return; // If no space is available
 
     Particle new_particle;
-    float theta = 2 * 3.1415926f * gl_GlobalInvocationID.x / PushConstants.emitCount + PushConstants.time * 0.1f;
-    new_particle.pos = vec4(PushConstants.offset_x,PushConstants.offset_y,0, 1.0);
-    new_particle.vel = vec4(cos(theta), sin(theta), 0, 1.0);
+    float theta = 3.1415926 * 2 * nrand(vec2(gl_GlobalInvocationID.x + 0.7 * fract(PushConstants.time), fract(PushConstants.time)));
+    //new_particle.vel = vec4(cos(theta), sin(theta), 0, 1.0);
     //new_particle.pos = vec4(hash32(vec2(gl_GlobalInvocationID.x, PushConstants.time)), 1.0);
-    //new_particle.vel = vec4(hash32(vec2(gl_GlobalInvocationID.x, 1 + PushConstants.time)), 1.0);
-    new_particle.pos.w = 200;
+    vec3 particle_to_center = vec3(cos(theta), sin(theta), 0);
+    new_particle.pos.xy = particle_to_center.xy + vec2(PushConstants.offset_x, PushConstants.offset_y);
 
+    // determine lifetime
+    float lifetime = lerp(0.4, 0.9, nrand(gl_GlobalInvocationID.x + 0.7 * fract(PushConstants.time)));
+    new_particle.pos.w = lifetime / 0.02;
+
+    // determine speed
+    vec3 tangent = normalize(cross(vec3(0,0,1), particle_to_center));
+    tangent = 4 * tangent * nrand(gl_GlobalInvocationID.x + 0.3 * fract(PushConstants.time));
+    float rotation_angle = 0.2 * nrand(gl_GlobalInvocationID.x + 0.1 * fract(PushConstants.time));
+    float cos_ra = cos(rotation_angle);
+    float sin_ra = sin(rotation_angle);
+    mat4 rotation_matrix = mat4(
+        +cos_ra, +sin_ra, 0 , 0,
+        -sin_ra, +cos_ra, 0 , 0,
+        0,       0,       1 , 0,
+        0,       0,       0 , 1
+    );
+    tangent = (rotation_matrix * vec4(tangent, 1.0)).xyz;
+    new_particle.vel = vec4(tangent, 1.0);
+
+    // write new particle
     uint newParticleIdx = deadPool.indices[deadCount-1];
     particles.particle[newParticleIdx] = new_particle;
     // add the new particle idx to live pool

@@ -41,5 +41,6 @@ void main() {
     gl_Position = ubo.proj * ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
     //gl_Position = ubo.proj * ubo.view * billboardMat * (vec4(modelPosition.xyz + instance_pos, 1.0));
     fragColor = inColor;
+    //fragColor = vec3(particles.particle[gl_InstanceIndex.x].pos.w);
     fragTexCoord = inTexCoord;
 }
