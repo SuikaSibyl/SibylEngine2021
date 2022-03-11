@@ -101,6 +101,7 @@ public:
 
 	virtual void onAwake() override
 	{
+		// create window
 		WindowLayerDesc window_layer_desc = {
 			SIByL::EWindowVendor::GLFW,
 			1280,
@@ -116,8 +117,8 @@ public:
 		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
+		// create scene
 		scene.deserialize("test_scene.scene", logicalDevice.get());
-
 
 		// shader resources
 		AssetLoader shaderLoader;
@@ -132,6 +133,7 @@ public:
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
 
+		rdg.reDatum(1280, 720);
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// particle system
 		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
@@ -139,11 +141,13 @@ public:
 		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		portal.init(sizeof(float) * 4 * 2, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 		portal.registerRenderGraph(&rdg_builder);
-
+		// renderer
+		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
+		uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
 		rdg_builder.build(resourceFactory.get());
 
 		// load image
-		Image image("./assets/texture.jpg");
+		Image image("./assets/Sparkle.tga");
 		texture = resourceFactory->createTexture(&image);
 		textureView = resourceFactory->createTextureView(texture.get());
 		sampler = resourceFactory->createSampler({});
@@ -188,14 +192,14 @@ public:
 			RHI::PipelineLayoutDesc pipelineLayout_desc =
 			{ {desciptor_set_layout.get()} };
 			pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
-		}
-		// compute stuff
-		{
+
 			// configure descriptors in sets
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 				descriptorSets[i]->update(((GFX::RDG::StorageBufferNode*)rdg.getResourceNode(portal.particleBuffer))->storageBuffer.get(), 2, 0);
 			}
-
+		}
+		// compute stuff
+		{
 			compute_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
 				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
@@ -227,7 +231,6 @@ public:
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
 				0,
-
 				});
 		}
 
@@ -257,8 +260,6 @@ public:
 
 		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
 
-		//rdg.getPassNode(init_pass)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
-
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();
 		logicalDevice->waitIdle();
@@ -270,20 +271,7 @@ public:
 	void createModifableResource()
 	{
 		RHI::Extend extend = swapchain->getExtend();
-
-		depthTexture = resourceFactory->createTexture(
-			{
-			RHI::ResourceType::Texture2D, //ResourceType type;
-			RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, //ResourceFormat format;
-			RHI::ImageTiling::OPTIMAL, //ImageTiling tiling;
-			(uint32_t)RHI::ImageUsageFlagBits::DEPTH_STENCIL_ATTACHMENT_BIT, //ImageUsageFlags usages;
-			RHI::BufferShareMode::EXCLUSIVE, //BufferShareMode shareMode;
-			RHI::SampleCount::COUNT_1_BIT, //SampleCount sampleCount;
-			RHI::ImageLayout::UNDEFINED, //ImageLayout layout;
-			extend.width, //uint32_t width;
-			extend.height //uint32_t height;
-			});
-		depthView = resourceFactory->createTextureView(depthTexture.get());
+		rdg.reDatum(extend.width, extend.height);
 
 		RHI::BufferLayout vertex_buffer_layout =
 		{
@@ -331,7 +319,6 @@ public:
 		};
 		MemScope<RHI::IDynamicState> dynamic_states = resourceFactory->createDynamicState(pipelinestates_desc);
 
-
 		RHI::RenderPassDesc renderpass_desc =
 		{{
 				// color attachment
@@ -378,6 +365,7 @@ public:
 		};
 		pipeline = resourceFactory->createPipeline(pipeline_desc);
 
+		GFX::RDG::TextureBufferNode* textureBufferNode = rdg.getTextureBufferNode(depthBuffer);
 		for (unsigned int i = 0; i < swapchain->getSwapchainCount(); i++)
 		{
 			RHI::FramebufferDesc framebuffer_desc =
@@ -385,7 +373,7 @@ public:
 				extend.width,
 				extend.height,
 				renderPass.get(),
-				{swapchain->getITextureView(i), depthView.get()},
+				{swapchain->getITextureView(i), textureBufferNode->depthView.get()},
 			};
 			framebuffers.emplace_back(resourceFactory->createFramebuffer(framebuffer_desc));
 		}
@@ -423,11 +411,12 @@ public:
 		// update uniform buffer
 		{
 			float time = (float)timer.getTotalTimeSeconds();
+			//time = 0.5 * 3.1415926;
 			auto [width, height] = swapchain->getExtend();
 			UniformBufferObject ubo;
-			ubo.cameraPos = glm::vec4(5.0f * cosf(time), 1.0f, 5.0f * sinf(time), 0.0f);
-			ubo.model = glm::scale(glm::mat4(1.0f), glm::vec3(0.01, 0.01, 0.01));
-			ubo.view = glm::lookAt(glm::vec3(5.0f * cosf(time), 1.0f, 5.0f * sinf(time)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.cameraPos = glm::vec4(15.0f * cosf(time), 2.0f, 15.0f * sinf(time), 0.0f);
+			ubo.model = glm::scale(glm::mat4(1.0f), glm::vec3(0.1, 0.1, 0.1));
+			ubo.view = glm::lookAt(glm::vec3(15.0f * cosf(time), 2.0f, 15.0f * sinf(time)), glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
 			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
@@ -435,17 +424,6 @@ public:
 		}
 		// drawFrame
 		{
-			float width = window_layer->getWindow()->getWidth();
-			float height = window_layer->getWindow()->getHeight();
-			float x = window_layer->getWindow()->getInput()->getMouseX();
-			float y = window_layer->getWindow()->getInput()->getMouseY();
-			x = 2 * (x - width / 2) / height;
-			y = 2 * (height / 2 - y) / height;
-			x *= 2.071067811;
-			y *= 2.071067811;
-			x = 0;
-			y = 1;
-
 			//	2. Acquire an image from the swap chain
 			uint32_t imageIndex = swapchain->acquireNextImage(imageAvailableSemaphore[currentFrame].get());
 			//	3. Record a command buffer which draws the scene onto that image
@@ -478,7 +456,7 @@ public:
 			while (deltaTime > 20)
 			{
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
-				EmitConstant constant_1{ 400000u / 50, (float)timer.getTotalTime(), x, y };
+				EmitConstant constant_1{ 400000u / 50, (float)timer.getTotalTime(), 0, 1.07 };
 				rdg.getComputePassNode(portal.emitPass)->executeWithConstant(commandbuffers[currentFrame].get(), 200, 1, 1, currentFrame, constant_1);
 				commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier_0.get());
 				rdg.getComputePassNode(portal.updatePass)->execute(commandbuffers[currentFrame].get(), 200, 1, 1, currentFrame);
@@ -511,8 +489,8 @@ private:
 
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
-	GFX::RDG::NodeHandle init_pass;
-	GFX::RDG::NodeHandle update_pass;
+	GFX::RDG::NodeHandle depthBuffer;
+	GFX::RDG::Container uniformBufferFlights;
 	ParticleSystem::ParticleSystem portal;
 
 	MemScope<RHI::IGraphicContext> graphicContext;
@@ -530,8 +508,6 @@ private:
 	MemScope<RHI::ITexture> texture;
 	MemScope<RHI::ITextureView> textureView;
 	MemScope<RHI::ISampler> sampler;
-	MemScope<RHI::ITexture> depthTexture;
-	MemScope<RHI::ITextureView> depthView;
 
 	MemScope<RHI::IDescriptorPool> descriptorPool;
 	MemScope<RHI::IDescriptorSetLayout> desciptor_set_layout;

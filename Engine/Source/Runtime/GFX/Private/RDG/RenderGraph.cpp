@@ -12,9 +12,22 @@ import GFX.RDG.StorageBufferNode;
 import GFX.RDG.ComputePassNode;
 import GFX.RDG.UniformBufferNode;
 import GFX.RDG.IndirectDrawBufferNode;
+import GFX.RDG.DepthBufferNode;
 
 namespace SIByL::GFX::RDG
 {
+	auto RenderGraph::reDatum(uint32_t const& width, uint32_t const& height) noexcept -> void
+	{
+		datumWidth = width;
+		datumHeight = height;
+
+		// reDatum passes
+		for (auto iter = resources.begin(); iter != resources.end(); iter++)
+		{
+			iter->second->onReDatum((void*)this, factory);
+		}
+	}
+
 	auto RenderGraph::getDescriptorPool() noexcept -> RHI::IDescriptorPool*
 	{
 		return descriptorPool.get();
@@ -48,6 +61,11 @@ namespace SIByL::GFX::RDG
 		return (ComputePassNode*)getPassNode(handle);
 	}
 
+	auto RenderGraph::getTextureBufferNode(NodeHandle handle) noexcept -> TextureBufferNode*
+	{
+		return (TextureBufferNode*)getResourceNode(handle);
+	}
+
 	auto RenderGraphBuilder::addTexture() noexcept -> NodeHandle
 	{
 
@@ -66,6 +84,18 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
+	auto RenderGraphBuilder::addUniformBufferFlights(size_t size) noexcept -> Container
+	{
+		uint32_t flights_count = attached.getMaxFrameInFlight();
+		Container container;
+		container.handles.resize(flights_count);
+		for (uint32_t i = 0; i < flights_count; i++)
+		{
+			container[i] = addUniformBuffer(size);
+		}
+		return container;
+	}
+
 	auto RenderGraphBuilder::addStorageBuffer(size_t size) noexcept -> NodeHandle
 	{
 		storageBufferCount++;
@@ -74,6 +104,15 @@ namespace SIByL::GFX::RDG
 		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
 		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
 		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
+		attached.resources[handle] = std::move(res);
+		return handle;
+	}
+
+	auto RenderGraphBuilder::addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle
+	{
+		MemScope<DepthBufferNode> dbn = MemNew<DepthBufferNode>(rel_width, rel_height);
+		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
+		MemScope<ResourceNode> res = MemCast<ResourceNode>(dbn);
 		attached.resources[handle] = std::move(res);
 		return handle;
 	}
@@ -101,6 +140,8 @@ namespace SIByL::GFX::RDG
 
 	auto RenderGraphBuilder::build(RHI::IResourceFactory* factory) noexcept -> void
 	{
+		attached.factory = factory;
+
 		// build resources
 		for(auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
 		{

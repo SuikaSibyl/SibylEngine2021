@@ -39,7 +39,7 @@
     <ClCompile Include="Public\RDG\Resource\ResourceNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\Pass\IRasterPass.ixx">
+    <ClCompile Include="Public\RDG\Pass\RasterPassNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Components\Mesh.ixx">
@@ -67,6 +67,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\RDG\Resource\IndirectDrawBufferNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RDG\Pass\RasterPassNode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\DepthBufferNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\ColorBufferNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\TextureBufferNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\RDG\Container\Container.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

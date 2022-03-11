@@ -67,7 +67,31 @@ void main()
     barrier();
 
     Particle particle = particles.particle[idx];
+    float ground_height = 0;
+
+    // update velocity
+    // - linear drag
+    float mass = particle.vel.w;
+    vec3 a = - 2 * normalize(particle.vel.xyz) * (length(particle.vel.xyz));;
+    // - gravity
+    if(particle.pos.y - ground_height > 0.02)
+        a += vec3(0, -9.81, 0);
+    particle.vel.xyz += 0.02 * a / mass;
+
+    // update position
     particle.pos.xyz = particle.pos.xyz + particle.vel.xyz * 0.02;
+
+    // collision handling
+    if(particle.pos.y < ground_height)
+    {
+        vec3 compensate = particle.vel.xyz * ((ground_height - particle.pos.y) / particle.vel.y);
+        particle.pos.xyz += compensate;
+        particle.pos.y = ground_height;
+        particle.vel.xyz += - 2 * vec3(0,1,0) * dot(particle.vel.xyz, vec3(0,1,0));
+        particle.vel.xyz *= 0.5;
+        // todo: roughness to randomize return velocity
+    }
+
     float lifetime = particle.pos.w;
     lifetime -= 1;
     if(lifetime <= 0)
