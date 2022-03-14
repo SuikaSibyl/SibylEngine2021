@@ -74,6 +74,7 @@ import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
 
 import ParticleSystem.ParticleSystem;
+import ParticleSystem.PrecomputedSample;
 
 import UAT.IUniversalApplication;
 
@@ -101,6 +102,13 @@ public:
 
 	virtual void onAwake() override
 	{
+		ParticleSystem::PrecomputedSampleTorus torusSampler(1, 0.04f);
+		std::vector<glm::vec3> torusSamples(1024);
+		for (int i = 0; i < 1024; i++)
+		{
+			torusSamples[i] = torusSampler.generateSample();
+		}
+
 		// create window
 		WindowLayerDesc window_layer_desc = {
 			SIByL::EWindowVendor::GLFW,
