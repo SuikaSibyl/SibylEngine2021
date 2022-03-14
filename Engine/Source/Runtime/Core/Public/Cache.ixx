@@ -23,6 +23,9 @@ namespace SIByL
 		// 3. else
 		//    load source file & save to cache
 
+		export struct EmptyHeader
+		{};
+
 		export class CacheBrain
 		{
 		public:
@@ -84,6 +87,7 @@ namespace SIByL
 			// write BufferDatas
 			for (int i = 0; i < buffers_count; i++)
 				cacheLoader.writeBuffer(file_ptr, *(buffers[i]));
+			cacheLoader.closeFile(file_ptr);
 		}
 
 		template <class Header>
@@ -109,6 +113,7 @@ namespace SIByL
 				*buffers[i] = std::move(Buffer{ buffer_metadatas[i].bufferLength, buffer_metadatas[i].bufferStride });
 				cacheLoader.readBuffer(file_ptr, *buffers[i]);
 			}
+			cacheLoader.closeFile(file_ptr);
 		}
 	}
 }

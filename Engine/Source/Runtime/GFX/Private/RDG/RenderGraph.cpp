@@ -107,6 +107,20 @@ namespace SIByL::GFX::RDG
 		attached.resources[handle] = std::move(res);
 		return handle;
 	}
+	
+	auto RenderGraphBuilder::addStorageBufferExt(RHI::IStorageBuffer* external) noexcept -> NodeHandle
+	{
+		storageBufferCount++;
+		MemScope<StorageBufferNode> sbn = MemNew<StorageBufferNode>();
+		sbn->size = external->getSize();
+		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
+		sbn->attributes |= (uint32_t) NodeAttrbutesFlagBits::PLACEHOLDER;
+		sbn->externalStorageBuffer = external;
+		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
+		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
+		attached.resources[handle] = std::move(res);
+		return handle;
+	}
 
 	auto RenderGraphBuilder::addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle
 	{

@@ -18,7 +18,8 @@ namespace SIByL::ParticleSystem
 
 		auto sdf(glm::vec3 const& p)
 		{
-			glm::vec2 q = glm::vec2(glm::length(glm::vec2(p.x, p.z) - R), p.y);
+			float length = glm::length(glm::vec2(p.x, p.z)) - R;
+			glm::vec2 q = glm::vec2(length, p.y);
 			return glm::length(q) - r;
 		}
 

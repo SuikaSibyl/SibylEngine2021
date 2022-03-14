@@ -5,6 +5,7 @@ import Core.MemoryManager;
 import RHI.IShader;
 import RHI.IDescriptorPool;
 import RHI.IFactory;
+import RHI.IStorageBuffer;
 import GFX.RDG.Common;
 import GFX.RDG.PassNode;
 import GFX.RDG.ResourceNode;
@@ -52,6 +53,7 @@ namespace SIByL::GFX::RDG
 		auto addUniformBuffer(size_t size) noexcept -> NodeHandle;
 		auto addUniformBufferFlights(size_t size) noexcept -> Container;
 		auto addStorageBuffer(size_t size) noexcept -> NodeHandle;
+		auto addStorageBufferExt(RHI::IStorageBuffer* external) noexcept -> NodeHandle;
 		auto addIndirectDrawBuffer() noexcept -> NodeHandle;
 		auto addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle;
 

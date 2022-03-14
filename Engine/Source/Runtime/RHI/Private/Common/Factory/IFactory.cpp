@@ -643,6 +643,25 @@ namespace SIByL::RHI
 		}
 		return sb;
 	}
+	
+	auto IResourceFactory::createStorageBuffer(Buffer* buffer) noexcept -> MemScope<IStorageBuffer>
+	{
+		MemScope<IStorageBuffer> sb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IStorageBufferVK> sb_vk = MemNew<IStorageBufferVK>(buffer, (ILogicalDeviceVK*)logicalDevice);
+			sb = MemCast<IStorageBuffer>(sb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return sb;
+	}
 
 	auto IResourceFactory::createIndirectDrawBuffer() noexcept -> MemScope<IStorageBuffer>
 	{

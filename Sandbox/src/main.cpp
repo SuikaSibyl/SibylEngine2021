@@ -35,6 +35,7 @@ import Core.Time;
 import Core.Image;
 import Core.Color;
 import Core.Input;
+import Core.Cache;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -65,6 +66,7 @@ import RHI.ISampler;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 
+import ECS.UID;
 import ECS.TagComponent;
 
 import GFX.SceneTree;
@@ -100,14 +102,23 @@ public:
 		float y;
 	};
 
+	struct Empty
+	{};
 	virtual void onAwake() override
 	{
-		ParticleSystem::PrecomputedSampleTorus torusSampler(1, 0.04f);
-		std::vector<glm::vec3> torusSamples(1024);
-		for (int i = 0; i < 1024; i++)
-		{
-			torusSamples[i] = torusSampler.generateSample();
-		}
+		//ParticleSystem::PrecomputedSampleTorus torusSampler(1, 0.04f);
+		//std::vector<glm::vec4> torusSamples(1024);
+		//for (int i = 0; i < 1024; i++)
+		//{
+		//	torusSamples[i] = glm::vec4(torusSampler.generateSample(), 0.0f);
+		//	float z = torusSamples[i].y;
+		//	torusSamples[i].y = torusSamples[i].z;
+		//	torusSamples[i].z = z;
+		//}
+		//Buffer precomputed_proxy(torusSamples.data(), torusSamples.size() * sizeof(glm::vec4), 1);
+		//Buffer* buffers[] = { &precomputed_proxy };
+		//ECS::UID uid = ECS::UniqueID::RequestUniqueID();
+		//CacheBrain::instance()->saveCache(uid, EmptyHeader{}, buffers, 1, 0);
 
 		// create window
 		WindowLayerDesc window_layer_desc = {
@@ -141,6 +152,12 @@ public:
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
 
+		Buffer torusSamples;
+		Buffer* samples[] = { &torusSamples };
+		EmptyHeader header;
+		CacheBrain::instance()->loadCache(2267996151488940154, header, samples);
+		torusBuffer = resourceFactory->createStorageBuffer(&torusSamples);
+
 		rdg.reDatum(1280, 720);
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// particle system
@@ -148,6 +165,7 @@ public:
 		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		portal.init(sizeof(float) * 4 * 2, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
+		portal.addEmitterSamples(torusBuffer.get());
 		portal.registerRenderGraph(&rdg_builder);
 		// renderer
 		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
@@ -511,6 +529,7 @@ private:
 	MemScope<RHI::IShader> shaderCompute;
 	MemScope<RHI::IShader> shaderComputeInit;
 
+	MemScope<RHI::IStorageBuffer> torusBuffer;
 	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;
 
 	MemScope<RHI::ITexture> texture;

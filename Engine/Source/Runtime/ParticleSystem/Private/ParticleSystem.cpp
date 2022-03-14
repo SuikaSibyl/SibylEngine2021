@@ -30,9 +30,10 @@ namespace SIByL::ParticleSystem
 		liveIndexBufferSecondary = builder->addStorageBuffer(sizeof(unsigned int) * maxParticleCount);
 		counterBuffer = builder->addStorageBuffer(sizeof(unsigned int) * 5);
 		indirectDrawBuffer = builder->addIndirectDrawBuffer();
+		emitterSamplerBufferExt = builder->addStorageBufferExt(emitterSamplesExt);
 
 		initPass = builder->addComputePass(initShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, indirectDrawBuffer }, sizeof(unsigned int));
-		emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer }, sizeof(unsigned int) * 4);
+		emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, emitterSamplerBufferExt }, sizeof(unsigned int) * 4);
 		updatePass = builder->addComputePass(updateShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, indirectDrawBuffer });
 	}
 }

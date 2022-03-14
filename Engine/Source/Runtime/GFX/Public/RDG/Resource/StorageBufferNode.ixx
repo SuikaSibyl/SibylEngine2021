@@ -1,5 +1,5 @@
 module;
-
+#include <cstdint>
 export module GFX.RDG.StorageBufferNode;
 import Core.MemoryManager;
 import RHI.IFactory;
@@ -14,10 +14,23 @@ namespace SIByL::GFX::RDG
 	public:
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
 		{
-			storageBuffer = factory->createStorageBuffer(size);
+			if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
+			{
+				storageBuffer = factory->createStorageBuffer(size);
+			}
+		}
+
+		virtual auto getStorageBuffer() noexcept -> RHI::IStorageBuffer*
+		{
+			if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
+			{
+				return storageBuffer.get();
+			}
+			return externalStorageBuffer;
 		}
 
 		size_t size;
+		RHI::IStorageBuffer* externalStorageBuffer = nullptr;
 		MemScope<RHI::IStorageBuffer> storageBuffer = nullptr;
 	};
 }

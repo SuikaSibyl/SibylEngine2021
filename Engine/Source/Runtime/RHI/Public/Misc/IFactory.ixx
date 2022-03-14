@@ -97,6 +97,7 @@ namespace SIByL
 			auto createDescriptorSetLayout(DescriptorSetLayoutDesc const& desc) noexcept -> MemScope<IDescriptorSetLayout>;
 			auto createUniformBuffer(uint32_t const& size) noexcept -> MemScope<IUniformBuffer>;
 			auto createStorageBuffer(uint32_t const& size) noexcept -> MemScope<IStorageBuffer>;
+			auto createStorageBuffer(Buffer* buffer) noexcept -> MemScope<IStorageBuffer>;
 			auto createIndirectDrawBuffer() noexcept -> MemScope<IStorageBuffer>;
 			auto createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>;
 			auto createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>;

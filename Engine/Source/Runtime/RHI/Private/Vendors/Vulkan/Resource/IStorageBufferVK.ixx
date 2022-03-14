@@ -21,6 +21,7 @@ namespace SIByL
 		{
 		public:
 			IStorageBufferVK(uint32_t const& size, ILogicalDeviceVK* logical_device, BufferUsageFlags const& extra_usage = 0);
+			IStorageBufferVK(Buffer* size, ILogicalDeviceVK* logical_device, BufferUsageFlags const& extra_usage = 0);
 			virtual ~IStorageBufferVK() = default;
 
 			virtual auto getSize() noexcept -> uint32_t override;

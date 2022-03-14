@@ -94,7 +94,7 @@ namespace SIByL::GFX::RDG
 				switch (resource->resourceType)
 				{
 				case RHI::DescriptorType::STORAGE_BUFFER:
-					compute_descriptorSets[i]->update(((StorageBufferNode*)resource)->storageBuffer.get(), j, 0);
+					compute_descriptorSets[i]->update(((StorageBufferNode*)resource)->getStorageBuffer(), j, 0);
 					break;
 				default:
 					SE_CORE_ERROR("GFX :: Compute Pass Node Binding Resource Type unsupported!");
