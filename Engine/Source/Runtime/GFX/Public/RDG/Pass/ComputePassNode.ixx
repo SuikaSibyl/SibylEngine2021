@@ -8,7 +8,6 @@ import RHI.IDescriptorSet;
 import RHI.IDescriptorSetLayout;
 import Core.MemoryManager;
 import GFX.RDG.Common;
-import GFX.RDG.PassNode;
 
 namespace SIByL::GFX::RDG
 {

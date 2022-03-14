@@ -1,18 +1,18 @@
 module;
 #include <unordered_map>
 module GFX.RDG.RenderGraph;
+import Core.BitFlag;
 import Core.MemoryManager;
 import RHI.IDescriptorPool;
 import RHI.IFactory;
 import ECS.UID;
 import GFX.RDG.Common;
-import GFX.RDG.PassNode;
-import GFX.RDG.ResourceNode;
 import GFX.RDG.StorageBufferNode;
 import GFX.RDG.ComputePassNode;
 import GFX.RDG.UniformBufferNode;
 import GFX.RDG.IndirectDrawBufferNode;
 import GFX.RDG.DepthBufferNode;
+import GFX.RDG.ColorBufferNode;
 
 namespace SIByL::GFX::RDG
 {
@@ -21,10 +21,16 @@ namespace SIByL::GFX::RDG
 		datumWidth = width;
 		datumHeight = height;
 
-		// reDatum passes
+		// reDatum resources
 		for (auto iter = resources.begin(); iter != resources.end(); iter++)
 		{
-			iter->second->onReDatum((void*)this, factory);
+			registry.getNode((*iter))->onReDatum((void*)this, factory);
+		}
+
+		// reDatum passes
+		for (auto iter = passes.begin(); iter != passes.end(); iter++)
+		{
+			registry.getNode((*iter))->onReDatum((void*)this, factory);
 		}
 	}
 
@@ -35,11 +41,7 @@ namespace SIByL::GFX::RDG
 
 	auto RenderGraph::getResourceNode(NodeHandle handle) noexcept -> ResourceNode*
 	{
-		if (resources.find(handle) != resources.end())
-		{
-			return resources[handle].get();
-		}
-		return nullptr;
+		return (ResourceNode*)registry.getNode(handle);
 	}
 	
 	auto RenderGraph::getIndirectDrawBufferNode(NodeHandle handle) noexcept -> IndirectDrawBufferNode*
@@ -49,11 +51,7 @@ namespace SIByL::GFX::RDG
 	
 	auto RenderGraph::getPassNode(NodeHandle handle) noexcept -> PassNode*
 	{
-		if (passes.find(handle) != passes.end())
-		{
-			return passes[handle].get();
-		}
-		return nullptr;
+		return (PassNode*)registry.getNode(handle);
 	}
 
 	auto RenderGraph::getComputePassNode(NodeHandle handle) noexcept -> ComputePassNode*
@@ -66,9 +64,20 @@ namespace SIByL::GFX::RDG
 		return (TextureBufferNode*)getResourceNode(handle);
 	}
 
+	auto RenderGraph::getTextureBufferNodeFlight(NodeHandle handle, uint32_t flight) noexcept -> TextureBufferNode*
+	{
+		NodeHandle flight_handle = ((FlightContainer*)getResourceNode(handle))->handleOnFlight(flight);
+		return (TextureBufferNode*)getResourceNode(flight_handle);;
+	}
+
+	auto RenderGraph::getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*
+	{
+		NodeHandle flight_handle = ((FlightContainer*)registry.getNode(handle))->handleOnFlight(flight);
+		return ((UniformBufferNode*)registry.getNode(flight_handle))->uniformBuffer.get();
+	}
+
 	auto RenderGraphBuilder::addTexture() noexcept -> NodeHandle
 	{
-
 		return 0;
 	}
 
@@ -78,22 +87,23 @@ namespace SIByL::GFX::RDG
 		MemScope<UniformBufferNode> ubn = MemNew<UniformBufferNode>();
 		ubn->size = size;
 		ubn->resourceType = RHI::DescriptorType::UNIFORM_BUFFER;
-		MemScope<ResourceNode> res = MemCast<ResourceNode>(ubn);
-		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
-		attached.resources[handle] = std::move(res);
+		NodeHandle handle = attached.registry.registNode(std::move(ubn));
+		attached.resources.emplace_back(handle);
 		return handle;
 	}
 
-	auto RenderGraphBuilder::addUniformBufferFlights(size_t size) noexcept -> Container
+	auto RenderGraphBuilder::addUniformBufferFlights(size_t size) noexcept -> NodeHandle
 	{
 		uint32_t flights_count = attached.getMaxFrameInFlight();
-		Container container;
-		container.handles.resize(flights_count);
+		std::vector<NodeHandle> handles(flights_count);
 		for (uint32_t i = 0; i < flights_count; i++)
 		{
-			container[i] = addUniformBuffer(size);
+			handles[i] = addUniformBuffer(size);
 		}
-		return container;
+		MemScope<FlightContainer> fc = MemNew<FlightContainer>(std::move(handles));
+		NodeHandle handle = attached.registry.registNode(std::move(fc));
+		attached.resources.emplace_back(handle);
+		return handle;
 	}
 
 	auto RenderGraphBuilder::addStorageBuffer(size_t size) noexcept -> NodeHandle
@@ -102,9 +112,8 @@ namespace SIByL::GFX::RDG
 		MemScope<StorageBufferNode> sbn = MemNew<StorageBufferNode>();
 		sbn->size = size;
 		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
-		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
-		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
-		attached.resources[handle] = std::move(res);
+		NodeHandle handle = attached.registry.registNode(std::move(sbn));
+		attached.resources.emplace_back(handle);
 		return handle;
 	}
 	
@@ -116,18 +125,41 @@ namespace SIByL::GFX::RDG
 		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
 		sbn->attributes |= (uint32_t) NodeAttrbutesFlagBits::PLACEHOLDER;
 		sbn->externalStorageBuffer = external;
-		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
-		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
-		attached.resources[handle] = std::move(res);
+		NodeHandle handle = attached.registry.registNode(std::move(sbn));
+		attached.resources.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphBuilder::addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view) noexcept -> NodeHandle
+	{
+		MemScope<ColorBufferNode> cbn = MemNew<ColorBufferNode>();
+		cbn->attributes |= addBit(NodeAttrbutesFlagBits::PLACEHOLDER);
+		cbn->ext_texture = texture;
+		cbn->ext_view = view;
+		NodeHandle handle = attached.registry.registNode(std::move(cbn));
+		attached.resources.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphBuilder::addColorBufferFlightsExt(std::vector<RHI::ITexture*> const& textures, std::vector<RHI::ITextureView*> const& views) noexcept -> NodeHandle
+	{
+		uint32_t flights_count = textures.size();
+		std::vector<NodeHandle> handles(flights_count);
+		for (uint32_t i = 0; i < flights_count; i++)
+		{
+			handles[i] = addColorBufferExt(textures[i], views[i]);
+		}
+		MemScope<FlightContainer> fc = MemNew<FlightContainer>(std::move(handles));
+		NodeHandle handle = attached.registry.registNode(std::move(fc));
+		attached.resources.emplace_back(handle);
 		return handle;
 	}
 
 	auto RenderGraphBuilder::addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle
 	{
 		MemScope<DepthBufferNode> dbn = MemNew<DepthBufferNode>(rel_width, rel_height);
-		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
-		MemScope<ResourceNode> res = MemCast<ResourceNode>(dbn);
-		attached.resources[handle] = std::move(res);
+		NodeHandle handle = attached.registry.registNode(std::move(dbn));
+		attached.resources.emplace_back(handle);
 		return handle;
 	}
 
@@ -137,18 +169,16 @@ namespace SIByL::GFX::RDG
 		MemScope<IndirectDrawBufferNode> sbn = MemNew<IndirectDrawBufferNode>();
 		sbn->size = sizeof(unsigned int) * 5;
 		sbn->resourceType = RHI::DescriptorType::STORAGE_BUFFER;
-		MemScope<ResourceNode> res = MemCast<ResourceNode>(sbn);
-		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
-		attached.resources[handle] = std::move(res);
+		NodeHandle handle = attached.registry.registNode(std::move(sbn));
+		attached.resources.emplace_back(handle);
 		return handle;
 	}
 
 	auto RenderGraphBuilder::addComputePass(RHI::IShader* shader, std::vector<NodeHandle>&& ios, uint32_t const& constant_size) noexcept -> NodeHandle
 	{
 		MemScope<ComputePassNode> cpn = MemNew<ComputePassNode>((void*)&attached, shader, std::move(ios), constant_size);
-		MemScope<PassNode> res = MemCast<PassNode>(cpn);
-		NodeHandle handle = ECS::UniqueID::RequestUniqueID();
-		attached.passes[handle] = std::move(res);
+		NodeHandle handle = attached.registry.registNode(std::move(cpn));
+		attached.passes.emplace_back(handle);
 		return handle;
 	}
 
@@ -159,7 +189,7 @@ namespace SIByL::GFX::RDG
 		// build resources
 		for(auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
 		{
-			iter->second->onBuild((void*)&attached, factory);
+			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
 		}
 
 		// create pool
@@ -174,7 +204,7 @@ namespace SIByL::GFX::RDG
 		// build passes
 		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
 		{
-			iter->second->onBuild((void*)&attached, factory);
+			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
 		}
 	}
 }

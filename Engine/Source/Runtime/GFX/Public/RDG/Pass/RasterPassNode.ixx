@@ -26,11 +26,12 @@ import RHI.IDescriptorPool;
 import RHI.IDescriptorSet;
 import RHI.ITexture;
 import RHI.ITextureView;
+import RHI.IRenderPass;
 import RHI.ISampler;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 import Core.MemoryManager;
-import GFX.RDG.PassNode;
+import GFX.RDG.Common;
 import GFX.RDG.Container;
 
 namespace SIByL::GFX::RDG
@@ -41,8 +42,19 @@ namespace SIByL::GFX::RDG
 		RasterPassNode(void* graph, std::vector<NodeHandle>&& ins, RHI::IShader* vertex_shader, RHI::IShader* fragment_shader, uint32_t const& constant_size = 0);
 
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 
 		FramebufferContainer framebuffer;
+
+		MemScope<RHI::IVertexLayout> vertexLayout;
+		MemScope<RHI::IInputAssembly> inputAssembly;
+		MemScope<RHI::IViewportsScissors> viewportScissors;
+		MemScope<RHI::IRasterizer> rasterizer;
+		MemScope<RHI::IMultisampling> multisampling;
+		MemScope<RHI::IDepthStencil> depthstencil;
+		MemScope<RHI::IColorBlending> colorBlending;
+		MemScope<RHI::IDynamicState> dynamicStates;
+		MemScope<RHI::IPipelineLayout> pipelineLayout;
 
 		MemScope<RHI::IShader> shaderVert;
 		MemScope<RHI::IShader> shaderFrag;

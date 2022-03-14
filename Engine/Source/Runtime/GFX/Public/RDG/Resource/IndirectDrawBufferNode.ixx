@@ -4,7 +4,6 @@ export module GFX.RDG.IndirectDrawBufferNode;
 import Core.MemoryManager;
 import RHI.IFactory;
 import GFX.RDG.Common;
-import GFX.RDG.ResourceNode;
 import GFX.RDG.StorageBufferNode;
 
 namespace SIByL::GFX::RDG

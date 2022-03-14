@@ -157,15 +157,13 @@
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
     <ClCompile Include="Public\GFXLayer\GFXLayer.ixx" />
-    <ClCompile Include="Public\RDG\Common.ixx" />
-    <ClCompile Include="Public\RDG\Container\Container.ixx" />
+    <ClCompile Include="Public\RDG\Common\Common.ixx" />
+    <ClCompile Include="Public\RDG\Common\Container.ixx" />
     <ClCompile Include="Public\RDG\Pass\ComputePassNode.ixx" />
-    <ClCompile Include="Public\RDG\Pass\PassNode.ixx" />
     <ClCompile Include="Public\RDG\Pass\RasterPassNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\ColorBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\DepthBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\IndirectDrawBufferNode.ixx" />
-    <ClCompile Include="Public\RDG\Resource\ResourceNode.ixx" />
     <ClCompile Include="Public\RDG\RenderGraph.ixx" />
     <ClCompile Include="Public\RDG\Resource\StorageBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\TextureBufferNode.ixx" />

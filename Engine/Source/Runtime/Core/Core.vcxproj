@@ -178,6 +178,7 @@
     <ClCompile Include="Public\Allocator.ixx" />
     <ClCompile Include="Public\Application.ixx" />
     <ClCompile Include="Public\Assert.ixx" />
+    <ClCompile Include="Public\BitFlag.ixx" />
     <ClCompile Include="Public\Buffer.ixx" />
     <ClCompile Include="Public\Cache.ixx" />
     <ClCompile Include="Public\Color.ixx" />

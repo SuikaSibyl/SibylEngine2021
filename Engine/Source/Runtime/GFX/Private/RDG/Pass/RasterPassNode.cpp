@@ -27,10 +27,10 @@ import RHI.IDescriptorSet;
 import RHI.ITexture;
 import RHI.ITextureView;
 import RHI.ISampler;
+import RHI.IRenderPass;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 import Core.MemoryManager;
-import GFX.RDG.PassNode;
 
 namespace SIByL::GFX::RDG
 {
@@ -48,37 +48,48 @@ namespace SIByL::GFX::RDG
 
 	auto RasterPassNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
-		//RenderGraph* render_graph = (RenderGraph*)graph;
-
+		// vertex buffer layout
 		RHI::BufferLayout vertex_buffer_layout =
 		{
 			{RHI::DataType::Float3, "Position"},
 			{RHI::DataType::Float3, "Color"},
 			{RHI::DataType::Float2, "UV"},
 		};
-		MemScope<RHI::IVertexLayout> vertex_layout = factory->createVertexLayout(vertex_buffer_layout);
-		MemScope<RHI::IInputAssembly> input_assembly = factory->createInputAssembly(RHI::TopologyKind::TriangleList);
+		vertexLayout = factory->createVertexLayout(vertex_buffer_layout);
+
+		// input assembly
+		inputAssembly = factory->createInputAssembly(RHI::TopologyKind::TriangleList);
+
+		// viewport scissors
 		RHI::Extend extend{ framebuffer.getWidth(), framebuffer.getHeight() };
-		MemScope<RHI::IViewportsScissors> viewport_scissors = factory->createViewportsScissors(extend, extend);
+		viewportScissors = factory->createViewportsScissors(extend, extend);
+
+		// raster
 		RHI::RasterizerDesc rasterizer_desc =
 		{
 			RHI::PolygonMode::FILL,
 			0.0f,
 			RHI::CullMode::NONE,
 		};
-		MemScope<RHI::IRasterizer> rasterizer = factory->createRasterizer(rasterizer_desc);
+		rasterizer = factory->createRasterizer(rasterizer_desc);
+
+		// multisample
 		RHI::MultiSampleDesc multisampling_desc =
 		{
 			false,
 		};
-		MemScope<RHI::IMultisampling> multisampling = factory->createMultisampling(multisampling_desc);
+		multisampling = factory->createMultisampling(multisampling_desc);
+
+		// depth stencil
 		RHI::DepthStencilDesc depthstencil_desc =
 		{
 			true,
 			false,
 			RHI::CompareOp::LESS
 		};
-		MemScope<RHI::IDepthStencil> depthstencil = factory->createDepthStencil(depthstencil_desc);
+		depthstencil = factory->createDepthStencil(depthstencil_desc);
+
+		// color blending 
 		RHI::ColorBlendingDesc colorBlending_desc =
 		{
 			RHI::BlendOperator::ADD,
@@ -89,18 +100,20 @@ namespace SIByL::GFX::RDG
 			RHI::BlendFactor::ONE,
 			true,
 		};
-		MemScope<RHI::IColorBlending> color_blending = factory->createColorBlending(colorBlending_desc);
+		colorBlending = factory->createColorBlending(colorBlending_desc);
+
+		// pipeline state
 		std::vector<RHI::PipelineState> pipelinestates_desc =
 		{
 			RHI::PipelineState::VIEWPORT,
 			RHI::PipelineState::LINE_WIDTH,
 		};
-		MemScope<RHI::IDynamicState> dynamic_states = factory->createDynamicState(pipelinestates_desc);
+		dynamicStates = factory->createDynamicState(pipelinestates_desc);
 
 		// create pipeline layouts
 		RHI::PipelineLayoutDesc pipelineLayout_desc =
 		{ {desciptorSetLayout.get()} };
-		MemScope<RHI::IPipelineLayout> pipeline_layout = factory->createPipelineLayout(pipelineLayout_desc);
+		MemScope<RHI::IPipelineLayout> pipelineLayout = factory->createPipelineLayout(pipelineLayout_desc);
 
 		RHI::RenderPassDesc renderpass_desc =
 		{ {
@@ -135,18 +148,40 @@ namespace SIByL::GFX::RDG
 		RHI::PipelineDesc pipeline_desc =
 		{
 			{ shaderVert.get(), shaderFrag.get()},
-			vertex_layout.get(),
-			input_assembly.get(),
-			viewport_scissors.get(),
+			vertexLayout.get(),
+			inputAssembly.get(),
+			viewportScissors.get(),
 			rasterizer.get(),
 			multisampling.get(),
 			depthstencil.get(),
-			color_blending.get(),
-			dynamic_states.get(),
-			pipeline_layout.get(),
+			colorBlending.get(),
+			dynamicStates.get(),
+			pipelineLayout.get(),
 			renderPass.get(),
 		};
 		pipeline = factory->createPipeline(pipeline_desc);
 	}
 
+	auto RasterPassNode::onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		// viewport scissors
+		RHI::Extend extend{ framebuffer.getWidth(), framebuffer.getHeight() };
+		viewportScissors = factory->createViewportsScissors(extend, extend);
+
+		RHI::PipelineDesc pipeline_desc =
+		{
+			{ shaderVert.get(), shaderFrag.get()},
+			vertexLayout.get(),
+			inputAssembly.get(),
+			viewportScissors.get(),
+			rasterizer.get(),
+			multisampling.get(),
+			depthstencil.get(),
+			colorBlending.get(),
+			dynamicStates.get(),
+			pipelineLayout.get(),
+			renderPass.get(),
+		};
+		pipeline = factory->createPipeline(pipeline_desc);
+	}
 }

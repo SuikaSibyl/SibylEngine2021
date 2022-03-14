@@ -2,7 +2,7 @@ module;
 #include <cstdint>
 #include <vector>
 export module GFX.RDG.DepthBufferNode;
-import GFX.RDG.ResourceNode;
+import GFX.RDG.Common;
 import Core.MemoryManager;
 import RHI.IEnum;
 import RHI.ITexture;
@@ -36,7 +36,7 @@ namespace SIByL::GFX::RDG
 	{
 		RenderGraph* render_graph = (RenderGraph*)graph;
 
-		depthTexture = factory->createTexture(
+		texture = factory->createTexture(
 			{
 			RHI::ResourceType::Texture2D, //ResourceType type;
 			RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, //ResourceFormat format;
@@ -49,6 +49,6 @@ namespace SIByL::GFX::RDG
 			(uint32_t)(render_graph->getDatumHeight() * relHeight) //uint32_t height;
 			});
 
-		depthView = factory->createTextureView(depthTexture.get());
+		view = factory->createTextureView(texture.get());
 	}
 }

@@ -3,6 +3,9 @@ module;
 #include <vector>
 #include <string>
 export module GFX.RDG.Container;
+import Core.BitFlag;
+import RHI.IEnum;
+import RHI.IFactory;
 import GFX.RDG.Common;
 
 namespace SIByL::GFX::RDG
@@ -10,13 +13,5 @@ namespace SIByL::GFX::RDG
 	export struct FrameFlightContainer :public Container
 	{
 
-	};
-
-	export struct FramebufferContainer :public Container
-	{
-		auto getWidth() noexcept -> uint32_t;
-		auto getHeight() noexcept -> uint32_t;
-
-		uint32_t width, height;
 	};
 }

@@ -5,7 +5,6 @@ import Core.MemoryManager;
 import RHI.IFactory;
 import RHI.IUniformBuffer;
 import GFX.RDG.Common;
-import GFX.RDG.ResourceNode;
 
 namespace SIByL::GFX::RDG
 {

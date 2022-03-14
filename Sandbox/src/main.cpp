@@ -135,6 +135,8 @@ public:
 		physicalDevice = (RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
 		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
+		// create swapchain & related ...
+		swapchain = resourceFactory->createSwapchain({});
 
 		// create scene
 		scene.deserialize("test_scene.scene", logicalDevice.get());
@@ -170,6 +172,14 @@ public:
 		// renderer
 		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
 		uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
+		std::vector<RHI::ITexture*> swapchin_textures;
+		std::vector<RHI::ITextureView*> swapchin_texture_views;
+		for (int i = 0; i < swapchain->getSwapchainCount(); i++)
+		{
+			swapchin_textures.emplace_back(swapchain->getITexture(i));
+			swapchin_texture_views.emplace_back(swapchain->getITextureView(i));
+		}
+		swapchainColorBufferFlights = rdg_builder.addColorBufferFlightsExt(swapchin_textures, swapchin_texture_views);
 		rdg_builder.build(resourceFactory.get());
 
 		// load image
@@ -179,12 +189,7 @@ public:
 		sampler = resourceFactory->createSampler({});
 
 		// uniform process
-		{				
-			// uniform buffer
-			uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-				uniformBuffers[i] = resourceFactory->createUniformBuffer(sizeof(UniformBufferObject));
-
+		{
 			// create pool
 			RHI::DescriptorPoolDesc descriptor_pool_desc =
 			{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT},
@@ -210,7 +215,7 @@ public:
 
 			// configure descriptors in sets
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				descriptorSets[i]->update(uniformBuffers[i].get(), 0, 0);
+				descriptorSets[i]->update(rdg.getUniformBufferFlight(uniformBufferFlights, i), 0, 0);
 				descriptorSets[i]->update(textureView.get(), sampler.get(), 1, 0);
 			}
 
@@ -259,9 +264,6 @@ public:
 				0,
 				});
 		}
-
-		// create swapchain & related ...
-		swapchain = resourceFactory->createSwapchain({});
 		createModifableResource();
 
 		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
@@ -394,12 +396,14 @@ public:
 		GFX::RDG::TextureBufferNode* textureBufferNode = rdg.getTextureBufferNode(depthBuffer);
 		for (unsigned int i = 0; i < swapchain->getSwapchainCount(); i++)
 		{
+			GFX::RDG::TextureBufferNode* swapchainBufferNode = rdg.getTextureBufferNodeFlight(swapchainColorBufferFlights, i);
+
 			RHI::FramebufferDesc framebuffer_desc =
 			{
 				extend.width,
 				extend.height,
 				renderPass.get(),
-				{swapchain->getITextureView(i), textureBufferNode->depthView.get()},
+				{swapchainBufferNode->getTextureView(), textureBufferNode->getTextureView()},
 			};
 			framebuffers.emplace_back(resourceFactory->createFramebuffer(framebuffer_desc));
 		}
@@ -412,7 +416,6 @@ public:
 		framebuffers.clear();
 		pipeline = nullptr;
 		renderPass = nullptr;
-		swapchain = nullptr;
 
 		swapchain = resourceFactory->createSwapchain({ e.GetWidth(), e.GetHeight() });
 		createModifableResource();
@@ -446,7 +449,7 @@ public:
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
 			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
-			uniformBuffers[currentFrame]->updateBuffer(&ubo_proxy);
+			rdg.getUniformBufferFlight(uniformBufferFlights, currentFrame)->updateBuffer(&ubo_proxy);
 		}
 		// drawFrame
 		{
@@ -516,7 +519,8 @@ private:
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
 	GFX::RDG::NodeHandle depthBuffer;
-	GFX::RDG::Container uniformBufferFlights;
+	GFX::RDG::NodeHandle uniformBufferFlights;
+	GFX::RDG::NodeHandle swapchainColorBufferFlights;
 	ParticleSystem::ParticleSystem portal;
 
 	MemScope<RHI::IGraphicContext> graphicContext;
@@ -530,7 +534,6 @@ private:
 	MemScope<RHI::IShader> shaderComputeInit;
 
 	MemScope<RHI::IStorageBuffer> torusBuffer;
-	std::vector<MemScope<RHI::IUniformBuffer>> uniformBuffers;
 
 	MemScope<RHI::ITexture> texture;
 	MemScope<RHI::ITextureView> textureView;

@@ -16,7 +16,6 @@ import RHI.IPipelineLayout;
 
 import Core.MemoryManager;
 import GFX.RDG.Common;
-import GFX.RDG.PassNode;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
 

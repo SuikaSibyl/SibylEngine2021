@@ -1,4 +1,5 @@
 module;
+#include <vector>
 #include <unordered_map>
 export module GFX.RDG.RenderGraph;
 import Core.MemoryManager;
@@ -6,9 +7,8 @@ import RHI.IShader;
 import RHI.IDescriptorPool;
 import RHI.IFactory;
 import RHI.IStorageBuffer;
+import RHI.IUniformBuffer;
 import GFX.RDG.Common;
-import GFX.RDG.PassNode;
-import GFX.RDG.ResourceNode;
 import GFX.RDG.ComputePassNode;
 import GFX.RDG.IndirectDrawBufferNode;
 import GFX.RDG.TextureBufferNode;
@@ -25,7 +25,10 @@ namespace SIByL::GFX::RDG
 		auto getPassNode(NodeHandle handle) noexcept -> PassNode*;
 		auto getComputePassNode(NodeHandle handle) noexcept -> ComputePassNode*;
 		auto getTextureBufferNode(NodeHandle handle) noexcept -> TextureBufferNode*;
+		auto getTextureBufferNodeFlight(NodeHandle handle, uint32_t flight) noexcept -> TextureBufferNode*;
 		auto getMaxFrameInFlight() noexcept -> uint32_t { return 2; }
+
+		auto getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*;
 
 		auto getDatumWidth() noexcept -> uint32_t { return datumWidth; }
 		auto getDatumHeight() noexcept -> uint32_t { return datumHeight; }
@@ -33,11 +36,14 @@ namespace SIByL::GFX::RDG
 		auto reDatum(uint32_t const& width, uint32_t const& height) noexcept -> void;
 
 	private:
+		// Node manage
+		NodeRegistry registry;
+		std::vector<NodeHandle> passes;
+		std::vector<NodeHandle> resources;
+
 		uint32_t datumWidth, datumHeight;
 		RHI::IResourceFactory* factory;
 		friend struct RenderGraphBuilder;
-		std::unordered_map<NodeHandle, MemScope<PassNode>> passes;
-		std::unordered_map<NodeHandle, MemScope<ResourceNode>> resources;
 		MemScope<RHI::IDescriptorPool> descriptorPool;
 	};
 
@@ -51,9 +57,11 @@ namespace SIByL::GFX::RDG
 		// add resource nodes
 		auto addTexture() noexcept -> NodeHandle;
 		auto addUniformBuffer(size_t size) noexcept -> NodeHandle;
-		auto addUniformBufferFlights(size_t size) noexcept -> Container;
+		auto addUniformBufferFlights(size_t size) noexcept -> NodeHandle;
 		auto addStorageBuffer(size_t size) noexcept -> NodeHandle;
 		auto addStorageBufferExt(RHI::IStorageBuffer* external) noexcept -> NodeHandle;
+		auto addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view) noexcept -> NodeHandle;
+		auto addColorBufferFlightsExt(std::vector<RHI::ITexture*> const& textures, std::vector<RHI::ITextureView*> const& views) noexcept -> NodeHandle;
 		auto addIndirectDrawBuffer() noexcept -> NodeHandle;
 		auto addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle;
 
