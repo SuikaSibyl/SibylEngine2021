@@ -74,6 +74,7 @@ import GFX.Scene;
 import GFX.Mesh;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
+import GFX.RDG.RasterPassNode;
 
 import ParticleSystem.ParticleSystem;
 import ParticleSystem.PrecomputedSample;
@@ -130,18 +131,13 @@ public:
 		// shader resources
 		AssetLoader shaderLoader;
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
-		Buffer shader_vert, shader_frag, shader_comp, shader_comp_init;
-		shaderLoader.syncReadAll("vs_particle.spv", shader_vert);
-		shaderLoader.syncReadAll("fs_sampler.spv", shader_frag);
-		shaderLoader.syncReadAll("particle.spv", shader_comp);
-		shaderLoader.syncReadAll("init.spv", shader_comp_init);
-		shaderVert = resourceFactory->createShaderFromBinary(shader_vert, { RHI::ShaderStage::VERTEX,"main" });
-		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
-		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
-		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
+
+		MemScope<RHI::IShader> shaderVert = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
+		MemScope<RHI::IShader> shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
 		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> aces = resourceFactory->createShaderFromBinaryFile("aces.spv", { RHI::ShaderStage::COMPUTE,"main" });
 
 		// load image
 		Image image("./assets/Sparkle.tga");
@@ -162,6 +158,7 @@ public:
 		portal.init(sizeof(float) * 4 * 2, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 		portal.addEmitterSamples(torusBuffer.get());
 		GFX::RDG::NodeHandle external_texture = rdg_builder.addColorBufferExt(texture.get(), textureView.get());
+		GFX::RDG::NodeHandle external_sampler = rdg_builder.addSamplerExt(sampler.get());
 		portal.registerRenderGraph(&rdg_builder);
 		// renderer
 		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
@@ -173,55 +170,32 @@ public:
 			swapchin_textures.emplace_back(swapchain->getITexture(i));
 			swapchin_texture_views.emplace_back(swapchain->getITextureView(i));
 		}
-		swapchainColorBufferFlights = rdg_builder.addColorBufferFlightsExt(swapchin_textures, swapchin_texture_views);
-		//GFX::RDG::NodeHandle framebuffer = rdg_builder.addFrameBufferFlightsRef({
-		//	{{rdg.getContainer(swapchainColorBufferFlights)->handles[0]}, depthBuffer},
-		//	{{rdg.getContainer(swapchainColorBufferFlights)->handles[1]}, depthBuffer} });
-		//renderPassNode = rdg_builder.addRasterPass();
+		swapchainColorBufferFlights = rdg_builder.addColorBufferFlightsExtPresent(swapchin_textures, swapchin_texture_views);
+		framebuffer = rdg_builder.addFrameBufferFlightsRef({
+			{{rdg.getContainer(swapchainColorBufferFlights)->handles[0]}, depthBuffer},
+			{{rdg.getContainer(swapchainColorBufferFlights)->handles[1]}, depthBuffer},
+			{{rdg.getContainer(swapchainColorBufferFlights)->handles[2]}, depthBuffer}, });
+
+		// raster pass sono 1
+		//GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB, 1.f, 1.f);
+		//GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
+		//GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
+		//
+		//acesPass = rdg_builder.addComputePass(aces.get(), { srgb_color_attachment }, sizeof(unsigned int) * 2);
+
+		// raster pass
+		renderPassNode = rdg_builder.addRasterPass();
+		GFX::RDG::RasterPassNode* rasterPassNode = rdg.getRasterPassNode(renderPassNode);
+		rasterPassNode->shaderVert = std::move(shaderVert);
+		rasterPassNode->shaderFrag = std::move(shaderFrag);
+		rasterPassNode->framebufferFlights = framebuffer;
+		rasterPassNode->ins = { uniformBufferFlights, external_sampler, portal.particleBuffer };
+		rasterPassNode->textures = { external_texture };
+		rasterPassNode->useFlights = true;
 
 		rdg_builder.build(resourceFactory.get());
+		rdg.print();
 
-		// uniform process
-		{
-			// create pool
-			RHI::DescriptorPoolDesc descriptor_pool_desc =
-			{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT},
-			   {RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, MAX_FRAMES_IN_FLIGHT},
-			   {RHI::DescriptorType::STORAGE_BUFFER, 4 * MAX_FRAMES_IN_FLIGHT}}, // set types
-				2 * MAX_FRAMES_IN_FLIGHT }; // total sets
-			descriptorPool = resourceFactory->createDescriptorPool(descriptor_pool_desc);
-
-			// create desc layout
-			RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-			{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-			   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
-			   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr }} };
-			desciptor_set_layout = resourceFactory->createDescriptorSetLayout(descriptor_set_layout_desc);
-
-			// create sets
-			descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-			RHI::DescriptorSetDesc descriptor_set_desc =
-			{	descriptorPool.get(),
-				desciptor_set_layout.get() };
-			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-				descriptorSets[i] = resourceFactory->createDescriptorSet(descriptor_set_desc);
-
-			// configure descriptors in sets
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				descriptorSets[i]->update(rdg.getUniformBufferFlight(uniformBufferFlights, i), 0, 0);
-				descriptorSets[i]->update(rdg.getTextureBufferNode(external_texture)->getTextureView(), sampler.get(), 1, 0);
-			}
-
-			// create pipeline layouts
-			RHI::PipelineLayoutDesc pipelineLayout_desc =
-			{ {desciptor_set_layout.get()} };
-			pipeline_layout = resourceFactory->createPipelineLayout(pipelineLayout_desc);
-
-			// configure descriptors in sets
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				descriptorSets[i]->update(((GFX::RDG::StorageBufferNode*)rdg.getResourceNode(portal.particleBuffer))->storageBuffer.get(), 2, 0);
-			}
-		}
 		// compute stuff
 		{
 			compute_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
@@ -295,120 +269,12 @@ public:
 	{
 		RHI::Extend extend = swapchain->getExtend();
 		rdg.reDatum(extend.width, extend.height);
-
-		RHI::BufferLayout vertex_buffer_layout =
-		{
-			{RHI::DataType::Float3, "Position"},
-			{RHI::DataType::Float3, "Color"},
-			{RHI::DataType::Float2, "UV"},
-		};
-		MemScope<RHI::IVertexLayout> vertex_layout = resourceFactory->createVertexLayout(vertex_buffer_layout);
-		MemScope<RHI::IInputAssembly> input_assembly = resourceFactory->createInputAssembly(RHI::TopologyKind::TriangleList);
-		MemScope<RHI::IViewportsScissors> viewport_scissors = resourceFactory->createViewportsScissors(extend, extend);
-		RHI::RasterizerDesc rasterizer_desc =
-		{
-			RHI::PolygonMode::FILL,
-			0.0f,
-			RHI::CullMode::NONE,
-		};
-		MemScope<RHI::IRasterizer> rasterizer = resourceFactory->createRasterizer(rasterizer_desc);
-		RHI::MultiSampleDesc multisampling_desc =
-		{
-			false,
-		};
-		MemScope<RHI::IMultisampling> multisampling = resourceFactory->createMultisampling(multisampling_desc);
-		RHI::DepthStencilDesc depthstencil_desc =
-		{
-			true,
-			false,
-			RHI::CompareOp::LESS
-		};
-		MemScope<RHI::IDepthStencil> depthstencil = resourceFactory->createDepthStencil(depthstencil_desc);
-		RHI::ColorBlendingDesc colorBlending_desc =
-		{
-			RHI::BlendOperator::ADD,
-			RHI::BlendFactor::ONE,
-			RHI::BlendFactor::ONE,
-			RHI::BlendOperator::ADD,
-			RHI::BlendFactor::ONE,
-			RHI::BlendFactor::ONE,
-			true,
-		};
-		MemScope<RHI::IColorBlending> color_blending = resourceFactory->createColorBlending(colorBlending_desc);
-		std::vector<RHI::PipelineState> pipelinestates_desc =
-		{
-			RHI::PipelineState::VIEWPORT,
-			RHI::PipelineState::LINE_WIDTH,
-		};
-		MemScope<RHI::IDynamicState> dynamic_states = resourceFactory->createDynamicState(pipelinestates_desc);
-
-		RHI::RenderPassDesc renderpass_desc =
-		{{
-				// color attachment
-				{
-					RHI::SampleCount::COUNT_1_BIT,
-					RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB,
-					RHI::AttachmentLoadOp::CLEAR,
-					RHI::AttachmentStoreOp::STORE,
-					RHI::AttachmentLoadOp::DONT_CARE,
-					RHI::AttachmentStoreOp::DONT_CARE,
-					RHI::ImageLayout::UNDEFINED,
-					RHI::ImageLayout::PRESENT_SRC,
-					{0,0,0,1}
-				},
-			},
-			{				// depth attachment
-				{
-					RHI::SampleCount::COUNT_1_BIT,
-					RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT,
-					RHI::AttachmentLoadOp::CLEAR,
-					RHI::AttachmentStoreOp::DONT_CARE,
-					RHI::AttachmentLoadOp::DONT_CARE,
-					RHI::AttachmentStoreOp::DONT_CARE,
-					RHI::ImageLayout::UNDEFINED,
-					RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA,
-					{1,0}
-				},
-			} };
-		renderPass = resourceFactory->createRenderPass(renderpass_desc);
-
-		RHI::PipelineDesc pipeline_desc =
-		{
-			{ shaderVert.get(), shaderFrag.get()},
-			vertex_layout.get(),
-			input_assembly.get(),
-			viewport_scissors.get(),
-			rasterizer.get(),
-			multisampling.get(),
-			depthstencil.get(),
-			color_blending.get(),
-			dynamic_states.get(),
-			pipeline_layout.get(),
-			renderPass.get(),
-		};
-		pipeline = resourceFactory->createPipeline(pipeline_desc);
-
-		GFX::RDG::TextureBufferNode* textureBufferNode = rdg.getTextureBufferNode(depthBuffer);
-		for (unsigned int i = 0; i < swapchain->getSwapchainCount(); i++)
-		{
-			GFX::RDG::TextureBufferNode* swapchainBufferNode = rdg.getTextureBufferNodeFlight(swapchainColorBufferFlights, i);
-
-			RHI::FramebufferDesc framebuffer_desc =
-			{
-				extend.width,
-				extend.height,
-				renderPass.get(),
-				{swapchainBufferNode->getTextureView(), textureBufferNode->getTextureView()},
-			};
-			framebuffers.emplace_back(resourceFactory->createFramebuffer(framebuffer_desc));
-		}
 	}
 
 	virtual auto onWindowResize(WindowResizeEvent& e) -> bool override
 	{
 		logicalDevice->waitIdle();
 
-		framebuffers.clear();
 		pipeline = nullptr;
 		renderPass = nullptr;
 		swapchain = nullptr;
@@ -465,16 +331,18 @@ public:
 
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_drawcall_barrier.get());
 
-			commandbuffers[currentFrame]->cmdBeginRenderPass(renderPass.get(), framebuffers[imageIndex].get());
-			commandbuffers[currentFrame]->cmdBindPipeline(pipeline.get());
+			commandbuffers[currentFrame]->cmdBeginRenderPass(
+				rdg.getFramebufferContainerFlight(framebuffer, imageIndex)->getRenderPass(), 
+				rdg.getFramebufferContainerFlight(framebuffer, imageIndex)->getFramebuffer());
+			commandbuffers[currentFrame]->cmdBindPipeline(rdg.getRasterPassNode(renderPassNode)->pipeline.get());
 			
 			std::function<void(ECS::TagComponent&, GFX::Mesh&)> mesh_processor = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
 				commandbuffers[currentFrame]->cmdBindVertexBuffer(mesh.vertexBuffer.get());
 
 				commandbuffers[currentFrame]->cmdBindIndexBuffer(mesh.indexBuffer.get());
-				RHI::IDescriptorSet* tmp_set = descriptorSets[currentFrame].get();
+				RHI::IDescriptorSet* tmp_set = rdg.getRasterPassNode(renderPassNode)->descriptorSets[currentFrame].get();
 				commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
-					pipeline_layout.get(), 0, 1, &tmp_set, 0, nullptr);
+					rdg.getRasterPassNode(renderPassNode)->pipelineLayout.get(), 0, 1, &tmp_set, 0, nullptr);
 
 				commandbuffers[currentFrame]->cmdDrawIndexedIndirect(rdg.getIndirectDrawBufferNode(portal.indirectDrawBuffer)->storageBuffer.get(), 0, 1, sizeof(unsigned int) * 5);
 			};
@@ -525,7 +393,9 @@ private:
 	GFX::RDG::NodeHandle depthBuffer;
 	GFX::RDG::NodeHandle renderPassNode;
 	GFX::RDG::NodeHandle uniformBufferFlights;
+	GFX::RDG::NodeHandle framebuffer;
 	GFX::RDG::NodeHandle swapchainColorBufferFlights;
+	GFX::RDG::NodeHandle acesPass;
 	ParticleSystem::ParticleSystem portal;
 
 	MemScope<RHI::IGraphicContext> graphicContext;
@@ -533,21 +403,12 @@ private:
 	MemScope<RHI::ILogicalDevice> logicalDevice;
 
 	MemScope<RHI::IResourceFactory> resourceFactory;
-	MemScope<RHI::IShader> shaderVert;
-	MemScope<RHI::IShader> shaderFrag;
-	MemScope<RHI::IShader> shaderCompute;
-	MemScope<RHI::IShader> shaderComputeInit;
 
 	MemScope<RHI::IStorageBuffer> torusBuffer;
 
 	MemScope<RHI::ITexture> texture;
 	MemScope<RHI::ITextureView> textureView;
 	MemScope<RHI::ISampler> sampler;
-
-	MemScope<RHI::IDescriptorPool> descriptorPool;
-	MemScope<RHI::IDescriptorSetLayout> desciptor_set_layout;
-	MemScope<RHI::IPipelineLayout> pipeline_layout;
-	std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 
 	MemScope<RHI::IMemoryBarrier> compute_memory_barrier_0;
 	MemScope<RHI::IMemoryBarrier> compute_drawcall_memory_barrier;
@@ -559,7 +420,6 @@ private:
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;
 	MemScope<RHI::IPipeline> pipeline;
-	std::vector<MemScope<RHI::IFramebuffer>> framebuffers;
 
 	MemScope<RHI::ICommandPool> commandPool;
 	std::vector<MemScope<RHI::ICommandBuffer>> commandbuffers;

@@ -161,11 +161,12 @@ namespace SIByL::RHI
 			transitionImageLayout(ImageLayout::UNDEFINED, ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA);
 	}
 
-	ITextureVK::ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device)
+	ITextureVK::ITextureVK(VkImage _image, IResourceVK&& _resource, TextureDesc const& desc, ILogicalDeviceVK* _logical_device)
 		: image(_image)
 		, resource(std::move(_resource))
 		, logicalDevice(_logical_device)
 		, externalImage(true)
+		, desc(desc)
 	{}
 
 	ITextureVK::ITextureVK(ITextureVK&& _texture)
@@ -174,6 +175,7 @@ namespace SIByL::RHI
 		resource = std::move(_texture.resource);
 		logicalDevice = _texture.logicalDevice;
 		externalImage = _texture.externalImage;
+		desc = _texture.desc;
 
 		_texture.image = nullptr;
 	}

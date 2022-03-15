@@ -150,9 +150,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\GFXLayer\GFXLayer.cpp" />
+    <ClCompile Include="Private\RDG\Common\Common.cpp" />
     <ClCompile Include="Private\RDG\Pass\ComputePassNode.cpp" />
     <ClCompile Include="Private\RDG\Pass\RasterPassNode.cpp" />
     <ClCompile Include="Private\RDG\RenderGraph.cpp" />
+    <ClCompile Include="Private\RDG\Resource\ColorBufferNode.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
@@ -165,6 +167,7 @@
     <ClCompile Include="Public\RDG\Resource\DepthBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\IndirectDrawBufferNode.ixx" />
     <ClCompile Include="Public\RDG\RenderGraph.ixx" />
+    <ClCompile Include="Public\RDG\Resource\SamplerNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\StorageBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\TextureBufferNode.ixx" />
     <ClCompile Include="Public\RDG\Resource\UniformBufferNode.ixx" />

@@ -78,5 +78,14 @@
     <ClCompile Include="Public\RDG\Common\Container.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\RDG\Resource\SamplerNode.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RDG\Common\Common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\RDG\Resource\ColorBufferNode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

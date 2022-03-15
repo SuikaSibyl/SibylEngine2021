@@ -146,7 +146,19 @@ namespace SIByL::RHI
 			IResourceVK resource;
 			resource.setVKFormat(swapChainImageFormat);
 			resource.setVKImageViewType(VK_IMAGE_VIEW_TYPE_2D);
-			ITextureVK texture(images[i], std::move(resource), logicalDevice);
+			TextureDesc desc =
+			{
+				ResourceType::Texture2D,
+				ResourceFormat::FORMAT_B8G8R8A8_SRGB,
+				ImageTiling::OPTIMAL,
+				0,
+				BufferShareMode::EXCLUSIVE,
+				SampleCount::COUNT_1_BIT,
+				ImageLayout::UNDEFINED,
+				extent.width,
+				extent.height
+			};
+			ITextureVK texture(images[i], std::move(resource), desc, logicalDevice);
 			swapchainViews.emplace_back(texture.createView({}));
 			swapChainTextures.emplace_back(std::move(texture));
 		}

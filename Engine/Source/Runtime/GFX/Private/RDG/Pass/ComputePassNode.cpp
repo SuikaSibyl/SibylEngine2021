@@ -25,7 +25,8 @@ namespace SIByL::GFX::RDG
 		: shader(shader)
 		, ios(ios) 
 		, constantSize(constant_size)
-	{
+	{	
+		type = NodeDetailedType::COMPUTE_PASS;
 		RenderGraph* rg = (RenderGraph*)graph;
 		for (unsigned int i = 0; i < ios.size(); i++)
 		{
@@ -37,6 +38,12 @@ namespace SIByL::GFX::RDG
 				break;
 			case NodeDetailedType::UNIFORM_BUFFER:
 				rg->uniformBufferDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			case NodeDetailedType::SAMPLER:
+				rg->samplerDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			case NodeDetailedType::COLOR_TEXTURE:
+				rg->storageImageDescriptorCount += rg->getMaxFrameInFlight();
 				break;
 			default:
 				break;
@@ -98,19 +105,28 @@ namespace SIByL::GFX::RDG
 
 		// configure descriptors in sets
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			//int textureIdx = 0;
 			for (unsigned int j = 0; j < ios.size(); j++)
 			{
 				ResourceNode* resource = rg->getResourceNode(ios[j]);
-				switch (resource->resourceType)
+				switch (resource->type)
 				{
-				case RHI::DescriptorType::STORAGE_BUFFER:
+				case NodeDetailedType::STORAGE_BUFFER:
 					compute_descriptorSets[i]->update(((StorageBufferNode*)resource)->getStorageBuffer(), j, 0);
 					break;
+				case NodeDetailedType::UNIFORM_BUFFER:
+					compute_descriptorSets[i]->update(rg->getUniformBufferFlight(ios[j], i), j, 0);
+					break;
+					//case NodeDetailedType::SAMPLER:
+					//	descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
+					//		rg->getSamplerNode(ins[j])->getSampler(), j, 0);
+					//	break;
 				default:
-					SE_CORE_ERROR("GFX :: Compute Pass Node Binding Resource Type unsupported!");
+					SE_CORE_ERROR("GFX :: Raster Pass Node Binding Resource Type unsupported!");
 					break;
 				}
 			}
 		}
+
 	}
 }

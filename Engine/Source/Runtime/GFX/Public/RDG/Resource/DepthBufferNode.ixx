@@ -25,7 +25,7 @@ namespace SIByL::GFX::RDG
 	DepthBufferNode::DepthBufferNode(float const& rel_width, float const& rel_height)
 		: relWidth(rel_width)
 		, relHeight(rel_height)
-	{}
+	{ type = NodeDetailedType::DEPTH_TEXTURE; }
 
 	auto DepthBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{

@@ -17,11 +17,12 @@ import RHI.ICommandPool;
 import RHI.ICommandBuffer;
 import RHI.ISemaphore;
 import RHI.IFence;
+import RHI.IBarrier;
 
 namespace SIByL
 {
 	namespace GFX
-	{
+	{		
 		export class GFXLayer :public ILayer
 		{
 		public:

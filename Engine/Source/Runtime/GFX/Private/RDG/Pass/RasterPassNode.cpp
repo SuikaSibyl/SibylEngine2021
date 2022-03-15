@@ -1,6 +1,7 @@
 module;
 #include <vector>
 module GFX.RDG.RasterPassNode;
+import Core.Log;
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
 import RHI.ILogicalDevice;
@@ -38,10 +39,29 @@ namespace SIByL::GFX::RDG
 	RasterPassNode::RasterPassNode(
 		void* graph, 
 		std::vector<NodeHandle>&& ins, 
-		RHI::IShader* vertex_shader, 
-		RHI::IShader* fragment_shader, 
 		uint32_t const& constant_size)
+		:ins(ins)
 	{
+		RenderGraph* rg = (RenderGraph*)graph;
+		for (unsigned int i = 0; i < ins.size(); i++)
+		{
+			// TODO :: Dinstinguish Vertex / Fragment shaders
+			//rg->getResourceNode(ios[i])->shaderStages |= (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT;
+			switch (rg->getResourceNode(ins[i])->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+				rg->storageBufferDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			case NodeDetailedType::UNIFORM_BUFFER:
+				rg->uniformBufferDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			case NodeDetailedType::SAMPLER:
+				rg->samplerDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	auto RasterPassNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
@@ -61,8 +81,12 @@ namespace SIByL::GFX::RDG
 		inputAssembly = factory->createInputAssembly(RHI::TopologyKind::TriangleList);
 
 		// viewport scissors
-		RHI::Extend extend{ framebuffer.getWidth(), framebuffer.getHeight() };
-		viewportScissors = factory->createViewportsScissors(extend, extend);
+		if (useFlights)
+		{
+			FramebufferContainer* framebuffer_0 = rg->getFramebufferContainerFlight(framebufferFlights, 0);
+			RHI::Extend extend{ framebuffer_0->getWidth(), framebuffer_0->getHeight() };
+			viewportScissors = factory->createViewportsScissors(extend, extend);
+		}
 
 		// raster
 		RHI::RasterizerDesc rasterizer_desc =
@@ -129,47 +153,35 @@ namespace SIByL::GFX::RDG
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 			descriptorSets[i] = factory->createDescriptorSet(descriptor_set_desc);
 
-		// configure descriptors in sets
-		//for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		//	descriptorSets[i]->update(rg->getUniformBufferFlight(uniformBufferFlights, i), 0, 0);
-		//	//descriptorSets[i]->update(textureView.get(), sampler.get(), 1, 0);
-		//}
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			int textureIdx = 0;
+			for (unsigned int j = 0; j < ins.size(); j++)
+			{
+				ResourceNode* resource = rg->getResourceNode(ins[j]);
+				switch (resource->type)
+				{
+				case NodeDetailedType::STORAGE_BUFFER:
+					descriptorSets[i]->update(((StorageBufferNode*)resource)->getStorageBuffer(), j, 0);
+					break;
+				case NodeDetailedType::UNIFORM_BUFFER:
+					descriptorSets[i]->update(rg->getUniformBufferFlight(ins[j], i), j, 0);
+					break;
+				case NodeDetailedType::SAMPLER:
+					descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
+						rg->getSamplerNode(ins[j])->getSampler(), j, 0);
+					break;
+				default:
+					SE_CORE_ERROR("GFX :: Raster Pass Node Binding Resource Type unsupported!");
+					break;
+				}
+			}
+		}
 
 		// create pipeline layouts
 		RHI::PipelineLayoutDesc pipelineLayout_desc =
 		{ {desciptorSetLayout.get()} };
-		MemScope<RHI::IPipelineLayout> pipelineLayout = factory->createPipelineLayout(pipelineLayout_desc);
-
-		RHI::RenderPassDesc renderpass_desc =
-		{ {
-				// color attachment
-				{
-					RHI::SampleCount::COUNT_1_BIT,
-					RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB,
-					RHI::AttachmentLoadOp::CLEAR,
-					RHI::AttachmentStoreOp::STORE,
-					RHI::AttachmentLoadOp::DONT_CARE,
-					RHI::AttachmentStoreOp::DONT_CARE,
-					RHI::ImageLayout::UNDEFINED,
-					RHI::ImageLayout::PRESENT_SRC,
-					{0,0,0,1}
-				},
-			},
-			{				// depth attachment
-				{
-					RHI::SampleCount::COUNT_1_BIT,
-					RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT,
-					RHI::AttachmentLoadOp::CLEAR,
-					RHI::AttachmentStoreOp::DONT_CARE,
-					RHI::AttachmentLoadOp::DONT_CARE,
-					RHI::AttachmentStoreOp::DONT_CARE,
-					RHI::ImageLayout::UNDEFINED,
-					RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA,
-					{1,0}
-				},
-			} };
-		renderPass = factory->createRenderPass(renderpass_desc);
-
+		pipelineLayout = factory->createPipelineLayout(pipelineLayout_desc);
+		
 		RHI::PipelineDesc pipeline_desc =
 		{
 			{ shaderVert.get(), shaderFrag.get()},
@@ -182,16 +194,22 @@ namespace SIByL::GFX::RDG
 			colorBlending.get(),
 			dynamicStates.get(),
 			pipelineLayout.get(),
-			renderPass.get(),
+			rg->getFramebufferContainerFlight(framebufferFlights, 0)->renderPass.get(),
 		};
 		pipeline = factory->createPipeline(pipeline_desc);
 	}
 
 	auto RasterPassNode::onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		RenderGraph* rg = (RenderGraph*)graph;
+
 		// viewport scissors
-		RHI::Extend extend{ framebuffer.getWidth(), framebuffer.getHeight() };
-		viewportScissors = factory->createViewportsScissors(extend, extend);
+		if (useFlights)
+		{
+			FramebufferContainer* framebuffer_0 = rg->getFramebufferContainerFlight(framebufferFlights, 0);
+			RHI::Extend extend{ framebuffer_0->getWidth(), framebuffer_0->getHeight() };
+			viewportScissors = factory->createViewportsScissors(extend, extend);
+		}
 
 		RHI::PipelineDesc pipeline_desc =
 		{
@@ -205,7 +223,7 @@ namespace SIByL::GFX::RDG
 			colorBlending.get(),
 			dynamicStates.get(),
 			pipelineLayout.get(),
-			renderPass.get(),
+			rg->getFramebufferContainerFlight(framebufferFlights, 0)->renderPass.get(),
 		};
 		pipeline = factory->createPipeline(pipeline_desc);
 	}

@@ -20,7 +20,7 @@ namespace SIByL
 			ITextureVK() = default;
 			ITextureVK(Image* image, ILogicalDeviceVK* _logical_device);
 			ITextureVK(TextureDesc const&, ILogicalDeviceVK* _logical_device);
-			ITextureVK(VkImage _image, IResourceVK&& _resource, ILogicalDeviceVK* _logical_device);
+			ITextureVK(VkImage _image, IResourceVK&& _resource, TextureDesc const& desc, ILogicalDeviceVK* _logical_device);
 			ITextureVK(ITextureVK const&) = delete;
 			ITextureVK(ITextureVK &&);
 			virtual ~ITextureVK();

@@ -5,11 +5,14 @@ module;
 #include <string>
 #include <unordered_map>
 export module GFX.RDG.Common;
+import Core.Log;
 import Core.BitFlag;
 import Core.MemoryManager;
 import RHI.IEnum;
 import RHI.IFactory;
 import RHI.ICommandBuffer;
+import RHI.IRenderPass;
+import RHI.IFramebuffer;
 import ECS.UID;
 
 namespace SIByL::GFX::RDG
@@ -37,6 +40,7 @@ namespace SIByL::GFX::RDG
 		PLACEHOLDER = 0x00000001,
 		CONTAINER   = 0x00000002,
 		RESOURCE    = 0x00000004,
+		FLIGHT      = 0x00000008,
 	};
 	export enum class NodeDetailedType :uint32_t
 	{
@@ -44,11 +48,17 @@ namespace SIByL::GFX::RDG
 		STORAGE_BUFFER,
 		UNIFORM_BUFFER,
 		FRAME_BUFFER,
+		SAMPLER,
+		RASTER_PASS,
+		COMPUTE_PASS,
+		COLOR_TEXTURE,
+		DEPTH_TEXTURE,
 	};
 
 	struct NodeRegistry;
 	export struct Node
 	{
+		virtual auto onPrint() noexcept -> void;
 		virtual auto onRegister() noexcept -> void {}
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
@@ -86,6 +96,7 @@ namespace SIByL::GFX::RDG
 	export struct ResourceNode :public Node
 	{
 	public:
+		ResourceNode() { attributes |= addBit(NodeAttrbutesFlagBits::RESOURCE); }
 		RHI::DescriptorType resourceType;
 		RHI::ShaderStageFlags shaderStages;
 	};
@@ -93,12 +104,11 @@ namespace SIByL::GFX::RDG
 	export struct PassNode :public Node
 	{
 	public:
-
 	};
 
 	// Framebuffers & uniform buffer flights could be a sets of resources
 	// Container could also be a node, with a vector of sub-handles.
-	export struct Container :public Node
+	export struct Container :public ResourceNode
 	{
 		Container() { attributes |= addBit(NodeAttrbutesFlagBits::CONTAINER); }
 		Container(std::initializer_list<NodeHandle> list) :handles(list) {
@@ -115,9 +125,9 @@ namespace SIByL::GFX::RDG
 
 	export struct FlightContainer :public Container
 	{
-		FlightContainer() = default;
-		FlightContainer(std::initializer_list<NodeHandle> list) :Container(list) {}
-		FlightContainer(std::vector<NodeHandle>&& handles) :Container(std::move(handles)) {}
+		FlightContainer() { attributes |= addBit(NodeAttrbutesFlagBits::FLIGHT); }
+		FlightContainer(std::initializer_list<NodeHandle> list) :Container(list) { attributes |= addBit(NodeAttrbutesFlagBits::FLIGHT); }
+		FlightContainer(std::vector<NodeHandle>&& handles) :Container(std::move(handles)) { attributes |= addBit(NodeAttrbutesFlagBits::FLIGHT); }
 
 		auto handleOnFlight(uint32_t const& flight) noexcept -> NodeHandle { return handles[flight]; }
 	};
@@ -125,11 +135,17 @@ namespace SIByL::GFX::RDG
 	export struct FramebufferContainer :public Container
 	{
 		FramebufferContainer() { type = NodeDetailedType::FRAME_BUFFER; }
-		auto getWidth() noexcept -> uint32_t { return width; }
-		auto getHeight() noexcept -> uint32_t { return height; }
+		auto getWidth() noexcept -> uint32_t;
+		auto getHeight() noexcept -> uint32_t;
+		auto getFramebuffer() noexcept -> RHI::IFramebuffer* { return framebuffer.get(); }
+		auto getRenderPass() noexcept -> RHI::IRenderPass* { return renderPass.get(); }
+		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 
-		uint32_t width, height;
 		uint32_t colorAttachCount = 0;
 		uint32_t depthAttachCount = 0;
+
+		MemScope<RHI::IRenderPass> renderPass;
+		MemScope<RHI::IFramebuffer> framebuffer;
 	};
 }

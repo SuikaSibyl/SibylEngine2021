@@ -268,6 +268,9 @@ namespace SIByL::RHI
 		case ResourceFormat::FORMAT_D32_SFLOAT_S8_UINT:
 			return VK_FORMAT_D32_SFLOAT_S8_UINT;
 			break;
+		case ResourceFormat::FORMAT_R32G32B32A32_SFLOAT:
+			return VK_FORMAT_R32G32B32A32_SFLOAT;
+			break;
 		default:
 			break;
 		}
