@@ -414,6 +414,14 @@ public:
 		swapchain = nullptr;
 
 		swapchain = resourceFactory->createSwapchain({ e.GetWidth(), e.GetHeight() });
+		for (int i = 0; i < swapchain->getSwapchainCount(); i++)
+		{
+			rdg.getTextureBufferNodeFlight(swapchainColorBufferFlights, i)->resetExternal(
+				swapchain->getITexture(i),
+				swapchain->getITextureView(i)
+			);
+		}
+
 		createModifableResource();
 
 		return false;

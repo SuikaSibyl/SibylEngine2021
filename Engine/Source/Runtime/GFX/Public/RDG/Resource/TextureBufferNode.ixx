@@ -32,6 +32,12 @@ namespace SIByL::GFX::RDG
 			return ext_view;
 		}
 
+		auto resetExternal(RHI::ITexture* t, RHI::ITextureView* tv) noexcept -> void
+		{
+			ext_texture = t;
+			ext_view = tv;
+		}
+
 		RHI::ITexture* ext_texture;
 		RHI::ITextureView* ext_view;
 
