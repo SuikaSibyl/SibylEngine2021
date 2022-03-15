@@ -40,11 +40,9 @@ namespace SIByL::GFX::RDG
 	export struct RasterPassNode :public PassNode
 	{
 	public:
-		RasterPassNode() { type = NodeDetailedType::RASTER_PASS; }
-
 		RasterPassNode(
 			void* graph,
-			std::vector<NodeHandle>&& ins,
+			std::vector<NodeHandle> const& ins,
 			uint32_t const& constant_size);
 
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;

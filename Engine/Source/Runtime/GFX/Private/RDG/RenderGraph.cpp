@@ -321,9 +321,9 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
-	auto RenderGraphBuilder::addRasterPass() noexcept -> NodeHandle
+	auto RenderGraphBuilder::addRasterPass(std::vector<NodeHandle> const& ins, uint32_t const& constant_size) noexcept -> NodeHandle
 	{
-		MemScope<RasterPassNode> rpn = MemNew<RasterPassNode>();
+		MemScope<RasterPassNode> rpn = MemNew<RasterPassNode>((void*)&attached, ins, constant_size);
 		NodeHandle handle = attached.registry.registNode(std::move(rpn));
 		attached.passes.emplace_back(handle);
 		return handle;

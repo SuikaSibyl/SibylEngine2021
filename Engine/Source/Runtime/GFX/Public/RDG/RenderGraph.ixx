@@ -86,7 +86,7 @@ namespace SIByL::GFX::RDG
 		auto addFrameBufferFlightsRef(std::vector<std::pair<std::vector<NodeHandle> const&, NodeHandle>> infos) noexcept -> NodeHandle;
 
 		auto addComputePass(RHI::IShader* shader, std::vector<NodeHandle>&& ios, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
-		auto addRasterPass() noexcept -> NodeHandle;
+		auto addRasterPass(std::vector<NodeHandle> const& ins, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
 
 		RenderGraph& attached;
 

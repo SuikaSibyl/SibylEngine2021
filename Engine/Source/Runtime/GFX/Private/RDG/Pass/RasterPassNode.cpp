@@ -38,10 +38,12 @@ namespace SIByL::GFX::RDG
 {
 	RasterPassNode::RasterPassNode(
 		void* graph, 
-		std::vector<NodeHandle>&& ins, 
+		std::vector<NodeHandle> const& ins,
 		uint32_t const& constant_size)
 		:ins(ins)
 	{
+		type = NodeDetailedType::RASTER_PASS;
+
 		RenderGraph* rg = (RenderGraph*)graph;
 		for (unsigned int i = 0; i < ins.size(); i++)
 		{

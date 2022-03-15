@@ -184,12 +184,11 @@ public:
 		//acesPass = rdg_builder.addComputePass(aces.get(), { srgb_color_attachment }, sizeof(unsigned int) * 2);
 
 		// raster pass
-		renderPassNode = rdg_builder.addRasterPass();
+		renderPassNode = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer });
 		GFX::RDG::RasterPassNode* rasterPassNode = rdg.getRasterPassNode(renderPassNode);
 		rasterPassNode->shaderVert = std::move(shaderVert);
 		rasterPassNode->shaderFrag = std::move(shaderFrag);
 		rasterPassNode->framebufferFlights = framebuffer;
-		rasterPassNode->ins = { uniformBufferFlights, external_sampler, portal.particleBuffer };
 		rasterPassNode->textures = { external_texture };
 		rasterPassNode->useFlights = true;
 
