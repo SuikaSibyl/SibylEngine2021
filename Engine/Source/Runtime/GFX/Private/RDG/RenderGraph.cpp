@@ -1,14 +1,17 @@
 module;
 #include <unordered_map>
 module GFX.RDG.RenderGraph;
+import Core.Log;
 import Core.BitFlag;
 import Core.MemoryManager;
 import RHI.IDescriptorPool;
 import RHI.IFactory;
+import RHI.ITexture;
 import ECS.UID;
 import GFX.RDG.Common;
 import GFX.RDG.StorageBufferNode;
 import GFX.RDG.ComputePassNode;
+import GFX.RDG.RasterPassNode;
 import GFX.RDG.UniformBufferNode;
 import GFX.RDG.IndirectDrawBufferNode;
 import GFX.RDG.DepthBufferNode;
@@ -74,6 +77,11 @@ namespace SIByL::GFX::RDG
 	{
 		NodeHandle flight_handle = ((FlightContainer*)registry.getNode(handle))->handleOnFlight(flight);
 		return ((UniformBufferNode*)registry.getNode(flight_handle))->uniformBuffer.get();
+	}
+
+	auto RenderGraph::getContainer(NodeHandle handle) noexcept -> Container*
+	{
+		return (Container*)registry.getNode(handle);
 	}
 
 	auto RenderGraphBuilder::addTexture() noexcept -> NodeHandle
@@ -182,6 +190,50 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
+	auto RenderGraphBuilder::addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment) noexcept -> NodeHandle
+	{
+		MemScope<FramebufferContainer> fbc = MemNew<FramebufferContainer>();
+		fbc->colorAttachCount = color_attachments.size();
+		fbc->depthAttachCount = (depth_attachment == 0) ? 0 : 1;
+		fbc->handles.resize(fbc->colorAttachCount + fbc->depthAttachCount);
+		for (int i = 0; i < fbc->colorAttachCount; i++)
+		{
+			fbc->handles[i] = color_attachments[i];
+		}
+		if (depth_attachment) fbc->handles[fbc->colorAttachCount] = depth_attachment;
+		if (color_attachments.size() > 0)
+		{
+			fbc->width = attached.getTextureBufferNode(color_attachments[0])->getTexture()->getDescription().width;
+			fbc->height = attached.getTextureBufferNode(color_attachments[0])->getTexture()->getDescription().height;
+		}
+		else if(depth_attachment)
+		{
+			fbc->width = attached.getTextureBufferNode(depth_attachment)->getTexture()->getDescription().width;
+			fbc->height = attached.getTextureBufferNode(depth_attachment)->getTexture()->getDescription().height;
+		}
+		else
+		{
+			SE_CORE_ERROR("RDG :: Framebuffer creation without either color attachments or depth attachments");
+		}
+		NodeHandle handle = attached.registry.registNode(std::move(fbc));
+		attached.resources.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphBuilder::addFrameBufferFlightsRef(std::vector<std::pair<std::vector<NodeHandle> const&, NodeHandle>> infos) noexcept -> NodeHandle
+	{
+		uint32_t flights_count = infos.size();
+		std::vector<NodeHandle> handles(flights_count);
+		for (uint32_t i = 0; i < flights_count; i++)
+		{
+			handles[i] = addFrameBufferRef(infos[i].first, infos[i].second);
+		}
+		MemScope<FlightContainer> fc = MemNew<FlightContainer>(std::move(handles));
+		NodeHandle handle = attached.registry.registNode(std::move(fc));
+		attached.resources.emplace_back(handle);
+		return handle;
+	}
+
 	auto RenderGraphBuilder::build(RHI::IResourceFactory* factory) noexcept -> void
 	{
 		attached.factory = factory;
@@ -194,11 +246,11 @@ namespace SIByL::GFX::RDG
 
 		// create pool
 		uint32_t MAX_FRAMES_IN_FLIGHT = attached.getMaxFrameInFlight();
-		RHI::DescriptorPoolDesc descriptor_pool_desc =
-		{ {{RHI::DescriptorType::UNIFORM_BUFFER, MAX_FRAMES_IN_FLIGHT},
-		   {RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, MAX_FRAMES_IN_FLIGHT},
-		   {RHI::DescriptorType::STORAGE_BUFFER, storageBufferCount * MAX_FRAMES_IN_FLIGHT}}, // set types
-			attached.passes.size() * MAX_FRAMES_IN_FLIGHT}; // total sets
+		RHI::DescriptorPoolDesc descriptor_pool_desc{ {}, attached.passes.size() * MAX_FRAMES_IN_FLIGHT };
+		if (attached.storageBufferDescriptorCount > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_BUFFER, attached.storageBufferDescriptorCount);
+		if (attached.uniformBufferDescriptorCount > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::UNIFORM_BUFFER, attached.uniformBufferDescriptorCount);
+		if (MAX_FRAMES_IN_FLIGHT > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, MAX_FRAMES_IN_FLIGHT);
+
 		attached.descriptorPool = factory->createDescriptorPool(descriptor_pool_desc);
 
 		// build passes
@@ -207,4 +259,13 @@ namespace SIByL::GFX::RDG
 			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
 		}
 	}
+
+	auto RenderGraphBuilder::addRasterPass() noexcept -> NodeHandle
+	{
+		MemScope<RasterPassNode> rpn = MemNew<RasterPassNode>();
+		NodeHandle handle = attached.registry.registNode(std::move(rpn));
+		attached.passes.emplace_back(handle);
+		return handle;
+	}
+
 }

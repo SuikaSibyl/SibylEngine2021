@@ -1,6 +1,6 @@
 module;
 #include <vector>
-export module GFX.RasterPassNode;
+export module GFX.RDG.RasterPassNode;
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
 import RHI.ILogicalDevice;
@@ -39,12 +39,15 @@ namespace SIByL::GFX::RDG
 	export struct RasterPassNode :public PassNode
 	{
 	public:
+		RasterPassNode() = default;
 		RasterPassNode(void* graph, std::vector<NodeHandle>&& ins, RHI::IShader* vertex_shader, RHI::IShader* fragment_shader, uint32_t const& constant_size = 0);
 
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 
 		FramebufferContainer framebuffer;
+		MemScope<RHI::IShader> shaderVert;
+		MemScope<RHI::IShader> shaderFrag;
 
 		MemScope<RHI::IVertexLayout> vertexLayout;
 		MemScope<RHI::IInputAssembly> inputAssembly;
@@ -56,9 +59,8 @@ namespace SIByL::GFX::RDG
 		MemScope<RHI::IDynamicState> dynamicStates;
 		MemScope<RHI::IPipelineLayout> pipelineLayout;
 
-		MemScope<RHI::IShader> shaderVert;
-		MemScope<RHI::IShader> shaderFrag;
 		MemScope<RHI::IDescriptorSetLayout> desciptorSetLayout;
+		std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 		MemScope<RHI::IRenderPass> renderPass;
 		MemScope<RHI::IPipeline> pipeline;
 	};

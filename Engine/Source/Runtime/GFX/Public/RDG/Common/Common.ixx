@@ -40,7 +40,10 @@ namespace SIByL::GFX::RDG
 	};
 	export enum class NodeDetailedType :uint32_t
 	{
-
+		NONE,
+		STORAGE_BUFFER,
+		UNIFORM_BUFFER,
+		FRAME_BUFFER,
 	};
 
 	struct NodeRegistry;
@@ -50,7 +53,7 @@ namespace SIByL::GFX::RDG
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		NodeRegistry* registry;
-		NodeDetailedType type;
+		NodeDetailedType type = NodeDetailedType::NONE;
 		NodeAttributesFlags attributes = 0;
 	};
 
@@ -90,7 +93,7 @@ namespace SIByL::GFX::RDG
 	export struct PassNode :public Node
 	{
 	public:
-		virtual auto execute(RHI::ICommandBuffer* buffer, unsigned int x, unsigned int y, unsigned int z, unsigned int frame) noexcept -> void = 0;
+
 	};
 
 	// Framebuffers & uniform buffer flights could be a sets of resources
@@ -121,9 +124,12 @@ namespace SIByL::GFX::RDG
 
 	export struct FramebufferContainer :public Container
 	{
+		FramebufferContainer() { type = NodeDetailedType::FRAME_BUFFER; }
 		auto getWidth() noexcept -> uint32_t { return width; }
 		auto getHeight() noexcept -> uint32_t { return height; }
 
 		uint32_t width, height;
+		uint32_t colorAttachCount = 0;
+		uint32_t depthAttachCount = 0;
 	};
 }

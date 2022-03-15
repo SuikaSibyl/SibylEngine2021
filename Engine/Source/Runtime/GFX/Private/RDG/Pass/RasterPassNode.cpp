@@ -1,6 +1,6 @@
 module;
 #include <vector>
-module GFX.RasterPassNode;
+module GFX.RDG.RasterPassNode;
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
 import RHI.ILogicalDevice;
@@ -31,6 +31,7 @@ import RHI.IRenderPass;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 import Core.MemoryManager;
+import GFX.RDG.RenderGraph;
 
 namespace SIByL::GFX::RDG
 {
@@ -41,13 +42,12 @@ namespace SIByL::GFX::RDG
 		RHI::IShader* fragment_shader, 
 		uint32_t const& constant_size)
 	{
-
-		//MemScope<RHI::IVertexLayout> vertex_layout = resourceFactory->createVertexLayout(vertex_buffer_layout);
-
 	}
 
 	auto RasterPassNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		RenderGraph* rg = (RenderGraph*)graph;
+
 		// vertex buffer layout
 		RHI::BufferLayout vertex_buffer_layout =
 		{
@@ -109,6 +109,31 @@ namespace SIByL::GFX::RDG
 			RHI::PipelineState::LINE_WIDTH,
 		};
 		dynamicStates = factory->createDynamicState(pipelinestates_desc);
+
+		//
+		// create desc layout
+		RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
+		{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+		   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
+		   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr }} };
+		desciptorSetLayout = factory->createDescriptorSetLayout(descriptor_set_layout_desc);
+
+		//
+		// create sets
+		uint32_t MAX_FRAMES_IN_FLIGHT = rg->getMaxFrameInFlight();
+		descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+		RHI::IDescriptorPool* descriptor_pool = rg->getDescriptorPool();
+		RHI::DescriptorSetDesc descriptor_set_desc =
+		{ descriptor_pool,
+			desciptorSetLayout.get() };
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+			descriptorSets[i] = factory->createDescriptorSet(descriptor_set_desc);
+
+		// configure descriptors in sets
+		//for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		//	descriptorSets[i]->update(rg->getUniformBufferFlight(uniformBufferFlights, i), 0, 0);
+		//	//descriptorSets[i]->update(textureView.get(), sampler.get(), 1, 0);
+		//}
 
 		// create pipeline layouts
 		RHI::PipelineLayoutDesc pipelineLayout_desc =

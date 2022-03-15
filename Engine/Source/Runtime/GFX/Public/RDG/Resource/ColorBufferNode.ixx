@@ -3,6 +3,7 @@ module;
 #include <vector>
 export module GFX.RDG.ColorBufferNode;
 import GFX.RDG.Common;
+import Core.BitFlag;
 import Core.MemoryManager;
 import RHI.IEnum;
 import RHI.ITexture;
@@ -32,8 +33,10 @@ namespace SIByL::GFX::RDG
 
 	auto ColorBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
-		RenderGraph* render_graph = (RenderGraph*)graph;
+		if (hasBit(attributes, NodeAttrbutesFlagBits::PLACEHOLDER))
+			return;
 
+		RenderGraph* render_graph = (RenderGraph*)graph;
 		texture = factory->createTexture(
 			{
 			RHI::ResourceType::Texture2D, //ResourceType type;

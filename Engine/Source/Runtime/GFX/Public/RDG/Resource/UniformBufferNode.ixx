@@ -11,6 +11,8 @@ namespace SIByL::GFX::RDG
 	export struct UniformBufferNode :public ResourceNode
 	{
 	public:
+		UniformBufferNode() { type = NodeDetailedType::UNIFORM_BUFFER; }
+
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
 		{
 			uniformBuffer = factory->createUniformBuffer(size);

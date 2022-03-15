@@ -20,6 +20,7 @@ namespace SIByL
 		export class IUniformBufferVK :public IUniformBuffer
 		{
 		public:
+			IUniformBufferVK();
 			IUniformBufferVK(uint32_t const& size, ILogicalDeviceVK* logical_device);
 			virtual ~IUniformBufferVK() = default;
 

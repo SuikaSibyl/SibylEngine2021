@@ -30,6 +30,17 @@ namespace SIByL::GFX::RDG
 		for (unsigned int i = 0; i < ios.size(); i++)
 		{
 			rg->getResourceNode(ios[i])->shaderStages |= (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT;
+			switch (rg->getResourceNode(ios[i])->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+				rg->storageBufferDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			case NodeDetailedType::UNIFORM_BUFFER:
+				rg->uniformBufferDescriptorCount += rg->getMaxFrameInFlight();
+				break;
+			default:
+				break;
+			}
 		}
 	}
 	

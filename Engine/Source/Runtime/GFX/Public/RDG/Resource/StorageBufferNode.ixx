@@ -11,6 +11,8 @@ namespace SIByL::GFX::RDG
 	export struct StorageBufferNode :public ResourceNode
 	{
 	public:
+		StorageBufferNode() { type = NodeDetailedType::STORAGE_BUFFER; }
+
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
 		{
 			if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))

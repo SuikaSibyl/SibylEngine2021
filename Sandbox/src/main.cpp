@@ -106,20 +106,6 @@ public:
 	{};
 	virtual void onAwake() override
 	{
-		//ParticleSystem::PrecomputedSampleTorus torusSampler(1, 0.04f);
-		//std::vector<glm::vec4> torusSamples(1024);
-		//for (int i = 0; i < 1024; i++)
-		//{
-		//	torusSamples[i] = glm::vec4(torusSampler.generateSample(), 0.0f);
-		//	float z = torusSamples[i].y;
-		//	torusSamples[i].y = torusSamples[i].z;
-		//	torusSamples[i].z = z;
-		//}
-		//Buffer precomputed_proxy(torusSamples.data(), torusSamples.size() * sizeof(glm::vec4), 1);
-		//Buffer* buffers[] = { &precomputed_proxy };
-		//ECS::UID uid = ECS::UniqueID::RequestUniqueID();
-		//CacheBrain::instance()->saveCache(uid, EmptyHeader{}, buffers, 1, 0);
-
 		// create window
 		WindowLayerDesc window_layer_desc = {
 			SIByL::EWindowVendor::GLFW,
@@ -153,7 +139,17 @@ public:
 		shaderFrag = resourceFactory->createShaderFromBinary(shader_frag, { RHI::ShaderStage::FRAGMENT,"main" });
 		shaderCompute = resourceFactory->createShaderFromBinary(shader_comp, { RHI::ShaderStage::COMPUTE,"main" });
 		shaderComputeInit = resourceFactory->createShaderFromBinary(shader_comp_init, { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
 
+		// load image
+		Image image("./assets/Sparkle.tga");
+		texture = resourceFactory->createTexture(&image);
+		textureView = resourceFactory->createTextureView(texture.get());
+		sampler = resourceFactory->createSampler({});
+
+		// load precomputed samples
 		Buffer torusSamples;
 		Buffer* samples[] = { &torusSamples };
 		EmptyHeader header;
@@ -163,11 +159,9 @@ public:
 		rdg.reDatum(1280, 720);
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// particle system
-		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		portal.init(sizeof(float) * 4 * 2, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 		portal.addEmitterSamples(torusBuffer.get());
+		GFX::RDG::NodeHandle external_texture = rdg_builder.addColorBufferExt(texture.get(), textureView.get());
 		portal.registerRenderGraph(&rdg_builder);
 		// renderer
 		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
@@ -180,13 +174,12 @@ public:
 			swapchin_texture_views.emplace_back(swapchain->getITextureView(i));
 		}
 		swapchainColorBufferFlights = rdg_builder.addColorBufferFlightsExt(swapchin_textures, swapchin_texture_views);
-		rdg_builder.build(resourceFactory.get());
+		//GFX::RDG::NodeHandle framebuffer = rdg_builder.addFrameBufferFlightsRef({
+		//	{{rdg.getContainer(swapchainColorBufferFlights)->handles[0]}, depthBuffer},
+		//	{{rdg.getContainer(swapchainColorBufferFlights)->handles[1]}, depthBuffer} });
+		//renderPassNode = rdg_builder.addRasterPass();
 
-		// load image
-		Image image("./assets/Sparkle.tga");
-		texture = resourceFactory->createTexture(&image);
-		textureView = resourceFactory->createTextureView(texture.get());
-		sampler = resourceFactory->createSampler({});
+		rdg_builder.build(resourceFactory.get());
 
 		// uniform process
 		{
@@ -216,7 +209,7 @@ public:
 			// configure descriptors in sets
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 				descriptorSets[i]->update(rdg.getUniformBufferFlight(uniformBufferFlights, i), 0, 0);
-				descriptorSets[i]->update(textureView.get(), sampler.get(), 1, 0);
+				descriptorSets[i]->update(rdg.getTextureBufferNode(external_texture)->getTextureView(), sampler.get(), 1, 0);
 			}
 
 			// create pipeline layouts
@@ -266,6 +259,7 @@ public:
 		}
 		createModifableResource();
 
+		// comand stuffs
 		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
 		commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		imageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
@@ -279,6 +273,7 @@ public:
 			inFlightFence[i] = resourceFactory->createFence();
 		}
 
+		// timer
 		timer.start();
 
 		// init storage buffer
@@ -416,6 +411,7 @@ public:
 		framebuffers.clear();
 		pipeline = nullptr;
 		renderPass = nullptr;
+		swapchain = nullptr;
 
 		swapchain = resourceFactory->createSwapchain({ e.GetWidth(), e.GetHeight() });
 		createModifableResource();
@@ -519,6 +515,7 @@ private:
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
 	GFX::RDG::NodeHandle depthBuffer;
+	GFX::RDG::NodeHandle renderPassNode;
 	GFX::RDG::NodeHandle uniformBufferFlights;
 	GFX::RDG::NodeHandle swapchainColorBufferFlights;
 	ParticleSystem::ParticleSystem portal;
