@@ -43,6 +43,7 @@ namespace SIByL::GFX::RDG
 				rg->samplerDescriptorCount += rg->getMaxFrameInFlight();
 				break;
 			case NodeDetailedType::COLOR_TEXTURE:
+				rg->getColorBufferNode(ios[i])->usages |= (uint32_t)RHI::ImageUsageFlagBits::STORAGE_BIT;
 				rg->storageImageDescriptorCount += rg->getMaxFrameInFlight();
 				break;
 			default:
@@ -105,7 +106,7 @@ namespace SIByL::GFX::RDG
 
 		// configure descriptors in sets
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			//int textureIdx = 0;
+			int textureIdx = 0;
 			for (unsigned int j = 0; j < ios.size(); j++)
 			{
 				ResourceNode* resource = rg->getResourceNode(ios[j]);
@@ -117,10 +118,14 @@ namespace SIByL::GFX::RDG
 				case NodeDetailedType::UNIFORM_BUFFER:
 					compute_descriptorSets[i]->update(rg->getUniformBufferFlight(ios[j], i), j, 0);
 					break;
-					//case NodeDetailedType::SAMPLER:
-					//	descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
-					//		rg->getSamplerNode(ins[j])->getSampler(), j, 0);
-					//	break;
+				case NodeDetailedType::SAMPLER:
+					compute_descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
+						rg->getSamplerNode(ios[j])->getSampler(), j, 0);
+					break;
+				//case NodeDetailedType::COLOR_TEXTURE:
+				//	compute_descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
+				//		rg->getSamplerNode(ios[j])->getSampler(), j, 0);
+				//	break;
 				default:
 					SE_CORE_ERROR("GFX :: Raster Pass Node Binding Resource Type unsupported!");
 					break;

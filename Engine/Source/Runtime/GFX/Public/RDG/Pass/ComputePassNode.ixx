@@ -39,6 +39,7 @@ namespace SIByL::GFX::RDG
 		uint32_t constantSize;
 		RHI::IShader* shader;
 		std::vector<NodeHandle> ios;
+		std::vector<NodeHandle> textures;
 		MemScope<RHI::IPipeline> pipeline;
 		MemScope<RHI::IPipelineLayout> compute_pipeline_layout;
 		std::vector<MemScope<RHI::IDescriptorSet>> compute_descriptorSets;

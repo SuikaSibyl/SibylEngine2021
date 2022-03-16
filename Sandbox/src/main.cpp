@@ -177,11 +177,11 @@ public:
 			{{rdg.getContainer(swapchainColorBufferFlights)->handles[2]}, depthBuffer}, });
 
 		// raster pass sono 1
-		//GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB, 1.f, 1.f);
-		//GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
-		//GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
-		//
-		//acesPass = rdg_builder.addComputePass(aces.get(), { srgb_color_attachment }, sizeof(unsigned int) * 2);
+		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB, 1.f, 1.f);
+		GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
+		GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
+		
+		acesPass = rdg_builder.addComputePass(aces.get(), { srgb_color_attachment }, sizeof(unsigned int) * 2);
 
 		// raster pass
 		renderPassNode = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer });
