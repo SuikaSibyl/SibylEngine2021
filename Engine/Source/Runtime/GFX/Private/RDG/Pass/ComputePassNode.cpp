@@ -71,9 +71,26 @@ namespace SIByL::GFX::RDG
 		descriptor_set_layout_desc.perBindingDesc.resize(ios.size());
 		for (unsigned int i = 0; i < ios.size(); i++)
 		{
-			descriptor_set_layout_desc.perBindingDesc[i] = {
-				i, 1, rg->getResourceNode(ios[i])->resourceType, rg->getResourceNode(ios[i])->shaderStages, nullptr
-			};
+			ResourceNode* resource = rg->getResourceNode(ios[i]);
+			switch (resource->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+			case NodeDetailedType::UNIFORM_BUFFER:
+			case NodeDetailedType::SAMPLER:
+				descriptor_set_layout_desc.perBindingDesc[i] = {
+					i, 1, rg->getResourceNode(ios[i])->resourceType, rg->getResourceNode(ios[i])->shaderStages, nullptr
+				};				
+				break;
+			case NodeDetailedType::COLOR_TEXTURE:
+				descriptor_set_layout_desc.perBindingDesc[i] = {
+					i, 1, RHI::DescriptorType::STORAGE_IMAGE, rg->getResourceNode(ios[i])->shaderStages, nullptr
+				};
+				break;
+			default:
+				SE_CORE_ERROR("GFX :: Compute Pass Node Binding Resource Type unsupported!");
+				break;
+
+			}
 		}
 		MemScope<RHI::IDescriptorSetLayout> compute_desciptor_set_layout = factory->createDescriptorSetLayout(descriptor_set_layout_desc);
 
@@ -122,12 +139,11 @@ namespace SIByL::GFX::RDG
 					compute_descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
 						rg->getSamplerNode(ios[j])->getSampler(), j, 0);
 					break;
-				//case NodeDetailedType::COLOR_TEXTURE:
-				//	compute_descriptorSets[i]->update(rg->getTextureBufferNode(textures[textureIdx++])->getTextureView(),
-				//		rg->getSamplerNode(ios[j])->getSampler(), j, 0);
-				//	break;
+				case NodeDetailedType::COLOR_TEXTURE:
+					compute_descriptorSets[i]->update(rg->getTextureBufferNode(ios[j])->getTextureView(), j, 0);
+					break;
 				default:
-					SE_CORE_ERROR("GFX :: Raster Pass Node Binding Resource Type unsupported!");
+					SE_CORE_ERROR("GFX :: Compute Pass Node Binding Resource Type unsupported!");
 					break;
 				}
 			}

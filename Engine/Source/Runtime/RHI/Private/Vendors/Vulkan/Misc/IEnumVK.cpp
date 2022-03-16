@@ -250,6 +250,9 @@ namespace SIByL::RHI
 	{
 		switch (format)
 		{
+		case ResourceFormat::FORMAT_R8G8B8A8_UNORM:
+			return VK_FORMAT_R8G8B8A8_UNORM;
+			break;
 		case ResourceFormat::FORMAT_B8G8R8A8_RGB:
 			return VK_FORMAT_B8G8R8A8_UINT;
 			break;
@@ -541,6 +544,7 @@ namespace SIByL::RHI
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::TRANSFER_SRC_BIT, VK_IMAGE_USAGE_TRANSFER_SRC_BIT, flags);
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::TRANSFER_DST_BIT, VK_IMAGE_USAGE_TRANSFER_DST_BIT, flags);
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::SAMPLED_BIT, VK_IMAGE_USAGE_SAMPLED_BIT, flags);
+		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::STORAGE_BIT, VK_IMAGE_USAGE_STORAGE_BIT, flags);
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::COLOR_ATTACHMENT_BIT, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, flags);
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, flags);
 		flagBitSwitch(_flag, (uint32_t)SIByL::RHI::ImageUsageFlagBits::TRANSIENT_ATTACHMENT_BIT, VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT, flags);

@@ -33,7 +33,7 @@ namespace SIByL::GFX::RDG
 			RHI::ResourceType::Texture2D, //ResourceType type;
 			format, //ResourceFormat format;
 			RHI::ImageTiling::OPTIMAL, //ImageTiling tiling;
-			(uint32_t)RHI::ImageUsageFlagBits::COLOR_ATTACHMENT_BIT, //ImageUsageFlags usages;
+			usages, //ImageUsageFlags usages;
 			RHI::BufferShareMode::EXCLUSIVE, //BufferShareMode shareMode;
 			RHI::SampleCount::COUNT_1_BIT, //SampleCount sampleCount;
 			RHI::ImageLayout::UNDEFINED, //ImageLayout layout;
@@ -41,7 +41,7 @@ namespace SIByL::GFX::RDG
 			(uint32_t)(render_graph->getDatumHeight() * relHeight) //uint32_t height;
 			});
 
-		view = factory->createTextureView(texture.get());
+		view = factory->createTextureView(texture.get(), usages);
 	}
 
 }

@@ -17,6 +17,6 @@ void main()
     if(x>PushConstants.width || y>PushConstants.height)
         return;
     
-    imageStore(resultImage, ivec2(x, y), vec4(1,1,1,1));
+    imageStore(resultImage, ivec2(x, y), vec4(1.f * x / PushConstants.width, 1.f * y / PushConstants.height,1,1));
 
 }

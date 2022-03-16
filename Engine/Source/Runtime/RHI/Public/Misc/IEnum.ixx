@@ -67,6 +67,7 @@ namespace SIByL
 
 		export enum class ResourceFormat : uint32_t
 		{
+			FORMAT_R8G8B8A8_UNORM,
 			FORMAT_B8G8R8A8_RGB,
 			FORMAT_B8G8R8A8_SRGB,
 			FORMAT_R8G8B8A8_SRGB,

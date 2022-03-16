@@ -834,7 +834,7 @@ namespace SIByL::RHI
 		return tx;
 	}
 
-	auto IResourceFactory::createTextureView(ITexture* texture) noexcept -> MemScope<ITextureView>
+	auto IResourceFactory::createTextureView(ITexture* texture, ImageUsageFlags extra_usages) noexcept -> MemScope<ITextureView>
 	{
 		MemScope<ITextureView> tv = nullptr;
 		switch (api)
@@ -843,7 +843,7 @@ namespace SIByL::RHI
 			break;
 		case SIByL::RHI::API::VULKAN:
 		{
-			MemScope<ITextureViewVK> tv_vk = MemNew<ITextureViewVK>(texture, (ILogicalDeviceVK*)logicalDevice);
+			MemScope<ITextureViewVK> tv_vk = MemNew<ITextureViewVK>(texture, (ILogicalDeviceVK*)logicalDevice, extra_usages);
 			tv = MemCast<ITextureView>(tv_vk);
 		}
 		break;

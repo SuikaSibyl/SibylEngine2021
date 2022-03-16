@@ -98,7 +98,7 @@ namespace SIByL::GFX::RDG
 	public:
 		ResourceNode() { attributes |= addBit(NodeAttrbutesFlagBits::RESOURCE); }
 		RHI::DescriptorType resourceType;
-		RHI::ShaderStageFlags shaderStages;
+		RHI::ShaderStageFlags shaderStages = 0;
 	};
 
 	export struct PassNode :public Node

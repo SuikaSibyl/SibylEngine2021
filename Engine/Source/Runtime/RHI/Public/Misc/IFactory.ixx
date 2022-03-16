@@ -107,7 +107,7 @@ namespace SIByL
 			auto createBufferImageCopy(BufferImageCopyDesc const& desc) noexcept -> MemScope<IBufferImageCopy>;
 			auto createTexture(Image* image) noexcept -> MemScope<ITexture>;
 			auto createTexture(TextureDesc const&) noexcept -> MemScope<ITexture>;
-			auto createTextureView(ITexture* texture) noexcept -> MemScope<ITextureView>;
+			auto createTextureView(ITexture* texture, ImageUsageFlags extra_usages = 0) noexcept -> MemScope<ITextureView>;
 			auto createSampler(SamplerDesc const&) noexcept -> MemScope<ISampler>;
 
 			auto createShaderFromBinaryFile(std::filesystem::path path, ShaderDesc const& desc) noexcept -> MemScope<IShader>;

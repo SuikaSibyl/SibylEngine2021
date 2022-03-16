@@ -124,6 +124,27 @@ namespace SIByL::RHI
 		vkUpdateDescriptorSets(logicalDevice->getDeviceHandle(), 1, &descriptorWrite, 0, nullptr);
 	}
 
+	auto IDescriptorSetVK::update(ITextureView* texture_view, uint32_t const& binding, uint32_t const& array_element) noexcept -> void
+	{
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_GENERAL;
+		imageInfo.imageView = *((ITextureViewVK*)texture_view)->getpVkImageView();
+		imageInfo.sampler = VK_NULL_HANDLE;
+		
+		VkWriteDescriptorSet descriptorWrite{};
+		descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrite.dstSet = set;
+		descriptorWrite.dstBinding = binding;
+		descriptorWrite.dstArrayElement = array_element;
+		descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE;
+		descriptorWrite.descriptorCount = 1;
+		descriptorWrite.pBufferInfo = nullptr;
+		descriptorWrite.pImageInfo = &imageInfo; // Optional
+		descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+		vkUpdateDescriptorSets(logicalDevice->getDeviceHandle(), 1, &descriptorWrite, 0, nullptr);
+	}
+
 	auto IDescriptorSetVK::getVkDescriptorSet() noexcept -> VkDescriptorSet*
 	{
 		return &set;

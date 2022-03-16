@@ -36,7 +36,7 @@ namespace SIByL
 			:logicalDevice(_logical_device)
 		{}
 
-		ITextureViewVK::ITextureViewVK(ITexture* texture, ILogicalDeviceVK* _logical_device)
+		ITextureViewVK::ITextureViewVK(ITexture* texture, ILogicalDeviceVK* _logical_device, ImageUsageFlags extra_usages)
 			:logicalDevice(_logical_device)
 		{
 			ResourceFormat format = ((ITextureVK*)texture)->getDescription().format;
@@ -53,6 +53,7 @@ namespace SIByL
 			case SIByL::RHI::ResourceFormat::FORMAT_R8G8B8A8_SRGB:
 			case SIByL::RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB:
 			case SIByL::RHI::ResourceFormat::FORMAT_B8G8R8A8_RGB:
+			case SIByL::RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM:
 			case SIByL::RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT:
 				accessMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				break;

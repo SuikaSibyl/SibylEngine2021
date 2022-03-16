@@ -105,6 +105,12 @@ public:
 
 	struct Empty
 	{};
+
+	struct Size
+	{
+		unsigned int width;
+		unsigned int height;
+	};
 	virtual void onAwake() override
 	{
 		// create window
@@ -177,10 +183,7 @@ public:
 			{{rdg.getContainer(swapchainColorBufferFlights)->handles[2]}, depthBuffer}, });
 
 		// raster pass sono 1
-		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B8G8R8A8_SRGB, 1.f, 1.f);
-		GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
-		GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
-		
+		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
 		acesPass = rdg_builder.addComputePass(aces.get(), { srgb_color_attachment }, sizeof(unsigned int) * 2);
 
 		// raster pass
@@ -255,6 +258,9 @@ public:
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
 		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
+		rdg.getTextureBufferNode(srgb_color_attachment)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
+		Size size = { 1280,720 };
+		rdg.getComputePassNode(acesPass)->executeWithConstant(transientCommandbuffer.get(), 40, 23, 1, 0, size);
 
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();

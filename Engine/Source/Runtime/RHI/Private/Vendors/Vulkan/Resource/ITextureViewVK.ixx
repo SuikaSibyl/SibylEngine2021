@@ -14,7 +14,7 @@ namespace SIByL
 		{
 		public:
 			ITextureViewVK(ILogicalDeviceVK* _logical_device);
-			ITextureViewVK(ITexture* texture, ILogicalDeviceVK* _logical_device);
+			ITextureViewVK(ITexture* texture, ILogicalDeviceVK* _logical_device, ImageUsageFlags extra_usages = 0);
 			ITextureViewVK(ITextureViewVK&&) = default;
 			ITextureViewVK(ITextureViewVK const&) = delete;
 			virtual ~ITextureViewVK();

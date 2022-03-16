@@ -34,6 +34,7 @@ namespace SIByL
 			virtual auto update(IUniformBuffer* uniform_buffer, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
 			virtual auto update(IStorageBuffer* uniform_buffer, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
 			virtual auto update(ITextureView* texture_view, ISampler* sampler, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
+			virtual auto update(ITextureView* texture_view, uint32_t const& binding, uint32_t const& array_element) noexcept -> void = 0;
 
 		private:
 		};
