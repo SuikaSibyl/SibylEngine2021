@@ -247,4 +247,31 @@ namespace SIByL::RHI
 	{
 		vkCmdDrawIndexedIndirect(commandBuffer, *((IStorageBufferVK*)storageBuffer)->getVkBuffer(), indiret_offset, draw_count, draw_stride);
 	}
+
+	auto ICommandBufferVK::cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void
+	{
+		std::vector<VkImageBlit> blits(blit_info.size());
+
+		for (int i = 0; i < blit_info.size(); i++)
+		{
+			blits[i].srcSubresource.aspectMask = getVkImageAspectFlags(blit_info[i].srcAspects);
+			blits[i].srcSubresource.mipLevel = 0;
+			blits[i].srcSubresource.baseArrayLayer = 0;
+			blits[i].srcSubresource.layerCount = 1;
+			blits[i].srcOffsets[0] = VkOffset3D{ 0,0,0 };
+			blits[i].srcOffsets[1] = VkOffset3D{ (int)((ITextureVK*)src)->getDescription().width,(int)((ITextureVK*)src)->getDescription().height,1 };
+			blits[i].dstSubresource.aspectMask = getVkImageAspectFlags(blit_info[i].dstAspects);
+			blits[i].dstSubresource.mipLevel = 0;
+			blits[i].dstSubresource.baseArrayLayer = 0;
+			blits[i].dstSubresource.layerCount = 1;
+			blits[i].dstOffsets[0] = VkOffset3D{ 0,0,0 };
+			blits[i].dstOffsets[1] = VkOffset3D{ (int)((ITextureVK*)src)->getDescription().width,(int)((ITextureVK*)src)->getDescription().height,1 };
+		}
+		vkCmdBlitImage(commandBuffer, 
+			*((ITextureVK*)src)->getVkImage(), getVkImageLayout(srcLayout),
+			*((ITextureVK*)dst)->getVkImage(), getVkImageLayout(dstLayout), 
+			blit_info.size(),
+			blits.data(), 
+			VkFilter::VK_FILTER_NEAREST);
+	}
 }

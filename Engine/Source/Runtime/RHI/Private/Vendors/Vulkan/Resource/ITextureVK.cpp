@@ -215,6 +215,13 @@ namespace SIByL::RHI
 			sourceStage = (uint32_t)PipelineStageFlagBits::TOP_OF_PIPE_BIT;
 			destinationStage = (uint32_t)PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT;
 		}
+		else if (old_layout == ImageLayout::UNDEFINED && new_layout == ImageLayout::PRESENT_SRC) {
+			srcAccessMask = 0;
+			dstAccessMask = (uint32_t)AccessFlagBits::TRANSFER_WRITE_BIT;
+
+			sourceStage = (uint32_t)PipelineStageFlagBits::TOP_OF_PIPE_BIT;
+			destinationStage = (uint32_t)PipelineStageFlagBits::TRANSFER_BIT;
+		}
 		else if (old_layout == ImageLayout::UNDEFINED && new_layout == ImageLayout::GENERAL) {
 			srcAccessMask = 0;
 			dstAccessMask = (uint32_t)AccessFlagBits::SHADER_WRITE_BIT | (uint32_t)AccessFlagBits::MEMORY_WRITE_BIT;

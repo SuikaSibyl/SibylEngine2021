@@ -10,6 +10,22 @@ layout ( binding = 1, rgba32f ) uniform image2D inputImage;
 
 layout (local_size_x =32, local_size_y =32) in;
 
+vec3 ACESToneMapping(vec3 color, float adapted_lum)
+{
+	const float A = 2.51f;
+	const float B = 0.03f;
+	const float C = 2.43f;
+	const float D = 0.59f;
+	const float E = 0.14f;
+
+	color *= adapted_lum;
+	return (color * (A * color + B)) / (color * (C * color + D) + E);
+}
+
+vec3 linearTosRGB(const in vec3 color) {
+    return vec3( color.r < 0.0031308 ? color.r * 12.92 : 1.055 * pow(color.r, 1.0/2.4) - 0.055, color.g < 0.0031308 ? color.g * 12.92 : 1.055 * pow(color.g, 1.0/2.4) - 0.055, color.b < 0.0031308 ? color.b * 12.92 : 1.055 * pow(color.b, 1.0/2.4) - 0.055);
+}
+
 void main()
 {
     uint x = gl_GlobalInvocationID.x;
@@ -17,10 +33,14 @@ void main()
 
     vec2 uv = vec2((0.5 + 1.f * x) / PushConstants.width, (0.5 + 1.f * y) / PushConstants.height);
     vec4 texture_color = imageLoad(inputImage, ivec2(x, y));
-
+    
     if(x>PushConstants.width || y>PushConstants.height)
         return;
     
-    imageStore(resultImage, ivec2(x, y), texture_color * vec4(uv,1,1));
+    vec3 hdrCol = texture_color.rgb;
+    hdrCol = ACESToneMapping(hdrCol, 0.5);
+    hdrCol = linearTosRGB(hdrCol);
+
+    imageStore(resultImage, ivec2(x, y), vec4(hdrCol, 1));
 
 }

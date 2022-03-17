@@ -148,7 +148,9 @@ namespace SIByL::GFX::RDG
 						rg->getSamplerNode(ios[j])->getSampler(), j, 0);
 					break;
 				case NodeDetailedType::COLOR_TEXTURE:
+				{
 					compute_descriptorSets[i]->update(rg->getTextureBufferNode(ios[j])->getTextureView(), j, 0);
+				}
 					break;
 				default:
 					SE_CORE_ERROR("GFX :: Compute Pass Node Binding Resource Type unsupported!");

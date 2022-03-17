@@ -187,7 +187,7 @@ public:
 		GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 		srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
-		GFX::RDG::NodeHandle test_write_target = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
+		test_write_target = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
 		acesPass = rdg_builder.addComputePass(aces.get(), { test_write_target, srgb_color_attachment }, sizeof(unsigned int) * 2);
 
 		// raster pass
@@ -211,8 +211,132 @@ public:
 		rdg_builder.build(resourceFactory.get());
 		rdg.print();
 
-		// compute stuff
+		for (int i = 0; i < 3; i++)
 		{
+			GFX::RDG::NodeHandle color_attachment_i = rdg.getContainer(swapchainColorBufferFlights)->handles[i];
+			rdg.getTextureBufferNode(color_attachment_i)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::PRESENT_SRC);
+			MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
+				rdg.getTextureBufferNode(color_attachment_i)->getTexture(), //ITexture* image;
+				RHI::ImageSubresourceRange{
+					(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+					0,
+					1,
+					0,
+					1
+				},//ImageSubresourceRange subresourceRange;
+				(uint32_t)RHI::AccessFlagBits::TRANSFER_WRITE_BIT, //AccessFlags srcAccessMask;
+				(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT, //AccessFlags dstAccessMask;
+				RHI::ImageLayout::TRANSFER_DST_OPTIMAL, // old Layout
+				RHI::ImageLayout::PRESENT_SRC // new Layout
+			});
+			color_attach_copy2present[i] = resourceFactory->createBarrier({
+				(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//srcStageMask
+				(uint32_t)RHI::PipelineStageFlagBits::ALL_GRAPHICS_BIT,//dstStageMask
+				0,
+				{},
+				{},
+				{image_memory_barrier.get()}
+			});
+			MemScope<RHI::IImageMemoryBarrier> image_memory_barrier2 = resourceFactory->createImageMemoryBarrier({
+				rdg.getTextureBufferNode(color_attachment_i)->getTexture(), //ITexture* image;
+				RHI::ImageSubresourceRange{
+					(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+					0,
+					1,
+					0,
+					1
+				},//ImageSubresourceRange subresourceRange;
+				(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT, //AccessFlags srcAccessMask;
+				(uint32_t)RHI::AccessFlagBits::TRANSFER_WRITE_BIT, //AccessFlags dstAccessMask;
+				RHI::ImageLayout::PRESENT_SRC, // old Layout
+				RHI::ImageLayout::TRANSFER_DST_OPTIMAL // new Layout
+			});
+
+			color_attach_present2copy[i] = resourceFactory->createBarrier({
+				(uint32_t)RHI::PipelineStageFlagBits::ALL_GRAPHICS_BIT,//srcStageMask
+				(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//dstStageMask
+				0,
+				{},
+				{},
+				{image_memory_barrier2.get()}
+			});
+
+		}
+		// ACES Results
+		{
+			MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
+				rdg.getTextureBufferNode(test_write_target)->getTexture(), //ITexture* image;
+				RHI::ImageSubresourceRange{
+					(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+					0,
+					1,
+					0,
+					1
+				},//ImageSubresourceRange subresourceRange;
+				(uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT, //AccessFlags srcAccessMask;
+				(uint32_t)RHI::AccessFlagBits::TRANSFER_READ_BIT, //AccessFlags dstAccessMask;
+				RHI::ImageLayout::GENERAL, // old Layout
+				RHI::ImageLayout::TRANSFER_SRC_OPTIMAL // new Layout
+			});			
+			aces_res_general2copysrc = resourceFactory->createBarrier({
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//srcStageMask
+				(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//dstStageMask
+				0,
+				{},
+				{},
+				{image_memory_barrier.get()}
+			});
+
+			MemScope<RHI::IImageMemoryBarrier> image_memory_barrier_2 = resourceFactory->createImageMemoryBarrier({
+				rdg.getTextureBufferNode(test_write_target)->getTexture(), //ITexture* image;
+				RHI::ImageSubresourceRange{
+					(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+					0,
+					1,
+					0,
+					1
+				},//ImageSubresourceRange subresourceRange;
+				(uint32_t)RHI::AccessFlagBits::TRANSFER_READ_BIT, //AccessFlags srcAccessMask;
+				(uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT, //AccessFlags dstAccessMask;
+				RHI::ImageLayout::TRANSFER_SRC_OPTIMAL, // old Layout
+				RHI::ImageLayout::GENERAL // new Layout
+			});
+
+			aces_res_copysrc2general = resourceFactory->createBarrier({
+				(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//srcStageMask
+				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//dstStageMask
+				0,
+				{},
+				{},
+				{image_memory_barrier_2.get()}
+				});
+		}
+		// compute stuff
+		{		
+			MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
+				rdg.getTextureBufferNode(srgb_color_attachment)->getTexture(), //ITexture* image;
+				RHI::ImageSubresourceRange{
+					(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+					0,
+					1,
+					0,
+					1
+				},//ImageSubresourceRange subresourceRange;
+				0, //AccessFlags srcAccessMask;
+				(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT, //AccessFlags dstAccessMask;
+				RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL, // old Layout
+				RHI::ImageLayout::GENERAL // new Layout
+			});
+
+			attach_read_barrier = resourceFactory->createBarrier({
+					(uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT,//srcStageMask
+					(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//dstStageMask
+					0,
+					{},
+					{},
+					{image_memory_barrier.get()}
+				});
+
 			compute_barrier = resourceFactory->createBarrier(RHI::BarrierDesc{
 				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
@@ -222,6 +346,7 @@ public:
 					(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT | (uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
 					(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT | (uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
 				});
+
 			compute_barrier_0 = resourceFactory->createBarrier(RHI::BarrierDesc{
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
@@ -351,24 +476,24 @@ public:
 			// render pass 1
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_drawcall_barrier.get());
 
-			commandbuffers[currentFrame]->cmdBeginRenderPass(
-				rdg.getFramebufferContainerFlight(framebuffer, imageIndex)->getRenderPass(), 
-				rdg.getFramebufferContainerFlight(framebuffer, imageIndex)->getFramebuffer());
-			commandbuffers[currentFrame]->cmdBindPipeline(rdg.getRasterPassNode(renderPassNode)->pipeline.get());
-			
-			std::function<void(ECS::TagComponent&, GFX::Mesh&)> mesh_processor = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
-				commandbuffers[currentFrame]->cmdBindVertexBuffer(mesh.vertexBuffer.get());
+			//commandbuffers[currentFrame]->cmdBeginRenderPass(
+			//	rdg.getFramebufferContainerFlight(framebuffer, imageIndex)->getRenderPass(), 
+			//	rdg.getFramebufferContainerFlight(framebuffer, imageIndex)->getFramebuffer());
+			//commandbuffers[currentFrame]->cmdBindPipeline(rdg.getRasterPassNode(renderPassNode)->pipeline.get());
+			//
+			//std::function<void(ECS::TagComponent&, GFX::Mesh&)> mesh_processor = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
+			//	commandbuffers[currentFrame]->cmdBindVertexBuffer(mesh.vertexBuffer.get());
 
-				commandbuffers[currentFrame]->cmdBindIndexBuffer(mesh.indexBuffer.get());
-				RHI::IDescriptorSet* tmp_set = rdg.getRasterPassNode(renderPassNode)->descriptorSets[currentFrame].get();
-				commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
-					rdg.getRasterPassNode(renderPassNode)->pipelineLayout.get(), 0, 1, &tmp_set, 0, nullptr);
+			//	commandbuffers[currentFrame]->cmdBindIndexBuffer(mesh.indexBuffer.get());
+			//	RHI::IDescriptorSet* tmp_set = rdg.getRasterPassNode(renderPassNode)->descriptorSets[currentFrame].get();
+			//	commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
+			//		rdg.getRasterPassNode(renderPassNode)->pipelineLayout.get(), 0, 1, &tmp_set, 0, nullptr);
 
-				commandbuffers[currentFrame]->cmdDrawIndexedIndirect(rdg.getIndirectDrawBufferNode(portal.indirectDrawBuffer)->storageBuffer.get(), 0, 1, sizeof(unsigned int) * 5);
-			};
-			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
+			//	commandbuffers[currentFrame]->cmdDrawIndexedIndirect(rdg.getIndirectDrawBufferNode(portal.indirectDrawBuffer)->storageBuffer.get(), 0, 1, sizeof(unsigned int) * 5);
+			//};
+			//scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
 
-			commandbuffers[currentFrame]->cmdEndRenderPass();
+			//commandbuffers[currentFrame]->cmdEndRenderPass();
 
 			// render pass 2
 			commandbuffers[currentFrame]->cmdBeginRenderPass(
@@ -386,12 +511,13 @@ public:
 
 				commandbuffers[currentFrame]->cmdDrawIndexedIndirect(rdg.getIndirectDrawBufferNode(portal.indirectDrawBuffer)->storageBuffer.get(), 0, 1, sizeof(unsigned int) * 5);
 			};
-			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
+			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor_2);
 
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 
 			// begin compute pass
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier.get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(attach_read_barrier.get());
 
 			Size size = { 1280,720 };
 			rdg.getComputePassNode(acesPass)->executeWithConstant(commandbuffers[currentFrame].get(), 40, 23, 1, 0, size);
@@ -408,6 +534,20 @@ public:
 
 				deltaTime -= 20;
 			}
+
+			commandbuffers[currentFrame]->cmdPipelineBarrier(color_attach_present2copy[imageIndex].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(aces_res_general2copysrc.get());
+
+			commandbuffers[currentFrame]->cmdBlitImage(
+				rdg.getTextureBufferNode(test_write_target)->getTexture(),
+				RHI::ImageLayout::TRANSFER_SRC_OPTIMAL,
+				rdg.getTextureBufferNode(rdg.getContainer(swapchainColorBufferFlights)->handles[imageIndex])->getTexture(),
+				RHI::ImageLayout::TRANSFER_DST_OPTIMAL,
+				{ {(uint32_t)RHI::ImageAspectFlagBits::COLOR_BIT,(uint32_t)RHI::ImageAspectFlagBits::COLOR_BIT} }
+			);
+
+			commandbuffers[currentFrame]->cmdPipelineBarrier(aces_res_copysrc2general.get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(color_attach_copy2present[imageIndex].get());
 
 			commandbuffers[currentFrame]->endRecording();
 			//	4. Submit the recorded command buffer
@@ -441,6 +581,7 @@ private:
 	GFX::RDG::NodeHandle framebuffer;
 	GFX::RDG::NodeHandle swapchainColorBufferFlights;
 	GFX::RDG::NodeHandle acesPass;
+	GFX::RDG::NodeHandle test_write_target;
 	GFX::RDG::NodeHandle srgb_framebuffer;
 	ParticleSystem::ParticleSystem portal;
 
@@ -466,6 +607,11 @@ private:
 	MemScope<RHI::IBarrier> compute_drawcall_barrier;
 	MemScope<RHI::IBarrier> compute_barrier;
 	MemScope<RHI::IBarrier> compute_barrier_2;
+	MemScope<RHI::IBarrier> attach_read_barrier;
+	MemScope<RHI::IBarrier> aces_res_general2copysrc;
+	MemScope<RHI::IBarrier> aces_res_copysrc2general;
+	MemScope<RHI::IBarrier> color_attach_copy2present[3];
+	MemScope<RHI::IBarrier> color_attach_present2copy[3];
 
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;

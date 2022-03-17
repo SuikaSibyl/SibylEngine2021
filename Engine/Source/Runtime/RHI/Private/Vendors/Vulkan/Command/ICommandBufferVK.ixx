@@ -61,6 +61,7 @@ namespace SIByL
 			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void override;
 			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void override;
 			virtual auto cmdDrawIndexedIndirect(IStorageBuffer* storageBuffer, uint32_t const& indiret_offset, uint32_t const& draw_count, uint32_t const& draw_stride) noexcept -> void override;
+			virtual auto cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void override;
 
 		private:
 			auto createVkCommandBuffer() noexcept -> void;

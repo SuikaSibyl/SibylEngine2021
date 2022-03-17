@@ -1,5 +1,6 @@
 module;
 #include <cstdint>
+#include <vector>
 export module RHI.ICommandBuffer;
 import RHI.IResource;
 import RHI.IRenderPass;
@@ -20,6 +21,8 @@ namespace SIByL
 {
 	namespace RHI
 	{
+		struct BlitInfo;
+
 		// ╔══════════════════════════╗
 		// ║      Command Buffer      ║
 		// ╚══════════════════════════╝
@@ -108,6 +111,14 @@ namespace SIByL
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void = 0;
 			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void = 0;
 			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void = 0;
+			virtual auto cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void = 0;
 		};
+
+		export struct BlitInfo
+		{
+			ImageAspectFlags srcAspects;
+			ImageAspectFlags dstAspects;
+		};
+
 	}
 }
