@@ -99,6 +99,11 @@ namespace SIByL::GFX::RDG
 		return (FramebufferContainer*)getResourceNode(flight_handle);
 	}
 
+	auto RenderGraph::getFramebufferContainer(NodeHandle handle) noexcept -> FramebufferContainer*
+	{
+		return (FramebufferContainer*)getResourceNode(handle);
+	}
+
 	auto RenderGraph::getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*
 	{
 		NodeHandle flight_handle = ((FlightContainer*)registry.getNode(handle))->handleOnFlight(flight);
@@ -272,6 +277,7 @@ namespace SIByL::GFX::RDG
 		for (int i = 0; i < fbc->colorAttachCount; i++)
 		{
 			fbc->handles[i] = color_attachments[i];
+			attached.getColorBufferNode(color_attachments[i])->usages |= (uint32_t)RHI::ImageUsageFlagBits::COLOR_ATTACHMENT_BIT;
 		}
 		if (depth_attachment) fbc->handles[fbc->colorAttachCount] = depth_attachment;
 		NodeHandle handle = attached.registry.registNode(std::move(fbc));

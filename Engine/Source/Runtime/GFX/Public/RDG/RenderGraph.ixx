@@ -38,6 +38,7 @@ namespace SIByL::GFX::RDG
 		auto getSamplerNode(NodeHandle handle) noexcept -> SamplerNode*;
 		auto getRasterPassNode(NodeHandle handle) noexcept -> RasterPassNode*;
 		auto getFramebufferContainerFlight(NodeHandle handle, uint32_t flight) noexcept -> FramebufferContainer*;
+		auto getFramebufferContainer(NodeHandle handle) noexcept -> FramebufferContainer*;
 
 		auto getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*;
 

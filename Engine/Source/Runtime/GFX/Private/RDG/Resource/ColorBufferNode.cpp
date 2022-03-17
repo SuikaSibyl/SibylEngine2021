@@ -33,7 +33,7 @@ namespace SIByL::GFX::RDG
 			RHI::ResourceType::Texture2D, //ResourceType type;
 			format, //ResourceFormat format;
 			RHI::ImageTiling::OPTIMAL, //ImageTiling tiling;
-			usages, //ImageUsageFlags usages;
+			(uint32_t)RHI::ImageUsageFlagBits::SAMPLED_BIT | usages, //ImageUsageFlags usages;
 			RHI::BufferShareMode::EXCLUSIVE, //BufferShareMode shareMode;
 			RHI::SampleCount::COUNT_1_BIT, //SampleCount sampleCount;
 			RHI::ImageLayout::UNDEFINED, //ImageLayout layout;

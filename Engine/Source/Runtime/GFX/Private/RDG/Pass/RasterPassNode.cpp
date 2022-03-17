@@ -89,6 +89,12 @@ namespace SIByL::GFX::RDG
 			RHI::Extend extend{ framebuffer_0->getWidth(), framebuffer_0->getHeight() };
 			viewportScissors = factory->createViewportsScissors(extend, extend);
 		}
+		else
+		{
+			FramebufferContainer* framebuffer_0 = rg->getFramebufferContainer(framebuffer);
+			RHI::Extend extend{ framebuffer_0->getWidth(), framebuffer_0->getHeight() };
+			viewportScissors = factory->createViewportsScissors(extend, extend);
+		}
 
 		// raster
 		RHI::RasterizerDesc rasterizer_desc =
@@ -196,7 +202,7 @@ namespace SIByL::GFX::RDG
 			colorBlending.get(),
 			dynamicStates.get(),
 			pipelineLayout.get(),
-			rg->getFramebufferContainerFlight(framebufferFlights, 0)->renderPass.get(),
+			useFlights ? rg->getFramebufferContainerFlight(framebufferFlights, 0)->renderPass.get() : rg->getFramebufferContainer(framebuffer)->renderPass.get(),
 		};
 		pipeline = factory->createPipeline(pipeline_desc);
 	}
@@ -212,6 +218,13 @@ namespace SIByL::GFX::RDG
 			RHI::Extend extend{ framebuffer_0->getWidth(), framebuffer_0->getHeight() };
 			viewportScissors = factory->createViewportsScissors(extend, extend);
 		}
+		else
+		{
+			FramebufferContainer* framebuffer_0 = rg->getFramebufferContainer(framebuffer);
+			RHI::Extend extend{ framebuffer_0->getWidth(), framebuffer_0->getHeight() };
+			viewportScissors = factory->createViewportsScissors(extend, extend);
+		}
+
 
 		RHI::PipelineDesc pipeline_desc =
 		{
@@ -225,7 +238,7 @@ namespace SIByL::GFX::RDG
 			colorBlending.get(),
 			dynamicStates.get(),
 			pipelineLayout.get(),
-			rg->getFramebufferContainerFlight(framebufferFlights, 0)->renderPass.get(),
+			useFlights ? rg->getFramebufferContainerFlight(framebufferFlights, 0)->renderPass.get() : rg->getFramebufferContainer(framebuffer)->renderPass.get(),
 		};
 		pipeline = factory->createPipeline(pipeline_desc);
 	}

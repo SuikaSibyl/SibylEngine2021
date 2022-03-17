@@ -183,8 +183,12 @@ public:
 			{{rdg.getContainer(swapchainColorBufferFlights)->handles[2]}, depthBuffer}, });
 
 		// raster pass sono 1
-		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
-		acesPass = rdg_builder.addComputePass(aces.get(), { srgb_color_attachment }, sizeof(unsigned int) * 2);
+		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f);
+		GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
+		srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
+
+		GFX::RDG::NodeHandle test_write_target = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
+		acesPass = rdg_builder.addComputePass(aces.get(), { test_write_target, srgb_color_attachment }, sizeof(unsigned int) * 2);
 
 		// raster pass
 		renderPassNode = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer });
@@ -194,6 +198,15 @@ public:
 		rasterPassNode->framebufferFlights = framebuffer;
 		rasterPassNode->textures = { external_texture };
 		rasterPassNode->useFlights = true;
+
+		MemScope<RHI::IShader> shaderVert2 = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
+		MemScope<RHI::IShader> shaderFrag2 = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+		renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer });
+		GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
+		rasterPassNodeSRGB->shaderVert = std::move(shaderVert2);
+		rasterPassNodeSRGB->shaderFrag = std::move(shaderFrag2);
+		rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
+		rasterPassNodeSRGB->textures = { external_texture };
 
 		rdg_builder.build(resourceFactory.get());
 		rdg.print();
@@ -259,6 +272,7 @@ public:
 
 		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
 		rdg.getTextureBufferNode(srgb_color_attachment)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
+		rdg.getTextureBufferNode(test_write_target)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
 		Size size = { 1280,720 };
 		rdg.getComputePassNode(acesPass)->executeWithConstant(transientCommandbuffer.get(), 40, 23, 1, 0, size);
 
@@ -334,6 +348,7 @@ public:
 			commandbuffers[currentFrame]->reset();
 			commandbuffers[currentFrame]->beginRecording();
 
+			// render pass 1
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_drawcall_barrier.get());
 
 			commandbuffers[currentFrame]->cmdBeginRenderPass(
@@ -355,7 +370,31 @@ public:
 
 			commandbuffers[currentFrame]->cmdEndRenderPass();
 
+			// render pass 2
+			commandbuffers[currentFrame]->cmdBeginRenderPass(
+				rdg.getFramebufferContainer(srgb_framebuffer)->getRenderPass(),
+				rdg.getFramebufferContainer(srgb_framebuffer)->getFramebuffer());
+			commandbuffers[currentFrame]->cmdBindPipeline(rdg.getRasterPassNode(renderPassNodeSRGB)->pipeline.get());
+			
+			std::function<void(ECS::TagComponent&, GFX::Mesh&)> mesh_processor_2 = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
+				commandbuffers[currentFrame]->cmdBindVertexBuffer(mesh.vertexBuffer.get());
+
+				commandbuffers[currentFrame]->cmdBindIndexBuffer(mesh.indexBuffer.get());
+				RHI::IDescriptorSet* tmp_set = rdg.getRasterPassNode(renderPassNodeSRGB)->descriptorSets[currentFrame].get();
+				commandbuffers[currentFrame]->cmdBindDescriptorSets(RHI::PipelineBintPoint::GRAPHICS,
+					rdg.getRasterPassNode(renderPassNodeSRGB)->pipelineLayout.get(), 0, 1, &tmp_set, 0, nullptr);
+
+				commandbuffers[currentFrame]->cmdDrawIndexedIndirect(rdg.getIndirectDrawBufferNode(portal.indirectDrawBuffer)->storageBuffer.get(), 0, 1, sizeof(unsigned int) * 5);
+			};
+			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(mesh_processor);
+
+			commandbuffers[currentFrame]->cmdEndRenderPass();
+
+			// begin compute pass
 			commandbuffers[currentFrame]->cmdPipelineBarrier(compute_barrier.get());
+
+			Size size = { 1280,720 };
+			rdg.getComputePassNode(acesPass)->executeWithConstant(commandbuffers[currentFrame].get(), 40, 23, 1, 0, size);
 
 			static float deltaTime = 0;
 			deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
@@ -397,10 +436,12 @@ private:
 	GFX::RDG::RenderGraph rdg;
 	GFX::RDG::NodeHandle depthBuffer;
 	GFX::RDG::NodeHandle renderPassNode;
+	GFX::RDG::NodeHandle renderPassNodeSRGB;
 	GFX::RDG::NodeHandle uniformBufferFlights;
 	GFX::RDG::NodeHandle framebuffer;
 	GFX::RDG::NodeHandle swapchainColorBufferFlights;
 	GFX::RDG::NodeHandle acesPass;
+	GFX::RDG::NodeHandle srgb_framebuffer;
 	ParticleSystem::ParticleSystem portal;
 
 	MemScope<RHI::IGraphicContext> graphicContext;
@@ -417,6 +458,10 @@ private:
 
 	MemScope<RHI::IMemoryBarrier> compute_memory_barrier_0;
 	MemScope<RHI::IMemoryBarrier> compute_drawcall_memory_barrier;
+	MemScope<RHI::IImageMemoryBarrier> general2colorattach_imb;
+	MemScope<RHI::IImageMemoryBarrier> colorattach2general_imb;
+	MemScope<RHI::IBarrier> general2colorattach_b;
+	MemScope<RHI::IBarrier> colorattach2general_b;
 	MemScope<RHI::IBarrier> compute_barrier_0;
 	MemScope<RHI::IBarrier> compute_drawcall_barrier;
 	MemScope<RHI::IBarrier> compute_barrier;

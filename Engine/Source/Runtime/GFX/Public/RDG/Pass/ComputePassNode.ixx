@@ -35,7 +35,6 @@ namespace SIByL::GFX::RDG
 			buffer->cmdDispatch(x, y, z);
 		}
 
-	private:
 		uint32_t constantSize;
 		RHI::IShader* shader;
 		std::vector<NodeHandle> ios;

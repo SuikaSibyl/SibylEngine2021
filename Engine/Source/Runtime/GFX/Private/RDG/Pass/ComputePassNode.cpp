@@ -75,10 +75,18 @@ namespace SIByL::GFX::RDG
 			switch (resource->type)
 			{
 			case NodeDetailedType::STORAGE_BUFFER:
+				descriptor_set_layout_desc.perBindingDesc[i] = {
+					i, 1, RHI::DescriptorType::STORAGE_BUFFER, rg->getResourceNode(ios[i])->shaderStages, nullptr
+				};
+				break;
 			case NodeDetailedType::UNIFORM_BUFFER:
+				descriptor_set_layout_desc.perBindingDesc[i] = {
+					i, 1, RHI::DescriptorType::UNIFORM_BUFFER, rg->getResourceNode(ios[i])->shaderStages, nullptr
+				};
+				break;
 			case NodeDetailedType::SAMPLER:
 				descriptor_set_layout_desc.perBindingDesc[i] = {
-					i, 1, rg->getResourceNode(ios[i])->resourceType, rg->getResourceNode(ios[i])->shaderStages, nullptr
+					i, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, rg->getResourceNode(ios[i])->shaderStages, nullptr
 				};				
 				break;
 			case NodeDetailedType::COLOR_TEXTURE:
