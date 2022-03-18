@@ -11,10 +11,7 @@ using namespace std;
 namespace SIByL::Core
 {
 	LayerStack::~LayerStack()
-	{
-		for (ILayer* layer : layer_stack)
-			delete layer;
-	}
+	{}
 
 	void LayerStack::pushLayer(ILayer* layer)
 	{

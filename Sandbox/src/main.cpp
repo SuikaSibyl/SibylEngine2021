@@ -18,6 +18,8 @@ module;
 #include <glm/gtc/type_ptr.hpp>
 #include "entt/entt.hpp"
 #include <math.h>
+
+#include "imgui/imgui/imgui.h"
 module Main;
 
 import Core.Assert;
@@ -138,6 +140,7 @@ public:
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
 		imguiLayer = MemNew<Editor::ImGuiLayer>(logicalDevice.get());
+		pushLayer(imguiLayer.get());
 
 		//// create swapchain & related ...
 		//swapchain = resourceFactory->createSwapchain({});
@@ -444,6 +447,12 @@ public:
 
 	virtual void onUpdate() override
 	{
+
+		imguiLayer->startNewFrame();
+		bool show_demo_window = true;
+		ImGui::ShowDemoWindow(&show_demo_window);
+		imguiLayer->render();
+
 		//// 1. Wait for the previous frame to finish
 		//{
 		//	inFlightFence[currentFrame]->wait();
