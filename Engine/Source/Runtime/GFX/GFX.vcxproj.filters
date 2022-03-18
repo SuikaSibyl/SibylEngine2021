@@ -33,58 +33,7 @@
     <ClCompile Include="Private\Scene\SceneTree.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\RDG\RenderGraph.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Pass\RasterPassNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Public\Components\Mesh.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Pass\ComputePassNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Common\Common.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\RDG\RenderGraph.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\RDG\Pass\ComputePassNode.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\StorageBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\UniformBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\IndirectDrawBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\RDG\Pass\RasterPassNode.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\DepthBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\ColorBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\TextureBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Common\Container.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\RDG\Resource\SamplerNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\RDG\Common\Common.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\RDG\Resource\ColorBufferNode.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

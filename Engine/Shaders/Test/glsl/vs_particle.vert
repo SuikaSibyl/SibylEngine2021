@@ -11,6 +11,7 @@ struct Particle
 {
     vec4 pos;
     vec4 vel;
+    vec4 color;
 };
 layout(set = 0, binding = 2, std430) buffer Particles
 {
@@ -24,23 +25,40 @@ layout(location = 2) in vec2 inTexCoord;
 layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
 
-void main() {
-    vec3 instance_pos = particles.particle[gl_InstanceIndex.x].pos.xyz;
-
-    vec3 look = normalize(ubo.cameraPos.xyz);
+mat4 billboardTowardCameraPlane(vec3 cameraPos)
+{
+    vec3 look = - normalize(cameraPos);
     vec3 right = normalize(cross(vec3(0,1,0), look));
     vec3 up = normalize(cross(right, look));
-    mat4 billboardMat = mat4(
+    return mat4(
         right.x,right.y,right.z,0,
         up.x,up.y,up.z,0,
         look.x,look.y,look.z,0,
         0,0,0,1);
+}
 
-    vec4 modelPosition = billboardMat *  ubo.model * vec4(inPosition,1.0);
+mat4 billboardAlongVelocity(vec3 velocity, vec3 cameraPos)
+{
+    vec3 up = - normalize(velocity);
+    vec3 right = normalize(cross(up, normalize(cameraPos)));
+    vec3 look = normalize(cross(right, up));
+    return mat4(
+        right.x,right.y,right.z,0,
+        up.x,up.y,up.z,0,
+        look.x,look.y,look.z,0,
+        0,0,0,1);
+}
+
+void main() {
+    Particle particle = particles.particle[gl_InstanceIndex.x];
+    vec3 instance_pos = particle.pos.xyz;
+
+    mat4 billboardMat = billboardAlongVelocity(particle.vel.xyz, ubo.cameraPos.xyz);
+
+    float clamped_speed = clamp(length(particle.vel.xyz), 0, 4) / 4;
+    vec4 modelPosition = billboardMat *  ubo.model * vec4(inPosition * vec3(0.1,0.1,0.1) * vec3(0.1, 0.769 * clamped_speed, 1),1.0);
 
     gl_Position = ubo.proj * ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
-    //gl_Position = ubo.proj * ubo.view * billboardMat * (vec4(modelPosition.xyz + instance_pos, 1.0));
     fragColor = inColor;
-    //fragColor = vec3(particles.particle[gl_InstanceIndex.x].pos.w);
     fragTexCoord = inTexCoord;
 }

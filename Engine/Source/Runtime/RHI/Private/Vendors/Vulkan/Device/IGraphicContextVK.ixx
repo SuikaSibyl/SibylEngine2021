@@ -28,7 +28,7 @@ namespace SIByL
 			auto hasValidationLayers() -> bool;
 			auto getSurface() noexcept -> VkSurfaceKHR&;
 			auto getAttachedWindow() noexcept -> IWindowGLFW*;
-		public:
+
 			auto createInstance() -> void;
 			auto checkExtension() -> void;
 			auto checkValidationLayerSupport() -> bool;

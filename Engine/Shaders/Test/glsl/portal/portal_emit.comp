@@ -11,6 +11,7 @@ struct Particle
 {
     vec4 pos;
     vec4 vel;
+    vec4 color;
 };
 
 layout(set = 0, binding = 0, std430) buffer Particles
@@ -88,6 +89,23 @@ float curve_velocity(float time)
     else return 1.653;
 }
 
+float randPerThread(float seed)
+{
+    return nrand(gl_GlobalInvocationID.x + seed * fract(PushConstants.time));
+}
+
+float remapWithClamp(float i, float old_range_min, float old_range_max, float new_range_min, float new_range_max)
+{
+    float clamped = clamp(i, old_range_min, old_range_max);
+    float uniformed = (clamped - old_range_min) / (old_range_max - old_range_min);
+    return new_range_min + uniformed * (new_range_max - new_range_min);
+}
+
+float hermiteSplineSeg(vec2)
+{
+
+}
+
 layout (local_size_x =512) in;
 void main()
 {
@@ -99,15 +117,15 @@ void main()
     if(deadCount <= 1 || deadCount > counter.counter[0].maxCount) return; // If no space is available
 
     Particle new_particle;
-    // init
-    float sphere_radius = 1;
-    float theta = 3.1415926 * 2 * nrand(vec2(gl_GlobalInvocationID.x + 0.7 * fract(PushConstants.time), fract(PushConstants.time)));
-    //vec3 particle_to_center = sphere_radius * vec3(cos(theta), sin(theta), 0);
-    //particle_to_center.z = nrand(vec2(gl_GlobalInvocationID.x + 0.9 * fract(PushConstants.time), fract(PushConstants.time)));
-    //particle_to_center.z = 0.04 * 2 * (particle_to_center.z - 0.5);
-    uint sample_idx= int(1024 * nrand(vec2(gl_GlobalInvocationID.x + 0.8 * fract(PushConstants.time), fract(PushConstants.time)))) % 1024;
+    // ========================================================================
+    // Time for init a new particle
+    // ========================================================================
+    // init the particle on a Torus
+    float major_radius = 1;
+    float minor_radius = 1;
+    uint sample_idx= int(1024 * randPerThread(0.2)) % 1024;
     vec3 particle_to_center = emitterSamples.pos[sample_idx].xyz;
-    float pos_rotation_angle = 0.2 * nrand(gl_GlobalInvocationID.x + 0.6 * fract(PushConstants.time));
+    float pos_rotation_angle = 0.2 * randPerThread(0.3);
     float pos_cos_ra = cos(pos_rotation_angle);
     float pos_sin_ra = sin(pos_rotation_angle);
     mat4 pos_rotation_matrix = mat4(
@@ -120,15 +138,33 @@ void main()
 
     new_particle.pos.xyz = particle_to_center.xyz + vec3(PushConstants.offset_x, PushConstants.offset_y, 0);
 
-    // determine lifetime
-    float rand_lifetime = nrand(gl_GlobalInvocationID.x + 0.7 * fract(PushConstants.time));
-    float lifetime = lerp(0.4, 0.9, rand_lifetime);
+    // # Height Mask
+    // We generate a (0..1) mask based particle elevation.
+    // It is then used to categorize particles and 
+    // to cancel turbulence noise for particles close to the ground.
+    float height_mask = (clamp(new_particle.pos.y, 0.2, 0.8) - 0.2) / 0.6;
+    // # Categorizing particles
+    // We are categorizing particles in two groups: core sparks and travelling sparks.
+    // Based on a 0.05 probability. This will affect the lifetime.
+    // Also, for the travelling sparks, we use the height mask to scale their lifetime up to 5 times 
+    // for particles close to the ground.
+    float rand_for_categorizing = randPerThread(0.4);
+    float smaller_one = lerp(rand_for_categorizing, 0.4, 0.9);
+    float larger_one = lerp(rand_for_categorizing, 0.9, 1.8);
+    float remaped_heightmask = larger_one * remapWithClamp(height_mask,0,1,2.5,1);
+    float rand_for_lifetime = randPerThread(0.5);
+    // Set lifetime
+    float lifetime = (rand_for_lifetime < lerp(height_mask, 0.15, 0.01)) ? remaped_heightmask : smaller_one;
     new_particle.pos.w = lifetime / 0.02;
-
+    // Pulse rotation mask
+    float total_time = PushConstants.time * 0.001;
+    float angle_on_torus = total_time * -30 + atan(new_particle.pos.y, new_particle.pos.x);
+    float rotation_mask = mod(angle_on_torus, 6.283185) / 6.283185;
+    
     // determine speed
     vec3 tangent = normalize(cross(vec3(0,0,1), particle_to_center));
-    tangent = 6 * tangent * nrand(gl_GlobalInvocationID.x + 0.3 * fract(PushConstants.time));
-    float rotation_angle = 0.2 * nrand(gl_GlobalInvocationID.x + 0.1 * fract(PushConstants.time));
+    tangent = 6 * tangent * randPerThread(0.6);
+    float rotation_angle = 0.2 * randPerThread(0.7);
     float cos_ra = cos(rotation_angle);
     float sin_ra = sin(rotation_angle);
     mat4 rotation_matrix = mat4(
@@ -140,11 +176,17 @@ void main()
     tangent = (rotation_matrix * vec4(tangent, 1.0)).xyz;
     tangent += particle_to_center * vec3(0,0,32);
     // extra component
-    float pulse_rotation_mask = mod(theta + (-3)*PushConstants.time, 6.283185) / 6.283185;
-    tangent *= curve_velocity(pulse_rotation_mask) * (0.8 + 1.2 * nrand(gl_GlobalInvocationID.x + 0.1 * fract(PushConstants.time)));
-    new_particle.vel = vec4(tangent, 0.6 + 0.6 * nrand(gl_GlobalInvocationID.x + 0.3 * fract(PushConstants.time)));
+    tangent *= curve_velocity(rotation_mask) * (0.8 + 1.2 * randPerThread(0.8));
+    new_particle.vel.xyz = (tangent);
+    // Set Mass Random Uniform [0.6, 1.2]
+    new_particle.vel.w = 0.6 + 0.6 * randPerThread(0.9);
 
+    // Set Color
+    new_particle.color = 
 
+    // ========================================================================
+    // Custom Part Over
+    // ========================================================================
     // write new particle
     uint newParticleIdx = deadPool.indices[deadCount-1];
     particles.particle[newParticleIdx] = new_particle;
