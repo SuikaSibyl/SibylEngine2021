@@ -67,18 +67,24 @@ namespace SIByL::RHI
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-		VkSemaphore waitSemaphores[] = { *((ISemaphoreVK*)wait)->getVkSemaphore() };
-		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-		submitInfo.waitSemaphoreCount = 1;
-		submitInfo.pWaitSemaphores = waitSemaphores;
-		submitInfo.pWaitDstStageMask = waitStages;
+		if (wait)
+		{
+			VkSemaphore waitSemaphores[] = { *((ISemaphoreVK*)wait)->getVkSemaphore() };
+			VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+			submitInfo.waitSemaphoreCount = 1;
+			submitInfo.pWaitSemaphores = waitSemaphores;
+			submitInfo.pWaitDstStageMask = waitStages;
+		}
 		
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &commandBuffer;
 		
-		VkSemaphore signalSemaphores[] = { *((ISemaphoreVK*)signal)->getVkSemaphore() };
-		submitInfo.signalSemaphoreCount = 1;
-		submitInfo.pSignalSemaphores = signalSemaphores;
+		if (signal)
+		{
+			VkSemaphore signalSemaphores[] = { *((ISemaphoreVK*)signal)->getVkSemaphore() };
+			submitInfo.signalSemaphoreCount = 1;
+			submitInfo.pSignalSemaphores = signalSemaphores;
+		}
 
 		if (vkQueueSubmit(*(logicalDevice->getVkGraphicQueue()), 1, &submitInfo, *((IFenceVK*)fence)->getVkFence()) != VK_SUCCESS) {
 			SE_CORE_ERROR("failed to submit draw command buffer!");

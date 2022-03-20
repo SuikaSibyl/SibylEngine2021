@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{688c4381-ba51-4866-9827-eb59ae7008cb}</ProjectGuid>
-    <RootNamespace>ECS</RootNamespace>
+    <ProjectGuid>{60374e9e-1686-415c-9982-dfa210810091}</ProjectGuid>
+    <RootNamespace>Editor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -80,13 +80,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/entt;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/entt;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -147,21 +147,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Private\Core\Entity.cpp" />
-    <ClCompile Include="Private\Core\UID.cpp" />
-    <ClCompile Include="Public\Components\TagComponent.ixx" />
-    <ClCompile Include="Public\Core\Entity.ixx" />
-    <ClCompile Include="Public\Core\UID.ixx" />
+    <ClCompile Include="Public\Widgets\Viewport.ixx" />
+    <ClCompile Include="Public\Framework\Widget.ixx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ThirdParty\entt\entt.vcxproj">
-      <Project>{6e3d5f5e-f1b9-40d6-8334-1380cad68262}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Core\Core.vcxproj">
+    <ProjectReference Include="..\..\Runtime\Core\Core.vcxproj">
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Network\Network.vcxproj">
-      <Project>{92e7a182-38c2-4444-be91-ce9fed5f178a}</Project>
+    <ProjectReference Include="..\..\Runtime\RHI\RHI.vcxproj">
+      <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\EditorCore\EditorCore.vcxproj">
+      <Project>{38abb082-3018-4f4d-8b37-0f87c7665494}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

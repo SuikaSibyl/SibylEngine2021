@@ -176,6 +176,9 @@ xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang-llvm.dll $(Solut
     <ProjectReference Include="..\Engine\Source\Editor\EditorCore\EditorCore.vcxproj">
       <Project>{38abb082-3018-4f4d-8b37-0f87c7665494}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Engine\Source\Editor\Editor\Editor.vcxproj">
+      <Project>{60374e9e-1686-415c-9982-dfa210810091}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Engine\Source\Runtime\Core\Core.vcxproj">
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
     </ProjectReference>

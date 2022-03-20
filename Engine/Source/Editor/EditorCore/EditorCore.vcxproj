@@ -147,8 +147,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\ImGui\ImFactory.cpp" />
     <ClCompile Include="Private\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="Private\ImGui\Vulkan\ImGuiBackendVK.ixx" />
+    <ClCompile Include="Private\ImGui\Vulkan\ImImageVK.ixx" />
+    <ClCompile Include="Public\ImGui\ImFactory.ixx" />
+    <ClCompile Include="Public\ImGui\ImGuiImage.ixx" />
     <ClCompile Include="Public\ImGui\ImGuiLayer.ixx" />
   </ItemGroup>
   <ItemGroup>

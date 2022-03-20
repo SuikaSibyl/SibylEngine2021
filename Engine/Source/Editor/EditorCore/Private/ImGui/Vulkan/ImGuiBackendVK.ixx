@@ -37,6 +37,7 @@ namespace SIByL::Editor
 
 		virtual auto setupPlatformBackend() noexcept -> void override;
         virtual auto uploadFonts() noexcept -> void override;
+        virtual auto getWindowDPI() noexcept -> float override;
         virtual auto onWindowResize(WindowResizeEvent& e) -> void override;
 
         virtual auto startNewFrame() -> void override;
@@ -121,6 +122,11 @@ namespace SIByL::Editor
             pool_info.pPoolSizes = pool_sizes;
             vkCreateDescriptorPool(logicalDevice->getDeviceHandle(), &pool_info, nullptr, &descriptorPool);
         }
+    }
+
+    auto ImGuiBackendVK::getWindowDPI() noexcept -> float
+    {
+        return window->getHighDPI();
     }
 
 	auto ImGuiBackendVK::setupPlatformBackend() noexcept -> void

@@ -5,6 +5,7 @@ import Core.Layer;
 import Core.Window;
 import Core.Event;
 import Core.MemoryManager;
+import RHI.IEnum;
 import RHI.ILogicalDevice;
 
 namespace SIByL::Editor
@@ -13,6 +14,7 @@ namespace SIByL::Editor
 	{
 		virtual auto setupPlatformBackend() noexcept -> void = 0;
 		virtual auto uploadFonts() noexcept -> void = 0;
+		virtual auto getWindowDPI() noexcept -> float = 0;
 		virtual auto onWindowResize(WindowResizeEvent& e) -> void = 0;
 
 		virtual auto startNewFrame() -> void = 0;
@@ -28,8 +30,10 @@ namespace SIByL::Editor
 		auto onWindowResize(WindowResizeEvent& e) -> bool;
 
 		auto startNewFrame() -> void;
+		auto startGuiRecording() -> void;
 		auto render() -> void;
 
+		RHI::API api;
 		MemScope<ImGuiBackend> backend;
 	};
 }

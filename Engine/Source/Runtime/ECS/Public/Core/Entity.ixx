@@ -28,7 +28,7 @@ namespace SIByL::ECS
 
 		template<class... Component, class... ComponentRef>
 		void traverse(std::function<void(ComponentRef...)> fn) {
-			auto components_view = view<Component...>();
+			auto components_view = registry.view<Component...>();
 			for (auto entity : components_view)
 			{
 				if constexpr (sizeof...(Component) == 1) {

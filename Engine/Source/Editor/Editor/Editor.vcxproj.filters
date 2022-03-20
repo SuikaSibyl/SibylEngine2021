@@ -15,25 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Public\ImGui\ImGuiLayer.ixx">
+    <ClCompile Include="Public\Widgets\Viewport.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\ImGui\ImGuiLayer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\ImGui\Vulkan\ImGuiBackendVK.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\ImGui\ImGuiImage.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\ImGui\Vulkan\ImImageVK.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\ImGui\ImFactory.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Private\ImGui\ImFactory.cpp">
+    <ClCompile Include="Public\Framework\Widget.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
