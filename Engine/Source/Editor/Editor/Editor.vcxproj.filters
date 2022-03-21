@@ -21,5 +21,8 @@
     <ClCompile Include="Public\Framework\Widget.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Framework\Segment.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -167,6 +167,7 @@
     </ClCompile>
     <ClCompile Include="Private\Memory.cpp" />
     <ClCompile Include="Private\Time.cpp" />
+    <ClCompile Include="Public\LinearAlgebra.ixx" />
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.cpp" />
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.ixx" />
     <ClCompile Include="Private\Vendors\GLFW\IWindowGLFW.cpp" />

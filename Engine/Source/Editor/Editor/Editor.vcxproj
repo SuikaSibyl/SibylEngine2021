@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Public\Framework\Segment.ixx" />
     <ClCompile Include="Public\Widgets\Viewport.ixx" />
     <ClCompile Include="Public\Framework\Widget.ixx" />
   </ItemGroup>

@@ -1,4 +1,5 @@
 module;
+#include <cstdint>
 #include <utility>
 #include <type_traits>
 export module Core.MemoryManager;
@@ -40,6 +41,16 @@ namespace SIByL
 		private:
 			Allocator* lookUpAllocator(size_t size);
 		};
+
+		export auto MemAlloc(size_t size) noexcept -> void*
+		{
+			return Memory::instance()->allocate(size);
+		}
+
+		export auto MemFree(void* p, size_t size) noexcept -> void
+		{
+			Memory::instance()->free(p, size);
+		}
 
 		export
 		template<typename T>

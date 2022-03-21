@@ -1729,7 +1729,7 @@ static void ShowDemoWindowWidgets()
             average /= (float)IM_ARRAYSIZE(values);
             char overlay[32];
             sprintf(overlay, "avg %f", average);
-            ImGui::PlotLines("Lines", values, IM_ARRAYSIZE(values), values_offset, overlay, -1.0f, 1.0f, ImVec2(0, 80.0f));
+            ImGui::PlotLines("Lines", values, IM_ARRAYSIZE(values), values_offset, overlay, -1.0f, 1.0f, ImVec2(400.0f, 800.0f));
         }
 
         // Use functions to generate output

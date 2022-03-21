@@ -188,6 +188,9 @@ xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang-llvm.dll $(Solut
     <ProjectReference Include="..\Engine\Source\Runtime\GFX\GFX.vcxproj">
       <Project>{a207e2a1-8b21-4977-b486-e77f05dfb7d7}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\Engine\Source\Runtime\Interpolatior\Interpolatior.vcxproj">
+      <Project>{77f3d9c3-7516-4e3e-b42a-98332988b66c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Engine\Source\Runtime\ParticleSystem\ParticleSystem.vcxproj">
       <Project>{6f305728-c599-430c-979c-e9c1e833f300}</Project>
     </ProjectReference>

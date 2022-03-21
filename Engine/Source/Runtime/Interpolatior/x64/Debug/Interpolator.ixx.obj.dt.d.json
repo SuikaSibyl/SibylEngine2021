@@ -1,0 +1,10 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "p:\\sibylengine\\engine\\source\\runtime\\interpolatior\\public\\interpolator.ixx",
+        "ProvidedModule": "",
+        "Includes": [],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

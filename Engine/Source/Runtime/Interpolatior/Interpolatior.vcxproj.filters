@@ -15,10 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Public\Curve.ixx">
+    <ClCompile Include="Public\IInterpolator.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\CurveBaker.ixx">
+    <ClCompile Include="Public\Hermite.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Sampler.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
