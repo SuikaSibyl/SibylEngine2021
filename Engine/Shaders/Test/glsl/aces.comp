@@ -38,7 +38,7 @@ void main()
         return;
     
     vec3 hdrCol = texture_color.rgb;
-    hdrCol = ACESToneMapping(hdrCol, 0.02);
+    hdrCol = ACESToneMapping(hdrCol, 5);
     hdrCol = linearTosRGB(hdrCol);
 
     imageStore(resultImage, ivec2(x, y), vec4(hdrCol, 1));

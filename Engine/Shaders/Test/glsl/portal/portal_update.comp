@@ -5,6 +5,7 @@ struct Particle
     vec4 pos;
     vec4 vel;
     vec4 color;
+    vec4 ext;
 };
 
 layout(set = 0, binding = 0, std430) buffer Particles

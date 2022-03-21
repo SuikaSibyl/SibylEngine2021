@@ -134,58 +134,58 @@ public:
 
 	virtual void onAwake() override
 	{
-		Interpolator::HermiteSpline<glm::vec2> test_spline;
-		std::vector<glm::vec2> spline_samples = test_spline.generateSamples(
-			{ 0.008,0.007 }, { 0.672,0.118 }, 
-			glm::normalize(glm::vec2{cos(0.3305),sin(0.3305)}),
-			glm::normalize(glm::vec2{cos(0.11916),sin(0.11916)}),
-			50
-		);
-		std::vector<glm::vec2> spline_samples_2 = test_spline.generateSamples(
-			{ 0.672,0.118 }, { 0.994,3.159 },
-			glm::normalize(glm::vec2{ cos(0.11916),sin(0.11916) }),
-			glm::normalize(glm::vec2{ cos(1.18682),sin(1.18682) }),
-			50
-		);
-		spline_samples.insert(spline_samples.end(), spline_samples_2.begin(), spline_samples_2.end());
-		Interpolator::Sampler curveUniform01;
-		samplesUniform01 = curveUniform01.LinearSampleCurveUniform01(spline_samples, 128);
+		//Interpolator::HermiteSpline<glm::vec2> test_spline;
+		//std::vector<glm::vec2> spline_samples = test_spline.generateSamples(
+		//	{ 0.008,0.007 }, { 0.672,0.118 }, 
+		//	glm::normalize(glm::vec2{cos(0.3305),sin(0.3305)}),
+		//	glm::normalize(glm::vec2{cos(0.11916),sin(0.11916)}),
+		//	50
+		//);
+		//std::vector<glm::vec2> spline_samples_2 = test_spline.generateSamples(
+		//	{ 0.672,0.118 }, { 0.994,3.159 },
+		//	glm::normalize(glm::vec2{ cos(0.11916),sin(0.11916) }),
+		//	glm::normalize(glm::vec2{ cos(1.18682),sin(1.18682) }),
+		//	50
+		//);
+		//spline_samples.insert(spline_samples.end(), spline_samples_2.begin(), spline_samples_2.end());
+		//Interpolator::Sampler curveUniform01;
+		//samplesUniform01 = curveUniform01.LinearSampleCurveUniform01(spline_samples, 128);
 
 
-		std::vector<glm::vec2> alpha_random_samples_1 = test_spline.generateSamples(
-			{ 0,0.357 }, { 0.869884,0.5752977 },
-			glm::normalize(glm::vec2{ cos(0.174533),sin(0.174533) }),
-			glm::normalize(glm::vec2{ cos(0.69813),sin(0.69813) }),
-			50
-		);
-		std::vector<glm::vec2> alpha_random_samples_2 = test_spline.generateSamples(
-			{ 0.869884,0.5752977 }, { 1,1 },
-			glm::normalize(glm::vec2{ cos(0.69813),sin(0.69813) }),
-			glm::normalize(glm::vec2{ cos(1.22173),sin(1.22173) }),
-			50
-		);
-		alpha_random_samples_1.insert(alpha_random_samples_1.end(), alpha_random_samples_2.begin(), alpha_random_samples_2.end());
-		alpha_random_samplesUniform01 = curveUniform01.LinearSampleCurveUniform01(alpha_random_samples_1, 128);
+		//std::vector<glm::vec2> alpha_random_samples_1 = test_spline.generateSamples(
+		//	{ 0,0.357 }, { 0.869884,0.5752977 },
+		//	glm::normalize(glm::vec2{ cos(0.174533),sin(0.174533) }),
+		//	glm::normalize(glm::vec2{ cos(0.69813),sin(0.69813) }),
+		//	50
+		//);
+		//std::vector<glm::vec2> alpha_random_samples_2 = test_spline.generateSamples(
+		//	{ 0.869884,0.5752977 }, { 1,1 },
+		//	glm::normalize(glm::vec2{ cos(0.69813),sin(0.69813) }),
+		//	glm::normalize(glm::vec2{ cos(1.22173),sin(1.22173) }),
+		//	50
+		//);
+		//alpha_random_samples_1.insert(alpha_random_samples_1.end(), alpha_random_samples_2.begin(), alpha_random_samples_2.end());
+		//alpha_random_samplesUniform01 = curveUniform01.LinearSampleCurveUniform01(alpha_random_samples_1, 128);
 
-		std::vector<glm::vec2> alpha = { {0,255},{0.652,255},{1,0} };
-		std::vector<float> alphaUniform01 = curveUniform01.LinearSampleCurveUniform01(alpha, 128);
-		std::vector<glm::vec2> r = { {0,191},{0.262,191},{0.568,191},{0.996,2} };
-		std::vector<float> rUniform01 = curveUniform01.LinearSampleCurveUniform01(r, 128);
-		std::vector<glm::vec2> g = { {0,53},{0.262,108},{0.568,80},{0.996,1} };
-		std::vector<float> gUniform01 = curveUniform01.LinearSampleCurveUniform01(g, 128);
-		std::vector<glm::vec2> b = { {0,14},{0.262,65},{0.568,68},{0.996,191} };
-		std::vector<float> bUniform01 = curveUniform01.LinearSampleCurveUniform01(b, 128);
-		std::vector<glm::vec2> i = { {0,13.79969},{0.262,4.816925},{0.568,1.924203},{0.996,2.554073} };
-		std::vector<float> iUniform01 = curveUniform01.LinearSampleCurveUniform01(i, 128);
+		//std::vector<glm::vec2> alpha = { {0,255},{0.652,255},{1,0} };
+		//std::vector<float> alphaUniform01 = curveUniform01.LinearSampleCurveUniform01(alpha, 128);
+		//std::vector<glm::vec2> r = { {0,191},{0.262,191},{0.568,191},{0.996,2} };
+		//std::vector<float> rUniform01 = curveUniform01.LinearSampleCurveUniform01(r, 128);
+		//std::vector<glm::vec2> g = { {0,53},{0.262,108},{0.568,80},{0.996,1} };
+		//std::vector<float> gUniform01 = curveUniform01.LinearSampleCurveUniform01(g, 128);
+		//std::vector<glm::vec2> b = { {0,14},{0.262,65},{0.568,68},{0.996,191} };
+		//std::vector<float> bUniform01 = curveUniform01.LinearSampleCurveUniform01(b, 128);
+		//std::vector<glm::vec2> i = { {0,13.79969},{0.262,4.816925},{0.568,1.924203},{0.996,2.554073} };
+		//std::vector<float> iUniform01 = curveUniform01.LinearSampleCurveUniform01(i, 128);
 
-		Image image_test(128, 2);
-		for (int i = 0; i < 128; i++)
-		{
-			// {3.2, 1, 14, -}
-			image_test.setPixel(i, 0, { samplesUniform01[i] / 3.2f, alpha_random_samplesUniform01[i], iUniform01[i] / 14, 0 });
-			image_test.setPixel(i, 1, { rUniform01[i] / 255, gUniform01[i] / 255, bUniform01[i] / 255, alphaUniform01[i] / 255 });
-		}
-		image_test.saveTGA("portal_bake.tga");
+		//Image image_test(128, 2);
+		//for (int i = 0; i < 128; i++)
+		//{
+		//	// {3.2, 1, 14, -}
+		//	image_test.setPixel(i, 0, { samplesUniform01[i] / 3.2f, alpha_random_samplesUniform01[i], iUniform01[i] / 14, 0 });
+		//	image_test.setPixel(i, 1, { rUniform01[i] / 255, gUniform01[i] / 255, bUniform01[i] / 255, alphaUniform01[i] / 255 });
+		//}
+		//image_test.saveTGA("portal_bake.tga");
 
 		// create window
 		WindowLayerDesc window_layer_desc = {
@@ -229,6 +229,9 @@ public:
 		texture = resourceFactory->createTexture(&image);
 		textureView = resourceFactory->createTextureView(texture.get());
 		sampler = resourceFactory->createSampler({});
+		Image baked_image("./assets/portal_bake.tga");
+		baked_texture = resourceFactory->createTexture(&baked_image);
+		baked_textureView = resourceFactory->createTextureView(baked_texture.get());
 
 		// load precomputed samples
 		Buffer torusSamples;
@@ -240,10 +243,13 @@ public:
 		rdg.reDatum(1280, 720);
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// particle system
-		portal.init(sizeof(float) * 4 * 3, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
+		portal.init(sizeof(float) * 4 * 4, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 		portal.addEmitterSamples(torusBuffer.get());
 		GFX::RDG::NodeHandle external_texture = rdg_builder.addColorBufferExt(texture.get(), textureView.get());
+		GFX::RDG::NodeHandle external_baked_texture = rdg_builder.addColorBufferExt(baked_texture.get(), baked_textureView.get());
 		GFX::RDG::NodeHandle external_sampler = rdg_builder.addSamplerExt(sampler.get());
+		portal.sampler = external_sampler;
+		portal.dataBakedImage = external_baked_texture;
 		portal.registerRenderGraph(&rdg_builder);
 		// renderer
 		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
@@ -265,13 +271,13 @@ public:
 		// HDR raster pass
 		MemScope<RHI::IShader> shaderVert2 = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
 		MemScope<RHI::IShader> shaderFrag2 = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-		renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer });
+		renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler });
 		rdg.tag(renderPassNodeSRGB, "Raster HDR");
 		GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
 		rasterPassNodeSRGB->shaderVert = std::move(shaderVert2);
 		rasterPassNodeSRGB->shaderFrag = std::move(shaderFrag2);
 		rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
-		rasterPassNodeSRGB->textures = { external_texture };
+		rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
 
 		// ACES
 		test_write_target = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
@@ -533,7 +539,7 @@ public:
 		// update uniform buffer
 		{
 			float time = (float)timer.getTotalTimeSeconds();
-			//time = 0.5 * 3.1415926;
+			float rotation = 0.5 * 3.1415926;
 			//uint32_t width = mainViewport.getWidth();
 			//uint32_t height = mainViewport.getHeight();
 			uint32_t width = 1280;
@@ -541,9 +547,9 @@ public:
 			//auto [width, height] = swapchain->getExtend();
 
 			UniformBufferObject ubo;
-			ubo.cameraPos = glm::vec4(10.0f* cosf(time), 2.0f, 10.0f * sinf(time), 0.0f);
+			ubo.cameraPos = glm::vec4(8.0f* cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
 			ubo.model = glm::mat4(1.0f);
-			ubo.view = glm::lookAt(glm::vec3(10.0f * cosf(time), 2.0f, 10.0f * sinf(time)), glm::vec3(0.0f, 3.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			ubo.view = glm::lookAt(glm::vec3(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
 			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
@@ -670,6 +676,8 @@ private:
 
 	MemScope<RHI::ITexture> texture;
 	MemScope<RHI::ITextureView> textureView;
+	MemScope<RHI::ITexture> baked_texture;
+	MemScope<RHI::ITextureView> baked_textureView;
 	MemScope<RHI::ISampler> sampler;
 
 	MemScope<RHI::IMemoryBarrier> compute_memory_barrier_0;

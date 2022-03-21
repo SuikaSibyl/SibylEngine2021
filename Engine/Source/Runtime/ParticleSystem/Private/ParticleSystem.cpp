@@ -6,6 +6,7 @@ import RHI.IShader;
 import GFX.RDG.Common;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
+import GFX.RDG.ComputePassNode;
 
 namespace SIByL::ParticleSystem
 {
@@ -33,7 +34,10 @@ namespace SIByL::ParticleSystem
 		emitterSamplerBufferExt = builder->addStorageBufferExt(emitterSamplesExt);
 
 		initPass = builder->addComputePass(initShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, indirectDrawBuffer }, sizeof(unsigned int));
-		emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, emitterSamplerBufferExt }, sizeof(unsigned int) * 4);
+		emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, emitterSamplerBufferExt, sampler }, sizeof(unsigned int) * 4);
+		GFX::RDG::ComputePassNode* emitPassNode = builder->attached.getComputePassNode(emitPass);
+		emitPassNode->textures = { dataBakedImage };
+
 		updatePass = builder->addComputePass(updateShader, { particleBuffer, counterBuffer, liveIndexBufferPrimary, deadIndexBuffer, indirectDrawBuffer });
 	}
 }

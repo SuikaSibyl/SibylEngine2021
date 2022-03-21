@@ -41,5 +41,8 @@ namespace SIByL::ParticleSystem
 		GFX::RDG::NodeHandle initPass;
 		GFX::RDG::NodeHandle emitPass;
 		GFX::RDG::NodeHandle updatePass;
+
+		GFX::RDG::NodeHandle sampler;
+		GFX::RDG::NodeHandle dataBakedImage;
 	};
 }
