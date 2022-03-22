@@ -1,0 +1,54 @@
+//////////////////////////////////////////////////////////////////////
+/////                       Compute Shader                      //////
+//////////////////////////////////////////////////////////////////////
+#version 450
+
+layout(push_constant) uniform constants {
+    vec2 outputSize;
+    vec2 globalTexSize;
+    vec2 textureBlurInputSize;
+    vec2 blurDir;
+} PushConstants;
+
+layout ( binding = 0 ) uniform sampler2D inputImage;
+layout ( binding = 1, r11f_g11f_b10f ) uniform image2D outputImage;
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+vec4 gaussianBlur(vec2 uv) {
+    vec2 maxCoord = 1.0 - 1.0 / PushConstants.textureBlurInputSize;
+    vec2 minCoord = 1.0 / PushConstants.textureBlurInputSize;
+
+    vec3 pixel = 0.3125 * texture(inputImage, max(min(uv, maxCoord), minCoord)).rgb;
+
+    vec2 offset;
+    vec2 blurDir = PushConstants.blurDir.xy / PushConstants.outputSize.xy;
+    blurDir *= PushConstants.globalTexSize.y * 0.00075;
+    offset = blurDir * 1.2857142857142858;
+
+    pixel += 0.328125 * texture(inputImage, max(min(uv + offset, maxCoord), minCoord)).rgb;
+    pixel += 0.328125 * texture(inputImage, max(min(uv - offset, maxCoord), minCoord)).rgb;
+
+    return vec4(pixel, 1.0);}
+
+void main(void)
+{
+    // base pixel colour for image
+    vec4 pixel = vec4(1.0, 0.0, 1.0, 1.0);
+    // get index in global work group i.e x,y position
+    ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+    if(gl_GlobalInvocationID.x >= PushConstants.outputSize.x || gl_GlobalInvocationID.y >= PushConstants.outputSize.y)
+        return;
+
+    float du = 1.0f / PushConstants.outputSize.x;
+    float dv = 1.0f / PushConstants.outputSize.y;
+
+    float u = du * (gl_GlobalInvocationID.x + 0.5f);
+    float v = dv * (gl_GlobalInvocationID.y + 0.5f);
+    
+    vec4 col = gaussianBlur(vec2(u,v));
+    pixel= col;
+    
+    // output to a specific pixel in the image
+    imageStore(outputImage, pixel_coords, pixel);
+}

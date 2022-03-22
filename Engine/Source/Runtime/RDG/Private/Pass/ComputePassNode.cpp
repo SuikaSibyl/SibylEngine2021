@@ -51,6 +51,37 @@ namespace SIByL::GFX::RDG
 			}
 		}
 	}
+
+	auto ComputePassNode::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void 
+	{
+		RenderGraph* rg = (RenderGraph*)graph;
+		unsigned texture_id = 0;
+		for (unsigned int i = 0; i < ios.size(); i++)
+		{
+			switch (rg->getResourceNode(ios[i])->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+				break;
+			case NodeDetailedType::UNIFORM_BUFFER:
+				break;
+			case NodeDetailedType::SAMPLER:
+			{
+				rg->getTextureBufferNode(textures[texture_id++])->consumeHistory.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+
+			}
+				break;
+			case NodeDetailedType::COLOR_TEXTURE:
+			{
+				rg->getTextureBufferNode(ios[i])->consumeHistory.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::BUFFER_WRITE });
+			}
+				break;
+			default:
+				break;
+			}
+		}
+	}
 	
 	auto ComputePassNode::execute(RHI::ICommandBuffer* buffer, unsigned int x, unsigned int y, unsigned int z, unsigned int frame) noexcept -> void
 	{

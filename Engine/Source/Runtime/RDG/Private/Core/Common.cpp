@@ -46,7 +46,33 @@ namespace SIByL::GFX::RDG
 			"Flights" : 
 			"Atom   ";
 		//std::string_view tag;
-		SE_CORE_INFO("│ NODE │ {0} │ {1} │ {2} | {3}", type_str, detailed_type_str, is_flight_str, (tag != std::string_view{}) ? tag.data() : "NAMELESS");
+		if (hasBit(attributes, NodeAttrbutesFlagBits::RESOURCE))
+		{
+			std::string cosume_history = {};
+			ResourceNode* resource_node = (ResourceNode*)this;
+			for (int i = 0; i < resource_node->consumeHistory.size(); i++)
+			{
+				std::string one_history = getString(resource_node->consumeHistory[i].kind);
+				cosume_history.append(one_history);
+			}
+			SE_CORE_INFO("│ NODE │ {0} │ {1} │ {2} | {3}", detailed_type_str, is_flight_str, (tag != std::string_view{}) ? tag.data() : "NAMELESS", cosume_history);
+		}
+		else
+		{
+			SE_CORE_INFO("│ NODE │ {0} │ {1} │ {2} ", detailed_type_str, is_flight_str, (tag != std::string_view{}) ? tag.data() : "NAMELESS");
+		}
+	}
+
+	auto BarrerPool::registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle
+	{
+		uint64_t uid = ECS::UniqueID::RequestUniqueID();
+		barriers[uid] = std::move(barrier);
+		return uid;
+	}
+
+	auto BarrerPool::getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*
+	{
+		return barriers[handle].get();
 	}
 
 	auto FramebufferContainer::getWidth() noexcept -> uint32_t 

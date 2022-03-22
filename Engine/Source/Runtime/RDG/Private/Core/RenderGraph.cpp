@@ -313,6 +313,17 @@ namespace SIByL::GFX::RDG
 	{
 		attached.factory = factory;
 
+		// compile resources
+		for (auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
+		{
+			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
+		}
+		// compile passes
+		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
+		{
+			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
+		}
+
 		// build resources
 		for(auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
 		{

@@ -168,6 +168,7 @@
     <ClCompile Include="Public\Core\Common.ixx" />
     <ClCompile Include="Public\Pass\BlitPassNode.ixx" />
     <ClCompile Include="Public\Pass\ComputePassNode.ixx" />
+    <ClCompile Include="Public\Pass\MultiDispatchScope.ixx" />
     <ClCompile Include="Public\Pass\RasterPassNode.ixx" />
     <ClCompile Include="Public\Core\RenderGraph.ixx" />
     <ClCompile Include="Public\Resource\ColorBufferNode.ixx" />

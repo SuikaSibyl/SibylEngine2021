@@ -274,6 +274,9 @@ namespace SIByL::RHI
 		case ResourceFormat::FORMAT_R32G32B32A32_SFLOAT:
 			return VK_FORMAT_R32G32B32A32_SFLOAT;
 			break;
+		case ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32:
+			return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+			break;
 		default:
 			break;
 		}

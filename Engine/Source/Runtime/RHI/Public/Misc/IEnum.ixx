@@ -75,6 +75,7 @@ namespace SIByL
 			FORMAT_D32_SFLOAT_S8_UINT, 
 			FORMAT_D24_UNORM_S8_UINT,
 			FORMAT_R32G32B32A32_SFLOAT,
+			FORMAT_B10G11R11_UFLOAT_PACK32,
 		};
 
 		export enum class TopologyKind : uint32_t

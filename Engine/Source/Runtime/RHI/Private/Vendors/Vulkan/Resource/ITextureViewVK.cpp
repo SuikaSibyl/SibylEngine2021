@@ -55,6 +55,7 @@ namespace SIByL
 			case SIByL::RHI::ResourceFormat::FORMAT_B8G8R8A8_RGB:
 			case SIByL::RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM:
 			case SIByL::RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT:
+			case SIByL::RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32:
 				accessMask = VK_IMAGE_ASPECT_COLOR_BIT;
 				break;
 			default:

@@ -14,6 +14,7 @@ import RHI.IFactory;
 import RHI.ICommandBuffer;
 import RHI.IRenderPass;
 import RHI.IFramebuffer;
+import RHI.IBarrier;
 import ECS.UID;
 
 namespace SIByL::GFX::RDG
@@ -40,9 +41,10 @@ namespace SIByL::GFX::RDG
 	{
 		PLACEHOLDER = 0x00000001,
 		CONTAINER   = 0x00000002,
-		RESOURCE    = 0x00000004,
-		FLIGHT      = 0x00000008,
-		PRESENT     = 0x00000010,
+		SCOPE	    = 0x00000004,
+		RESOURCE    = 0x00000008,
+		FLIGHT      = 0x00000010,
+		PRESENT     = 0x00000020,
 	};
 	export enum class NodeDetailedType :uint32_t
 	{
@@ -63,12 +65,16 @@ namespace SIByL::GFX::RDG
 		BLIT_PASS,
 	};
 
+	// Node will not be exposed directly for design reason
+	// We use a handle to refer to a node
+	export using NodeHandle = uint64_t;
+
 	struct NodeRegistry;
 	export struct Node
 	{
 		// Lifetime Virtual Funcs
 		virtual auto onRegister() noexcept -> void {} // optional
-		virtual auto onCompile() noexcept -> void {} // optional
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		// Debug Print
@@ -77,12 +83,9 @@ namespace SIByL::GFX::RDG
 		NodeRegistry* registry = nullptr;
 		NodeDetailedType type = NodeDetailedType::NONE;
 		NodeAttributesFlags attributes = 0;
+		NodeHandle handle;
 		std::string_view tag;
 	};
-
-	// Node will not be exposed directly for design reason
-	// We use a handle to refer to a node
-	export using NodeHandle = uint64_t;
 
 	// A registry is used to manage nodes
 	export struct NodeRegistry
@@ -97,6 +100,7 @@ namespace SIByL::GFX::RDG
 			cast_node->registry = this;
 			cast_node->onRegister();
 			NodeHandle handle = ECS::UniqueID::RequestUniqueID();
+			cast_node->handle = handle;
 			nodes[handle] = std::move(cast_node);
 			return handle;
 		}
@@ -106,7 +110,7 @@ namespace SIByL::GFX::RDG
 	// Three basic Node Children struct:
 	// - ResourceNode
 	// - PassNode
-	// - Container
+
 	export enum class ConsumeKind :uint32_t
 	{
 		BUFFER_READ,
@@ -127,6 +131,7 @@ namespace SIByL::GFX::RDG
 	{
 		ResourceNode() { attributes |= addBit(NodeAttrbutesFlagBits::RESOURCE); }
 		RHI::ShaderStageFlags shaderStages = 0;
+		std::vector<ConsumeHistory> consumeHistory;
 	};
 
 	export template<class T>
@@ -139,9 +144,21 @@ namespace SIByL::GFX::RDG
 	};
 
 	// Pass Node
-	export struct PassNode :public Node
-	{};
+	export using BarrierHandle = uint64_t;
+	export struct BarrerPool
+	{
+		auto registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle;
+		auto getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*;
+		std::unordered_map<BarrierHandle, MemScope<RHI::IBarrier>> barriers;
+	};
 
+	export struct PassNode :public Node
+	{
+		std::vector<BarrierHandle> barriers;
+	};
+
+	// - Container
+	//   container is a tuple of resources
 	// Framebuffers & uniform buffer flights could be a sets of resources
 	// Container could also be a node, with a vector of sub-handles.
 	export struct Container :public ResourceNode
@@ -187,4 +204,36 @@ namespace SIByL::GFX::RDG
 		MemScope<RHI::IRenderPass> renderPass;
 		MemScope<RHI::IFramebuffer> framebuffer;
 	};
+
+	// - Scope
+	//   scope is a tuple of resources
+	export struct PassScope :public PassNode
+	{
+		PassScope() { attributes |= addBit(NodeAttrbutesFlagBits::SCOPE); }
+		PassScope(std::initializer_list<NodeHandle> list) :handles(list) {
+			attributes |= addBit(NodeAttrbutesFlagBits::SCOPE);
+		}
+		PassScope(std::vector<NodeHandle>&& handles) :handles(handles) {
+			attributes |= addBit(NodeAttrbutesFlagBits::SCOPE);
+		}
+
+		auto operator[](int index) const -> NodeHandle { return handles[index]; }
+		auto operator[](int index) -> NodeHandle& { return handles[index]; }
+		auto size() -> size_t { return handles.size(); }
+		std::vector<NodeHandle> handles;
+	};
+
+	export auto getString(ConsumeKind kind) noexcept -> std::string
+	{
+		switch (kind)
+		{
+		case SIByL::GFX::RDG::ConsumeKind::BUFFER_READ:		return "BUFFER_READ   "; break;
+		case SIByL::GFX::RDG::ConsumeKind::BUFFER_WRITE:	return "BUFFER_WRITE  "; break;
+		case SIByL::GFX::RDG::ConsumeKind::RENDER_TARGET:	return "RENDER_TARGET "; break;
+		case SIByL::GFX::RDG::ConsumeKind::IMAGE_SAMPLE:	return "IMAGE_SAMPLE  "; break;
+		case SIByL::GFX::RDG::ConsumeKind::COPY_SRC:		return "COPY_SRC      "; break;
+		case SIByL::GFX::RDG::ConsumeKind::COPY_DST:		return "COPY_DST      "; break;
+		default:                                            return "ERROR         "; break;
+		}
+	}
 }

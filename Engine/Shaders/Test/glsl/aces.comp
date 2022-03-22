@@ -7,6 +7,7 @@ layout(push_constant) uniform constants {
 
 layout ( binding = 0, rgba8 ) uniform writeonly image2D resultImage;
 layout ( binding = 1, rgba32f ) uniform image2D inputImage;
+layout ( binding = 2, r11f_g11f_b10f ) uniform writeonly image2D bloomExtract;
 
 layout (local_size_x =32, local_size_y =32) in;
 
@@ -26,6 +27,15 @@ vec3 linearTosRGB(const in vec3 color) {
     return vec3( color.r < 0.0031308 ? color.r * 12.92 : 1.055 * pow(color.r, 1.0/2.4) - 0.055, color.g < 0.0031308 ? color.g * 12.92 : 1.055 * pow(color.g, 1.0/2.4) - 0.055, color.b < 0.0031308 ? color.b * 12.92 : 1.055 * pow(color.b, 1.0/2.4) - 0.055);
 }
 
+float getLuminance(const in vec3 color) {
+    const vec3 colorBright = vec3(0.2126, 0.7152, 0.0722);
+    return dot(color, colorBright);
+}
+
+vec3 extractBright(const in vec3 color, const in float uBloomThreshold) {
+    return color * clamp(getLuminance(color) - uBloomThreshold, 0.0, 1.0);
+}
+
 void main()
 {
     uint x = gl_GlobalInvocationID.x;
@@ -38,9 +48,7 @@ void main()
         return;
     
     vec3 hdrCol = texture_color.rgb;
-    hdrCol = ACESToneMapping(hdrCol, 5);
-    hdrCol = linearTosRGB(hdrCol);
-
-    imageStore(resultImage, ivec2(x, y), vec4(hdrCol, 1));
-
+    vec3 ldrCol = ACESToneMapping(hdrCol, 15);
+    imageStore(resultImage, ivec2(x, y), vec4(ldrCol, 1));
+    imageStore(bloomExtract, ivec2(x, y), vec4(extractBright(hdrCol, 0.1), 1.0));
 }

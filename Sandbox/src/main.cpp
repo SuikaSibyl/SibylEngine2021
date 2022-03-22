@@ -18,6 +18,7 @@ module;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <math.h>
+#define GRIDSIZE(x,ThreadSize) ((x+ThreadSize - 1)/ThreadSize)
 
 #include "imgui/imgui/imgui.h"
 module Main;
@@ -81,6 +82,7 @@ import GFX.Mesh;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
 import GFX.RDG.RasterPassNode;
+import GFX.RDG.Common;
 
 import ParticleSystem.ParticleSystem;
 import ParticleSystem.PrecomputedSample;
@@ -125,6 +127,20 @@ public:
 		unsigned int height;
 	};
 
+	struct BlurPassConstants
+	{
+		glm::vec2 outputSize;
+		glm::vec2 globalTextSize;
+		glm::vec2 textureBlurInputSize;
+		glm::vec2 blurDir;
+	};
+
+	struct BloomCombineConstant
+	{
+		glm::vec2 size;
+		float para;
+	};
+
 
 	MemScope<Editor::ImGuiLayer> imguiLayer;
 	Editor::Viewport mainViewport;
@@ -132,61 +148,58 @@ public:
 	std::vector<float> samplesUniform01;
 	std::vector<float> alpha_random_samplesUniform01;
 
+	void create_bloom_barrier(GFX::RDG::NodeHandle resource_handle, int i)
+	{
+		MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
+			rdg.getTextureBufferNode(resource_handle)->getTexture(), //ITexture* image;
+			RHI::ImageSubresourceRange{
+				(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+				0,
+				1,
+				0,
+				1
+			},//ImageSubresourceRange subresourceRange;
+			(uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT, //AccessFlags srcAccessMask;
+			(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT, //AccessFlags dstAccessMask;
+			RHI::ImageLayout::GENERAL, // old Layout
+			RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL // new Layout
+		});
+
+		bloom_write2sample[i] = resourceFactory->createBarrier({
+			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//srcStageMask
+			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//dstStageMask
+			0,
+			{},
+			{},
+			{image_memory_barrier.get()}
+		});
+
+		MemScope<RHI::IImageMemoryBarrier> image_memory_barrier_2 = resourceFactory->createImageMemoryBarrier({
+			rdg.getTextureBufferNode(resource_handle)->getTexture(), //ITexture* image;
+			RHI::ImageSubresourceRange{
+				(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
+				0,
+				1,
+				0,
+				1
+			},//ImageSubresourceRange subresourceRange;
+			(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT,  //AccessFlags srcAccessMask;
+			(uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT, //AccessFlags dstAccessMask;
+			RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL, // old Layout
+			RHI::ImageLayout::GENERAL // new Layout
+			});
+
+		bloom_sample2write[i] = resourceFactory->createBarrier({
+			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//srcStageMask
+			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//dstStageMask
+			0,
+			{},
+			{},
+			{image_memory_barrier_2.get()}
+		});
+	}
 	virtual void onAwake() override
 	{
-		//Interpolator::HermiteSpline<glm::vec2> test_spline;
-		//std::vector<glm::vec2> spline_samples = test_spline.generateSamples(
-		//	{ 0.008,0.007 }, { 0.672,0.118 }, 
-		//	glm::normalize(glm::vec2{cos(0.3305),sin(0.3305)}),
-		//	glm::normalize(glm::vec2{cos(0.11916),sin(0.11916)}),
-		//	50
-		//);
-		//std::vector<glm::vec2> spline_samples_2 = test_spline.generateSamples(
-		//	{ 0.672,0.118 }, { 0.994,3.159 },
-		//	glm::normalize(glm::vec2{ cos(0.11916),sin(0.11916) }),
-		//	glm::normalize(glm::vec2{ cos(1.18682),sin(1.18682) }),
-		//	50
-		//);
-		//spline_samples.insert(spline_samples.end(), spline_samples_2.begin(), spline_samples_2.end());
-		//Interpolator::Sampler curveUniform01;
-		//samplesUniform01 = curveUniform01.LinearSampleCurveUniform01(spline_samples, 128);
-
-
-		//std::vector<glm::vec2> alpha_random_samples_1 = test_spline.generateSamples(
-		//	{ 0,0.357 }, { 0.869884,0.5752977 },
-		//	glm::normalize(glm::vec2{ cos(0.174533),sin(0.174533) }),
-		//	glm::normalize(glm::vec2{ cos(0.69813),sin(0.69813) }),
-		//	50
-		//);
-		//std::vector<glm::vec2> alpha_random_samples_2 = test_spline.generateSamples(
-		//	{ 0.869884,0.5752977 }, { 1,1 },
-		//	glm::normalize(glm::vec2{ cos(0.69813),sin(0.69813) }),
-		//	glm::normalize(glm::vec2{ cos(1.22173),sin(1.22173) }),
-		//	50
-		//);
-		//alpha_random_samples_1.insert(alpha_random_samples_1.end(), alpha_random_samples_2.begin(), alpha_random_samples_2.end());
-		//alpha_random_samplesUniform01 = curveUniform01.LinearSampleCurveUniform01(alpha_random_samples_1, 128);
-
-		//std::vector<glm::vec2> alpha = { {0,255},{0.652,255},{1,0} };
-		//std::vector<float> alphaUniform01 = curveUniform01.LinearSampleCurveUniform01(alpha, 128);
-		//std::vector<glm::vec2> r = { {0,191},{0.262,191},{0.568,191},{0.996,2} };
-		//std::vector<float> rUniform01 = curveUniform01.LinearSampleCurveUniform01(r, 128);
-		//std::vector<glm::vec2> g = { {0,53},{0.262,108},{0.568,80},{0.996,1} };
-		//std::vector<float> gUniform01 = curveUniform01.LinearSampleCurveUniform01(g, 128);
-		//std::vector<glm::vec2> b = { {0,14},{0.262,65},{0.568,68},{0.996,191} };
-		//std::vector<float> bUniform01 = curveUniform01.LinearSampleCurveUniform01(b, 128);
-		//std::vector<glm::vec2> i = { {0,13.79969},{0.262,4.816925},{0.568,1.924203},{0.996,2.554073} };
-		//std::vector<float> iUniform01 = curveUniform01.LinearSampleCurveUniform01(i, 128);
-
-		//Image image_test(128, 2);
-		//for (int i = 0; i < 128; i++)
-		//{
-		//	// {3.2, 1, 14, -}
-		//	image_test.setPixel(i, 0, { samplesUniform01[i] / 3.2f, alpha_random_samplesUniform01[i], iUniform01[i] / 14, 0 });
-		//	image_test.setPixel(i, 1, { rUniform01[i] / 255, gUniform01[i] / 255, bUniform01[i] / 255, alphaUniform01[i] / 255 });
-		//}
-		//image_test.saveTGA("portal_bake.tga");
-
 		// create window
 		WindowLayerDesc window_layer_desc = {
 			SIByL::EWindowVendor::GLFW,
@@ -207,8 +220,6 @@ public:
 		imguiLayer = MemNew<Editor::ImGuiLayer>(logicalDevice.get());
 		pushLayer(imguiLayer.get());
 		Editor::ImFactory imfactory(imguiLayer.get());
-		//// create swapchain & related ...
-		//swapchain = resourceFactory->createSwapchain({});
 
 		// create scene
 		scene.deserialize("test_scene.scene", logicalDevice.get());
@@ -254,14 +265,7 @@ public:
 		// renderer
 		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
 		uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
-		//std::vector<RHI::ITexture*> swapchin_textures;
-		//std::vector<RHI::ITextureView*> swapchin_texture_views;
-		//for (int i = 0; i < swapchain->getSwapchainCount(); i++)
-		//{
-		//	swapchin_textures.emplace_back(swapchain->getITexture(i));
-		//	swapchin_texture_views.emplace_back(swapchain->getITextureView(i));
-		//}
-		//swapchainColorBufferFlights = rdg_builder.addColorBufferFlightsExtPresent(swapchin_textures, swapchin_texture_views);
+
 
 		// raster pass sono 1
 		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f);
@@ -280,120 +284,132 @@ public:
 		rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
 
 		// ACES
+		GFX::RDG::NodeHandle bloomExtract = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f, 1.f);
 		test_write_target = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
-		acesPass = rdg_builder.addComputePass(aces.get(), { test_write_target, srgb_color_attachment }, sizeof(unsigned int) * 2);
+		acesPass = rdg_builder.addComputePass(aces.get(), { test_write_target, srgb_color_attachment, bloomExtract }, sizeof(unsigned int) * 2);
 		rdg.tag(acesPass, "ACES");
+		
+		// bloom
+		MemScope<RHI::IShader> BlurLevel0 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel0.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> BlurLevel1 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel1.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> BlurLevel2 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel2.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> BlurLevel3 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel3.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		MemScope<RHI::IShader> BlurLevel4 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel4.spv", { RHI::ShaderStage::COMPUTE,"main" });
+
+		glm::vec2 screenSize = { 1280,720 };
+		GFX::RDG::NodeHandle bloom_00 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f);
+		{
+			blurPassConstants[0] = BlurPassConstants{ screenSize * glm::vec2{1. / 2,1. / 2}, screenSize, screenSize * glm::vec2{1,1}, {0,1} };
+			blurLevel00Pass = rdg_builder.addComputePass(BlurLevel0.get(), { external_sampler, bloom_00 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel00Pass)->textures = { bloomExtract };
+		}
+		GFX::RDG::NodeHandle bloom_01 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f);
+		{
+			blurPassConstants[1] = BlurPassConstants{ screenSize * glm::vec2{1. / 2,1. / 2}, screenSize, screenSize * glm::vec2{1. / 2,1. / 2}, {1,0} };
+			blurLevel01Pass = rdg_builder.addComputePass(BlurLevel0.get(), { external_sampler, bloom_01 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel01Pass)->textures = { bloom_00 };
+		}
+		GFX::RDG::NodeHandle bloom_10 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f);
+		{
+			blurPassConstants[2] = BlurPassConstants{ screenSize * glm::vec2{1. / 4,1. / 4}, screenSize, screenSize * glm::vec2{1. / 2,1. / 2}, {0,1} };
+			blurLevel10Pass = rdg_builder.addComputePass(BlurLevel1.get(), { external_sampler, bloom_10 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel10Pass)->textures = { bloom_01 };
+		}
+		GFX::RDG::NodeHandle bloom_11 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f);
+		{
+			blurPassConstants[3] = BlurPassConstants{ screenSize * glm::vec2{1. / 4,1. / 4}, screenSize, screenSize * glm::vec2{1. / 4,1. / 4}, {1,0} };
+			blurLevel11Pass = rdg_builder.addComputePass(BlurLevel1.get(), { external_sampler, bloom_11 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel11Pass)->textures = { bloom_10 };
+		}
+
+		GFX::RDG::NodeHandle bloom_20 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f);
+		{
+			blurPassConstants[4] = BlurPassConstants{ screenSize * glm::vec2{1. / 8,1. / 8}, screenSize, screenSize * glm::vec2{1. / 4,1. / 4}, {0,1} };
+			blurLevel20Pass = rdg_builder.addComputePass(BlurLevel2.get(), { external_sampler, bloom_20 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel20Pass)->textures = { bloom_11 };
+		}
+		GFX::RDG::NodeHandle bloom_21 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f);
+		{
+			blurPassConstants[5] = BlurPassConstants{ screenSize * glm::vec2{1. / 8,1. / 8}, screenSize, screenSize * glm::vec2{1. / 8,1. / 8}, {1,0} };
+			blurLevel21Pass = rdg_builder.addComputePass(BlurLevel2.get(), { external_sampler, bloom_21 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel21Pass)->textures = { bloom_20 };
+		}
+
+		GFX::RDG::NodeHandle bloom_30 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16);
+		{
+			blurPassConstants[6] = BlurPassConstants{ screenSize * glm::vec2{1. / 16,1. / 16}, screenSize, screenSize * glm::vec2{1. / 8,1. / 8}, {0,1} };
+			blurLevel30Pass = rdg_builder.addComputePass(BlurLevel3.get(), { external_sampler, bloom_30 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel30Pass)->textures = { bloom_21 };
+		}
+		GFX::RDG::NodeHandle bloom_31 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16);
+		{
+			blurPassConstants[7] = BlurPassConstants{ screenSize * glm::vec2{1. / 16,1. / 16}, screenSize, screenSize * glm::vec2{1. / 16,1. / 16}, {1,0} };
+			blurLevel31Pass = rdg_builder.addComputePass(BlurLevel3.get(), { external_sampler, bloom_31 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel31Pass)->textures = { bloom_30 };
+		}
+
+		GFX::RDG::NodeHandle bloom_40 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32);
+		{
+			blurPassConstants[8] = BlurPassConstants{ screenSize * glm::vec2{1. / 32,1. / 32}, screenSize, screenSize * glm::vec2{1. / 16,1. / 16}, {0,1} };
+			blurLevel40Pass = rdg_builder.addComputePass(BlurLevel4.get(), { external_sampler, bloom_40 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel40Pass)->textures = { bloom_31 };
+		}
+		GFX::RDG::NodeHandle bloom_41 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32);
+		{
+			blurPassConstants[9] = BlurPassConstants{ screenSize * glm::vec2{1. / 32,1. / 32}, screenSize, screenSize * glm::vec2{1. / 32,1. / 32}, {1,0} };
+			blurLevel41Pass = rdg_builder.addComputePass(BlurLevel4.get(), { external_sampler, bloom_41 }, sizeof(unsigned int) * 2 * 4);
+			rdg.getComputePassNode(blurLevel41Pass)->textures = { bloom_40 };
+		}
+
+		MemScope<RHI::IShader> BlurCombine = resourceFactory->createShaderFromBinaryFile("bloom/BloomCombine.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		GFX::RDG::NodeHandle bloomCombined = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f);
+		bloomCombinedPass = rdg_builder.addComputePass(BlurCombine.get(), { bloomCombined, 
+			external_sampler, external_sampler, external_sampler, 
+			external_sampler, external_sampler, external_sampler }, sizeof(unsigned int) * 3);
+		rdg.getComputePassNode(bloomCombinedPass)->textures = { test_write_target, bloom_01, bloom_11, bloom_21, bloom_31, bloom_41 };
+
 
 		// building ...
 		rdg_builder.build(resourceFactory.get());
 		rdg.print();
 
+		create_bloom_barrier(bloomExtract, 0);
+		create_bloom_barrier(bloom_00, 1);
+		create_bloom_barrier(bloom_01, 2);
+		create_bloom_barrier(bloom_10, 3);
+		create_bloom_barrier(bloom_11, 4);
+		create_bloom_barrier(bloom_20, 5);
+		create_bloom_barrier(bloom_21, 6);
+		create_bloom_barrier(bloom_30, 7);
+		create_bloom_barrier(bloom_31, 8);
+		create_bloom_barrier(bloom_40, 9);
+		create_bloom_barrier(bloom_41, 10);
+		create_bloom_barrier(test_write_target, 11);
+
+		rdg.getTextureBufferNode(bloomExtract)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_00)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_01)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_10)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_11)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_20)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_21)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_30)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_31)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_40)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+		rdg.getTextureBufferNode(bloom_41)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+
+		rdg.getTextureBufferNode(srgb_color_attachment)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
+		rdg.getTextureBufferNode(bloomCombined)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
+		rdg.getTextureBufferNode(test_write_target)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+
+
 		viewportImImage = imfactory.createImImage(
 			rdg.getSamplerNode(external_sampler)->getSampler(),
-			rdg.getTextureBufferNode(test_write_target)->getTextureView(), 
+			rdg.getTextureBufferNode(bloomCombined)->getTextureView(),
 			RHI::ImageLayout::GENERAL);
 		mainViewport.bindImImage(viewportImImage.get());
 
-		//for (int i = 0; i < 3; i++)
-		//{
-		//	GFX::RDG::NodeHandle color_attachment_i = rdg.getContainer(swapchainColorBufferFlights)->handles[i];
-		//	rdg.getTextureBufferNode(color_attachment_i)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::PRESENT_SRC);
-		//	MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
-		//		rdg.getTextureBufferNode(color_attachment_i)->getTexture(), //ITexture* image;
-		//		RHI::ImageSubresourceRange{
-		//			(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
-		//			0,
-		//			1,
-		//			0,
-		//			1
-		//		},//ImageSubresourceRange subresourceRange;
-		//		(uint32_t)RHI::AccessFlagBits::TRANSFER_WRITE_BIT, //AccessFlags srcAccessMask;
-		//		(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT, //AccessFlags dstAccessMask;
-		//		RHI::ImageLayout::TRANSFER_DST_OPTIMAL, // old Layout
-		//		RHI::ImageLayout::PRESENT_SRC // new Layout
-		//	});
-		//	color_attach_copy2present[i] = resourceFactory->createBarrier({
-		//		(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//srcStageMask
-		//		(uint32_t)RHI::PipelineStageFlagBits::ALL_GRAPHICS_BIT,//dstStageMask
-		//		0,
-		//		{},
-		//		{},
-		//		{image_memory_barrier.get()}
-		//	});
-		//	MemScope<RHI::IImageMemoryBarrier> image_memory_barrier2 = resourceFactory->createImageMemoryBarrier({
-		//		rdg.getTextureBufferNode(color_attachment_i)->getTexture(), //ITexture* image;
-		//		RHI::ImageSubresourceRange{
-		//			(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
-		//			0,
-		//			1,
-		//			0,
-		//			1
-		//		},//ImageSubresourceRange subresourceRange;
-		//		(uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT, //AccessFlags srcAccessMask;
-		//		(uint32_t)RHI::AccessFlagBits::TRANSFER_WRITE_BIT, //AccessFlags dstAccessMask;
-		//		RHI::ImageLayout::PRESENT_SRC, // old Layout
-		//		RHI::ImageLayout::TRANSFER_DST_OPTIMAL // new Layout
-		//	});
 
-		//	color_attach_present2copy[i] = resourceFactory->createBarrier({
-		//		(uint32_t)RHI::PipelineStageFlagBits::ALL_GRAPHICS_BIT,//srcStageMask
-		//		(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//dstStageMask
-		//		0,
-		//		{},
-		//		{},
-		//		{image_memory_barrier2.get()}
-		//	});
-
-		//}
-		//// ACES Results
-		//{
-		//	MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
-		//		rdg.getTextureBufferNode(test_write_target)->getTexture(), //ITexture* image;
-		//		RHI::ImageSubresourceRange{
-		//			(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
-		//			0,
-		//			1,
-		//			0,
-		//			1
-		//		},//ImageSubresourceRange subresourceRange;
-		//		(uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT, //AccessFlags srcAccessMask;
-		//		(uint32_t)RHI::AccessFlagBits::TRANSFER_READ_BIT, //AccessFlags dstAccessMask;
-		//		RHI::ImageLayout::GENERAL, // old Layout
-		//		RHI::ImageLayout::TRANSFER_SRC_OPTIMAL // new Layout
-		//	});
-		//	aces_res_general2copysrc = resourceFactory->createBarrier({
-		//		(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//srcStageMask
-		//		(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//dstStageMask
-		//		0,
-		//		{},
-		//		{},
-		//		{image_memory_barrier.get()}
-		//	});
-
-		//	MemScope<RHI::IImageMemoryBarrier> image_memory_barrier_2 = resourceFactory->createImageMemoryBarrier({
-		//		rdg.getTextureBufferNode(test_write_target)->getTexture(), //ITexture* image;
-		//		RHI::ImageSubresourceRange{
-		//			(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT,
-		//			0,
-		//			1,
-		//			0,
-		//			1
-		//		},//ImageSubresourceRange subresourceRange;
-		//		(uint32_t)RHI::AccessFlagBits::TRANSFER_READ_BIT, //AccessFlags srcAccessMask;
-		//		(uint32_t)RHI::AccessFlagBits::MEMORY_WRITE_BIT, //AccessFlags dstAccessMask;
-		//		RHI::ImageLayout::TRANSFER_SRC_OPTIMAL, // old Layout
-		//		RHI::ImageLayout::GENERAL // new Layout
-		//	});
-
-		//	aces_res_copysrc2general = resourceFactory->createBarrier({
-		//		(uint32_t)RHI::PipelineStageFlagBits::TRANSFER_BIT,//srcStageMask
-		//		(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,//dstStageMask
-		//		0,
-		//		{},
-		//		{},
-		//		{image_memory_barrier_2.get()}
-		//		});
-		//}
 		// compute stuff
 		{		
 			MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = resourceFactory->createImageMemoryBarrier({
@@ -459,14 +475,10 @@ public:
 		// comand stuffs
 		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
 		commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		imageAvailableSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
-		renderFinishedSemaphore.resize(MAX_FRAMES_IN_FLIGHT);
 		inFlightFence.resize(MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
 			commandbuffers[i] = resourceFactory->createCommandBuffer(commandPool.get());
-			imageAvailableSemaphore[i] = resourceFactory->createSemaphore();
-			renderFinishedSemaphore[i] = resourceFactory->createSemaphore();
 			inFlightFence[i] = resourceFactory->createFence();
 		}
 
@@ -479,23 +491,12 @@ public:
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
 		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
-		rdg.getTextureBufferNode(srgb_color_attachment)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
-		rdg.getTextureBufferNode(test_write_target)->getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL);
-		Size size = { 1280,720 };
-		rdg.getComputePassNode(acesPass)->executeWithConstant(transientCommandbuffer.get(), 40, 23, 1, 0, size);
-
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();
 		logicalDevice->waitIdle();
 
 
 		SE_CORE_INFO("OnAwake End");
-	}
-	
-	void createModifableResource()
-	{
-		//RHI::Extend extend = swapchain->getExtend();
-		//rdg.reDatum(extend.width, extend.height);
 	}
 
 	virtual auto onWindowResize(WindowResizeEvent& e) -> bool override
@@ -504,18 +505,6 @@ public:
 
 		pipeline = nullptr;
 		renderPass = nullptr;
-		//swapchain = nullptr;
-
-		//swapchain = resourceFactory->createSwapchain({ e.GetWidth(), e.GetHeight() });
-		//for (int i = 0; i < swapchain->getSwapchainCount(); i++)
-		//{
-		//	rdg.getTextureBufferNodeFlight(swapchainColorBufferFlights, i)->resetExternal(
-		//		swapchain->getITexture(i),
-		//		swapchain->getITextureView(i)
-		//	);
-		//}
-
-		//createModifableResource();
 
 		return false;
 	}
@@ -539,7 +528,7 @@ public:
 		// update uniform buffer
 		{
 			float time = (float)timer.getTotalTimeSeconds();
-			float rotation = 0.5 * 3.1415926;
+			float rotation = time;// 0.5 * 3.1415926;
 			//uint32_t width = mainViewport.getWidth();
 			//uint32_t height = mainViewport.getHeight();
 			uint32_t width = 1280;
@@ -557,8 +546,6 @@ public:
 		}
 		// drawFrame
 		{
-			////	2. Acquire an image from the swap chain
-			//uint32_t imageIndex = swapchain->acquireNextImage(imageAvailableSemaphore[currentFrame].get());
 			//	3. Record a command buffer which draws the scene onto that image
 			commandbuffers[currentFrame]->reset();
 			commandbuffers[currentFrame]->beginRecording();
@@ -591,7 +578,45 @@ public:
 			commandbuffers[currentFrame]->cmdPipelineBarrier(attach_read_barrier.get());
 
 			Size size = { 1280,720 };
+			float screenX = 1280, screenY = 720;
+
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[11].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[0].get());
 			rdg.getComputePassNode(acesPass)->executeWithConstant(commandbuffers[currentFrame].get(), 40, 23, 1, 0, size);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[0].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[1].get());
+			rdg.getComputePassNode(blurLevel00Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 2, 16), GRIDSIZE(screenY * 1. / 2, 16), 1, 0, blurPassConstants[0]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[1].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[2].get());
+			rdg.getComputePassNode(blurLevel01Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 2, 16), GRIDSIZE(screenY * 1. / 2, 16), 1, 0, blurPassConstants[1]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[2].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[3].get());
+			rdg.getComputePassNode(blurLevel10Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 4, 16), GRIDSIZE(screenY * 1. / 4, 16), 1, 0, blurPassConstants[2]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[3].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[4].get());
+			rdg.getComputePassNode(blurLevel11Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 4, 16), GRIDSIZE(screenY * 1. / 4, 16), 1, 0, blurPassConstants[3]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[4].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[5].get());
+			rdg.getComputePassNode(blurLevel20Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 8, 16), GRIDSIZE(screenY * 1. / 8, 16), 1, 0, blurPassConstants[4]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[5].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[6].get());
+			rdg.getComputePassNode(blurLevel21Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 8, 16), GRIDSIZE(screenY * 1. / 8, 16), 1, 0, blurPassConstants[5]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[6].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[7].get());
+			rdg.getComputePassNode(blurLevel30Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 16, 16), GRIDSIZE(screenY * 1. / 16, 16), 1, 0, blurPassConstants[6]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[7].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[8].get());
+			rdg.getComputePassNode(blurLevel31Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 16, 16), GRIDSIZE(screenY * 1. / 16, 16), 1, 0, blurPassConstants[7]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[8].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[9].get());
+			rdg.getComputePassNode(blurLevel40Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 32, 16), GRIDSIZE(screenY * 1. / 32, 16), 1, 0, blurPassConstants[8]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[9].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_sample2write[10].get());
+			rdg.getComputePassNode(blurLevel41Pass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX * 1. / 32, 16), GRIDSIZE(screenY * 1. / 32, 16), 1, 0, blurPassConstants[9]);
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[10].get());
+			commandbuffers[currentFrame]->cmdPipelineBarrier(bloom_write2sample[11].get());
+			BloomCombineConstant bloom_combine_constant = { glm::vec2{screenX, screenY}, 5.2175 };
+			rdg.getComputePassNode(bloomCombinedPass)->executeWithConstant(commandbuffers[currentFrame].get(), GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1, 0, bloom_combine_constant);
 
 			static float deltaTime = 0;
 			deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
@@ -606,26 +631,9 @@ public:
 				deltaTime -= 20;
 			}
 
-		//	commandbuffers[currentFrame]->cmdPipelineBarrier(color_attach_present2copy[imageIndex].get());
-		//	commandbuffers[currentFrame]->cmdPipelineBarrier(aces_res_general2copysrc.get());
-
-		//	commandbuffers[currentFrame]->cmdBlitImage(
-		//		rdg.getTextureBufferNode(test_write_target)->getTexture(),
-		//		RHI::ImageLayout::TRANSFER_SRC_OPTIMAL,
-		//		rdg.getTextureBufferNode(rdg.getContainer(swapchainColorBufferFlights)->handles[imageIndex])->getTexture(),
-		//		RHI::ImageLayout::TRANSFER_DST_OPTIMAL,
-		//		{ {(uint32_t)RHI::ImageAspectFlagBits::COLOR_BIT,(uint32_t)RHI::ImageAspectFlagBits::COLOR_BIT} }
-		//	);
-
-		//	commandbuffers[currentFrame]->cmdPipelineBarrier(aces_res_copysrc2general.get());
-		//	commandbuffers[currentFrame]->cmdPipelineBarrier(color_attach_copy2present[imageIndex].get());
-
 			commandbuffers[currentFrame]->endRecording();
 			//	4. Submit the recorded command buffer
 			commandbuffers[currentFrame]->submit(nullptr, nullptr, inFlightFence[currentFrame].get());
-			//commandbuffers[currentFrame]->submit(imageAvailableSemaphore[currentFrame].get(), renderFinishedSemaphore[currentFrame].get(), inFlightFence[currentFrame].get());
-			////	5. Present the swap chain image
-			//swapchain->present(imageIndex, renderFinishedSemaphore[currentFrame].get());
 		}
 		// update current frame
 		{
@@ -664,6 +672,19 @@ private:
 	GFX::RDG::NodeHandle acesPass;
 	GFX::RDG::NodeHandle test_write_target;
 	GFX::RDG::NodeHandle srgb_framebuffer;
+
+	BlurPassConstants blurPassConstants[10];
+	GFX::RDG::NodeHandle blurLevel00Pass;
+	GFX::RDG::NodeHandle blurLevel01Pass;
+	GFX::RDG::NodeHandle blurLevel10Pass;
+	GFX::RDG::NodeHandle blurLevel11Pass;
+	GFX::RDG::NodeHandle blurLevel20Pass;
+	GFX::RDG::NodeHandle blurLevel21Pass;
+	GFX::RDG::NodeHandle blurLevel30Pass;
+	GFX::RDG::NodeHandle blurLevel31Pass;
+	GFX::RDG::NodeHandle blurLevel40Pass;
+	GFX::RDG::NodeHandle blurLevel41Pass;
+	GFX::RDG::NodeHandle bloomCombinedPass;
 	ParticleSystem::ParticleSystem portal;
 
 	MemScope<RHI::IGraphicContext> graphicContext;
@@ -695,6 +716,8 @@ private:
 	MemScope<RHI::IBarrier> aces_res_copysrc2general;
 	MemScope<RHI::IBarrier> color_attach_copy2present[3];
 	MemScope<RHI::IBarrier> color_attach_present2copy[3];
+	MemScope<RHI::IBarrier> bloom_write2sample[20];
+	MemScope<RHI::IBarrier> bloom_sample2write[20];
 
 	MemScope<RHI::ISwapChain> swapchain;
 	MemScope<RHI::IRenderPass> renderPass;
@@ -702,8 +725,6 @@ private:
 
 	MemScope<RHI::ICommandPool> commandPool;
 	std::vector<MemScope<RHI::ICommandBuffer>> commandbuffers;
-	std::vector<MemScope<RHI::ISemaphore>> imageAvailableSemaphore;
-	std::vector<MemScope<RHI::ISemaphore>> renderFinishedSemaphore;
 	std::vector<MemScope<RHI::IFence>> inFlightFence;
 };
 

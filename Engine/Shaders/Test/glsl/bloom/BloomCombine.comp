@@ -1,0 +1,61 @@
+//////////////////////////////////////////////////////////////////////
+/////                       Compute Shader                      //////
+//////////////////////////////////////////////////////////////////////
+#version 450 
+layout(push_constant) uniform constants {
+    vec2 outputSize;
+    float uBloomFactor;
+} PushConstants;
+
+layout ( binding = 0, rgba8 ) uniform image2D outputImage;
+layout ( binding = 1 ) uniform sampler2D inputImage;
+layout ( binding = 2 ) uniform sampler2D TextureBloomBlur1;
+layout ( binding = 3 ) uniform sampler2D TextureBloomBlur2;
+layout ( binding = 4 ) uniform sampler2D TextureBloomBlur3;
+layout ( binding = 5 ) uniform sampler2D TextureBloomBlur4;
+layout ( binding = 6 ) uniform sampler2D TextureBloomBlur5;
+
+layout (local_size_x = 16, local_size_y = 16) in;
+
+float getRadiusFactored(const float value, const float middle) {
+    return mix(value, middle * 2.0 - value, 1);
+}
+
+vec4 bloomCombine(vec2 uv) {
+    vec3 bloom = vec3(0.0);
+    const float midVal = 0.6;
+    const float factor1 = 1.1;
+    const float factor2 = 0.9;
+    const float factor3 = 0.6;
+    const float factor4 = 0.3;
+    const float factor5 = 0.1;
+    bloom += texture(TextureBloomBlur1, uv).rgb * getRadiusFactored(factor1, midVal);
+    bloom += texture(TextureBloomBlur2, uv).rgb * getRadiusFactored(factor2, midVal);
+    bloom += texture(TextureBloomBlur3, uv).rgb * getRadiusFactored(factor3, midVal);
+    bloom += texture(TextureBloomBlur4, uv).rgb * getRadiusFactored(factor4, midVal);
+    bloom += texture(TextureBloomBlur5, uv).rgb * getRadiusFactored(factor5, midVal);
+    vec3 color = texture(inputImage, uv).rgb;
+    return vec4(color + (bloom * PushConstants.uBloomFactor), 1.0);
+}
+
+void main(void)
+{
+    // base pixel colour for image
+    vec4 pixel = vec4(1.0, 0.0, 1.0, 1.0);
+    // get index in global work group i.e x,y position
+    ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
+    if(gl_GlobalInvocationID.x >= PushConstants.outputSize.x || gl_GlobalInvocationID.y >= PushConstants.outputSize.y)
+        return;
+
+    float du = 1.0f / PushConstants.outputSize.x;
+    float dv = 1.0f / PushConstants.outputSize.y;
+
+    float u = du * (gl_GlobalInvocationID.x + 0.5f);
+    float v = dv * (gl_GlobalInvocationID.y + 0.5f);
+
+    vec4 col = bloomCombine(vec2(u,v));
+    pixel= col;
+    
+    // output to a specific pixel in the image
+    imageStore(outputImage, pixel_coords, pixel);
+}

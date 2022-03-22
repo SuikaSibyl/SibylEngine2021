@@ -66,5 +66,8 @@
     <ClCompile Include="Public\Pass\BlitPassNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Pass\MultiDispatchScope.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
