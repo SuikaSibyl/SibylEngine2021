@@ -84,6 +84,7 @@ import GFX.RDG.StorageBufferNode;
 import GFX.RDG.RasterPassNode;
 import GFX.RDG.Common;
 import GFX.RDG.MultiDispatchScope;
+import GFX.PostProcessing.AcesBloom;
 
 import ParticleSystem.ParticleSystem;
 import ParticleSystem.PrecomputedSample;
@@ -111,43 +112,8 @@ public:
 		glm::mat4 proj;
 	};
 
-	struct EmitConstant
-	{
-		unsigned int emitCount;
-		float time;
-		float x;
-		float y;
-	};
-
 	struct Empty
 	{};
-
-	struct Size
-	{
-		unsigned int width;
-		unsigned int height;
-	};
-
-	struct BlurPassConstants
-	{
-		glm::vec2 outputSize;
-		glm::vec2 globalTextSize;
-		glm::vec2 textureBlurInputSize;
-		glm::vec2 blurDir;
-	};
-
-	struct BloomCombineConstant
-	{
-		glm::vec2 size;
-		float para;
-	};
-
-
-	MemScope<Editor::ImGuiLayer> imguiLayer;
-	Editor::Viewport mainViewport;
-	MemScope<Editor::ImImage> viewportImImage;
-	std::vector<float> samplesUniform01;
-	std::vector<float> alpha_random_samplesUniform01;
 
 	virtual void onAwake() override
 	{
@@ -183,7 +149,6 @@ public:
 		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> aces = resourceFactory->createShaderFromBinaryFile("aces.spv", { RHI::ShaderStage::COMPUTE,"main" });
 
 		// load image
 		Image image("./assets/Sparkle.tga");
@@ -201,6 +166,9 @@ public:
 		CacheBrain::instance()->loadCache(2267996151488940154, header, samples);
 		torusBuffer = resourceFactory->createStorageBuffer(&torusSamples);
 		
+		// Create proxy
+		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
+
 		// Build Up Pipeline
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// sub-pipeline building helper components
@@ -215,19 +183,20 @@ public:
 		portal.sampler = external_sampler;
 		portal.dataBakedImage = external_baked_texture;
 		portal.registerResources(&rdg_builder);
+		acesbloom->registerResources(&rdg_builder);
 		// renderer
-		depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
+		GFX::RDG::NodeHandle depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
 		uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
 
 		// raster pass sono 1
 		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
 		GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
-		srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
+		GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
 		// HDR raster pass
 		MemScope<RHI::IShader> shaderVert2 = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
 		MemScope<RHI::IShader> shaderFrag2 = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-		renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler });
+		GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler });
 		rdg.tag(renderPassNodeSRGB, "Raster HDR");
 		GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
 		rasterPassNodeSRGB->shaderVert = std::move(shaderVert2);
@@ -249,156 +218,14 @@ public:
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};
-
+		
 		// ACES
-		GFX::RDG::NodeHandle bloomExtract = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f, 1.f, "Bloom Extract Image");
-		test_write_target = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "LDR Image");
-		acesPass = rdg_builder.addComputePass(aces.get(), { test_write_target, srgb_color_attachment, bloomExtract }, "ACES & Bloom Extract", sizeof(unsigned int) * 2);
-		rdg.getComputePassNode(acesPass)->customDispatch = [](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-		{
-			Size size = { 1280,720 };
-			compute_pass->executeWithConstant(commandbuffer, 40, 23, 1, 0, size);
-		};
-
-		// bloom
-		MemScope<RHI::IShader> BlurLevel0 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel0.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> BlurLevel1 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel1.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> BlurLevel2 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel2.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> BlurLevel3 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel3.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> BlurLevel4 = resourceFactory->createShaderFromBinaryFile("bloom/BlurLevel4.spv", { RHI::ShaderStage::COMPUTE,"main" });
-
-		glm::vec2 screenSize = { 1280,720 };
-		GFX::RDG::NodeHandle bloom_00 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f, "Bloom 00 Image");
-		{
-			blurPassConstants[0] = BlurPassConstants{ screenSize * glm::vec2{1. / 2,1. / 2}, screenSize, screenSize * glm::vec2{1,1}, {0,1} };
-			blurLevel00Pass = rdg_builder.addComputePass(BlurLevel0.get(), { external_sampler, bloom_00 }, "Bloom Blur 00", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel00Pass)->textures = { bloomExtract };
-			rdg.getComputePassNode(blurLevel00Pass)->customDispatch = [&pass_constant = blurPassConstants[0]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 2, 16), GRIDSIZE(screenY * 1. / 2, 16), 1, 0, pass_constant);
-			};
-		}
-		GFX::RDG::NodeHandle bloom_01 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f, "Bloom 01 Image");
-		{
-			blurPassConstants[1] = BlurPassConstants{ screenSize * glm::vec2{1. / 2,1. / 2}, screenSize, screenSize * glm::vec2{1. / 2,1. / 2}, {1,0} };
-			blurLevel01Pass = rdg_builder.addComputePass(BlurLevel0.get(), { external_sampler, bloom_01 }, "Bloom Blur 01", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel01Pass)->textures = { bloom_00 };
-			rdg.getComputePassNode(blurLevel01Pass)->customDispatch = [&pass_constant = blurPassConstants[1]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 2, 16), GRIDSIZE(screenY * 1. / 2, 16), 1, 0, pass_constant);
-			};
-		}
-		GFX::RDG::NodeHandle bloom_10 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f, "Bloom 10 Image");
-		{
-			blurPassConstants[2] = BlurPassConstants{ screenSize * glm::vec2{1. / 4,1. / 4}, screenSize, screenSize * glm::vec2{1. / 2,1. / 2}, {0,1} };
-			blurLevel10Pass = rdg_builder.addComputePass(BlurLevel1.get(), { external_sampler, bloom_10 }, "Bloom Blur 10", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel10Pass)->textures = { bloom_01 };
-			rdg.getComputePassNode(blurLevel10Pass)->customDispatch = [&pass_constant = blurPassConstants[2]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 4, 16), GRIDSIZE(screenY * 1. / 4, 16), 1, 0, pass_constant);
-			};
-		}
-		GFX::RDG::NodeHandle bloom_11 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f, "Bloom 11 Image");
-		{
-			blurPassConstants[3] = BlurPassConstants{ screenSize * glm::vec2{1. / 4,1. / 4}, screenSize, screenSize * glm::vec2{1. / 4,1. / 4}, {1,0} };
-			blurLevel11Pass = rdg_builder.addComputePass(BlurLevel1.get(), { external_sampler, bloom_11 }, "Bloom Blur 11", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel11Pass)->textures = { bloom_10 };
-			rdg.getComputePassNode(blurLevel11Pass)->customDispatch = [&pass_constant = blurPassConstants[3]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 4, 16), GRIDSIZE(screenY * 1. / 4, 16), 1, 0, pass_constant);
-			};
-		}
-
-		GFX::RDG::NodeHandle bloom_20 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f, "Bloom 20 Image");
-		{
-			blurPassConstants[4] = BlurPassConstants{ screenSize * glm::vec2{1. / 8,1. / 8}, screenSize, screenSize * glm::vec2{1. / 4,1. / 4}, {0,1} };
-			blurLevel20Pass = rdg_builder.addComputePass(BlurLevel2.get(), { external_sampler, bloom_20 }, "Bloom Blur 20", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel20Pass)->textures = { bloom_11 };
-			rdg.getComputePassNode(blurLevel20Pass)->customDispatch = [&pass_constant = blurPassConstants[4]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 8, 16), GRIDSIZE(screenY * 1. / 8, 16), 1, 0, pass_constant);
-			};
-		}
-		GFX::RDG::NodeHandle bloom_21 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f, "Bloom 21 Image");
-		{
-			blurPassConstants[5] = BlurPassConstants{ screenSize * glm::vec2{1. / 8,1. / 8}, screenSize, screenSize * glm::vec2{1. / 8,1. / 8}, {1,0} };
-			blurLevel21Pass = rdg_builder.addComputePass(BlurLevel2.get(), { external_sampler, bloom_21 }, "Bloom Blur 21", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel21Pass)->textures = { bloom_20 };
-			rdg.getComputePassNode(blurLevel21Pass)->customDispatch = [&pass_constant = blurPassConstants[5]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 8, 16), GRIDSIZE(screenY * 1. / 8, 16), 1, 0, pass_constant);
-			};
-		}
-
-		GFX::RDG::NodeHandle bloom_30 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16, "Bloom 30 Image");
-		{
-			blurPassConstants[6] = BlurPassConstants{ screenSize * glm::vec2{1. / 16,1. / 16}, screenSize, screenSize * glm::vec2{1. / 8,1. / 8}, {0,1} };
-			blurLevel30Pass = rdg_builder.addComputePass(BlurLevel3.get(), { external_sampler, bloom_30 }, "Bloom Blur 30", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel30Pass)->textures = { bloom_21 };
-			rdg.getComputePassNode(blurLevel30Pass)->customDispatch = [&pass_constant = blurPassConstants[6]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 16, 16), GRIDSIZE(screenY * 1. / 16, 16), 1, 0, pass_constant);
-			};
-		}
-		GFX::RDG::NodeHandle bloom_31 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16, "Bloom 31 Image");
-		{
-			blurPassConstants[7] = BlurPassConstants{ screenSize * glm::vec2{1. / 16,1. / 16}, screenSize, screenSize * glm::vec2{1. / 16,1. / 16}, {1,0} };
-			blurLevel31Pass = rdg_builder.addComputePass(BlurLevel3.get(), { external_sampler, bloom_31 }, "Bloom Blur 31", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel31Pass)->textures = { bloom_30 };
-			rdg.getComputePassNode(blurLevel31Pass)->customDispatch = [&pass_constant = blurPassConstants[7]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 16, 16), GRIDSIZE(screenY * 1. / 16, 16), 1, 0, pass_constant);
-			};
-		}
-
-		GFX::RDG::NodeHandle bloom_40 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32, "Bloom 40 Image");
-		{
-			blurPassConstants[8] = BlurPassConstants{ screenSize * glm::vec2{1. / 32,1. / 32}, screenSize, screenSize * glm::vec2{1. / 16,1. / 16}, {0,1} };
-			blurLevel40Pass = rdg_builder.addComputePass(BlurLevel4.get(), { external_sampler, bloom_40 }, "Bloom Blur 40", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel40Pass)->textures = { bloom_31 };
-			rdg.getComputePassNode(blurLevel40Pass)->customDispatch = [&pass_constant = blurPassConstants[8]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 32, 16), GRIDSIZE(screenY * 1. / 32, 16), 1, 0, pass_constant);
-			};
-		}
-		GFX::RDG::NodeHandle bloom_41 = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32, "Bloom 41 Image");
-		{
-			blurPassConstants[9] = BlurPassConstants{ screenSize * glm::vec2{1. / 32,1. / 32}, screenSize, screenSize * glm::vec2{1. / 32,1. / 32}, {1,0} };
-			blurLevel41Pass = rdg_builder.addComputePass(BlurLevel4.get(), { external_sampler, bloom_41 }, "Bloom Blur 41", sizeof(unsigned int) * 2 * 4);
-			rdg.getComputePassNode(blurLevel41Pass)->textures = { bloom_40 };
-			rdg.getComputePassNode(blurLevel41Pass)->customDispatch = [&pass_constant = blurPassConstants[9]](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				float screenX = 1280, screenY = 720;
-				compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX * 1. / 32, 16), GRIDSIZE(screenY * 1. / 32, 16), 1, 0, pass_constant);
-			};
-		}
-
-		MemScope<RHI::IShader> BlurCombine = resourceFactory->createShaderFromBinaryFile("bloom/BloomCombine.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		GFX::RDG::NodeHandle bloomCombined = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "Combined Image");
-		bloomCombinedPass = rdg_builder.addComputePass(BlurCombine.get(), { bloomCombined, 
-			external_sampler, external_sampler, external_sampler, 
-			external_sampler, external_sampler, external_sampler }, 
-			"Bloom Combine",
-			sizeof(unsigned int) * 3);
-		rdg.getComputePassNode(bloomCombinedPass)->textures = { test_write_target, bloom_01, bloom_11, bloom_21, bloom_31, bloom_41 };
-		rdg.getComputePassNode(bloomCombinedPass)->customDispatch = [](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-		{
-			float screenX = 1280, screenY = 720;
-			BloomCombineConstant bloom_combine_constant = { glm::vec2{screenX, screenY}, 5.2175 };
-			compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(screenX, 16), GRIDSIZE(screenY, 16), 1, 0, bloom_combine_constant);
-		};
+		acesbloom->iHdrImage = srgb_color_attachment;
+		acesbloom->iExternalSampler = external_sampler;
+		acesbloom->registerComputePasses(&rdg_builder);
 
 		// particle system update pass
-		scope_begin = rdg_builder.beginMultiDispatchScope("Scope Begin Portal-Update Multi-Dispatch");
+		GFX::RDG::NodeHandle scope_begin = rdg_builder.beginMultiDispatchScope("Scope Begin Portal-Update Multi-Dispatch");
 		rdg.getMultiDispatchScope(scope_begin)->customDispatchCount = [&timer = timer]()
 		{
 			static float deltaTime = 0;
@@ -407,9 +234,8 @@ public:
 			deltaTime -= dispatch_times * 20;
 			return dispatch_times;
 		};
-
 		portal.registerUpdatePasses(&rdg_builder);
-		scope_end = rdg_builder.endScope();
+		GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
 
 		// building ...
 		rdg_builder.build(resourceFactory.get(), 1280, 720);
@@ -418,7 +244,7 @@ public:
 		// create ImImage for viewport
 		viewportImImage = imfactory.createImImage(
 			rdg.getSamplerNode(external_sampler)->getSampler(),
-			rdg.getTextureBufferNode(bloomCombined)->getTextureView(),
+			rdg.getTextureBufferNode(acesbloom->bloomCombined)->getTextureView(),
 			RHI::ImageLayout::GENERAL);
 		mainViewport.bindImImage(viewportImImage.get());
 
@@ -450,10 +276,6 @@ public:
 	virtual auto onWindowResize(WindowResizeEvent& e) -> bool override
 	{
 		logicalDevice->waitIdle();
-
-		pipeline = nullptr;
-		renderPass = nullptr;
-
 		return false;
 	}
 
@@ -526,56 +348,40 @@ public:
 
 private:
 	Timer timer;
-	uint32_t currentFrame = 0;
+	// Window Layer
 	WindowLayer* window_layer;
-
+	// Editor Layer
+	MemScope<Editor::ImGuiLayer> imguiLayer;
+	Editor::Viewport mainViewport;
+	MemScope<Editor::ImImage> viewportImImage;
+	// Application
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
 
-	BlurPassConstants blurPassConstants[10];
-	GFX::RDG::NodeHandle depthBuffer;
-	GFX::RDG::NodeHandle renderPassNodeSRGB;
-	GFX::RDG::NodeHandle uniformBufferFlights;
-	GFX::RDG::NodeHandle swapchainColorBufferFlights;
-	GFX::RDG::NodeHandle acesPass;
-	GFX::RDG::NodeHandle test_write_target;
-	GFX::RDG::NodeHandle srgb_framebuffer;
-	GFX::RDG::NodeHandle blurLevel00Pass;
-	GFX::RDG::NodeHandle blurLevel01Pass;
-	GFX::RDG::NodeHandle blurLevel10Pass;
-	GFX::RDG::NodeHandle blurLevel11Pass;
-	GFX::RDG::NodeHandle blurLevel20Pass;
-	GFX::RDG::NodeHandle blurLevel21Pass;
-	GFX::RDG::NodeHandle blurLevel30Pass;
-	GFX::RDG::NodeHandle blurLevel31Pass;
-	GFX::RDG::NodeHandle blurLevel40Pass;
-	GFX::RDG::NodeHandle blurLevel41Pass;
-	GFX::RDG::NodeHandle bloomCombinedPass;
-	GFX::RDG::NodeHandle scope_begin;
-	GFX::RDG::NodeHandle scope_end;
+	// RDG Proxy
 	ParticleSystem::ParticleSystem portal;
+	MemScope<GFX::PostProcessing::AcesBloomProxyUnit> acesbloom;
 
+	// Device stuff
 	MemScope<RHI::IGraphicContext> graphicContext;
 	MemScope<RHI::IPhysicalDevice> physicalDevice;
 	MemScope<RHI::ILogicalDevice> logicalDevice;
-
 	MemScope<RHI::IResourceFactory> resourceFactory;
 
-	MemScope<RHI::IStorageBuffer> torusBuffer;
+	// Comands
+	MemScope<RHI::ICommandPool> commandPool;
+	std::vector<MemScope<RHI::ICommandBuffer>> commandbuffers;
+	std::vector<MemScope<RHI::IFence>> inFlightFence;
+	uint32_t currentFrame = 0;
 
+	// Lifetime Resources
+	MemScope<RHI::IStorageBuffer> torusBuffer;
 	MemScope<RHI::ITexture> texture;
 	MemScope<RHI::ITextureView> textureView;
 	MemScope<RHI::ITexture> baked_texture;
 	MemScope<RHI::ITextureView> baked_textureView;
 	MemScope<RHI::ISampler> sampler;
-
-	MemScope<RHI::ISwapChain> swapchain;
-	MemScope<RHI::IRenderPass> renderPass;
-	MemScope<RHI::IPipeline> pipeline;
-
-	MemScope<RHI::ICommandPool> commandPool;
-	std::vector<MemScope<RHI::ICommandBuffer>> commandbuffers;
-	std::vector<MemScope<RHI::IFence>> inFlightFence;
+	GFX::RDG::NodeHandle uniformBufferFlights;
 };
 
 auto SE_CREATE_APP() noexcept -> SIByL::IApplication*
