@@ -45,10 +45,13 @@ namespace SIByL::GFX::RDG
 			uint32_t const& constant_size);
 
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
 		NodeHandle framebufferFlights;
 		NodeHandle framebuffer;
+		NodeHandle indirectDrawBufferHandle = 0;
 		bool useFlights = false;
 
 		MemScope<RHI::IShader> shaderVert;
@@ -69,5 +72,8 @@ namespace SIByL::GFX::RDG
 		MemScope<RHI::IDescriptorSetLayout> desciptorSetLayout;
 		std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
 		MemScope<RHI::IPipeline> pipeline;
+		RHI::IStorageBuffer* indirectDrawBuffer;
+
+		std::function<void(GFX::RDG::RasterPassNode*, RHI::ICommandBuffer*, uint32_t)> customCommandRecord;
 	};
 }

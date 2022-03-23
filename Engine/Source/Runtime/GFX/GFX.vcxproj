@@ -154,6 +154,7 @@
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
     <ClCompile Include="Public\GFXLayer\GFXLayer.ixx" />
+    <ClCompile Include="Public\PostProcessing\AcesBloom.ixx" />
     <ClCompile Include="Public\Scene\Scene.ixx" />
     <ClCompile Include="Public\Scene\SceneTree.ixx" />
   </ItemGroup>
@@ -163,6 +164,9 @@
     </ProjectReference>
     <ProjectReference Include="..\ECS\ECS.vcxproj">
       <Project>{688c4381-ba51-4866-9827-eb59ae7008cb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RDG\RDG.vcxproj">
+      <Project>{5ab39c8d-66d2-4c46-bf4b-6b55b8f24b20}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RHI\RHI.vcxproj">
       <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>

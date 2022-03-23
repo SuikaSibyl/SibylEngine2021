@@ -10,6 +10,8 @@ import RHI.ITexture;
 import RHI.ICommandQueue;
 import RHI.ITexture;
 import RHI.ITexture.VK;
+import RHI.IBuffer;
+import RHI.IBuffer.VK;
 
 //import RHI.ICommandQueue.VK;
 
@@ -23,6 +25,22 @@ namespace SIByL::RHI
     }
     
     auto IMemoryBarrierVK::getVkMemoryBarrier() noexcept -> VkMemoryBarrier*
+    {
+        return &barrier;
+    }
+
+    IBufferMemoryBarrierVK::IBufferMemoryBarrierVK(BufferMemoryBarrierDesc const& desc)
+    {
+        barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+        barrier.srcAccessMask = getVkAccessFlags(desc.srcAccessMask);
+        barrier.dstAccessMask = getVkAccessFlags(desc.dstAccessMask);
+        barrier.buffer = *((IBufferVK*)desc.buffer)->getVkBuffer();
+        barrier.size = VK_WHOLE_SIZE;
+        barrier.srcQueueFamilyIndex = desc.srcQueue == nullptr ? VK_QUEUE_FAMILY_IGNORED : VK_QUEUE_FAMILY_IGNORED; // TODO: FIX QUEUE TRANSITION
+        barrier.dstQueueFamilyIndex = desc.dstQueue == nullptr ? VK_QUEUE_FAMILY_IGNORED : VK_QUEUE_FAMILY_IGNORED; // TODO: FIX QUEUE TRANSITION
+    }
+
+    auto IBufferMemoryBarrierVK::getVkBufferMemoryBarrier() noexcept -> VkBufferMemoryBarrier*
     {
         return &barrier;
     }

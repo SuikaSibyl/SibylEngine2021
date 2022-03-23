@@ -25,8 +25,13 @@ namespace SIByL::RHI
 			memoryBarriers[i] = *((IMemoryBarrierVK*)desc.memoryBarriers[i])->getVkMemoryBarrier();
 		}
 
-		// TODO
 		// - buffer memory barrier
+		bufferMemoryBarriers.resize(desc.bufferMemoryBarriers.size());
+		for (int i = 0; i < bufferMemoryBarriers.size(); i++)
+		{
+			bufferMemoryBarriers[i] = *((IBufferMemoryBarrierVK*)desc.bufferMemoryBarriers[i])->getVkBufferMemoryBarrier();
+		}
+
 		// - image memory barrier
 		imageMemoryBarriers.resize(desc.imageMemoryBarriers.size());
 		for (int i = 0; i < imageMemoryBarriers.size(); i++)

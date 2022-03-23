@@ -14,6 +14,7 @@ import RHI.IFactory;
 import RHI.ICommandBuffer;
 import RHI.IRenderPass;
 import RHI.IFramebuffer;
+import RHI.ICommandBuffer;
 import RHI.IBarrier;
 import ECS.UID;
 
@@ -22,30 +23,40 @@ namespace SIByL::GFX::RDG
 	// Node is the first citizen in RDG
 	// The RDG is composed of many nodes with certain connection
 	// A node is either a resource (ResourceNode) or a resource manipulation (PassNode)
-	// ┌──────┬──────────────┬───────────────┬──────────────────┐
-	// │	  │ 			 │			     │ ColorBufferNode  │
-	// │	  │  			 │  TextureNode  ├──────────────────┤
-	// │      │              │               │ DepthBufferNode  │
-	// │	  │ ResourceNode ├───────────────┼──────────────────┼────────────────────┐
-	// │      │              │               │ StorageBuffer    │ IndirectDrawBuffer │
-	// │ Node │				 │  BufferNode   ├──────────────────┼────────────────────┘
-	// │      │              │               │ UniformBuffer    │
-	// │      ├──────────────┼───────────────┼──────────────────┘
-	// │      │              │  RasterPass   │
-	// │      │   PassNode   ├───────────────┤
-	// │	  │              │  ComputePass  │
-	// └──────┴──────────────┴───────────────┘
+	// ┌──────┬──────────────┬───────────┬───────────────┬──────────────────┐
+	// │	  │              │ 			 │			     │ ColorBufferNode  │
+	// │	  │              │  		 │  TextureNode  ├──────────────────┤
+	// │      │              │           │               │ DepthBufferNode  │
+	// │	  │              │  (Atom*)  ├───────────────┼──────────────────┼────────────────────┐
+	// │      │              │           │               │ StorageBuffer    │ IndirectDrawBuffer │
+	// │      │	ResourceNode │ 			 │  BufferNode   ├──────────────────┼────────────────────┘
+	// │      │              │           │               │ UniformBuffer    │
+	// │      │              ├───────────┼───────────────┴────────┬─────────┘
+	// │ Node │              │  		 │  FlightContainer       │
+	// │	  │              │ Contianer ├────────────────────────┤
+	// │      │	             │ 			 │  FramebufferContainer  │
+	// │      ├──────────────┼───────────┼──────────────────┬─────┘
+	// │	  │ 			 │			 │ RasterPass       │
+	// │	  │  			 │  (Atom*)  ├──────────────────┤
+	// │      │ PassNode     │           │ ComputePass      │
+	// │	  │              ├───────────┼──────────────────┤
+	// │      │              │  Scope    │ MultiDispatch    │
+	// └──────┴──────────────┴───────────┴──────────────────┘
+	// 
 	// An attribute bits is used for tell attributes
 	export using NodeAttributesFlags = uint32_t;
 	export enum class NodeAttrbutesFlagBits: uint32_t
 	{
-		PLACEHOLDER = 0x00000001,
-		CONTAINER   = 0x00000002,
-		SCOPE	    = 0x00000004,
-		RESOURCE    = 0x00000008,
-		FLIGHT      = 0x00000010,
-		PRESENT     = 0x00000020,
+		PLACEHOLDER		 = 0x00000001,
+		CONTAINER		 = 0x00000002,
+		SCOPE			 = 0x00000004,
+		RESOURCE		 = 0x00000008,
+		FLIGHT			 = 0x00000010,
+		PRESENT			 = 0x00000020,
+		ONE_TIME_SUBMIT	 = 0x00000040,
+		INCLUSION		 = 0x00000080,
 	};
+
 	export enum class NodeDetailedType :uint32_t
 	{
 		NONE,
@@ -63,6 +74,10 @@ namespace SIByL::GFX::RDG
 		RASTER_PASS,
 		COMPUTE_PASS,
 		BLIT_PASS,
+		// Pass Scope
+		SCOPE,
+		MULTI_DISPATCH_SCOPE,
+		SCOPE_END,
 	};
 
 	// Node will not be exposed directly for design reason
@@ -107,18 +122,23 @@ namespace SIByL::GFX::RDG
 		std::unordered_map<NodeHandle, MemScope<Node>> nodes;
 	};
 
-	// Three basic Node Children struct:
+	// basic Node Children struct:
 	// - ResourceNode
-	// - PassNode
 
+	// consume history will be statisticed
+	// in order to generate correct barrier
 	export enum class ConsumeKind :uint32_t
 	{
-		BUFFER_READ,
-		BUFFER_WRITE,
+		BUFFER_READ_WRITE,
 		RENDER_TARGET,
+		IMAGE_STORAGE_READ_WRITE,
 		IMAGE_SAMPLE,
 		COPY_SRC,
 		COPY_DST,
+		INDIRECT_DRAW,
+		SCOPE,
+		MULTI_DISPATCH_SCOPE_BEGIN,
+		MULTI_DISPATCH_SCOPE_END,
 	};
 
 	export struct ConsumeHistory
@@ -131,9 +151,11 @@ namespace SIByL::GFX::RDG
 	{
 		ResourceNode() { attributes |= addBit(NodeAttrbutesFlagBits::RESOURCE); }
 		RHI::ShaderStageFlags shaderStages = 0;
+		std::vector<ConsumeHistory> consumeHistoryOnetime;
 		std::vector<ConsumeHistory> consumeHistory;
 	};
 
+	// Some resource could be either external or localy owned
 	export template<class T>
 	union TolerantPtr
 	{
@@ -143,9 +165,13 @@ namespace SIByL::GFX::RDG
 		MemScope<T> scope;
 	};
 
-	// Pass Node
+	// basic Node Children struct:
+	// - PassNode
+
+	// Barrier is managed together
+	// There ref (by handle) will be dispatched to each pass
 	export using BarrierHandle = uint64_t;
-	export struct BarrerPool
+	export struct BarrierPool
 	{
 		auto registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle;
 		auto getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*;
@@ -154,6 +180,7 @@ namespace SIByL::GFX::RDG
 
 	export struct PassNode :public Node
 	{
+		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void {}
 		std::vector<BarrierHandle> barriers;
 	};
 
@@ -210,30 +237,29 @@ namespace SIByL::GFX::RDG
 	export struct PassScope :public PassNode
 	{
 		PassScope() { attributes |= addBit(NodeAttrbutesFlagBits::SCOPE); }
-		PassScope(std::initializer_list<NodeHandle> list) :handles(list) {
-			attributes |= addBit(NodeAttrbutesFlagBits::SCOPE);
-		}
-		PassScope(std::vector<NodeHandle>&& handles) :handles(handles) {
-			attributes |= addBit(NodeAttrbutesFlagBits::SCOPE);
-		}
 
-		auto operator[](int index) const -> NodeHandle { return handles[index]; }
-		auto operator[](int index) -> NodeHandle& { return handles[index]; }
-		auto size() -> size_t { return handles.size(); }
-		std::vector<NodeHandle> handles;
+	};
+	
+	export struct PassScopeEnd :public PassScope
+	{
+		NodeHandle scopeBeginHandle;
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 	};
 
 	export auto getString(ConsumeKind kind) noexcept -> std::string
 	{
 		switch (kind)
 		{
-		case SIByL::GFX::RDG::ConsumeKind::BUFFER_READ:		return "BUFFER_READ   "; break;
-		case SIByL::GFX::RDG::ConsumeKind::BUFFER_WRITE:	return "BUFFER_WRITE  "; break;
-		case SIByL::GFX::RDG::ConsumeKind::RENDER_TARGET:	return "RENDER_TARGET "; break;
-		case SIByL::GFX::RDG::ConsumeKind::IMAGE_SAMPLE:	return "IMAGE_SAMPLE  "; break;
-		case SIByL::GFX::RDG::ConsumeKind::COPY_SRC:		return "COPY_SRC      "; break;
-		case SIByL::GFX::RDG::ConsumeKind::COPY_DST:		return "COPY_DST      "; break;
-		default:                                            return "ERROR         "; break;
+		case SIByL::GFX::RDG::ConsumeKind::BUFFER_READ_WRITE:			return "BUFFER_READ_WRITE   "; break;
+		case SIByL::GFX::RDG::ConsumeKind::RENDER_TARGET:				return "RENDER_TARGET "; break;
+		case SIByL::GFX::RDG::ConsumeKind::IMAGE_STORAGE_READ_WRITE:	return "IMAGE_STORAGE_READ_WRITE  "; break;
+		case SIByL::GFX::RDG::ConsumeKind::IMAGE_SAMPLE:				return "IMAGE_SAMPLE  "; break;
+		case SIByL::GFX::RDG::ConsumeKind::COPY_SRC:					return "COPY_SRC      "; break;
+		case SIByL::GFX::RDG::ConsumeKind::COPY_DST:					return "COPY_DST      "; break;
+		case SIByL::GFX::RDG::ConsumeKind::INDIRECT_DRAW:				return "INDIRECT_DRAW "; break;
+		case SIByL::GFX::RDG::ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN:  return "MULTI_DISPATCH_SCOPE_BEGIN "; break;
+		case SIByL::GFX::RDG::ConsumeKind::MULTI_DISPATCH_SCOPE_END:	return "MULTI_DISPATCH_SCOPE_END "; break;
+		default:														return "ERROR         "; break;
 		}
 	}
 }

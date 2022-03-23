@@ -102,6 +102,7 @@ namespace SIByL
 			auto createDescriptorPool(DescriptorPoolDesc const& desc) noexcept -> MemScope<IDescriptorPool>;
 			auto createDescriptorSet(DescriptorSetDesc const& desc) noexcept -> MemScope<IDescriptorSet>;
 			auto createMemoryBarrier(MemoryBarrierDesc const& desc) noexcept -> MemScope<IMemoryBarrier>;
+			auto createBufferMemoryBarrier(BufferMemoryBarrierDesc const& desc) noexcept -> MemScope<IBufferMemoryBarrier>;
 			auto createImageMemoryBarrier(ImageMemoryBarrierDesc const& desc) noexcept -> MemScope<IImageMemoryBarrier>;
 			auto createBarrier(BarrierDesc const& desc) noexcept -> MemScope<IBarrier>;
 			auto createBufferImageCopy(BufferImageCopyDesc const& desc) noexcept -> MemScope<IBufferImageCopy>;

@@ -3,6 +3,7 @@ module;
 module GFX.RDG.ComputePassNode;
 
 import Core.Log;
+import Core.BitFlag;
 
 import RHI.IEnum;
 import RHI.IShader;
@@ -61,20 +62,35 @@ namespace SIByL::GFX::RDG
 			switch (rg->getResourceNode(ios[i])->type)
 			{
 			case NodeDetailedType::STORAGE_BUFFER:
+			{
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getResourceNode(ios[i])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
+				else
+					rg->getResourceNode(ios[i])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
+			}
 				break;
 			case NodeDetailedType::UNIFORM_BUFFER:
 				break;
 			case NodeDetailedType::SAMPLER:
 			{
-				rg->getTextureBufferNode(textures[texture_id++])->consumeHistory.emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
-
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getTextureBufferNode(textures[texture_id++])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+				else
+					rg->getTextureBufferNode(textures[texture_id++])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
 			}
 				break;
 			case NodeDetailedType::COLOR_TEXTURE:
 			{
-				rg->getTextureBufferNode(ios[i])->consumeHistory.emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::BUFFER_WRITE });
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getTextureBufferNode(ios[i])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
+				else
+					rg->getTextureBufferNode(ios[i])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
 			}
 				break;
 			default:
@@ -191,4 +207,10 @@ namespace SIByL::GFX::RDG
 		}
 
 	}
+
+	auto ComputePassNode::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
+	{
+		customDispatch(this, commandbuffer, flight);
+	}
+
 }

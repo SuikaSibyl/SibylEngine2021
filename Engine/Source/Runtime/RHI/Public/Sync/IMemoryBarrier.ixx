@@ -4,6 +4,7 @@ export module RHI.IMemoryBarrier;
 import RHI.IEnum;
 import RHI.ICommandQueue;
 import RHI.ITexture;
+import RHI.IBuffer;
 
 namespace SIByL
 {
@@ -121,7 +122,13 @@ namespace SIByL
         // ╚════════════════════════════════════╝
         export struct BufferMemoryBarrierDesc
         {
-
+            // buffer memory barrier mask
+            IBuffer* buffer;
+            AccessFlags srcAccessMask;
+            AccessFlags dstAccessMask;
+            // only if queue transition is need
+            ICommandQueue* srcQueue = nullptr;
+            ICommandQueue* dstQueue = nullptr;
         };
 
         // ╔═══════════════════════════════════╗

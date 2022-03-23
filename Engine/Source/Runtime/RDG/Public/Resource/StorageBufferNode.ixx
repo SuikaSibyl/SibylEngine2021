@@ -13,22 +13,8 @@ namespace SIByL::GFX::RDG
 	public:
 		StorageBufferNode() { type = NodeDetailedType::STORAGE_BUFFER; }
 
-		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
-		{
-			if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
-			{
-				storageBuffer = factory->createStorageBuffer(size);
-			}
-		}
-
-		virtual auto getStorageBuffer() noexcept -> RHI::IStorageBuffer*
-		{
-			if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
-			{
-				return storageBuffer.get();
-			}
-			return externalStorageBuffer;
-		}
+		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto getStorageBuffer() noexcept -> RHI::IStorageBuffer*;
 
 		size_t size;
 		RHI::IStorageBuffer* externalStorageBuffer = nullptr;

@@ -24,6 +24,7 @@ namespace SIByL::GFX::RDG
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		auto execute(RHI::ICommandBuffer* buffer, unsigned int x, unsigned int y, unsigned int z, unsigned int frame) noexcept -> void;
+		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
 		template<class T>
 		auto executeWithConstant(RHI::ICommandBuffer* buffer, unsigned int x, unsigned int y, unsigned int z, unsigned int frame, T const& constant) noexcept -> void
@@ -43,5 +44,7 @@ namespace SIByL::GFX::RDG
 		MemScope<RHI::IPipeline> pipeline;
 		MemScope<RHI::IPipelineLayout> compute_pipeline_layout;
 		std::vector<MemScope<RHI::IDescriptorSet>> compute_descriptorSets;
+
+		std::function<void(GFX::RDG::ComputePassNode*, RHI::ICommandBuffer*, uint32_t)> customDispatch;
 	};
 }

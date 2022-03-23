@@ -6,6 +6,7 @@ import RHI.IMemoryBarrier;
 import RHI.IEnum;
 import RHI.ICommandQueue;
 import RHI.ITexture;
+import RHI.IBuffer;
 
 namespace SIByL
 {
@@ -20,6 +21,17 @@ namespace SIByL
 
         private:
             VkMemoryBarrier barrier{};
+        };
+
+        export class IBufferMemoryBarrierVK :public IBufferMemoryBarrier
+        {
+        public:
+            IBufferMemoryBarrierVK(BufferMemoryBarrierDesc const&);
+            virtual ~IBufferMemoryBarrierVK() = default;
+            auto getVkBufferMemoryBarrier() noexcept -> VkBufferMemoryBarrier*;
+
+        private:
+            VkBufferMemoryBarrier barrier{};
         };
 
         export class IImageMemoryBarrierVK: public IImageMemoryBarrier

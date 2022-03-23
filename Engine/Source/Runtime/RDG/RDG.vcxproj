@@ -162,10 +162,13 @@
   <ItemGroup>
     <ClCompile Include="Private\Core\Common.cpp" />
     <ClCompile Include="Private\Pass\ComputePassNode.cpp" />
+    <ClCompile Include="Private\Pass\MultiDispatchScope.cpp" />
     <ClCompile Include="Private\Pass\RasterPassNode.cpp" />
     <ClCompile Include="Private\Core\RenderGraph.cpp" />
     <ClCompile Include="Private\Resource\ColorBufferNode.cpp" />
+    <ClCompile Include="Private\Resource\StorageBufferNode.cpp" />
     <ClCompile Include="Public\Core\Common.ixx" />
+    <ClCompile Include="Public\Core\ProxyUnity.ixx" />
     <ClCompile Include="Public\Pass\BlitPassNode.ixx" />
     <ClCompile Include="Public\Pass\ComputePassNode.ixx" />
     <ClCompile Include="Public\Pass\MultiDispatchScope.ixx" />

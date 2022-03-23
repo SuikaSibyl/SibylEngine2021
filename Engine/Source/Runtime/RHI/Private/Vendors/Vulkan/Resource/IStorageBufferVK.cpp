@@ -80,4 +80,9 @@ namespace SIByL::RHI
 	{
 		return buffer.getVkBuffer();
 	}
+
+	auto IStorageBufferVK::getIBuffer() noexcept -> IBuffer*
+	{
+		return (IBuffer*) & buffer;
+	}
 }

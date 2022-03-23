@@ -20,6 +20,7 @@ namespace SIByL
 			virtual ~IStorageBuffer() = default;
 
 			virtual auto getSize() noexcept -> uint32_t = 0;
+			virtual auto getIBuffer() noexcept -> IBuffer* = 0;
 		};
 	}
 }

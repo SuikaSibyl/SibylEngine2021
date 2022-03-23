@@ -69,5 +69,14 @@
     <ClCompile Include="Public\Pass\MultiDispatchScope.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Private\Resource\StorageBufferNode.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Pass\MultiDispatchScope.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Core\ProxyUnity.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

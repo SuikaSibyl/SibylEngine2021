@@ -110,10 +110,9 @@ void main()
     if(gl_GlobalInvocationID.x >= PushConstants.emitCount) return;
 
     // Move a dead particle to alive
-    if(counter.counter[0].deadCount==0) return;
     uint deadCount = atomicAdd(counter.counter[0].deadCount, -1);
-    if(deadCount <= 1 || deadCount > counter.counter[0].maxCount) return; // If no space is available
-
+    if(deadCount == 0 || deadCount > counter.counter[0].maxCount) return; // If no space is available
+    
     Particle new_particle;
     // ========================================================================
     // Time for init a new particle

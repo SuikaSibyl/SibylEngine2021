@@ -739,6 +739,25 @@ namespace SIByL::RHI
 		return imb;
 	}
 
+	auto IResourceFactory::createBufferMemoryBarrier(BufferMemoryBarrierDesc const& desc) noexcept -> MemScope<IBufferMemoryBarrier>
+	{
+		MemScope<IBufferMemoryBarrier> bmb = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IBufferMemoryBarrierVK> bmb_vk = MemNew<IBufferMemoryBarrierVK>(desc);
+			bmb = MemCast<IBufferMemoryBarrier>(bmb_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return bmb;
+	}
+
 	auto IResourceFactory::createMemoryBarrier(MemoryBarrierDesc const& desc) noexcept -> MemScope<IMemoryBarrier>
 	{
 		MemScope<IMemoryBarrier> imb = nullptr;

@@ -63,14 +63,14 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
-	auto BarrerPool::registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle
+	auto BarrierPool::registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle
 	{
 		uint64_t uid = ECS::UniqueID::RequestUniqueID();
 		barriers[uid] = std::move(barrier);
 		return uid;
 	}
 
-	auto BarrerPool::getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*
+	auto BarrierPool::getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*
 	{
 		return barriers[handle].get();
 	}
@@ -158,5 +158,19 @@ namespace SIByL::GFX::RDG
 			attachments,
 		};
 		framebuffer = factory->createFramebuffer(framebuffer_desc);
+	}
+
+	auto PassScopeEnd::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		RenderGraph* rg = (RenderGraph*)graph;
+		for (auto iter = rg->resources.begin(); iter != rg->resources.end(); iter++)
+		{
+			if (rg->getResourceNode((*iter))->consumeHistory.back().pass == scopeBeginHandle)
+			{
+				rg->getResourceNode((*iter))->consumeHistory.pop_back();
+			}
+			else
+				rg->getResourceNode((*iter))->consumeHistory.emplace_back(handle, ConsumeKind::MULTI_DISPATCH_SCOPE_END);
+		}
 	}
 }

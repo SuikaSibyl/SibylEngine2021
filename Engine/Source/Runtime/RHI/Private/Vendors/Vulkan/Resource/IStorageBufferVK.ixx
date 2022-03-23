@@ -25,6 +25,7 @@ namespace SIByL
 			virtual ~IStorageBufferVK() = default;
 
 			virtual auto getSize() noexcept -> uint32_t override;
+			virtual auto getIBuffer() noexcept -> IBuffer* override;
 			auto getVkBuffer() noexcept -> VkBuffer*;
 
 		private:
