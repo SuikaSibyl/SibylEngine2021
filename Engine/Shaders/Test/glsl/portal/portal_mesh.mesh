@@ -124,14 +124,14 @@ void main()
 
     for(uint i = 0; i < 6; i++)
     {
-        gl_PrimitiveIndicesNV[i + 6*thread_id] = indices[i] + 4 * thread_id;
+        gl_PrimitiveIndicesNV[i + 6*thread_id] = indices[i];
     }
     
     if (thread_id == 0) {
         gl_PrimitiveCountNV = LOCAL_SIZE * 2;
         if((gl_WorkGroupID.x + 1) * LOCAL_SIZE > drawIndirect.content[0].instanceCount)
         {
-            gl_PrimitiveCountNV = drawIndirect.content[0].instanceCount - gl_WorkGroupID.x * LOCAL_SIZE;
+            gl_PrimitiveCountNV = max(drawIndirect.content[0].instanceCount - gl_WorkGroupID.x * LOCAL_SIZE, 0);
         }
     }
 }
