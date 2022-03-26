@@ -226,7 +226,7 @@ public:
 
 				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
 				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
-				commandbuffer->cmdDrawMeshTasks(100000u / 16 + 1, 0);
+				commandbuffer->cmdDrawMeshTasks(100000u / 4 + 1, 0);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};
