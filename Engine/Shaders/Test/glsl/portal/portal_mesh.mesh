@@ -1,8 +1,9 @@
 #version 450
 #extension GL_NV_mesh_shader: require
 
-layout(local_size_x = 4, local_size_y = 1, local_size_z = 1) in;
-layout(triangles, max_vertices = 16, max_primitives = 8) out;
+#define LOCAL_SIZE 8
+layout(local_size_x = LOCAL_SIZE, local_size_y = 1, local_size_z = 1) in;
+layout(triangles, max_vertices = LOCAL_SIZE * 4, max_primitives = LOCAL_SIZE * 2) out;
 
 layout(binding = 0) uniform UniformBufferObject {
     vec4 cameraPos;
@@ -127,6 +128,10 @@ void main()
     }
     
     if (thread_id == 0) {
-        gl_PrimitiveCountNV = 8;
+        gl_PrimitiveCountNV = LOCAL_SIZE * 2;
+        if((gl_WorkGroupID.x + 1) * LOCAL_SIZE > drawIndirect.content[0].instanceCount)
+        {
+            gl_PrimitiveCountNV = drawIndirect.content[0].instanceCount - gl_WorkGroupID.x * LOCAL_SIZE;
+        }
     }
 }

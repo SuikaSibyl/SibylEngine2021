@@ -127,8 +127,8 @@ public:
 		window_layer = attachWindowLayer(window_layer_desc);
 
 		// create device
-		graphicContext = (RHI::IFactory::createGraphicContext({ 
-			RHI::API::VULKAN, 
+		graphicContext = (RHI::IFactory::createGraphicContext({
+			RHI::API::VULKAN,
 			(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
 
 		graphicContext->attachWindow(window_layer->getWindow());
@@ -168,7 +168,7 @@ public:
 		EmptyHeader header;
 		CacheBrain::instance()->loadCache(2267996151488940154, header, samples);
 		torusBuffer = resourceFactory->createStorageBuffer(&torusSamples);
-		
+
 		// Create proxy
 		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 
@@ -226,11 +226,11 @@ public:
 
 				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
 				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
-				commandbuffer->cmdDrawMeshTasks(100000u / 4 + 1, 0);
+				commandbuffer->cmdDrawMeshTasks(100000u / 8 + 1, 0);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};
-		
+
 		// ACES
 		acesbloom->iHdrImage = srgb_color_attachment;
 		acesbloom->iExternalSampler = external_sampler;
@@ -316,12 +316,12 @@ public:
 			//auto [width, height] = swapchain->getExtend();
 
 			UniformBufferObject ubo;
-			ubo.cameraPos = glm::vec4(8.0f* cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
+			ubo.cameraPos = glm::vec4(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
 			ubo.model = glm::mat4(1.0f);
 			ubo.view = glm::lookAt(glm::vec3(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
 			ubo.proj[1][1] *= -1;
-			Buffer ubo_proxy((void*) &ubo, sizeof(UniformBufferObject), 4);
+			Buffer ubo_proxy((void*)&ubo, sizeof(UniformBufferObject), 4);
 			rdg.getUniformBufferFlight(uniformBufferFlights, currentFrame)->updateBuffer(&ubo_proxy);
 		}
 		// drawFrame
