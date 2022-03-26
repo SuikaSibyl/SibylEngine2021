@@ -54,8 +54,11 @@ namespace SIByL::GFX::RDG
 		NodeHandle indirectDrawBufferHandle = 0;
 		bool useFlights = false;
 
-		MemScope<RHI::IShader> shaderVert;
-		MemScope<RHI::IShader> shaderFrag;
+		MemScope<RHI::IShader> shaderVert = nullptr;
+		MemScope<RHI::IShader> shaderFrag = nullptr;
+		MemScope<RHI::IShader> shaderTask = nullptr;
+		MemScope<RHI::IShader> shaderMesh = nullptr;
+
 		std::vector<NodeHandle> ins;
 		std::vector<NodeHandle> textures;
 

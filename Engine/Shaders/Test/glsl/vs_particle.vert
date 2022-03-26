@@ -21,12 +21,20 @@ layout(set = 0, binding = 2, std430) buffer Particles
 
 layout(binding = 3) uniform sampler2D texSampler;
 
+layout(set = 0, binding = 4, std430) buffer LiveIndexBuffer
+{
+    uint[] indices;
+} livePool;
+
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inColor;
 layout(location = 2) in vec2 inTexCoord;
 
-layout(location = 0) out vec3 fragColor;
-layout(location = 1) out vec2 fragTexCoord;
+layout (location = 0) out PerVertexData
+{
+  vec3 fragColor;
+  vec2 fragTexCoord;
+} v_out;   // [max_vertices]
 
 mat4 billboardTowardCameraPlane(vec3 cameraPos)
 {
@@ -58,7 +66,7 @@ float speed_y_curve(float i)
     return 0.769 * i;
 }
 void main() {
-    Particle particle = particles.particle[gl_InstanceIndex.x];
+    Particle particle = particles.particle[livePool.indices[gl_InstanceIndex.x]];
     vec3 instance_pos = particle.pos.xyz;
 
     mat4 billboardMat = billboardAlongVelocity(particle.vel.xyz, ubo.cameraPos.xyz);
@@ -71,6 +79,6 @@ void main() {
     float lifeAlpha = 1 - particle.pos.w / particle.ext.x;
     vec4 colorOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.75));
     float intensityOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.25)).b;
-    fragColor = particle.color.rgb *pow(2,intensityOverLife) * colorOverLife.rgb * colorOverLife.a;
-    fragTexCoord = inTexCoord;
+    v_out.fragColor = particle.color.rgb *pow(2,intensityOverLife) * colorOverLife.rgb * colorOverLife.a;
+    v_out.fragTexCoord = inTexCoord;
 }

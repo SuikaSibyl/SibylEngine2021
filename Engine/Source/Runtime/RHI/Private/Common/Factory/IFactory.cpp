@@ -79,9 +79,8 @@ namespace SIByL::RHI
 		{
 		case API::VULKAN:
 		{
-			MemScope<IGraphicContextVK> res_vk = MemNew<IGraphicContextVK>();
+			MemScope<IGraphicContextVK> res_vk = MemNew<IGraphicContextVK>(desc.extensions);
 			res = MemCast<IGraphicContext>(res_vk);
-			res = SNew<IGraphicContextVK>();
 			res->setAPI(desc.api);
 		}
 		break;

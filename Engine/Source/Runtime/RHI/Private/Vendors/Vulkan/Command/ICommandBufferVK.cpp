@@ -280,4 +280,13 @@ namespace SIByL::RHI
 			blits.data(), 
 			VkFilter::VK_FILTER_NEAREST);
 	}
+
+	auto ICommandBufferVK::cmdDrawMeshTasks(uint32_t taskCount, uint32_t firstTask) noexcept -> void
+	{
+		logicalDevice->getPhysicalDeviceVk()->getGraphicContextVK()->vkCmdDrawMeshTasksNV(
+			commandBuffer,
+			taskCount,
+			firstTask
+			);
+	}
 }

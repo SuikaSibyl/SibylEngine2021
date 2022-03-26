@@ -1,4 +1,5 @@
 module;
+#include <cstdint>
 #include <vector>
 #include <optional>
 #include <vulkan/vulkan.h>
@@ -6,6 +7,7 @@ module;
 module RHI.GraphicContext.VK;
 import Core.Log;
 import Core.Window;
+import Core.BitFlag;
 import Core.Window.GLFW;
 import RHI.GraphicContext;
 
@@ -76,10 +78,12 @@ namespace SIByL
 			return windowAttached;
 		}
 
-		IGraphicContextVK::IGraphicContextVK()
+		IGraphicContextVK::IGraphicContextVK(GraphicContextExtensionFlags _extensions)
 		{
+			extensions = _extensions;
 			createInstance();
 			setupDebugMessenger();
+			setupExtensions();
 		}
 
 		auto IGraphicContextVK::initialize() -> bool
@@ -136,9 +140,6 @@ namespace SIByL
 				createInfo.pNext = nullptr;
 			}
 
-			// all prepared
-			// issue the vkCreateInstance call
-			VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 			// check error
 			if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
 				SE_CORE_ERROR("failed to create instance!");
@@ -195,6 +196,13 @@ namespace SIByL
 			glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 			// add extensions that glfw needs
 			std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+			// add other extensions
+			if (hasBit(this->extensions, GraphicContextExtensionFlagBits::MESH_SHADER))
+			{
+				extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+			}
+
 			// add extensions that validation layer needs
 			if (enableValidationLayers) {
 				extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -260,6 +268,19 @@ namespace SIByL
 #ifdef _DEBUG
 				SE_CORE_ERROR("Vulkan :: cannot be attached to a non-glfw window now.");
 #endif // _DEBUG
+			}
+		}
+
+		PFN_vkVoidFunction vkGetInstanceProcAddrStub(void* context, const char* name)
+		{
+			return vkGetInstanceProcAddr((VkInstance)context, name);
+		}
+
+		auto IGraphicContextVK::setupExtensions() -> void
+		{
+			if (hasBit(this->extensions, GraphicContextExtensionFlagBits::MESH_SHADER))
+			{
+				vkCmdDrawMeshTasksNV = (PFN_vkCmdDrawMeshTasksNV)vkGetInstanceProcAddrStub(instance, "vkCmdDrawMeshTasksNV");
 			}
 		}
 	}

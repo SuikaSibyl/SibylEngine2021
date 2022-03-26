@@ -13,7 +13,7 @@ namespace SIByL
 		export class IGraphicContextVK :public IGraphicContext
 		{
 		public:
-			IGraphicContextVK();
+			IGraphicContextVK(GraphicContextExtensionFlags _extensions = 0);
 			static auto getVKInstance() -> VkInstance&;
 			// SObject
 			virtual auto initialize() -> bool;
@@ -34,11 +34,17 @@ namespace SIByL
 			auto checkValidationLayerSupport() -> bool;
 			auto getRequiredExtensions() -> std::vector<const char*>;
 			auto setupDebugMessenger() -> void;
+			auto setupExtensions() -> void;
 
 			VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 			VkDebugUtilsMessengerEXT debugMessenger;
 			VkSurfaceKHR surface;
 			IWindowGLFW* windowAttached;
+
+			// Extensions
+			typedef void (VKAPI_PTR* PFN_vkCmdDrawMeshTasksNV)(VkCommandBuffer commandBuffer, uint32_t taskCount, uint32_t firstTask);
+			PFN_vkCmdDrawMeshTasksNV vkCmdDrawMeshTasksNV;
+
 		};
 	}
 }

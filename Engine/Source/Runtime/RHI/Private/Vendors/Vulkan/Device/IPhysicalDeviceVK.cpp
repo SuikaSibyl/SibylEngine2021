@@ -1,10 +1,12 @@
 module;
+#include <utility>
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <set>
 #include <string>
 module RHI.IPhysicalDevice.VK;
 import Core.Log;
+import Core.BitFlag;
 import RHI.GraphicContext;
 import RHI.GraphicContext.VK;
 
@@ -19,6 +21,13 @@ namespace SIByL::RHI
 	IPhysicalDeviceVK::IPhysicalDeviceVK(IGraphicContext* context)
 	{
 		graphicContext = dynamic_cast<IGraphicContextVK*>(context);
+
+		if (hasBit(graphicContext->getExtensions(), GraphicContextExtensionFlagBits::MESH_SHADER))
+		{
+			deviceExtensions.push_back(VK_NV_MESH_SHADER_EXTENSION_NAME);
+		}
+
+
 		enableDebugLayer = enableValidationLayers;
 		queryAllPhysicalDevice();
 	}
@@ -28,7 +37,7 @@ namespace SIByL::RHI
 		return true;
 	}
 
-	bool IPhysicalDeviceVK::checkDeviceExtensionSupport(VkPhysicalDevice device)
+	bool IPhysicalDeviceVK::checkDeviceExtensionSupport(VkPhysicalDevice device, std::string& device_diagnosis)
 	{
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -42,6 +51,14 @@ namespace SIByL::RHI
 			requiredExtensions.erase(extension.extensionName);
 		}
 
+		if (!requiredExtensions.empty())
+		{
+			device_diagnosis.append("Required Extension not supported: ");
+			for (const auto& extension : requiredExtensions) {
+				device_diagnosis.append(extension);
+				device_diagnosis.append(" | ");
+			}
+		}
 		return requiredExtensions.empty();
 	}
 
@@ -68,11 +85,11 @@ namespace SIByL::RHI
 		return details;
 	}
 
-	auto IPhysicalDeviceVK::isDeviceSuitable(VkPhysicalDevice device) -> bool
+	auto IPhysicalDeviceVK::isDeviceSuitable(VkPhysicalDevice device, std::string& device_diagnosis) -> bool
 	{
 		QueueFamilyIndices indices = findQueueFamilies(device);
 		// check extension supports
-		bool extensionsSupported = checkDeviceExtensionSupport(device);
+		bool extensionsSupported = checkDeviceExtensionSupport(device, device_diagnosis);
 		// check swapchain support
 		bool swapChainAdequate = false;
 		if (extensionsSupported) {
@@ -144,15 +161,22 @@ namespace SIByL::RHI
 		}
 
 		// Find the best
+		std::vector<std::string> diagnosis;
 		for (const auto& device : devices) {
-			if (isDeviceSuitable(device)) {
+			std::string device_diagnosis;
+			if (isDeviceSuitable(device, device_diagnosis)) {
 				physicalDevice = device;
 				break;
 			}
+			diagnosis.emplace_back(std::move(device_diagnosis));
 		}
 
 		if (physicalDevice == VK_NULL_HANDLE) {
-			SE_CORE_ERROR("VULKAN :: failed to find a suitable GPU!");
+			SE_CORE_ERROR("VULKAN :: IPhysicalDeviceVK:: Failed to find a suitable GPU from {0} enumerated ones!", deviceCount);
+			for (int i = 0; i < deviceCount; i++)
+			{
+				SE_CORE_ERROR("   DEVICE [{0}] :: {1}", i, diagnosis[i]);
+			}
 		}
 	}
 

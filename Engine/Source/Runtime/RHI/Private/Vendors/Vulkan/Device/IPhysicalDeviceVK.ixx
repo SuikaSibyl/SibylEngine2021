@@ -2,6 +2,7 @@ module;
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <optional>
+#include <string>
 export module RHI.IPhysicalDevice.VK;
 import RHI.IPhysicalDevice;
 import RHI.GraphicContext;
@@ -56,10 +57,10 @@ namespace SIByL
 
 		private:
 			auto queryAllPhysicalDevice() noexcept -> void;
-			auto isDeviceSuitable(VkPhysicalDevice device) -> bool;
+			auto isDeviceSuitable(VkPhysicalDevice device, std::string& device_diagnosis) -> bool;
 			auto rateDeviceSuitability(VkPhysicalDevice device) -> int;
 			auto findQueueFamilies(VkPhysicalDevice device)->QueueFamilyIndices;
-			auto checkDeviceExtensionSupport(VkPhysicalDevice device) -> bool;
+			auto checkDeviceExtensionSupport(VkPhysicalDevice device, std::string& device_diagnosis) -> bool;
 			auto querySwapChainSupport(VkPhysicalDevice device) -> SwapChainSupportDetails;
 			auto findSupportedFormat(std::vector<VkFormat> const& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) noexcept -> VkFormat;
 		};

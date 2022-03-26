@@ -57,8 +57,9 @@ namespace SIByL
 			pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 			pipelineInfo.stageCount = shaderStages.size();
 			pipelineInfo.pStages = shaderStages.data();
-			pipelineInfo.pVertexInputState = static_cast<IVertexLayoutVK*>(desc.vertexLayout)->getVkInputState();
-			pipelineInfo.pInputAssemblyState = static_cast<IInputAssemblyVK*>(desc.inputAssembly)->getVkInputAssembly();
+
+			if(desc.vertexLayout) pipelineInfo.pVertexInputState = static_cast<IVertexLayoutVK*>(desc.vertexLayout)->getVkInputState();
+			if (desc.inputAssembly) pipelineInfo.pInputAssemblyState = static_cast<IInputAssemblyVK*>(desc.inputAssembly)->getVkInputAssembly();
 			pipelineInfo.pViewportState = static_cast<IViewportsScissorsVK*>(desc.viewportsScissors)->getVkPipelineViewportStateCreateInfo();
 			pipelineInfo.pRasterizationState = static_cast<IRasterizerVK*>(desc.rasterizer)->getVkPipelineRasterizationStateCreateInfo();
 			pipelineInfo.pMultisampleState = static_cast<IMultisamplingVK*>(desc.multisampling)->getVkPipelineMultisampleStateCreateInfo();

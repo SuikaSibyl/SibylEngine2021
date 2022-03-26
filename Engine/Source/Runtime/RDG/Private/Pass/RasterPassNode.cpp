@@ -221,10 +221,19 @@ namespace SIByL::GFX::RDG
 		//
 		// create desc layout
 		RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-		{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+		{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
 		   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
-		   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-		   { 3, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr }} };
+		   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
+		   { 3, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
+		   { 4, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
+		   { 5, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr }} };
+		//RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
+		//{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+		//   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
+		//   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+		//   { 3, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
+		//   { 4, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },} };
+
 		desciptorSetLayout = factory->createDescriptorSetLayout(descriptor_set_layout_desc);
 
 		//
@@ -267,11 +276,25 @@ namespace SIByL::GFX::RDG
 		{ {desciptorSetLayout.get()} };
 		pipelineLayout = factory->createPipelineLayout(pipelineLayout_desc);
 		
+		std::vector<RHI::IShader*> shader_groups;
+		if (shaderVert.get() == nullptr && shaderFrag.get() != nullptr && shaderMesh.get() != nullptr)
+		{
+			shader_groups = { shaderMesh.get(), shaderFrag.get() };
+		}
+		else if (shaderVert.get() != nullptr && shaderFrag.get() != nullptr && shaderMesh.get() == nullptr)
+		{
+			shader_groups = { shaderVert.get(), shaderFrag.get() };
+		}
+		else
+		{
+			SE_CORE_ERROR("RDG :: Unkown Raster Pass Shader composition!");
+		}
+
 		RHI::PipelineDesc pipeline_desc =
 		{
-			{ shaderVert.get(), shaderFrag.get()},
-			vertexLayout.get(),
-			inputAssembly.get(),
+			shader_groups,
+			(shaderVert.get() != nullptr) ? vertexLayout.get() : nullptr,
+			(shaderVert.get() != nullptr) ? inputAssembly.get() : nullptr,
 			viewportScissors.get(),
 			rasterizer.get(),
 			multisampling.get(),

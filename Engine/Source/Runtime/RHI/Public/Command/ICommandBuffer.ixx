@@ -112,6 +112,7 @@ namespace SIByL
 			virtual auto cmdDispatch(uint32_t const& x, uint32_t const& y, uint32_t const& z) noexcept -> void = 0;
 			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void = 0;
 			virtual auto cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void = 0;
+			virtual auto cmdDrawMeshTasks(uint32_t taskCount, uint32_t firstTask) noexcept -> void = 0;
 		};
 
 		export struct BlitInfo

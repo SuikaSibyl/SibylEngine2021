@@ -42,6 +42,7 @@ namespace SIByL
 		export struct GraphicContextDesc
 		{
 			API api;
+			GraphicContextExtensionFlags extensions = 0;
 		};
 
 		export struct PhysicalDeviceDesc

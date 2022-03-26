@@ -127,7 +127,10 @@ public:
 		window_layer = attachWindowLayer(window_layer_desc);
 
 		// create device
-		graphicContext = (RHI::IFactory::createGraphicContext({ RHI::API::VULKAN }));
+		graphicContext = (RHI::IFactory::createGraphicContext({ 
+			RHI::API::VULKAN, 
+			(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
+
 		graphicContext->attachWindow(window_layer->getWindow());
 		physicalDevice = (RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
 		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
@@ -194,13 +197,19 @@ public:
 		GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
 		// HDR raster pass
-		MemScope<RHI::IShader> shaderVert2 = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
-		MemScope<RHI::IShader> shaderFrag2 = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-		GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler });
+		//GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler, portal.liveIndexBuffer });
+		//rdg.tag(renderPassNodeSRGB, "Raster HDR");
+		//GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
+		//rasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
+		//rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+		//rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
+		//rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
+		//rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
+		GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 		rdg.tag(renderPassNodeSRGB, "Raster HDR");
 		GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
-		rasterPassNodeSRGB->shaderVert = std::move(shaderVert2);
-		rasterPassNodeSRGB->shaderFrag = std::move(shaderFrag2);
+		rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+		rasterPassNodeSRGB->shaderMesh = resourceFactory->createShaderFromBinaryFile("portal/portal_mesh.spv", { RHI::ShaderStage::MESH,"main" });
 		rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
 		rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
 		rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
@@ -214,7 +223,10 @@ public:
 					RHI::PipelineBintPoint::GRAPHICS,
 					raster_pass->pipelineLayout.get(),
 					0, 1, &set, 0, nullptr);
-				commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+
+				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+				commandbuffer->cmdDrawMeshTasks(100000u / 16 + 1, 0);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};

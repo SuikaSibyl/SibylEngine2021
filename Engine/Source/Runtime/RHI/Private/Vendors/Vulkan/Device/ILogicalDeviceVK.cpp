@@ -4,6 +4,7 @@ module;
 #include <set>
 module RHI.ILogicalDevice.VK;
 import Core.Log;
+import Core.BitFlag;
 import RHI.IPhysicalDevice.VK;
 
 namespace SIByL::RHI
@@ -113,6 +114,15 @@ namespace SIByL::RHI
 		// enable extesions
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(physicalDevice->getDeviceExtensions().size());
 		createInfo.ppEnabledExtensionNames = physicalDevice->getDeviceExtensions().data();
+
+		VkPhysicalDeviceMeshShaderFeaturesNV mesh_shader_feature{};
+		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::MESH_SHADER))
+		{
+			mesh_shader_feature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV;
+			mesh_shader_feature.taskShader = VK_TRUE;
+			mesh_shader_feature.meshShader = VK_TRUE;
+			createInfo.pNext = &mesh_shader_feature;
+		}
 
 		if (vkCreateDevice(physicalDevice->getPhysicalDevice(), &createInfo, nullptr, &device) != VK_SUCCESS) {
 			SE_CORE_ERROR("VULKAN :: failed to create logical device!");

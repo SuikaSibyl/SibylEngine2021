@@ -1,3 +1,5 @@
+module;
+#include <cstdint>
 export module RHI.GraphicContext;
 import Core.SObject;
 import Core.Window;
@@ -14,6 +16,12 @@ namespace SIByL
 		// │  OpenGL      │   Varies by OS   │
 		// ╰──────────────┴──────────────────╯
 
+		export enum struct GraphicContextExtensionFlagBits
+		{
+			MESH_SHADER = 0x00000001,
+		};
+		export using GraphicContextExtensionFlags = uint32_t;
+
 		export class IGraphicContext :public SObject
 		{
 		public:
@@ -23,8 +31,11 @@ namespace SIByL
 			auto setAPI(API const& _api) noexcept -> void { api = _api; }
 			auto getAPI() noexcept -> API { return api; }
 
-		private:
+			auto getExtensions() noexcept -> GraphicContextExtensionFlags { return extensions; }
+
+		protected:
 			API api;
+			GraphicContextExtensionFlags extensions;
 		};
 	}
 }
