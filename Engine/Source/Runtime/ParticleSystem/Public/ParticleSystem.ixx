@@ -19,10 +19,8 @@ namespace SIByL::ParticleSystem
 			RHI::IShader* updateShader
 			) noexcept -> void;
 
-		auto registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void;
-		auto registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void;
-
-		auto addEmitterSamples(RHI::IStorageBuffer* storageBuffer) noexcept -> void { emitterSamplesExt = storageBuffer; }
+		virtual auto registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void = 0;
+		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void = 0;
 
 		uint32_t particleDataSize;
 		uint32_t maxParticleCount;
@@ -31,22 +29,14 @@ namespace SIByL::ParticleSystem
 		RHI::IShader* emitShader;
 		RHI::IShader* updateShader;
 
-		Timer* timer;
-
-		RHI::IStorageBuffer* emitterSamplesExt;
-
 		GFX::RDG::NodeHandle particleBuffer;
 		GFX::RDG::NodeHandle deadIndexBuffer;
 		GFX::RDG::NodeHandle liveIndexBuffer;
 		GFX::RDG::NodeHandle counterBuffer;
 		GFX::RDG::NodeHandle indirectDrawBuffer;
-		GFX::RDG::NodeHandle emitterSamplerBufferExt;
 
 		GFX::RDG::NodeHandle initPass;
 		GFX::RDG::NodeHandle emitPass;
 		GFX::RDG::NodeHandle updatePass;
-
-		GFX::RDG::NodeHandle sampler;
-		GFX::RDG::NodeHandle dataBakedImage;
 	};
 }

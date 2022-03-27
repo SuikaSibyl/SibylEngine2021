@@ -98,6 +98,8 @@ import Editor.ImImage;
 import Interpolator.Hermite;
 import Interpolator.Sampler;
 
+import Demo.Portal;
+
 using namespace SIByL;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
@@ -149,25 +151,8 @@ public:
 		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
 		MemScope<RHI::IShader> shaderVert = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
 		MemScope<RHI::IShader> shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-		MemScope<RHI::IShader> shaderPortalInit = resourceFactory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> shaderPortalEmit = resourceFactory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		MemScope<RHI::IShader> shaderPortalUpdate = resourceFactory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
 
-		// load image
-		Image image("./assets/Sparkle.tga");
-		texture = resourceFactory->createTexture(&image);
-		textureView = resourceFactory->createTextureView(texture.get());
-		sampler = resourceFactory->createSampler({});
-		Image baked_image("./assets/portal_bake.tga");
-		baked_texture = resourceFactory->createTexture(&baked_image);
-		baked_textureView = resourceFactory->createTextureView(baked_texture.get());
-
-		// load precomputed samples
-		Buffer torusSamples;
-		Buffer* samples[] = { &torusSamples };
-		EmptyHeader header;
-		CacheBrain::instance()->loadCache(2267996151488940154, header, samples);
-		torusBuffer = resourceFactory->createStorageBuffer(&torusSamples);
+		portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
 
 		// Create proxy
 		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
@@ -176,15 +161,7 @@ public:
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// sub-pipeline building helper components
 		// - particle system
-		portal.init(sizeof(float) * 4 * 4, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
-		portal.timer = &timer;
 		// - 1. Register resources
-		portal.addEmitterSamples(torusBuffer.get());
-		GFX::RDG::NodeHandle external_texture = rdg_builder.addColorBufferExt(texture.get(), textureView.get(), "Sparkle Sprite");
-		GFX::RDG::NodeHandle external_baked_texture = rdg_builder.addColorBufferExt(baked_texture.get(), baked_textureView.get(), "Baked Curves");
-		GFX::RDG::NodeHandle external_sampler = rdg_builder.addSamplerExt(sampler.get());
-		portal.sampler = external_sampler;
-		portal.dataBakedImage = external_baked_texture;
 		portal.registerResources(&rdg_builder);
 		acesbloom->registerResources(&rdg_builder);
 		// renderer
@@ -205,14 +182,14 @@ public:
 		//rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
 		//rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
 		//rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
-		GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler, portal.liveIndexBuffer, portal.indirectDrawBuffer });
+		GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 		rdg.tag(renderPassNodeSRGB, "Raster HDR");
 		GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
 		rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
 		rasterPassNodeSRGB->shaderMesh = resourceFactory->createShaderFromBinaryFile("portal/portal_mesh.spv", { RHI::ShaderStage::MESH,"main" });
 		rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
 		rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
-		rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
+		rasterPassNodeSRGB->textures = { portal.spriteHandle, portal.bakedCurveHandle };
 		rasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
 		{
 			std::function<void(ECS::TagComponent&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
@@ -226,14 +203,14 @@ public:
 
 				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
 				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
-				commandbuffer->cmdDrawMeshTasks(160000u / 8, 0);
+				commandbuffer->cmdDrawMeshTasks(100000u / 16, 0);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};
 
 		// ACES
 		acesbloom->iHdrImage = srgb_color_attachment;
-		acesbloom->iExternalSampler = external_sampler;
+		acesbloom->iExternalSampler = portal.samplerHandle;
 		acesbloom->registerComputePasses(&rdg_builder);
 
 		// particle system update pass
@@ -255,7 +232,7 @@ public:
 
 		// create ImImage for viewport
 		viewportImImage = imfactory.createImImage(
-			rdg.getSamplerNode(external_sampler)->getSampler(),
+			rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
 			rdg.getTextureBufferNode(acesbloom->bloomCombined)->getTextureView(),
 			RHI::ImageLayout::GENERAL);
 		mainViewport.bindImImage(viewportImImage.get());
@@ -371,7 +348,7 @@ private:
 	GFX::RDG::RenderGraph rdg;
 
 	// RDG Proxy
-	ParticleSystem::ParticleSystem portal;
+	Demo::PortalSystem portal;
 	MemScope<GFX::PostProcessing::AcesBloomProxyUnit> acesbloom;
 
 	// Device stuff
@@ -387,12 +364,6 @@ private:
 	uint32_t currentFrame = 0;
 
 	// Lifetime Resources
-	MemScope<RHI::IStorageBuffer> torusBuffer;
-	MemScope<RHI::ITexture> texture;
-	MemScope<RHI::ITextureView> textureView;
-	MemScope<RHI::ITexture> baked_texture;
-	MemScope<RHI::ITextureView> baked_textureView;
-	MemScope<RHI::ISampler> sampler;
 	GFX::RDG::NodeHandle uniformBufferFlights;
 };
 
