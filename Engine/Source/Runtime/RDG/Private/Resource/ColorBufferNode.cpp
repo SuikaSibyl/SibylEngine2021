@@ -25,10 +25,8 @@ namespace SIByL::GFX::RDG
 		type = NodeDetailedType::COLOR_TEXTURE;
 	}
 	
-	auto ColorBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto ColorBufferNode::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
-		RenderGraph* rg = (RenderGraph*)graph;
-
 		// Create Actual Texture Resource
 		if (!hasBit(attributes, NodeAttrbutesFlagBits::PLACEHOLDER))
 		{
@@ -47,9 +45,21 @@ namespace SIByL::GFX::RDG
 				});
 			textureView.scope = factory->createTextureView(getTexture(), usages);
 		}
+	}
+
+	auto ColorBufferNode::rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		devirtualize(graph, factory);
+	}
+
+	auto ColorBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		RenderGraph* rg = (RenderGraph*)graph;
 
 		if (consumeHistory.size() > 1)
 		{
+			if (consumeHistory[0].kind >= ConsumeKind::SCOPE && consumeHistory.size() == 3) return;
+
 			unsigned int history_size = consumeHistory.size();
 			unsigned int i_minus = history_size - 1;
 

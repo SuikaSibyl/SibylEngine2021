@@ -25,6 +25,7 @@ namespace SIByL
 			virtual void onUpdate() {}
 			virtual void onShutdown() {}
 			virtual bool onWindowClose(WindowCloseEvent& e);
+			virtual bool onKeyPressedEvent(KeyPressedEvent& e);
 			auto onWindowResizeSafe(WindowResizeEvent& e) -> bool;
 			virtual auto onWindowResize(WindowResizeEvent& e) -> bool;
 

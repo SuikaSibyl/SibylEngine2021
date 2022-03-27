@@ -56,6 +56,7 @@ namespace SIByL::Core
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(IApplication::onWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(IApplication::onWindowResizeSafe));
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(IApplication::onKeyPressedEvent));
 
 		if (e.handled)
 			return;
@@ -84,6 +85,10 @@ namespace SIByL::Core
 	}
 
 	auto IApplication::onWindowResize(WindowResizeEvent& e) -> bool
+	{
+		return false;
+	}
+	auto IApplication::onKeyPressedEvent(KeyPressedEvent& e) -> bool
 	{
 		return false;
 	}

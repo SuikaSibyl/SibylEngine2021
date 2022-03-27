@@ -13,7 +13,7 @@ namespace SIByL::GFX::RDG
 	public:
 		UniformBufferNode() { type = NodeDetailedType::UNIFORM_BUFFER; }
 
-		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
 		{
 			uniformBuffer = factory->createUniformBuffer(size);
 		}

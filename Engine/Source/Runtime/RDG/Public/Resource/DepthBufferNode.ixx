@@ -16,8 +16,11 @@ namespace SIByL::GFX::RDG
 	export struct DepthBufferNode :public TextureBufferNode
 	{
 		DepthBufferNode(float const& rel_width, float const& rel_height);
+
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
-		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 	};
 
 	// Impl
@@ -31,12 +34,7 @@ namespace SIByL::GFX::RDG
 		type = NodeDetailedType::DEPTH_TEXTURE; 
 	}
 
-	auto DepthBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
-	{
-		onReDatum(graph, factory);
-	}
-
-	auto DepthBufferNode::onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto DepthBufferNode::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		RenderGraph* render_graph = (RenderGraph*)graph;
 
@@ -55,4 +53,12 @@ namespace SIByL::GFX::RDG
 
 		textureView.scope = factory->createTextureView(getTexture());
 	}
+
+	auto DepthBufferNode::rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		devirtualize(graph, factory);
+	}
+
+	auto DepthBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{}
 }

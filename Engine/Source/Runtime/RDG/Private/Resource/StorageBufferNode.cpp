@@ -14,14 +14,17 @@ import RHI.IMemoryBarrier;
 
 namespace SIByL::GFX::RDG
 {
-	auto StorageBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto StorageBufferNode::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
-		RenderGraph* rg = (RenderGraph*)graph;
-
 		if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
 		{
 			storageBuffer = factory->createStorageBuffer(size);
 		}
+	}
+
+	auto StorageBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		RenderGraph* rg = (RenderGraph*)graph;
 
 		if (consumeHistory.size() > 1)
 		{

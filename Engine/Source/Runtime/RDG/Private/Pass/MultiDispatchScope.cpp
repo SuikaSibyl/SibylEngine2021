@@ -16,6 +16,7 @@ namespace SIByL::GFX::RDG
 
 	auto MultiDispatchScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		barriers.clear();
 		RenderGraph* rg = (RenderGraph*)graph;
 		for (auto iter = rg->resources.begin(); iter != rg->resources.end(); iter++)
 		{

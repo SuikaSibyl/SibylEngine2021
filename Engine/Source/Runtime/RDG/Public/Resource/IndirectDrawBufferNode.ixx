@@ -11,7 +11,7 @@ namespace SIByL::GFX::RDG
 	export struct IndirectDrawBufferNode :public StorageBufferNode
 	{
 	public:
-		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
 		{
 			size = sizeof(unsigned int) * 5;
 			storageBuffer = factory->createIndirectDrawBuffer();

@@ -21,7 +21,9 @@ namespace SIByL::GFX::RDG
 	{
 	public:
 		ComputePassNode(void* graph, RHI::IShader* shader, std::vector<NodeHandle>&& ios, uint32_t const& constant_size = 0);
-		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		auto execute(RHI::ICommandBuffer* buffer, unsigned int x, unsigned int y, unsigned int z, unsigned int frame) noexcept -> void;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;

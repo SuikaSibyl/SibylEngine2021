@@ -66,83 +66,7 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
-	auto RasterPassNode::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
-	{
-		RenderGraph* rg = (RenderGraph*)graph;
-		unsigned texture_id = 0;
-		for (unsigned int i = 0; i < ins.size(); i++)
-		{
-			switch (rg->getResourceNode(ins[i])->type)
-			{
-			case NodeDetailedType::STORAGE_BUFFER:
-			{
-				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
-					rg->getResourceNode(ins[i])->consumeHistoryOnetime.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
-				else
-					rg->getResourceNode(ins[i])->consumeHistory.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
-			}
-			break;
-			case NodeDetailedType::UNIFORM_BUFFER:
-				break;
-			case NodeDetailedType::SAMPLER:
-			{
-				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
-					rg->getTextureBufferNode(textures[texture_id++])->consumeHistoryOnetime.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
-				else
-					rg->getTextureBufferNode(textures[texture_id++])->consumeHistory.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
-			}
-			break;
-			case NodeDetailedType::COLOR_TEXTURE:
-			{
-				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
-					rg->getTextureBufferNode(ins[i])->consumeHistoryOnetime.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
-				else
-					rg->getTextureBufferNode(ins[i])->consumeHistory.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
-			}
-			break;
-			default:
-				break;
-			}
-		}
-
-		// render target
-		if (!useFlights)
-		{
-			FramebufferContainer* framebuffer_container = rg->getFramebufferContainer(framebuffer);
-			for (int i = 0; i < framebuffer_container->handles.size(); i++)
-			{
-				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
-					rg->getResourceNode(framebuffer_container->handles[i])->consumeHistoryOnetime.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET });
-				else
-					rg->getResourceNode(framebuffer_container->handles[i])->consumeHistory.emplace_back
-					(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET });
-			}
-		}
-		else 
-		{
-			// TODO
-		}
-
-		// if there are indirect draw buffer, add consume history
-		if (indirectDrawBufferHandle)
-		{
-			if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
-				rg->getResourceNode(indirectDrawBufferHandle)->consumeHistoryOnetime.emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::INDIRECT_DRAW });
-			else
-				rg->getResourceNode(indirectDrawBufferHandle)->consumeHistory.emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::INDIRECT_DRAW });
-		}
-	}
-
-	auto RasterPassNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto RasterPassNode::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		RenderGraph* rg = (RenderGraph*)graph;
 
@@ -220,19 +144,31 @@ namespace SIByL::GFX::RDG
 
 		//
 		// create desc layout
-		RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-		{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
-		   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
-		   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
-		   { 3, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
-		   { 4, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr },
-		   { 5, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT, nullptr }} };
-		//RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc =
-		//{ {{ 0, 1, RHI::DescriptorType::UNIFORM_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-		//   { 1, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT, nullptr },
-		//   { 2, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-		//   { 3, 1, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },
-		//   { 4, 1, RHI::DescriptorType::STORAGE_BUFFER, (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT, nullptr },} };
+		RHI::DescriptorSetLayoutDesc descriptor_set_layout_desc;
+		for (int i = 0; i < ins.size(); i++)
+		{
+			RHI::DescriptorType descriptorType;
+			ResourceNode* resource = rg->getResourceNode(ins[i]);
+			switch (resource->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+				descriptorType = RHI::DescriptorType::STORAGE_BUFFER;
+				break;
+			case NodeDetailedType::UNIFORM_BUFFER:
+				descriptorType = RHI::DescriptorType::UNIFORM_BUFFER;
+				break;
+			case NodeDetailedType::SAMPLER:
+				descriptorType = RHI::DescriptorType::COMBINED_IMAGE_SAMPLER;
+				break;
+			default:
+				SE_CORE_ERROR("GFX :: Raster Pass Node Binding Resource Type unsupported!");
+				break;
+			}
+
+			descriptor_set_layout_desc.perBindingDesc.emplace_back(
+				i, 1, descriptorType, stageMasks[i], nullptr
+			);
+		}
 
 		desciptorSetLayout = factory->createDescriptorSetLayout(descriptor_set_layout_desc);
 
@@ -275,7 +211,7 @@ namespace SIByL::GFX::RDG
 		RHI::PipelineLayoutDesc pipelineLayout_desc =
 		{ {desciptorSetLayout.get()} };
 		pipelineLayout = factory->createPipelineLayout(pipelineLayout_desc);
-		
+
 		std::vector<RHI::IShader*> shader_groups;
 		if (shaderVert.get() == nullptr && shaderFrag.get() != nullptr && shaderMesh.get() != nullptr)
 		{
@@ -313,7 +249,84 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
-	auto RasterPassNode::onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto RasterPassNode::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		barriers.clear();
+		RenderGraph* rg = (RenderGraph*)graph;
+		unsigned texture_id = 0;
+		for (unsigned int i = 0; i < ins.size(); i++)
+		{
+			switch (rg->getResourceNode(ins[i])->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+			{
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getResourceNode(ins[i])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
+				else
+					rg->getResourceNode(ins[i])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
+			}
+			break;
+			case NodeDetailedType::UNIFORM_BUFFER:
+				break;
+			case NodeDetailedType::SAMPLER:
+			{
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getTextureBufferNode(textures[texture_id++])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+				else
+					rg->getTextureBufferNode(textures[texture_id++])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+			}
+			break;
+			case NodeDetailedType::COLOR_TEXTURE:
+			{
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getTextureBufferNode(ins[i])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
+				else
+					rg->getTextureBufferNode(ins[i])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
+			}
+			break;
+			default:
+				break;
+			}
+		}
+
+		// render target
+		if (!useFlights)
+		{
+			FramebufferContainer* framebuffer_container = rg->getFramebufferContainer(framebuffer);
+			for (int i = 0; i < framebuffer_container->handles.size(); i++)
+			{
+				if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+					rg->getResourceNode(framebuffer_container->handles[i])->consumeHistoryOnetime.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET });
+				else
+					rg->getResourceNode(framebuffer_container->handles[i])->consumeHistory.emplace_back
+					(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET });
+			}
+		}
+		else 
+		{
+			// TODO
+		}
+
+		// if there are indirect draw buffer, add consume history
+		if (indirectDrawBufferHandle)
+		{
+			if (hasBit(attributes, NodeAttrbutesFlagBits::ONE_TIME_SUBMIT))
+				rg->getResourceNode(indirectDrawBufferHandle)->consumeHistoryOnetime.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::INDIRECT_DRAW });
+			else
+				rg->getResourceNode(indirectDrawBufferHandle)->consumeHistory.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::INDIRECT_DRAW });
+		}
+	}
+
+	auto RasterPassNode::rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		RenderGraph* rg = (RenderGraph*)graph;
 

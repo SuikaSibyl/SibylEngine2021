@@ -101,7 +101,7 @@ namespace SIByL::GFX::RDG
 		}
 	}
 	
-	auto FramebufferContainer::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto FramebufferContainer::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		RenderGraph* rg = (RenderGraph*)graph;
 		
@@ -139,10 +139,10 @@ namespace SIByL::GFX::RDG
 			};
 		}
 		renderPass = factory->createRenderPass(renderpass_desc);
-		onReDatum(graph, factory);
+		rereference(graph, factory);
 	}
 
-	auto FramebufferContainer::onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	auto FramebufferContainer::rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		RenderGraph* rg = (RenderGraph*)graph;
 		std::vector<RHI::ITextureView*> attachments(handles.size());

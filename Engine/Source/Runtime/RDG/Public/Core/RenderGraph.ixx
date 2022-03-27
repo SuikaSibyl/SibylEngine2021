@@ -11,6 +11,7 @@ import RHI.IStorageBuffer;
 import RHI.IUniformBuffer;
 import RHI.ISampler;
 import RHI.ICommandBuffer;
+import RHI.ICommandBuffer;
 import GFX.RDG.Common;
 import GFX.RDG.ComputePassNode;
 import GFX.RDG.IndirectDrawBufferNode;
@@ -23,6 +24,50 @@ import GFX.RDG.MultiDispatchScope;
 namespace SIByL::GFX::RDG
 {
 	struct RenderGraphBuilder;
+
+	// Life of a Render Graph
+	// 
+	// ╭── Render Graph Begin
+	// │ 
+	// │ ╭── Render Graph Builder Begin
+	// │ ├────	Register Resources Nodes
+	// │ ├────	Register Passes Nodes
+	// │ ╰── Render Graph Builder End
+	// │ 
+	// │ ╭── Build Begin
+	// │ │ ╭── Unvirtualize Begin
+	// │ │ ├────  Unvirtualize Resources Nodes
+	// │ │ ├────  Unvirtualize Passes Nodes
+	// │ │ ╰── Unvirtualize Begin
+	// │ │ ╭── Compile Pipeline Begin
+	// │ │ ├────  Consume Hisotry Insertion
+	// │ │ ├────  Barrier Creation
+	// │ │ ╰── Compile Pipeline Begin
+	// │ ╰── Build End
+	// │ 
+	// │ ╭── Run Begin
+	// │ ╰── Run End
+	// │
+	// │ ~ OPTIONAL ~
+	// │ ╭── Render Graph Builder(Editor) Begin
+	// │ ├────	Register / Modify Resources Nodes
+	// │ ├────	Register / Modify Passes Nodes
+	// │ │
+	// │ │ ╭── Unvirtualize Begin
+	// │ │ ├────  Unvirtualize Resources Nodes (Only Dirty)
+	// │ │ ├────  Unvirtualize Passes Nodes (Only Dirty)
+	// │ │ ╰── Unvirtualize End
+	// │ │ 
+	// │ │ ╭── Compile Pipeline Begin
+	// │ │ ├────  Consume Hisotry Insertion
+	// │ │ ├────  Barrier Creation
+	// │ │ ╰── Compile Pipeline Begin
+	// │ │ 
+	// │ ╰── Render Graph Builder(Editor) End
+	// │ 
+	// ╰── Render Graph End
+	//
+
 	export class RenderGraph
 	{
 	public:
@@ -57,7 +102,7 @@ namespace SIByL::GFX::RDG
 		// Node manage
 		NodeRegistry registry;
 		std::vector<NodeHandle> passes;
-		std::vector<NodeHandle> passesOnetime;
+		std::vector<NodeHandle> passesBackPool;
 		std::vector<NodeHandle> resources;
 
 		uint32_t storageBufferDescriptorCount = 0;
@@ -98,8 +143,9 @@ namespace SIByL::GFX::RDG
 		auto endScope() noexcept -> NodeHandle;
 
 		auto addComputePass(RHI::IShader* shader, std::vector<NodeHandle>&& ios, std::string_view name, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
-		auto addComputePassOneTime(RHI::IShader* shader, std::vector<NodeHandle>&& ios, std::string_view name, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
+		auto addComputePassBackPool(RHI::IShader* shader, std::vector<NodeHandle>&& ios, std::string_view name, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
 		auto addRasterPass(std::vector<NodeHandle> const& ins, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
+		auto addRasterPassBackPool(std::vector<NodeHandle> const& ins, uint32_t const& constant_size = 0) noexcept -> NodeHandle;
 
 		RenderGraph& attached;
 		std::vector<NodeHandle> scopeStack;

@@ -36,7 +36,7 @@ namespace SIByL::GFX::RDG
 		SE_CORE_INFO("");
 		SE_CORE_INFO("ONETIME PASSES :: ");
 		// reDatum passes
-		for (auto iter = passesOnetime.begin(); iter != passesOnetime.end(); iter++)
+		for (auto iter = passesBackPool.begin(); iter != passesBackPool.end(); iter++)
 		{
 			registry.getNode((*iter))->onPrint();
 		}
@@ -73,7 +73,7 @@ namespace SIByL::GFX::RDG
 		}
 
 		// reDatum passes
-		for (auto iter = passesOnetime.begin(); iter != passesOnetime.end(); iter++)
+		for (auto iter = passesBackPool.begin(); iter != passesBackPool.end(); iter++)
 		{
 			registry.getNode((*iter))->onReDatum((void*)this, factory);
 		}
@@ -349,13 +349,13 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
-	auto RenderGraphBuilder::addComputePassOneTime(RHI::IShader* shader, std::vector<NodeHandle>&& ios, std::string_view name, uint32_t const& constant_size) noexcept -> NodeHandle
+	auto RenderGraphBuilder::addComputePassBackPool(RHI::IShader* shader, std::vector<NodeHandle>&& ios, std::string_view name, uint32_t const& constant_size) noexcept -> NodeHandle
 	{
 		MemScope<ComputePassNode> cpn = MemNew<ComputePassNode>((void*)&attached, shader, std::move(ios), constant_size);
 		cpn->type = NodeDetailedType::COMPUTE_PASS;
 		cpn->attributes |= (uint32_t)NodeAttrbutesFlagBits::ONE_TIME_SUBMIT;
 		NodeHandle handle = attached.registry.registNode(std::move(cpn));
-		attached.passesOnetime.emplace_back(handle);
+		attached.passesBackPool.emplace_back(handle);
 		attached.tag(handle, name);
 		return handle;
 	}
@@ -398,48 +398,41 @@ namespace SIByL::GFX::RDG
 		attached.datumWidth = width;
 		attached.datumHeight = height;
 
-		// compile resources
-		for (auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
-		{
-			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
-		}
-		// compile passes
-		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
-		{
-			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
-		}
-		// compile passesOnetime
-		for (auto iter = attached.passesOnetime.begin(); iter != attached.passesOnetime.end(); iter++)
-		{
-			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
-		}
-
-		// build resources
-		for(auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
-		{
-			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
-		}
-
-		// create pool
+		// create descripotr pool
 		uint32_t MAX_FRAMES_IN_FLIGHT = attached.getMaxFrameInFlight();
-		RHI::DescriptorPoolDesc descriptor_pool_desc{ {}, (attached.passes.size() + attached.passesOnetime.size()) * MAX_FRAMES_IN_FLIGHT};
+		RHI::DescriptorPoolDesc descriptor_pool_desc{ {}, (attached.passes.size() + attached.passesBackPool.size()) * MAX_FRAMES_IN_FLIGHT };
 		if (attached.storageBufferDescriptorCount > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_BUFFER, attached.storageBufferDescriptorCount);
 		if (attached.uniformBufferDescriptorCount > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::UNIFORM_BUFFER, attached.uniformBufferDescriptorCount);
 		if (attached.samplerDescriptorCount > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, attached.samplerDescriptorCount);
 		if (attached.storageImageDescriptorCount > 0) descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_IMAGE, attached.storageImageDescriptorCount);
-
 		attached.descriptorPool = factory->createDescriptorPool(descriptor_pool_desc);
 
+		// devirtualize resources
+		for (auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
+			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
+		// devirtualize passes
+		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
+			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
+		// devirtualize passes onetime
+		for (auto iter = attached.passesBackPool.begin(); iter != attached.passesBackPool.end(); iter++)
+			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
+
+		// clear barriers
+		attached.barrierPool.barriers.clear();
+
+		// compile resources
+		for (auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
+			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
+		// compile passes
+		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
+			attached.registry.getNode((*iter))->onCompile((void*)&attached, factory);
+
+		// build resources
+		for(auto iter = attached.resources.begin(); iter != attached.resources.end(); iter++)
+			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
 		// build passes
 		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
-		{
 			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
-		}
-		// build passes
-		for (auto iter = attached.passesOnetime.begin(); iter != attached.passesOnetime.end(); iter++)
-		{
-			attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
-		}
 	}
 
 	auto RenderGraphBuilder::beginMultiDispatchScope(std::string_view name) noexcept -> NodeHandle
@@ -471,6 +464,15 @@ namespace SIByL::GFX::RDG
 		rpn->type = NodeDetailedType::RASTER_PASS;
 		NodeHandle handle = attached.registry.registNode(std::move(rpn));
 		attached.passes.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphBuilder::addRasterPassBackPool(std::vector<NodeHandle> const& ins, uint32_t const& constant_size) noexcept -> NodeHandle
+	{
+		MemScope<RasterPassNode> rpn = MemNew<RasterPassNode>((void*)&attached, ins, constant_size);
+		rpn->type = NodeDetailedType::RASTER_PASS;
+		NodeHandle handle = attached.registry.registNode(std::move(rpn));
+		attached.passesBackPool.emplace_back(handle);
 		return handle;
 	}
 }

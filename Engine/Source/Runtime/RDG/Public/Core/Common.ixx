@@ -88,7 +88,9 @@ namespace SIByL::GFX::RDG
 	export struct Node
 	{
 		// Lifetime Virtual Funcs
-		virtual auto onRegister() noexcept -> void {} // optional
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
+		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
+
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
@@ -113,7 +115,6 @@ namespace SIByL::GFX::RDG
 			MemScope<T> resource = std::move(node);
 			MemScope<Node> cast_node = MemCast<Node>(resource);
 			cast_node->registry = this;
-			cast_node->onRegister();
 			NodeHandle handle = ECS::UniqueID::RequestUniqueID();
 			cast_node->handle = handle;
 			nodes[handle] = std::move(cast_node);
@@ -151,6 +152,13 @@ namespace SIByL::GFX::RDG
 	{
 		ResourceNode() { attributes |= addBit(NodeAttrbutesFlagBits::RESOURCE); }
 		RHI::ShaderStageFlags shaderStages = 0;
+
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
+		{
+			consumeHistoryOnetime.clear();
+			consumeHistory.clear();
+		}
+
 		std::vector<ConsumeHistory> consumeHistoryOnetime;
 		std::vector<ConsumeHistory> consumeHistory;
 	};
@@ -222,8 +230,8 @@ namespace SIByL::GFX::RDG
 		auto getColorAttachHandle(uint32_t idx) noexcept -> NodeHandle { return handles[idx]; }
 		auto getDepthAttachHandle() noexcept -> NodeHandle { return (depthAttachCount == 1) ? handles[colorAttachCount] : 0; }
 
-		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
-		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 
 		uint32_t colorAttachCount = 0;
 		uint32_t depthAttachCount = 0;

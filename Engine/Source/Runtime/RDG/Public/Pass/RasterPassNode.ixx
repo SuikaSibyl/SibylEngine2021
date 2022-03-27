@@ -44,9 +44,10 @@ namespace SIByL::GFX::RDG
 			std::vector<NodeHandle> const& ins,
 			uint32_t const& constant_size);
 
-		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
-		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
 		NodeHandle framebufferFlights;
@@ -61,6 +62,7 @@ namespace SIByL::GFX::RDG
 
 		std::vector<NodeHandle> ins;
 		std::vector<NodeHandle> textures;
+		std::vector<RHI::ShaderStageFlags> stageMasks;
 
 		MemScope<RHI::IVertexLayout> vertexLayout;
 		MemScope<RHI::IInputAssembly> inputAssembly;

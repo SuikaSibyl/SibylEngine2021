@@ -113,7 +113,7 @@ namespace SIByL::Demo
 	auto PortalSystem::registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void
 	{
 		// Create Init Pass
-		initPass = builder->addComputePassOneTime(initShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, indirectDrawBuffer }, "Particles Init", sizeof(unsigned int));
+		initPass = builder->addComputePassBackPool(initShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, indirectDrawBuffer }, "Particles Init", sizeof(unsigned int));
 
 		// Create Emit Pass
 		emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle }, "Particles Emit", sizeof(unsigned int) * 4);

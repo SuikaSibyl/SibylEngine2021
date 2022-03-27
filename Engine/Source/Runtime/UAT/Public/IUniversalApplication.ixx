@@ -20,7 +20,6 @@ namespace SIByL
 		public:
 			auto attachWindowLayer(WindowLayerDesc const& desc) -> WindowLayer*;
 			auto onWindowClose(WindowCloseEvent& e) -> bool;
-
 			
 		private:
 			std::vector<WindowLayer*> windowLayers;

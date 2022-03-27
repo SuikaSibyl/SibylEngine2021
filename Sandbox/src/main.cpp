@@ -117,6 +117,9 @@ public:
 	struct Empty
 	{};
 
+	GFX::RDG::NodeHandle renderPassNodeSRGB;
+	GFX::RDG::NodeHandle renderPassNodeSRGB_mesh;
+	
 	virtual void onAwake() override
 	{
 		// create window
@@ -146,50 +149,40 @@ public:
 		// create scene
 		scene.deserialize("test_scene.scene", logicalDevice.get());
 
-		// shader resources
-		AssetLoader shaderLoader;
-		shaderLoader.addSearchPath("../Engine/Binaries/Runtime/spirv");
-		MemScope<RHI::IShader> shaderVert = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
-		MemScope<RHI::IShader> shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-
-		portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
-
-		// Create proxy
+		// Create RDG register proxy
 		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
+		portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
 
 		// Build Up Pipeline
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// sub-pipeline building helper components
-		// - particle system
-		// - 1. Register resources
 		portal.registerResources(&rdg_builder);
 		acesbloom->registerResources(&rdg_builder);
 		// renderer
 		GFX::RDG::NodeHandle depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
 		uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
-
 		// raster pass sono 1
 		GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
 		GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 		GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
 		// HDR raster pass
-		//GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, external_sampler, portal.particleBuffer, external_sampler, portal.liveIndexBuffer });
-		//rdg.tag(renderPassNodeSRGB, "Raster HDR");
-		//GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
-		//rasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("vs_particle.spv", { RHI::ShaderStage::VERTEX,"main" });
-		//rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-		//rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
-		//rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
-		//rasterPassNodeSRGB->textures = { external_texture, external_baked_texture };
-		GFX::RDG::NodeHandle renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
+		renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 		rdg.tag(renderPassNodeSRGB, "Raster HDR");
 		GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
-		rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-		rasterPassNodeSRGB->shaderMesh = resourceFactory->createShaderFromBinaryFile("portal/portal_mesh.spv", { RHI::ShaderStage::MESH,"main" });
+		rasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("portal/portal_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
+		rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("portal/portal_vert_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
 		rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
 		rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
 		rasterPassNodeSRGB->textures = { portal.spriteHandle, portal.bakedCurveHandle };
+		rasterPassNodeSRGB->stageMasks = { 
+			(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT
+			};
 		rasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
 		{
 			std::function<void(ECS::TagComponent&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
@@ -201,8 +194,39 @@ public:
 					raster_pass->pipelineLayout.get(),
 					0, 1, &set, 0, nullptr);
 
-				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
-				//commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+				commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+			};
+			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
+		};
+
+		// Mesh Based Raster Pass
+		renderPassNodeSRGB_mesh = rdg_builder.addRasterPassBackPool({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
+		rdg.tag(renderPassNodeSRGB_mesh, "Raster HDR Mesh");
+		GFX::RDG::RasterPassNode* rasterPassNodeSRGB_mesh = rdg.getRasterPassNode(renderPassNodeSRGB_mesh);
+		rasterPassNodeSRGB_mesh->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+		rasterPassNodeSRGB_mesh->shaderMesh = resourceFactory->createShaderFromBinaryFile("portal/portal_mesh.spv", { RHI::ShaderStage::MESH,"main" });
+		rasterPassNodeSRGB_mesh->framebuffer = srgb_framebuffer;
+		rasterPassNodeSRGB_mesh->indirectDrawBufferHandle = portal.indirectDrawBuffer;
+		rasterPassNodeSRGB_mesh->textures = { portal.spriteHandle, portal.bakedCurveHandle };
+		rasterPassNodeSRGB_mesh->stageMasks = {
+			(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+			(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT
+		};
+		rasterPassNodeSRGB_mesh->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+		{
+			std::function<void(ECS::TagComponent&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
+				commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer.get());
+				commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer.get());
+				RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
+				commandbuffer->cmdBindDescriptorSets(
+					RHI::PipelineBintPoint::GRAPHICS,
+					raster_pass->pipelineLayout.get(),
+					0, 1, &set, 0, nullptr);
+
 				commandbuffer->cmdDrawMeshTasks(100000u / 16, 0);
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
@@ -229,6 +253,8 @@ public:
 		// building ...
 		rdg_builder.build(resourceFactory.get(), 1280, 720);
 		rdg.print();
+
+		rasterPassNodeSRGB_mesh->barriers = rasterPassNodeSRGB->barriers;
 
 		// create ImImage for viewport
 		viewportImImage = imfactory.createImImage(
@@ -268,6 +294,43 @@ public:
 		return false;
 	}
 
+	virtual auto onKeyPressedEvent(KeyPressedEvent& e) -> bool override
+	{
+		int keycode = e.GetKeyCode();
+		if (keycode == 32)
+		{
+			for (int i = 0; i < rdg.passes.size(); i++)
+			{
+				if (rdg.passes[i] == renderPassNodeSRGB)
+				{
+					for (int j = 0; j < rdg.passesBackPool.size(); j++)
+					{
+						if (rdg.passesBackPool[j] == renderPassNodeSRGB_mesh)
+						{
+							rdg.passes[i] = renderPassNodeSRGB_mesh;
+							rdg.passesBackPool[j] = renderPassNodeSRGB;
+							return false;
+						}
+					}
+				}
+				else if(rdg.passes[i] == renderPassNodeSRGB_mesh)
+				{
+					for (int j = 0; j < rdg.passesBackPool.size(); j++)
+					{
+						if (rdg.passesBackPool[j] == renderPassNodeSRGB_mesh)
+						{
+							rdg.passes[i] = renderPassNodeSRGB;
+							rdg.passesBackPool[j] = renderPassNodeSRGB_mesh;
+							return false;
+						}
+					}
+				}
+			}
+			SE_CORE_DEBUG("Change Render Pipeline~");
+		}
+		return false;
+	}
+
 	float test = 1.0f;
 
 	virtual void onUpdate() override
@@ -282,7 +345,7 @@ public:
 		// Timer update
 		{
 			timer.tick();
-			SE_CORE_INFO("FPS: {0}", timer.getFPS());
+			//SE_CORE_INFO("FPS: {0}", timer.getFPS());
 		}
 		// update uniform buffer
 		{

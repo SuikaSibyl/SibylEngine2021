@@ -13,6 +13,8 @@ namespace SIByL::GFX::RDG
 	public:
 		StorageBufferNode() { type = NodeDetailedType::STORAGE_BUFFER; }
 
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto getStorageBuffer() noexcept -> RHI::IStorageBuffer*;
 
