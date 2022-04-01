@@ -1,0 +1,80 @@
+#version 450
+
+layout(push_constant) uniform constants {
+    vec3 bbmin;
+    uint particleCount;
+    vec3 bbmax;
+} PushConstants;
+
+struct Counter
+{
+    uint aliveCount;
+    uint deadCount;
+    uint emitCount;
+    uint drawCount;
+    uint maxCount;
+};
+layout(set = 0, binding = 1, std430) buffer Counters
+{
+    Counter counter[];
+} counter;
+
+struct Particle
+{
+    vec4 pos;
+    vec4 vel;
+    vec4 color;
+    vec4 ext;
+};
+layout(set = 0, binding = 2, std430) buffer Particles
+{
+    Particle particle[];
+} particles;
+
+layout(set = 0, binding = 3, std430) buffer LiveIndexBuffer
+{
+    uint[] indices;
+} livePool;
+
+struct MortonIndex
+{
+    uint morton;
+    uint index;
+};
+layout(set = 0, binding = 4, std430) buffer MortonIndexBuffer
+{
+    MortonIndex content[];
+} mortonIndices;
+
+uint expandBits(uint v)
+{
+    v = (v * 0x00010001u) & 0xFF0000FFu;
+    v = (v * 0x00000101u) & 0x0F00F00Fu;
+    v = (v * 0x00000011u) & 0xC30C30C3u;
+    v = (v * 0x00000005u) & 0x49249249u;
+    return v;
+}
+
+uint morton(vec3 position)
+{
+    vec3 unipos = (position - PushConstants.bbmin) / (PushConstants.bbmax - PushConstants.bbmin);
+    uvec3 uiunipos = uvec3(unipos * 1023u);
+    uint morton_code = 0;
+    morton_code += expandBits(uiunipos.x);
+    morton_code += expandBits(uiunipos.y);
+    morton_code += expandBits(uiunipos.z);
+    return morton_code;
+}
+
+layout (local_size_x = 128) in;
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= counter.counter[0].aliveCount) return;
+
+    uint index = livePool.indices[idx];
+    vec3 position = particles.particle[index].pos.rgb;
+    
+    mortonIndices.content[idx].morton = morton(position);
+    mortonIndices.content[idx].index = index;
+}

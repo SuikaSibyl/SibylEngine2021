@@ -1,0 +1,94 @@
+#version 450
+
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+
+#define ELEMENT_SIZE 2048
+#define THREAD_PER_BLOCK 256
+#define ELEMENT_PER_THREAD 1
+#define ELEMENT_PER_BLOCK (THREAD_PER_BLOCK*ELEMENT_PER_THREAD)
+#define ELEMENT_REDUCED_SIZE ((ELEMENT_SIZE+ELEMENT_PER_BLOCK-1)/ELEMENT_PER_BLOCK)
+#define BITS_PER_DIGIT 1
+#define POSSIBLE_DIGIT_VALUE (1 << BITS_PER_DIGIT) // 2
+#define TOTAL_BITS 32 // ! This Value is Fixed to 32 in this implementation
+#define DIGIT_NUM TOTAL_BITS/BITS_PER_DIGIT // 32
+#define PASS_NUM DIGIT_NUM // 32
+
+layout (local_size_x = THREAD_PER_BLOCK) in;
+
+layout(push_constant) uniform constants {
+    uint digitOffset;
+} PushConstants;
+
+// Input = keys = values sort by
+// SIZE = ELEMENT_COUNT
+layout(set = 0, binding = 0, std430) buffer InputKeys
+{
+    uint keys[];
+};
+
+layout(set = 0, binding = 1, std430) buffer IntermediateHistogram
+{
+    uint histogram[];
+};
+
+// In this function, we need to calculate histograms for 
+// each possible digit value X each possible offset
+// 
+// We are not likely to visit all the keys in a block
+// A Possible Value Set is:
+//  - keys number       : 100,000+
+//  - thread per block  : 1024?
+//  - block need        : 100+
+//
+
+shared uint sharedPerWarpCount[PASS_NUM][POSSIBLE_DIGIT_VALUE][THREAD_PER_BLOCK];
+
+void setIntermediateHistogram(uint pass, uint digit_value, uint wid, uint value)
+{
+    histogram[pass*ELEMENT_REDUCED_SIZE*POSSIBLE_DIGIT_VALUE + digit_value*ELEMENT_REDUCED_SIZE + wid] = value;
+}
+
+void calcWholeArrayHistograms()
+{
+    // each thread loads one element from global to shared mem
+    uint tid = gl_LocalInvocationID.x;
+    uint i = gl_GlobalInvocationID.x;
+
+    uint element = keys[i];
+    for(uint i = 0; i < DIGIT_NUM; i++)
+    {
+        uint mask = 0x00000001 << i;
+        uint masked_element = (element & mask) >> i;
+        // each possible value
+        for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+        {
+            sharedPerWarpCount[i][j][tid] = (masked_element == j) ? 1 : 0;
+        }
+    }
+    barrier();
+    // do reduction in shared mem 
+    for(uint s=gl_WorkGroupSize.x/2; s>0; s>>= 1)
+    {
+        if (tid < s)
+        {
+            for(uint i = 0; i < DIGIT_NUM; i++)
+                for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+                    sharedPerWarpCount[i][j][tid] += sharedPerWarpCount[i][j][tid + s];
+        }
+        barrier();
+    }
+
+    // write result for this block to global mem
+    if (tid == 0)
+    {
+        for(uint i = 0; i < DIGIT_NUM; i++)
+            for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+                setIntermediateHistogram(i,j,gl_WorkGroupID.x, sharedPerWarpCount[i][j][0]);
+    }
+}
+
+void main()
+{
+    calcWholeArrayHistograms();
+}

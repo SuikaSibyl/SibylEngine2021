@@ -45,6 +45,7 @@ namespace SIByL
 			auto querySwapChainSupport() -> SwapChainSupportDetails;
 			auto getGraphicContextVK()->IGraphicContextVK*;
 			auto findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) noexcept -> uint32_t;
+			auto checkSubgroupProperties() noexcept -> void;
 
 		private:
 			bool enableDebugLayer;

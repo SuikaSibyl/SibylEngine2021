@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{60374e9e-1686-415c-9982-dfa210810091}</ProjectGuid>
-    <RootNamespace>Editor</RootNamespace>
+    <ProjectGuid>{e53fff1a-e23e-48b8-a23c-6cda694e901a}</ProjectGuid>
+    <RootNamespace>imguizmo</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -80,13 +80,13 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/imgui/imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/imgui/imgui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -147,29 +147,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Public\Framework\Segment.ixx" />
-    <ClCompile Include="Public\Segments\Component.ixx" />
-    <ClCompile Include="Public\Widgets\Inspector.ixx" />
-    <ClCompile Include="Public\Widgets\RenderPipeline.ixx" />
-    <ClCompile Include="Public\Widgets\Scene.ixx" />
-    <ClCompile Include="Public\Widgets\Viewport.ixx" />
-    <ClCompile Include="Public\Framework\Widget.ixx" />
+    <ClInclude Include="imguizmo\GraphEditor.h" />
+    <ClInclude Include="imguizmo\ImCurveEdit.h" />
+    <ClInclude Include="imguizmo\ImGradient.h" />
+    <ClInclude Include="imguizmo\ImGuizmo.h" />
+    <ClInclude Include="imguizmo\ImSequencer.h" />
+    <ClInclude Include="imguizmo\ImZoomSlider.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Runtime\Core\Core.vcxproj">
-      <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\ECS\ECS.vcxproj">
-      <Project>{688c4381-ba51-4866-9827-eb59ae7008cb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\GFX\GFX.vcxproj">
-      <Project>{a207e2a1-8b21-4977-b486-e77f05dfb7d7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\RHI\RHI.vcxproj">
-      <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\EditorCore\EditorCore.vcxproj">
-      <Project>{38abb082-3018-4f4d-8b37-0f87c7665494}</Project>
+    <ClCompile Include="imguizmo\GraphEditor.cpp" />
+    <ClCompile Include="imguizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="imguizmo\ImGradient.cpp" />
+    <ClCompile Include="imguizmo\ImGuizmo.cpp" />
+    <ClCompile Include="imguizmo\ImSequencer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="imguizmo\LICENSE" />
+    <None Include="imguizmo\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\imgui\imgui.vcxproj">
+      <Project>{4d5613d3-cc2b-4ef5-b203-d0f3a7ac519e}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

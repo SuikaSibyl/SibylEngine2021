@@ -1,0 +1,126 @@
+#version 450
+
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+
+#define ELEMENT_SIZE 2048
+#define THREAD_PER_BLOCK 1024
+#define BITS_PER_DIGIT 1
+#define POSSIBLE_DIGIT_VALUE (1 << BITS_PER_DIGIT) // 2
+#define TOTAL_BITS 32 // ! This Value is Fixed to 32 in this implementation
+#define DIGIT_NUM TOTAL_BITS/BITS_PER_DIGIT // 32
+#define PASS_NUM DIGIT_NUM // 32
+#define ELEMENT_REDUCED_SIZE (ELEMENT_SIZE/THREAD_PER_BLOCK) // 32
+
+layout (local_size_x = THREAD_PER_BLOCK) in;
+
+// Input = keys = values sort by
+// SIZE = ELEMENT_COUNT
+layout(set = 0, binding = 0, std430) buffer InputKeys
+{
+    uint keys[];
+};
+
+// Output = Histogram
+// Global Histograms are scanned for the whole-array.
+// It is a 2-D buffer
+// Here is an example for 4-way 16-bits parallel radix sorting
+//                 x-axis = possible value:
+//       y-axis =         0   1   2   3
+//       digit offset 0  [0] [1] [2] [3]
+//                    1  [4] [5] [6] [7]
+//                    2  [8] [.] [.] [.]
+//                    3  [.] [.] [.] [.]
+//                    .   .   .   .   .
+//                   31  [.] [.] [.] [.]
+// Access Example:
+//  gBlockWiseSum[POSSIBLE_DIGIT_VALUE*offset + value]
+layout(set = 0, binding = 1, std430) buffer IntermediateHistogram
+{
+    uint histogram[];
+};
+void setIntermediateHistogram(uint pass, uint digit_value, uint wid, uint value)
+{
+    histogram[pass*ELEMENT_REDUCED_SIZE*POSSIBLE_DIGIT_VALUE + digit_value*ELEMENT_REDUCED_SIZE + wid] = value;
+}
+
+// In this function, we need to calculate histograms for 
+// each possible digit value X each possible offset
+// 
+// We are not likely to visit all the keys in a block
+// A Possible Value Set is:
+//  - keys number       : 100,000+
+//  - thread per block  : 1024?
+//  - block need        : 100+
+//
+// A Hierarchy is build like this:
+// 1. Per warp reduction:
+//  0, 1, 2, ... 31, 32, 33, 34, ... 63
+// ╰──── warp ────╯  ╰───── warp ─────╯
+// 2. Per block reduction:
+//    if 1024 threads per block, only 32 warps exists
+//    thus we could use only one warp to reduction 1024 elements to 1
+//    If more than 1024 elements exists, we do multiple passes (or use a decoupled-lookback ?)
+
+// warp_value_pass
+shared uint sharedPerWarpCount[POSSIBLE_DIGIT_VALUE * PASS_NUM * THREAD_PER_BLOCK / 32];
+void setSharedPerWarpCount(uint pass, uint digit_value, uint warp_id, uint value)
+{
+    sharedPerWarpCount[gl_NumSubgroups*POSSIBLE_DIGIT_VALUE*pass + gl_NumSubgroups*digit_value + warp_id] = value;
+}
+uint getSharedPerWarpCount(uint pass, uint digit_value, uint warp_id)
+{
+    return sharedPerWarpCount[gl_NumSubgroups*POSSIBLE_DIGIT_VALUE*pass + gl_NumSubgroups*digit_value + warp_id];
+}
+void accSharedPerWarpCount(uint pass, uint digit_value, uint warp_id, uint value)
+{
+    sharedPerWarpCount[gl_NumSubgroups*POSSIBLE_DIGIT_VALUE*pass + gl_NumSubgroups*digit_value + warp_id] += value;
+}
+
+void calcWholeArrayHistograms()
+{
+    // Do per per warp reduce first
+    uint workgroup_offset = gl_WorkGroupID.x * THREAD_PER_BLOCK;
+    uint element = keys[gl_GlobalInvocationID.x];
+
+    // each digit offset
+    for(uint i = 0; i < DIGIT_NUM; i++)
+    {
+        uint mask = 0x00000001 << i;
+        uint masked_element = (element & mask) >> i;
+        // each possible value
+        for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+        {
+            uvec4 ballot = subgroupBallot(masked_element == j);
+            if(gl_SubgroupInvocationID == 0)
+            {
+                setSharedPerWarpCount(i, j, gl_SubgroupID, subgroupBallotBitCount(ballot));
+            }
+        }
+    }
+    memoryBarrier();
+    if(gl_SubgroupID == 0)
+    {
+        // do reduction in shared mem
+        for(uint s=gl_NumSubgroups/2; s>0; s>>=1)
+        {
+            if (gl_SubgroupInvocationID < s)
+            {
+                for(uint i = 0; i < DIGIT_NUM; i++)
+                    for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+                        accSharedPerWarpCount(i,j,gl_SubgroupInvocationID, getSharedPerWarpCount(i,j,gl_SubgroupInvocationID + s));
+            }
+            barrier();
+        }
+
+        if(gl_SubgroupInvocationID == 0)
+            for(uint i = 0; i < DIGIT_NUM; i++)
+                for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+                    setIntermediateHistogram(i,j,gl_WorkGroupID.x, getSharedPerWarpCount(i,j,0));
+    }
+}
+
+void main()
+{
+    calcWholeArrayHistograms();
+}

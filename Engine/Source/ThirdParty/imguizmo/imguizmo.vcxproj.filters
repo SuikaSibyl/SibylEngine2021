@@ -15,17 +15,44 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
+    <ClInclude Include="imguizmo\ImCurveEdit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImGradient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImGuizmo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImSequencer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\GraphEditor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="imguizmo\ImZoomSlider.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="imguizmo\ImCurveEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.ixx">
+    <ClCompile Include="imguizmo\ImGradient.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystem\Portal.ixx">
+    <ClCompile Include="imguizmo\ImGuizmo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\ParticleSystem\SortTest.ixx">
+    <ClCompile Include="imguizmo\ImSequencer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="imguizmo\GraphEditor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="imguizmo\LICENSE" />
+    <None Include="imguizmo\README.md" />
   </ItemGroup>
 </Project>

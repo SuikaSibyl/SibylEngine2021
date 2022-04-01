@@ -1,0 +1,133 @@
+#version 450
+
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+
+#define ELEMENT_SIZE 2048
+#define THREAD_PER_BLOCK 1024
+#define ELEMENT_PER_THREAD 1
+#define ELEMENT_PER_BLOCK (THREAD_PER_BLOCK*ELEMENT_PER_THREAD)
+#define ELEMENT_REDUCED_SIZE ((ELEMENT_SIZE+ELEMENT_PER_BLOCK-1)/ELEMENT_PER_BLOCK)
+#define BITS_PER_DIGIT 1
+#define POSSIBLE_DIGIT_VALUE (1 << BITS_PER_DIGIT) // 2
+#define TOTAL_BITS 32 // ! This Value is Fixed to 32 in this implementation
+#define DIGIT_NUM TOTAL_BITS/BITS_PER_DIGIT // 32
+#define PASS_NUM DIGIT_NUM // 32
+
+#define NUM_BANKS 16
+#define LOG_NUM_BANKS 4
+#define CONFLICT_FREE_OFFSET(n) ((n) >> NUM_BANKS + (n) >> (2 * LOG_NUM_BANKS)) 
+#define CONFLICT_FREE_PADDING ((POSSIBLE_DIGIT_VALUE) >> NUM_BANKS + (POSSIBLE_DIGIT_VALUE) >> (2 * LOG_NUM_BANKS)) 
+
+layout (local_size_x = THREAD_PER_BLOCK) in;
+
+layout(push_constant) uniform constants {
+    uint digitOffset;
+} PushConstants;
+
+layout(set = 0, binding = 0, std430) buffer IntermediateHistogram
+{
+    uint gIntermediateHistogram[];
+};
+
+layout(set = 0, binding = 1, std430) buffer GlobalDigitHistogram
+{
+    uint gGlobalHistogram[];
+};
+
+uint getIntermediateHistogram(uint pass, uint digit_value, uint wid)
+{
+    return gIntermediateHistogram[pass*ELEMENT_REDUCED_SIZE*POSSIBLE_DIGIT_VALUE + digit_value*ELEMENT_REDUCED_SIZE + wid];
+}
+void setGlobalDigitHistogram(uint pass, uint digit_value, uint value)
+{
+    gGlobalHistogram[pass*POSSIBLE_DIGIT_VALUE + digit_value] = value;
+}
+
+shared uint sharedPerWarpCount[PASS_NUM][POSSIBLE_DIGIT_VALUE][ELEMENT_REDUCED_SIZE];
+shared uint sharedPrefixSum[PASS_NUM][POSSIBLE_DIGIT_VALUE+CONFLICT_FREE_PADDING];
+
+void prefixSum()
+{
+    uint thid = gl_LocalInvocationID.x;
+    if(thid >= POSSIBLE_DIGIT_VALUE/2) return;
+    uint n = POSSIBLE_DIGIT_VALUE;
+    uint ai = thid;
+    uint bi = thid + (POSSIBLE_DIGIT_VALUE/2);
+    uint bankOffsetA = CONFLICT_FREE_OFFSET(ai);
+    uint bankOffsetB = CONFLICT_FREE_OFFSET(bi);
+    uint i = gl_WorkGroupID.x;
+
+    sharedPrefixSum[i][ai + bankOffsetA] = sharedPerWarpCount[i][ai][0]; // load input into shared memory 
+    sharedPrefixSum[i][bi + bankOffsetB] = sharedPerWarpCount[i][bi][0];
+
+    uint offset = 1;
+    for (uint d = n>>1; d > 0; d >>= 1) // build sum in place up the tree 
+    {
+        barrier();
+        if (thid < d)
+        {
+            uint ai = offset*(2*thid+1)-1;
+            uint bi = offset*(2*thid+2)-1;
+            ai += CONFLICT_FREE_OFFSET(ai);
+            bi += CONFLICT_FREE_OFFSET(bi);
+            sharedPrefixSum[i][bi] += sharedPrefixSum[i][ai];
+        }
+        offset *= 2; 
+    }
+
+    if (thid == 0)
+    {       
+        sharedPrefixSum[i][n - 1 + CONFLICT_FREE_OFFSET(n - 1)] = 0;
+    } // clear the last element  
+
+    for (int d = 1; d < n; d *= 2) // traverse down tree & build scan
+    {
+        offset >>= 1;
+        barrier();
+        if (thid < d)
+        {
+            uint ai = offset*(2*thid+1)-1;
+            uint bi = offset*(2*thid+2)-1; 
+            uint t = sharedPrefixSum[i][ai];
+            sharedPrefixSum[i][ai] = sharedPrefixSum[i][bi];
+            sharedPrefixSum[i][bi] += t;
+        }
+    }
+    barrier();
+    // write result for this block to global mem
+    setGlobalDigitHistogram(i, ai, sharedPrefixSum[i][ai+bankOffsetA]);
+    setGlobalDigitHistogram(i, bi, sharedPrefixSum[i][bi+bankOffsetB]);
+}
+
+void calcWholeArrayHistograms()
+{
+    // each thread loads one element from global to shared mem
+    uint tid = gl_LocalInvocationID.x;
+    if(tid > ELEMENT_REDUCED_SIZE) return;
+    uint i = gl_WorkGroupID.x;
+
+    for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+    {
+        sharedPerWarpCount[i][j][tid] = getIntermediateHistogram(i,j,tid);
+    }
+
+    barrier();
+    // do reduction in shared mem 
+    for(uint s=ELEMENT_REDUCED_SIZE/2; s>0; s>>= 1)
+    {
+        if (tid < s)
+        {
+            for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
+                sharedPerWarpCount[i][j][tid] += sharedPerWarpCount[i][j][tid + s];
+        }
+        barrier();
+    }
+
+    prefixSum();
+}
+
+void main()
+{
+    calcWholeArrayHistograms();
+}

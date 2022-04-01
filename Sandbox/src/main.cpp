@@ -92,17 +92,22 @@ import ParticleSystem.PrecomputedSample;
 import UAT.IUniversalApplication;
 import Editor.ImGuiLayer;
 import Editor.Viewport;
+import Editor.Scene;
 import Editor.ImFactory;
 import Editor.ImImage;
+import Editor.Inspector;
+import Editor.RenderPipeline;
 
 import Interpolator.Hermite;
 import Interpolator.Sampler;
 
 import Demo.Portal;
+import Demo.SortTest;
 
 using namespace SIByL;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
+//#define MACRO_USE_MESH 0
 
 class SandboxApp :public IUniversalApplication
 {
@@ -132,9 +137,14 @@ public:
 		window_layer = attachWindowLayer(window_layer_desc);
 
 		// create device
+#ifdef MACRO_USE_MESH
 		graphicContext = (RHI::IFactory::createGraphicContext({
 			RHI::API::VULKAN,
 			(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
+#else
+		graphicContext = (RHI::IFactory::createGraphicContext({
+			RHI::API::VULKAN }));
+#endif
 
 		graphicContext->attachWindow(window_layer->getWindow());
 		physicalDevice = (RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
@@ -148,15 +158,21 @@ public:
 
 		// create scene
 		scene.deserialize("test_scene.scene", logicalDevice.get());
+		sceneGui.bindScene(&scene);
+		inspectorGui.bindScene(&sceneGui);
+		pipelineGui.bindRenderGraph(&rdg);
+		pipelineGui.bindInspector(&inspectorGui);
 
 		// Create RDG register proxy
 		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 		portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
+		sortTest = std::move(Demo::SortTest(resourceFactory.get(), 2048));
 
 		// Build Up Pipeline
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 		// sub-pipeline building helper components
 		portal.registerResources(&rdg_builder);
+		sortTest.registerResources(&rdg_builder);
 		acesbloom->registerResources(&rdg_builder);
 		// renderer
 		GFX::RDG::NodeHandle depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
@@ -198,7 +214,7 @@ public:
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};
-
+#ifdef MACRO_USE_MESH
 		// Mesh Based Raster Pass
 		renderPassNodeSRGB_mesh = rdg_builder.addRasterPassBackPool({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 		rdg.tag(renderPassNodeSRGB_mesh, "Raster HDR Mesh");
@@ -231,6 +247,7 @@ public:
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 		};
+#endif
 
 		// ACES
 		acesbloom->iHdrImage = srgb_color_attachment;
@@ -248,14 +265,15 @@ public:
 			return dispatch_times;
 		};
 		portal.registerUpdatePasses(&rdg_builder);
+		sortTest.registerUpdatePasses(&rdg_builder);
 		GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
 
 		// building ...
 		rdg_builder.build(resourceFactory.get(), 1280, 720);
 		rdg.print();
-
+#ifdef MACRO_USE_MESH
 		rasterPassNodeSRGB_mesh->barriers = rasterPassNodeSRGB->barriers;
-
+#endif
 		// create ImImage for viewport
 		viewportImImage = imfactory.createImImage(
 			rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
@@ -275,12 +293,26 @@ public:
 
 		// timer
 		timer.start();
+		MemScope<RHI::IBarrier> compute_compute_barrier = resourceFactory->createBarrier({
+			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+			});
 
 		// init storage buffer
 		RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getTransientCommandPool();
 		MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
+		// Test
+		rdg.getComputePassNode(sortTest.sortInit)->executeWithConstant(transientCommandbuffer.get(), 2, 1, 1, 0, 2048u);
+		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		rdg.getComputePassNode(sortTest.sortHistogramNaive1_32)->executeWithConstant(transientCommandbuffer.get(), sortTest.elementReducedSize, 1, 1, 0, 0u);
+		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		rdg.getComputePassNode(sortTest.sortHistogramIntegrate1_32)->executeWithConstant(transientCommandbuffer.get(), 32, 1, 1, 0, 0u);
+		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), 1, 1, 1, 0, 0u);
+
+		// ~Test
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();
 		logicalDevice->waitIdle();
@@ -388,6 +420,9 @@ public:
 		ImGui::ShowDemoWindow(&show_demo_window);
 
 		mainViewport.onDrawGui();
+		sceneGui.onDrawGui();
+		inspectorGui.onDrawGui();
+		pipelineGui.onDrawGui();
 
 		imguiLayer->render();
 	}
@@ -406,6 +441,9 @@ private:
 	MemScope<Editor::ImGuiLayer> imguiLayer;
 	Editor::Viewport mainViewport;
 	MemScope<Editor::ImImage> viewportImImage;
+	Editor::Scene sceneGui;
+	Editor::Inspector inspectorGui;
+	Editor::RenderPipeline pipelineGui;
 	// Application
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
@@ -413,6 +451,7 @@ private:
 	// RDG Proxy
 	Demo::PortalSystem portal;
 	MemScope<GFX::PostProcessing::AcesBloomProxyUnit> acesbloom;
+	Demo::SortTest sortTest;
 
 	// Device stuff
 	MemScope<RHI::IGraphicContext> graphicContext;

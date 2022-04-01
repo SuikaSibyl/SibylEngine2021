@@ -1,0 +1,57 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+
+#define THREAD_PER_BLOCK 1024
+#define BITS_PER_DIGIT 8
+#define POSSIBLE_DIGIT_VALUE (1 << BITS_PER_DIGIT) // 256
+#define TOTAL_BITS 32 // ! This Value is Fixed to 32 in this implementation
+#define DIGIT_NUM TOTAL_BITS/BITS_PER_DIGIT // 4
+#define PASS_NUM DIGIT_NUM // 4
+
+layout (local_size_x = THREAD_PER_BLOCK) in;
+
+// Input = keys = values sort by
+// SIZE = ELEMENT_COUNT
+layout(set = 0, binding = 0, std430) buffer InputKeys
+{
+    uint keys[];
+};
+
+// Output = Histogram
+// Global Histograms are scanned for the whole-array.
+// It is a 2-D buffer
+// Here is an example for 4-way 16-bits parallel radix sorting
+//                 x-axis = possible value:
+//       y-axis =         0   1   2   3  ...  255
+//       digit offset 0  [0] [1] [2] [3] ... [255]
+//                    1  [.] [.] [.] [.] ...  [.]
+//                    2  [.] [.] [.] [.] ...  [.]
+//                    3  [.] [.] [.] [.] ...  [.]
+// Access Example:
+//  gBlockWiseSum[POSSIBLE_DIGIT_VALUE*offset + value]
+layout(set = 0, binding = 1, std430) buffer WholeArrayHistograms
+{
+    uint gWholeArrayHistograms[POSSIBLE_DIGIT_VALUE * PASS_NUM];
+};
+
+// In this function, we need to calculate histograms for 
+// each possible digit value X each possible offset
+// 
+// We are not likely to visit all the keys in a block
+// A Possible Value Set is:
+//  - keys number       : 100,000+
+//  - thread per block  : 1024?
+//  - block need        : 100+
+
+void calcWholeArrayHistograms()
+{
+    // Do per per warp reduce first
+    uint workgroup_offset = gl_WorkGroupID.x * THREAD_PER_BLOCK;
+    uvec4 subgroupBallot
+}
+
+void main()
+{
+    calcWholeArrayHistograms();
+}

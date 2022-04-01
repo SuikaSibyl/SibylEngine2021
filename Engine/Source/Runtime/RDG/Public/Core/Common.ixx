@@ -101,7 +101,7 @@ namespace SIByL::GFX::RDG
 		NodeDetailedType type = NodeDetailedType::NONE;
 		NodeAttributesFlags attributes = 0;
 		NodeHandle handle;
-		std::string_view tag;
+		std::string tag;
 	};
 
 	// A registry is used to manage nodes

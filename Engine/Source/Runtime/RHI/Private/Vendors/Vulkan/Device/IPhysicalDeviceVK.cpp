@@ -269,4 +269,17 @@ namespace SIByL::RHI
 		}
 		SE_CORE_ERROR("VULKAN :: Physical Device :: failed to find supported format!");
 	}
+
+	auto IPhysicalDeviceVK::checkSubgroupProperties() noexcept -> void
+	{
+		VkPhysicalDeviceSubgroupProperties subgroupProperties;
+		subgroupProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_PROPERTIES;
+		subgroupProperties.pNext = NULL;
+
+		VkPhysicalDeviceProperties2 physicalDeviceProperties;
+		physicalDeviceProperties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+		physicalDeviceProperties.pNext = &subgroupProperties;
+
+		vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties);
+	}
 }
