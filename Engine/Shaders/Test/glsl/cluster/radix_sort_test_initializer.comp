@@ -30,6 +30,6 @@ void main()
 {
     uint gid = gl_GlobalInvocationID.x;
     if(gid >= PushConstants.elementCount) return;
-    keys[gid] = gid;
+    keys[gid] = ELEMENT_SIZE - gid;
     indices[gid] = gid;
 }

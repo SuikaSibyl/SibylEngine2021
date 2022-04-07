@@ -290,10 +290,18 @@ public:
 
 		// timer
 		timer.start();
+		MemScope<RHI::IMemoryBarrier> compute_compute_memory_barrier = resourceFactory->createMemoryBarrier({
+			(uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
+			(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
+			});
+
 		MemScope<RHI::IBarrier> compute_compute_barrier = resourceFactory->createBarrier({
 			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 			(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
-			});
+			0,
+			{compute_compute_memory_barrier.get()}
+			}
+		);
 
 		// init storage buffer
 		RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getTransientCommandPool();
@@ -314,8 +322,8 @@ public:
 			rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), sortTest.possibleDigitValue * sortTest.elementCount / 2048, 1, 1, 0, i);
 		}
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-		rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), sortTest.elementCount / 1024, 1, 1, 0);
-		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), sortTest.elementCount / 1024, 1, 1, 0);
+		//transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 
 		// ~Test
 		transientCommandbuffer->endRecording();
