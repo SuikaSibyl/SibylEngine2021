@@ -1,0 +1,30 @@
+#version 450
+
+#define ELEMENT_NUM 4096
+#define BLOCK_SIZE 1024
+#define WARP_PER_BLOCK BLOCK_SIZE/32
+#define TILE_SIZE 2048
+#define TILE_PER_BLOCK 1
+#define ELEMENT_PER_BLOCK TILE_SIZE*TILE_PER_BLOCK
+#define ACTIVE_BLOCK_NUM ((ELEMENT_NUM+ELEMENT_PER_BLOCK - 1)/ELEMENT_PER_BLOCK)
+#define DIGITS 8
+#define POSSIBLE_DIGIT_VALUE 2
+
+layout (local_size_x = 1024) in;
+
+layout(set = 0, binding = 0, std430) buffer OffsetFromDigitStartsAggregate
+{
+    uint aggregate[];
+};
+layout(set = 0, binding = 1, std430) buffer OffsetFromDigitStartsPrefix
+{
+    uint prefix[];
+};
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= ACTIVE_BLOCK_NUM * POSSIBLE_DIGIT_VALUE) return;
+    aggregate[idx] = 0;
+    prefix[idx] = 0;
+}

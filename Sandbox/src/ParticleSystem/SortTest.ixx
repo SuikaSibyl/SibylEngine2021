@@ -45,16 +45,23 @@ namespace SIByL::Demo
 		GFX::RDG::NodeHandle offsetFromDigitStartPrefix;
 		GFX::RDG::NodeHandle intermediateHistogram;
 		GFX::RDG::NodeHandle globalHistogram;
+		// Only for Debug
+		GFX::RDG::NodeHandle sortedKeys;
 
 		GFX::RDG::NodeHandle sortHistogramNaive1_32;
 		GFX::RDG::NodeHandle sortHistogramIntegrate1_32;
 		GFX::RDG::NodeHandle sortInit;
 		GFX::RDG::NodeHandle sortPass;
+		GFX::RDG::NodeHandle sortPassClear;
+		GFX::RDG::NodeHandle sortShowKeys;
 
 		MemScope<RHI::IShader> shaderHistogramNaive1_32;
 		MemScope<RHI::IShader> shaderHistogramIntegrate1_32;
 		MemScope<RHI::IShader> shaderSortInit;
 		MemScope<RHI::IShader> shaderSortPass;
+		MemScope<RHI::IShader> shaderSortPassClear;
+		// Only for Debug
+		MemScope<RHI::IShader> shaderSortShowKeys;
 
 		RHI::IResourceFactory* factory;
 		uint32_t elementCount;
@@ -82,6 +89,8 @@ namespace SIByL::Demo
 		shaderHistogramIntegrate1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_integrate_1_32.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortInit = factory->createShaderFromBinaryFile("cluster/radix_sort_test_initializer.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortPass = factory->createShaderFromBinaryFile("cluster/radix_sort_onesweep.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		shaderSortPassClear = factory->createShaderFromBinaryFile("cluster/radix_sort_onesweep_clear.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		shaderSortShowKeys = factory->createShaderFromBinaryFile("cluster/radix_sort_show_keys.spv", { RHI::ShaderStage::COMPUTE,"main" });
 	}
 
 	auto SortTest::registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void
@@ -89,10 +98,13 @@ namespace SIByL::Demo
 		// Resources
 		inputKeys = builder->addStorageBuffer(sizeof(uint32_t) * elementCount, "Input Keys");
 		sortedIndexWithDoubleBuffer = builder->addStorageBuffer(sizeof(uint32_t) * elementCount * 2, "Sorted Indices Double-Buffer");
-		offsetFromDigitStartsAggregate = builder->addStorageBuffer(sizeof(uint32_t) * GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Aggregate)");
-		offsetFromDigitStartsAggregate = builder->addStorageBuffer(sizeof(uint32_t) * GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Prefix)");
+		offsetFromDigitStartsAggregate = builder->addStorageBuffer(sizeof(uint32_t) * possibleDigitValue *  GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Aggregate)");
+		offsetFromDigitStartPrefix = builder->addStorageBuffer(sizeof(uint32_t) * possibleDigitValue * GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Prefix)");
 		intermediateHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue * elementReducedSize, "Block-Wise Sum");
 		globalHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue, "Global Histogram");
+
+		sortedKeys = builder->addStorageBuffer(sizeof(uint32_t) * elementCount, "Sorted Keys");
+
 	}
 
 	struct EmitConstant
@@ -111,7 +123,9 @@ namespace SIByL::Demo
 		// Create Sort Pass
 		sortHistogramNaive1_32 = builder->addComputePassBackPool(shaderHistogramNaive1_32.get(), { inputKeys, intermediateHistogram }, "Naive Histogram Pass 1", sizeof(unsigned int));
 		sortHistogramIntegrate1_32 = builder->addComputePassBackPool(shaderHistogramIntegrate1_32.get(), { intermediateHistogram, globalHistogram }, "Histogram Pass 2", sizeof(unsigned int));
-		sortPass = builder->addComputePassBackPool(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartsAggregate, globalHistogram }, "Sort Pass", sizeof(unsigned int));
+		sortPass = builder->addComputePassBackPool(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram }, "Sort Pass", sizeof(unsigned int));
+		sortPassClear = builder->addComputePassBackPool(shaderSortPassClear.get(), { offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix }, "Sort Pass", 0);
+		sortShowKeys = builder->addComputePassBackPool(shaderSortShowKeys.get(), { inputKeys, sortedIndexWithDoubleBuffer, sortedKeys }, "Sort Test Pass", 0);
 
 		//emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle }, "Particles Emit", sizeof(unsigned int) * 4);
 		//builder->attached.getComputePassNode(emitPass)->customDispatch = [&timer = timer](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)

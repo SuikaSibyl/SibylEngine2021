@@ -119,9 +119,6 @@ public:
 		glm::mat4 proj;
 	};
 
-	struct Empty
-	{};
-
 	GFX::RDG::NodeHandle renderPassNodeSRGB;
 	GFX::RDG::NodeHandle renderPassNodeSRGB_mesh;
 	
@@ -166,7 +163,7 @@ public:
 		// Create RDG register proxy
 		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 		portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
-		sortTest = std::move(Demo::SortTest(resourceFactory.get(), 2048));
+		sortTest = std::move(Demo::SortTest(resourceFactory.get(), 4096));
 
 		// Build Up Pipeline
 		GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
@@ -304,13 +301,21 @@ public:
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 		rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
 		// Test
-		rdg.getComputePassNode(sortTest.sortInit)->executeWithConstant(transientCommandbuffer.get(), 2, 1, 1, 0, 2048u);
+		rdg.getComputePassNode(sortTest.sortInit)->executeWithConstant(transientCommandbuffer.get(), sortTest.elementCount / 1024, 1, 1, 0, sortTest.elementCount);
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 		rdg.getComputePassNode(sortTest.sortHistogramNaive1_32)->executeWithConstant(transientCommandbuffer.get(), sortTest.elementReducedSize, 1, 1, 0, 0u);
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 		rdg.getComputePassNode(sortTest.sortHistogramIntegrate1_32)->executeWithConstant(transientCommandbuffer.get(), 32, 1, 1, 0, 0u);
+		for (uint32_t i = 0; i < 32; i++)
+		{
+			transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+			rdg.getComputePassNode(sortTest.sortPassClear)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
+			transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+			rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), sortTest.possibleDigitValue * sortTest.elementCount / 2048, 1, 1, 0, i);
+		}
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-		rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), 1, 1, 1, 0, 0u);
+		rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), sortTest.elementCount / 1024, 1, 1, 0);
+		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 
 		// ~Test
 		transientCommandbuffer->endRecording();

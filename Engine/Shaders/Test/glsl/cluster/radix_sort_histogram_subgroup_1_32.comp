@@ -3,7 +3,7 @@
 #extension GL_KHR_shader_subgroup_basic: require
 #extension GL_KHR_shader_subgroup_ballot: require
 
-#define ELEMENT_SIZE 2048
+#define ELEMENT_SIZE 4096
 #define THREAD_PER_BLOCK 1024
 #define BITS_PER_DIGIT 1
 #define POSSIBLE_DIGIT_VALUE (1 << BITS_PER_DIGIT) // 2
@@ -80,7 +80,6 @@ void accSharedPerWarpCount(uint pass, uint digit_value, uint warp_id, uint value
 void calcWholeArrayHistograms()
 {
     // Do per per warp reduce first
-    uint workgroup_offset = gl_WorkGroupID.x * THREAD_PER_BLOCK;
     uint element = keys[gl_GlobalInvocationID.x];
 
     // each digit offset
