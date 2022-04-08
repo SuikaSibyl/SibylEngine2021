@@ -45,8 +45,10 @@ namespace SIByL::Demo
 		GFX::RDG::NodeHandle offsetFromDigitStartPrefix;
 		GFX::RDG::NodeHandle intermediateHistogram;
 		GFX::RDG::NodeHandle globalHistogram;
+		GFX::RDG::NodeHandle globalCounter;
 		// Only for Debug
 		GFX::RDG::NodeHandle sortedKeys;
+		GFX::RDG::NodeHandle debugInfo;
 
 		GFX::RDG::NodeHandle sortHistogramNaive1_32;
 		GFX::RDG::NodeHandle sortHistogramIntegrate1_32;
@@ -85,7 +87,7 @@ namespace SIByL::Demo
 
 		// load precomputed samples for particle position initialization
 		//shaderHistogramNaive1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_naive_1_32.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		shaderHistogramNaive1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_subgroup_1_32.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		shaderHistogramNaive1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_subgroup_1_32_opt.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderHistogramIntegrate1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_integrate_1_32.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortInit = factory->createShaderFromBinaryFile("cluster/radix_sort_test_initializer.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortPass = factory->createShaderFromBinaryFile("cluster/radix_sort_onesweep.spv", { RHI::ShaderStage::COMPUTE,"main" });
@@ -102,9 +104,10 @@ namespace SIByL::Demo
 		offsetFromDigitStartPrefix = builder->addStorageBuffer(sizeof(uint32_t) * possibleDigitValue * GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Prefix)");
 		intermediateHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue * elementReducedSize, "Block-Wise Sum");
 		globalHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue, "Global Histogram");
+		globalCounter = builder->addStorageBuffer(sizeof(uint32_t) * 2, "Global Counter");
 
 		sortedKeys = builder->addStorageBuffer(sizeof(uint32_t) * elementCount, "Sorted Keys");
-
+		debugInfo = builder->addStorageBuffer(sizeof(uint32_t) * elementCount * 2, "Debug Info");
 	}
 
 	struct EmitConstant
@@ -122,8 +125,8 @@ namespace SIByL::Demo
 
 		// Create Sort Pass
 		sortHistogramNaive1_32 = builder->addComputePassBackPool(shaderHistogramNaive1_32.get(), { inputKeys, intermediateHistogram }, "Naive Histogram Pass 1", sizeof(unsigned int));
-		sortHistogramIntegrate1_32 = builder->addComputePassBackPool(shaderHistogramIntegrate1_32.get(), { intermediateHistogram, globalHistogram }, "Histogram Pass 2", sizeof(unsigned int));
-		sortPass = builder->addComputePassBackPool(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram }, "Sort Pass", sizeof(unsigned int));
+		sortHistogramIntegrate1_32 = builder->addComputePassBackPool(shaderHistogramIntegrate1_32.get(), { intermediateHistogram, globalHistogram, globalCounter }, "Histogram Pass 2", sizeof(unsigned int));
+		sortPass = builder->addComputePassBackPool(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter }, "Sort Pass", sizeof(unsigned int));
 		sortPassClear = builder->addComputePassBackPool(shaderSortPassClear.get(), { offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix }, "Sort Pass", 0);
 		sortShowKeys = builder->addComputePassBackPool(shaderSortShowKeys.get(), { inputKeys, sortedIndexWithDoubleBuffer, sortedKeys }, "Sort Test Pass", 0);
 

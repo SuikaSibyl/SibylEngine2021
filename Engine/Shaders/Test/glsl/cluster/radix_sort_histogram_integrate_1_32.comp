@@ -3,11 +3,12 @@
 #extension GL_KHR_shader_subgroup_basic: require
 #extension GL_KHR_shader_subgroup_ballot: require
 
-#define ELEMENT_SIZE 4096
+#define ELEMENT_SIZE 100000
 #define THREAD_PER_BLOCK 1024
 #define ELEMENT_PER_THREAD 1
 #define ELEMENT_PER_BLOCK (THREAD_PER_BLOCK*ELEMENT_PER_THREAD)
 #define ELEMENT_REDUCED_SIZE ((ELEMENT_SIZE+ELEMENT_PER_BLOCK-1)/ELEMENT_PER_BLOCK)
+#define ELEMENT_REDUCED_SIZE_ALIGNED uint(exp2(uint(log2(ELEMENT_REDUCED_SIZE-1)+1)))
 #define BITS_PER_DIGIT 1
 #define POSSIBLE_DIGIT_VALUE (1 << BITS_PER_DIGIT) // 2
 #define TOTAL_BITS 32 // ! This Value is Fixed to 32 in this implementation
@@ -35,6 +36,12 @@ layout(set = 0, binding = 1, std430) buffer GlobalDigitHistogram
     uint gGlobalHistogram[];
 };
 
+layout(set = 0, binding = 2, std430) buffer GlobalCounter
+{
+    uint gWorkgroupCounter;
+    uint gDebugLogCounter;
+};
+
 uint getIntermediateHistogram(uint pass, uint digit_value, uint wid)
 {
     return gIntermediateHistogram[pass*ELEMENT_REDUCED_SIZE*POSSIBLE_DIGIT_VALUE + digit_value*ELEMENT_REDUCED_SIZE + wid];
@@ -44,8 +51,8 @@ void setGlobalDigitHistogram(uint pass, uint digit_value, uint value)
     gGlobalHistogram[pass*POSSIBLE_DIGIT_VALUE + digit_value] = value;
 }
 
-shared uint sharedPerWarpCount[PASS_NUM][POSSIBLE_DIGIT_VALUE][ELEMENT_REDUCED_SIZE];
-shared uint sharedPrefixSum[PASS_NUM][POSSIBLE_DIGIT_VALUE+CONFLICT_FREE_PADDING];
+shared uint sharedPerWarpCount[POSSIBLE_DIGIT_VALUE][ELEMENT_REDUCED_SIZE_ALIGNED];
+shared uint sharedPrefixSum[POSSIBLE_DIGIT_VALUE+CONFLICT_FREE_PADDING];
 
 void prefixSum()
 {
@@ -58,8 +65,8 @@ void prefixSum()
     uint bankOffsetB = CONFLICT_FREE_OFFSET(bi);
     uint i = gl_WorkGroupID.x;
 
-    sharedPrefixSum[i][ai + bankOffsetA] = sharedPerWarpCount[i][ai][0]; // load input into shared memory 
-    sharedPrefixSum[i][bi + bankOffsetB] = sharedPerWarpCount[i][bi][0];
+    sharedPrefixSum[ai + bankOffsetA] = sharedPerWarpCount[ai][0]; // load input into shared memory 
+    sharedPrefixSum[bi + bankOffsetB] = sharedPerWarpCount[bi][0];
 
     uint offset = 1;
     for (uint d = n>>1; d > 0; d >>= 1) // build sum in place up the tree 
@@ -71,14 +78,14 @@ void prefixSum()
             uint bi = offset*(2*thid+2)-1;
             ai += CONFLICT_FREE_OFFSET(ai);
             bi += CONFLICT_FREE_OFFSET(bi);
-            sharedPrefixSum[i][bi] += sharedPrefixSum[i][ai];
+            sharedPrefixSum[bi] += sharedPrefixSum[ai];
         }
         offset *= 2; 
     }
 
     if (thid == 0)
     {       
-        sharedPrefixSum[i][n - 1 + CONFLICT_FREE_OFFSET(n - 1)] = 0;
+        sharedPrefixSum[n - 1 + CONFLICT_FREE_OFFSET(n - 1)] = 0;
     } // clear the last element  
 
     for (int d = 1; d < n; d *= 2) // traverse down tree & build scan
@@ -89,37 +96,39 @@ void prefixSum()
         {
             uint ai = offset*(2*thid+1)-1;
             uint bi = offset*(2*thid+2)-1; 
-            uint t = sharedPrefixSum[i][ai];
-            sharedPrefixSum[i][ai] = sharedPrefixSum[i][bi];
-            sharedPrefixSum[i][bi] += t;
+            uint t = sharedPrefixSum[ai];
+            sharedPrefixSum[ai] = sharedPrefixSum[bi];
+            sharedPrefixSum[bi] += t;
         }
     }
     barrier();
     // write result for this block to global mem
-    setGlobalDigitHistogram(i, ai, sharedPrefixSum[i][ai+bankOffsetA]);
-    setGlobalDigitHistogram(i, bi, sharedPrefixSum[i][bi+bankOffsetB]);
+    setGlobalDigitHistogram(i, ai, sharedPrefixSum[ai+bankOffsetA]);
+    setGlobalDigitHistogram(i, bi, sharedPrefixSum[bi+bankOffsetB]);
 }
 
 void calcWholeArrayHistograms()
 {
     // each thread loads one element from global to shared mem
     uint tid = gl_LocalInvocationID.x;
-    if(tid > ELEMENT_REDUCED_SIZE) return;
-    uint i = gl_WorkGroupID.x;
+    if(tid >= ELEMENT_REDUCED_SIZE_ALIGNED) return;
 
+    uint i = gl_WorkGroupID.x;
     for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
     {
-        sharedPerWarpCount[i][j][tid] = getIntermediateHistogram(i,j,tid);
+        sharedPerWarpCount[j][tid] = (tid >= ELEMENT_REDUCED_SIZE) ?
+            0 : // exceed valid element
+            getIntermediateHistogram(i,j,tid);
     }
 
     barrier();
     // do reduction in shared mem 
-    for(uint s=ELEMENT_REDUCED_SIZE/2; s>0; s>>= 1)
+    for(uint s=ELEMENT_REDUCED_SIZE_ALIGNED/2; s>0; s>>= 1)
     {
         if (tid < s)
         {
             for(uint j = 0; j < POSSIBLE_DIGIT_VALUE; j++)
-                sharedPerWarpCount[i][j][tid] += sharedPerWarpCount[i][j][tid + s];
+                sharedPerWarpCount[j][tid] += sharedPerWarpCount[j][tid + s];
         }
         barrier();
     }
@@ -130,4 +139,10 @@ void calcWholeArrayHistograms()
 void main()
 {
     calcWholeArrayHistograms();
+
+    if(gl_LocalInvocationID.x==0) 
+    {
+        gWorkgroupCounter = 0;
+        gDebugLogCounter = 0;
+    }
 }

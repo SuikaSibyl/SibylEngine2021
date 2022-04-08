@@ -1,7 +1,7 @@
 #version 450
 #extension GL_KHR_shader_subgroup_basic: require
 
-#define ELEMENT_NUM 4096
+#define ELEMENT_NUM 100000
 #define BLOCK_SIZE 1024
 #define WARP_PER_BLOCK BLOCK_SIZE/32
 #define TILE_SIZE 2048
@@ -45,11 +45,11 @@ layout(set = 0, binding = 1, std430) buffer SortedIndex
 // values       1  [.] [.] [.] [.] [.] ... [.]
 // (bins)       2  [.] [.] [.] [.] [.] ... [.]
 //              3  [.] [.] [.] [.] [.] ... [.]
-layout(set = 0, binding = 2, std430) buffer OffsetFromDigitStartsAggregate
+layout(set = 0, binding = 2, std430) buffer volatile OffsetFromDigitStartsAggregate
 {
     uint aggregate[];
 };
-layout(set = 0, binding = 3, std430) buffer OffsetFromDigitStartsPrefix
+layout(set = 0, binding = 3, std430) buffer volatile OffsetFromDigitStartsPrefix
 {
     uint prefix[];
 };
@@ -73,10 +73,17 @@ layout(set = 0, binding = 4, std430) buffer GlobalDigitHistogram
 {
     uint gGlobalHistogram[];
 };
+
 uint getGlobalDigitHistogram(uint pass, uint digit_value)
 {
     return gGlobalHistogram[pass*POSSIBLE_DIGIT_VALUE + digit_value];
 }
+
+layout(set = 0, binding = 5, std430) buffer GlobalCounter
+{
+    uint gWorkgroupCounter;
+    uint gDebugLogCounter;
+};
 
 const uint already_prepared = 0x80000000;
 const uint low_pass_mask = 0x7FFFFFFF;
@@ -102,6 +109,9 @@ void countAggregateValue()
 }
 
 shared uint temp[TILE_SIZE + CONFLICT_FREE_OFFSET(TILE_SIZE)];
+shared uint sharedWorkgroupID;
+shared uint sharedExclusivePrefix;
+
 void setTempRaw(uint idx, uint value)
 {
     temp[idx+CONFLICT_FREE_OFFSET(idx)] = value;
@@ -114,28 +124,52 @@ uint getTempRaw(uint idx)
 void main()
 {
     uint thid = gl_LocalInvocationID.x;
-    uint wgid = gl_WorkGroupID.x / POSSIBLE_DIGIT_VALUE;
-    uint target_value = gl_WorkGroupID.x % POSSIBLE_DIGIT_VALUE;
-
+    if(thid==0) // Fetch a workgroupID
+    {
+        sharedWorkgroupID = atomicAdd(gWorkgroupCounter, 1);
+        if(sharedWorkgroupID+1==gl_NumWorkGroups.x) gWorkgroupCounter = 0;
+    }
+    barrier();
+    uint workgroupID = sharedWorkgroupID;
+    // Thread Info
+    uint wgid = workgroupID / POSSIBLE_DIGIT_VALUE;
+    uint target_digit = workgroupID % POSSIBLE_DIGIT_VALUE;
+    // Element to deal with
+    uint ai = thid;
+    uint bi = thid + (TILE_SIZE/2);
+    uint bankOffsetA = CONFLICT_FREE_OFFSET(ai); 
+    uint bankOffsetB = CONFLICT_FREE_OFFSET(bi);
+    uint workgroup_element_offset = wgid*TILE_SIZE*TILE_PER_BLOCK;
+    // Init workgroup shared memory
+    temp[ai+bankOffsetA] = 0;
+    temp[bi+bankOffsetB] = 0;
+    barrier();
+    
+    // Pass Info
     uint mask = 0x00000001 << PushConstants.digitOffset;
     uint in_array = PushConstants.digitOffset % 2;
     uint out_array = 1 -in_array;
-    uint workgroup_element_offset = wgid*TILE_SIZE*TILE_PER_BLOCK;
     // load keys into shared memory
     // each thread handle 2 keys
-
-    uint ai = thid; 
-    uint bi = thid + (TILE_SIZE/2); 
-    uint bankOffsetA = CONFLICT_FREE_OFFSET(ai); 
-    uint bankOffsetB = CONFLICT_FREE_OFFSET(bi);
+    uint offseted_ai = workgroup_element_offset + ai;
+    bool is_target_ai = false;
+    if(offseted_ai < ELEMENT_NUM)
+    {
+        uint passMask_a = keys[indices[offseted_ai + ELEMENT_NUM*in_array]];
+        passMask_a = (passMask_a & mask) >> PushConstants.digitOffset;
+        is_target_ai = (passMask_a == target_digit);
+        temp[ai+bankOffsetA] = is_target_ai ? 1 : 0;
+    }
+    uint offseted_bi = workgroup_element_offset + bi;
+    bool is_target_bi = false;
+    if(offseted_bi < ELEMENT_NUM)
+    {
+        uint passMask_b = keys[indices[offseted_bi + ELEMENT_NUM*in_array]];
+        passMask_b = (passMask_b & mask) >> PushConstants.digitOffset;
+        is_target_bi = (passMask_b == target_digit);
+        temp[bi+bankOffsetB] = is_target_bi ? 1 : 0;        
+    }
     
-    uint passMask_a = keys[indices[workgroup_element_offset + ai + ELEMENT_NUM*in_array]];
-    uint passMask_b = keys[indices[workgroup_element_offset + bi + ELEMENT_NUM*in_array]];
-    passMask_a = (passMask_a & mask) >> PushConstants.digitOffset;
-    passMask_b = (passMask_b & mask) >> PushConstants.digitOffset;
-    temp[ai+bankOffsetA] = (passMask_a == target_value) ? 1 : 0;
-    temp[bi+bankOffsetB] = (passMask_b == target_value) ? 1 : 0;
-
     // build sum in place up the tree 
     uint offset = 1;
     for (int d = TILE_SIZE>>1; d>0; d>>=1)
@@ -154,19 +188,18 @@ void main()
 
     barrier();
     uint workgroupAggregate = temp[TILE_SIZE-1 + CONFLICT_FREE_OFFSET(TILE_SIZE-1)];
-
-    uint tmp_id = accessOffset2DArray(target_value, wgid);
+    
+    uint tmp_id = accessOffset2DArray(target_digit, wgid);
     if (thid == 0)
     {
-        aggregate[tmp_id] = workgroupAggregate;
-        memoryBarrier();
-        // set prepared
-        aggregate[tmp_id] |= already_prepared; 
+        aggregate[tmp_id] = workgroupAggregate | already_prepared;
+        memoryBarrierBuffer();
+
         // clear the last element
         uint exclusive_prefix = 0;
         for(int i = int(wgid)-1; i >= 0; i--)
         {
-            uint local_tmp_id = accessOffset2DArray(target_value, i);
+            uint local_tmp_id = accessOffset2DArray(target_digit, i);
             if((prefix[local_tmp_id] & already_prepared) != 0)
             {
                 exclusive_prefix += prefix[local_tmp_id] & low_pass_mask;
@@ -179,11 +212,9 @@ void main()
                 exclusive_prefix += aggregate[local_tmp_id] & low_pass_mask;
             }
         }
-        prefix[tmp_id] = exclusive_prefix + workgroupAggregate;
-        memoryBarrier();
-        // set prepared
-        prefix[tmp_id] |= already_prepared;
-
+        sharedExclusivePrefix = exclusive_prefix;
+        prefix[tmp_id] = (exclusive_prefix + workgroupAggregate) | already_prepared;
+        memoryBarrierBuffer();
         temp[TILE_SIZE-1 + CONFLICT_FREE_OFFSET(TILE_SIZE-1)] = 0;
     }
 
@@ -202,16 +233,37 @@ void main()
             temp[bi] += t & low_pass_mask;
         }
     }
-    uint exclusive_prefix = (prefix[tmp_id]&low_pass_mask) - workgroupAggregate;
-
-    if(passMask_a == target_value)
+    
+    barrier();
+    uint exclusive_prefix = sharedExclusivePrefix;
+    
+    if(is_target_ai)
     {
-        uint target_pos_ai = (temp[ai+bankOffsetA]&low_pass_mask) + exclusive_prefix + getGlobalDigitHistogram(PushConstants.digitOffset, target_value);
-        indices[target_pos_ai + ELEMENT_NUM*out_array] = indices[workgroup_element_offset + ai + ELEMENT_NUM*in_array];
+        uint target_pos_ai = (temp[ai+bankOffsetA]&low_pass_mask) + exclusive_prefix + getGlobalDigitHistogram(PushConstants.digitOffset, target_digit);
+        uint value = indices[offseted_ai + ELEMENT_NUM*in_array];
+        indices[target_pos_ai + ELEMENT_NUM*out_array] = value;
     }
-    if(passMask_b == target_value)
+    if(is_target_bi)
     {
-        uint target_pos_bi = (temp[bi+bankOffsetB]&low_pass_mask) + exclusive_prefix + getGlobalDigitHistogram(PushConstants.digitOffset, target_value);
-        indices[target_pos_bi + ELEMENT_NUM*out_array] = indices[workgroup_element_offset + bi + ELEMENT_NUM*in_array];
+        uint target_pos_bi = (temp[bi+bankOffsetB]&low_pass_mask) + exclusive_prefix + getGlobalDigitHistogram(PushConstants.digitOffset, target_digit);
+        uint value = indices[offseted_bi + ELEMENT_NUM*in_array];
+        indices[target_pos_bi + ELEMENT_NUM*out_array] = value;
+    }
+
+    barrier();
+    
+    // clean up inter-workgroup info
+    if (thid == 0 && wgid>0)
+    {
+        uint prev_wgid = wgid - 1;
+        uint prev_prefix_id = accessOffset2DArray(target_digit, prev_wgid);
+        aggregate[prev_prefix_id] = 0;
+        prefix[prev_prefix_id] = 0;
+
+        if(wgid == (ACTIVE_BLOCK_NUM-1))
+        {
+            aggregate[tmp_id] = 0;
+            prefix[tmp_id] = 0;
+        }
     }
 }
