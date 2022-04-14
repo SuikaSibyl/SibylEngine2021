@@ -76,6 +76,9 @@ import ECS.Entity;
 import ECS.UID;
 import ECS.TagComponent;
 
+import Asset.AssetLayer;
+import Asset.RuntimeAssetManager;
+
 import GFX.SceneTree;
 import GFX.Scene;
 import GFX.Mesh;
@@ -86,10 +89,8 @@ import GFX.RDG.Common;
 import GFX.RDG.MultiDispatchScope;
 import GFX.PostProcessing.AcesBloom;
 
-import ParticleSystem.ParticleSystem;
-import ParticleSystem.PrecomputedSample;
-
 import UAT.IUniversalApplication;
+
 import Editor.ImGuiLayer;
 import Editor.Viewport;
 import Editor.Scene;
@@ -97,9 +98,7 @@ import Editor.ImFactory;
 import Editor.ImImage;
 import Editor.Inspector;
 import Editor.RenderPipeline;
-
-import Interpolator.Hermite;
-import Interpolator.Sampler;
+import Editor.EditorLayer;
 
 import Demo.Portal;
 import Demo.SortTest;
@@ -148,17 +147,26 @@ public:
 		logicalDevice = (RHI::IFactory::createLogicalDevice({ physicalDevice.get() }));
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
+		// create asset layer
+		assetLayer = MemNew<Asset::AssetLayer>();
+		pushLayer(assetLayer.get());
+		assetLayer->runtimeManager.addNewAsset({"Test"}); // TODO :: delete this only for test 
 		// create imgui layer
 		imguiLayer = MemNew<Editor::ImGuiLayer>(logicalDevice.get());
 		pushLayer(imguiLayer.get());
 		Editor::ImFactory imfactory(imguiLayer.get());
+		// create editor layer
+		editorLayer = MemNew<Editor::EditorLayer>();
+		pushLayer(editorLayer.get());
+		editorLayer->introspectionGui.bindApplication(this);
+		editorLayer->introspectionGui.bindInspector(&(editorLayer->inspectorGui));
 
 		// create scene
 		scene.deserialize("test_scene.scene", logicalDevice.get());
-		sceneGui.bindScene(&scene);
-		inspectorGui.bindScene(&sceneGui);
-		pipelineGui.bindRenderGraph(&rdg);
-		pipelineGui.bindInspector(&inspectorGui);
+		editorLayer->sceneGui.bindScene(&scene);
+		editorLayer->sceneGui.bindInspector(&(editorLayer->inspectorGui));
+		editorLayer->pipelineGui.bindRenderGraph(&rdg);
+		editorLayer->pipelineGui.bindInspector(&(editorLayer->inspectorGui));
 
 		// Create RDG register proxy
 		acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
@@ -276,7 +284,7 @@ public:
 			rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
 			rdg.getTextureBufferNode(acesbloom->bloomCombined)->getTextureView(),
 			RHI::ImageLayout::GENERAL);
-		mainViewport.bindImImage(viewportImImage.get());
+		editorLayer->mainViewport.bindImImage(viewportImImage.get());
 
 		// comand stuffs
 		commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
@@ -311,19 +319,20 @@ public:
 		// Test
 		rdg.getComputePassNode(sortTest.sortInit)->executeWithConstant(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount,1024), 1, 1, 0, sortTest.elementCount);
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-		rdg.getComputePassNode(sortTest.sortHistogramNaive1_32)->executeWithConstant(transientCommandbuffer.get(), sortTest.elementReducedSize * 32, 1, 1, 0, 0u);
+		rdg.getComputePassNode(sortTest.sortHistogramSubgroup_8_4)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, sortTest.subgroupHistogramElementPerBlock), 1, 1, 0);
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-		rdg.getComputePassNode(sortTest.sortHistogramIntegrate1_32)->executeWithConstant(transientCommandbuffer.get(), 32, 1, 1, 0, 0u);
-		for (uint32_t i = 0; i < 32; i++)
+		rdg.getComputePassNode(sortTest.sortHistogramIntegrate_8_4)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
+		for (uint32_t i = 0; i < 4; i++)
 		{
 			//transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 			//rdg.getComputePassNode(sortTest.sortPassClear)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
 			transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-			rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), sortTest.possibleDigitValue * GRIDSIZE(sortTest.elementCount,2048), 1, 1, 0, i);
+			//rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), sortTest.possibleDigitValue * GRIDSIZE(sortTest.elementCount,2048), 1, 1, 0, i);
+			rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, sortTest.elementPerBlock), 1, 1, 0, i);
 	    }
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 		rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, 1024), 1, 1, 0);
-		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 
 		// ~Test
 		transientCommandbuffer->endRecording();
@@ -431,12 +440,7 @@ public:
 		// demo window
 		bool show_demo_window = true;
 		ImGui::ShowDemoWindow(&show_demo_window);
-
-		mainViewport.onDrawGui();
-		sceneGui.onDrawGui();
-		inspectorGui.onDrawGui();
-		pipelineGui.onDrawGui();
-
+		editorLayer->onDrawGui();
 		imguiLayer->render();
 	}
 
@@ -451,12 +455,14 @@ private:
 	// Window Layer
 	WindowLayer* window_layer;
 	// Editor Layer
+	MemScope<Asset::AssetLayer> assetLayer;
+	// AssetLayer
+	// Editor Layer
 	MemScope<Editor::ImGuiLayer> imguiLayer;
-	Editor::Viewport mainViewport;
+	MemScope<Editor::EditorLayer> editorLayer;
+
 	MemScope<Editor::ImImage> viewportImImage;
-	Editor::Scene sceneGui;
-	Editor::Inspector inspectorGui;
-	Editor::RenderPipeline pipelineGui;
+
 	// Application
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;

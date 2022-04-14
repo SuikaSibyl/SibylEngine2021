@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{60374e9e-1686-415c-9982-dfa210810091}</ProjectGuid>
-    <RootNamespace>Editor</RootNamespace>
+    <ProjectGuid>{56d2e32e-7901-443f-ba06-a6bfb6245295}</ProjectGuid>
+    <RootNamespace>Asset</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -80,13 +80,11 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -147,35 +145,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Public\EditorLayer.ixx" />
-    <ClCompile Include="Public\Framework\Segment.ixx" />
-    <ClCompile Include="Public\Segments\AssetManager.ixx" />
-    <ClCompile Include="Public\Segments\Component.ixx" />
-    <ClCompile Include="Public\Widgets\Introspection.ixx" />
-    <ClCompile Include="Public\Widgets\Inspector.ixx" />
-    <ClCompile Include="Public\Widgets\RenderPipeline.ixx" />
-    <ClCompile Include="Public\Widgets\Scene.ixx" />
-    <ClCompile Include="Public\Widgets\Viewport.ixx" />
-    <ClCompile Include="Public\Framework\Widget.ixx" />
+    <ClCompile Include="Private\RuntimeAssetManager.cpp" />
+    <ClCompile Include="Public\Asset.ixx" />
+    <ClCompile Include="Public\AssetLayer.ixx" />
+    <ClCompile Include="Public\Assets\Mesh.ixx" />
+    <ClCompile Include="Public\Assets\Texture.ixx" />
+    <ClCompile Include="Public\RuntimeAssetManager.ixx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Runtime\Asset\Asset.vcxproj">
-      <Project>{56d2e32e-7901-443f-ba06-a6bfb6245295}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Core\Core.vcxproj">
+    <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\ECS\ECS.vcxproj">
+    <ProjectReference Include="..\ECS\ECS.vcxproj">
       <Project>{688c4381-ba51-4866-9827-eb59ae7008cb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\GFX\GFX.vcxproj">
-      <Project>{a207e2a1-8b21-4977-b486-e77f05dfb7d7}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\RHI\RHI.vcxproj">
-      <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\EditorCore\EditorCore.vcxproj">
-      <Project>{38abb082-3018-4f4d-8b37-0f87c7665494}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -44,21 +44,26 @@ namespace SIByL::Demo
 		GFX::RDG::NodeHandle offsetFromDigitStartsAggregate;
 		GFX::RDG::NodeHandle offsetFromDigitStartPrefix;
 		GFX::RDG::NodeHandle intermediateHistogram;
+		GFX::RDG::NodeHandle intermediateHistogramLookBack;
 		GFX::RDG::NodeHandle globalHistogram;
 		GFX::RDG::NodeHandle globalCounter;
 		// Only for Debug
 		GFX::RDG::NodeHandle sortedKeys;
 		GFX::RDG::NodeHandle debugInfo;
 
-		GFX::RDG::NodeHandle sortHistogramNaive1_32;
-		GFX::RDG::NodeHandle sortHistogramIntegrate1_32;
+		GFX::RDG::NodeHandle sortHistogramSubgroup_8_4;
+		GFX::RDG::NodeHandle sortHistogramIntegrate_8_4;
 		GFX::RDG::NodeHandle sortInit;
 		GFX::RDG::NodeHandle sortPass;
+		GFX::RDG::NodeHandle sortPass_0;
+		GFX::RDG::NodeHandle sortPass_1;
+		GFX::RDG::NodeHandle sortPass_2;
+		GFX::RDG::NodeHandle sortPass_3;
 		GFX::RDG::NodeHandle sortPassClear;
 		GFX::RDG::NodeHandle sortShowKeys;
 
-		MemScope<RHI::IShader> shaderHistogramNaive1_32;
-		MemScope<RHI::IShader> shaderHistogramIntegrate1_32;
+		MemScope<RHI::IShader> shaderHistogramNaive_8_4;
+		MemScope<RHI::IShader> shaderHistogramIntegrate_8_4;
 		MemScope<RHI::IShader> shaderSortInit;
 		MemScope<RHI::IShader> shaderSortPass;
 		MemScope<RHI::IShader> shaderSortPassClear;
@@ -67,15 +72,18 @@ namespace SIByL::Demo
 
 		RHI::IResourceFactory* factory;
 		uint32_t elementCount;
-		uint32_t threadPerWorkgroup = 1024;
-		uint32_t elementPerWorkgroup = 1024;
-		uint32_t tileSize = 2048;
+		uint32_t threadPerWorkgroup = 256;
+		uint32_t elementPerThread = 8;
+		uint32_t elementPerWorkgroup = threadPerWorkgroup * elementPerThread;
+		uint32_t bitsPerDigit = 8;
+		uint32_t tileSize = elementPerWorkgroup;
 		uint32_t tilePerBlock = 1;
 		uint32_t elementPerBlock = tileSize * tilePerBlock;
 		uint32_t elementReducedSize;
-		uint32_t bitsPerDigit = 1;
 		uint32_t possibleDigitValue = 1 << bitsPerDigit;
 		uint32_t passNum = 32 / bitsPerDigit;
+		uint32_t subgroupHistogramElementPerBlock = 8 * 256;
+		
 
 		uint32_t activeBlockNum = ((elementCount + elementPerBlock - 1) / elementPerBlock);
 	};
@@ -87,10 +95,10 @@ namespace SIByL::Demo
 
 		// load precomputed samples for particle position initialization
 		//shaderHistogramNaive1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_naive_1_32.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		shaderHistogramNaive1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_subgroup_1_32_opt.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		shaderHistogramIntegrate1_32 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_integrate_1_32.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		shaderHistogramNaive_8_4 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_subgroup_8_4.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		shaderHistogramIntegrate_8_4 = factory->createShaderFromBinaryFile("cluster/radix_sort_histogram_integrate_8_4.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortInit = factory->createShaderFromBinaryFile("cluster/radix_sort_test_initializer.spv", { RHI::ShaderStage::COMPUTE,"main" });
-		shaderSortPass = factory->createShaderFromBinaryFile("cluster/radix_sort_onesweep.spv", { RHI::ShaderStage::COMPUTE,"main" });
+		shaderSortPass = factory->createShaderFromBinaryFile("cluster/radix_sort_onesweep_template.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortPassClear = factory->createShaderFromBinaryFile("cluster/radix_sort_onesweep_clear.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		shaderSortShowKeys = factory->createShaderFromBinaryFile("cluster/radix_sort_show_keys.spv", { RHI::ShaderStage::COMPUTE,"main" });
 	}
@@ -102,7 +110,8 @@ namespace SIByL::Demo
 		sortedIndexWithDoubleBuffer = builder->addStorageBuffer(sizeof(uint32_t) * elementCount * 2, "Sorted Indices Double-Buffer");
 		offsetFromDigitStartsAggregate = builder->addStorageBuffer(sizeof(uint32_t) * possibleDigitValue *  GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Aggregate)");
 		offsetFromDigitStartPrefix = builder->addStorageBuffer(sizeof(uint32_t) * possibleDigitValue * GRIDSIZE(elementCount, (tileSize * tilePerBlock)), "Offset (Prefix)");
-		intermediateHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue * elementReducedSize, "Block-Wise Sum");
+		intermediateHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue, "Block-Wise Sum");
+		intermediateHistogramLookBack = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue * GRIDSIZE(elementCount, subgroupHistogramElementPerBlock), "Block-Wise Sum Look Back");
 		globalHistogram = builder->addStorageBuffer(sizeof(uint32_t) * passNum * possibleDigitValue, "Global Histogram");
 		globalCounter = builder->addStorageBuffer(sizeof(uint32_t) * 2, "Global Counter");
 
@@ -121,12 +130,31 @@ namespace SIByL::Demo
 	auto SortTest::registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void
 	{
 		// Create Init Pass
-		sortInit = builder->addComputePassBackPool(shaderSortInit.get(), { inputKeys, sortedIndexWithDoubleBuffer }, "Sort Init", sizeof(unsigned int));
+		sortInit = builder->addComputePassBackPool(shaderSortInit.get(), { inputKeys, sortedIndexWithDoubleBuffer, globalCounter }, "Sort Init", sizeof(unsigned int));
 
 		// Create Sort Pass
-		sortHistogramNaive1_32 = builder->addComputePassBackPool(shaderHistogramNaive1_32.get(), { inputKeys, intermediateHistogram }, "Naive Histogram Pass 1", sizeof(unsigned int));
-		sortHistogramIntegrate1_32 = builder->addComputePassBackPool(shaderHistogramIntegrate1_32.get(), { intermediateHistogram, globalHistogram, globalCounter }, "Histogram Pass 2", sizeof(unsigned int));
-		sortPass = builder->addComputePassBackPool(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter }, "Sort Pass", sizeof(unsigned int));
+		sortHistogramSubgroup_8_4 = builder->addComputePassBackPool(shaderHistogramNaive_8_4.get(), { inputKeys, intermediateHistogram, intermediateHistogramLookBack }, "Naive Histogram Pass 1", 0);
+		sortHistogramIntegrate_8_4 = builder->addComputePassBackPool(shaderHistogramIntegrate_8_4.get(), { intermediateHistogram, globalHistogram }, "Histogram Pass 2", sizeof(unsigned int));
+		sortPass = builder->addComputePassBackPool(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter, debugInfo }, "Sort Pass", sizeof(unsigned int));
+		
+		sortPass_0 = builder->addComputePass(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter, debugInfo }, "Sort Pass", sizeof(unsigned int));
+		builder->attached.getComputePassNode(sortPass_0)->customDispatch = [elementCount = elementCount, elementPerBlock = elementPerBlock] (GFX::RDG::ComputePassNode * compute_pass, RHI::ICommandBuffer * commandbuffer, uint32_t flight_idx)
+		{ compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(elementCount, elementPerBlock), 1, 1, flight_idx, 0); };
+
+		sortPass_1 = builder->addComputePass(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter, debugInfo }, "Sort Pass", sizeof(unsigned int));
+		builder->attached.getComputePassNode(sortPass_1)->customDispatch = [elementCount = elementCount, elementPerBlock = elementPerBlock](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+		{ compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(elementCount, elementPerBlock), 1, 1, flight_idx, 1); };
+
+		sortPass_2 = builder->addComputePass(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter, debugInfo }, "Sort Pass", sizeof(unsigned int));
+		builder->attached.getComputePassNode(sortPass_2)->customDispatch = [elementCount = elementCount, elementPerBlock = elementPerBlock](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+		{ compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(elementCount, elementPerBlock), 1, 1, flight_idx, 2); };
+
+		sortPass_3 = builder->addComputePass(shaderSortPass.get(), { inputKeys, sortedIndexWithDoubleBuffer, offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix, globalHistogram, globalCounter, debugInfo }, "Sort Pass", sizeof(unsigned int));
+		builder->attached.getComputePassNode(sortPass_3)->customDispatch = [elementCount = elementCount, elementPerBlock = elementPerBlock](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+		{ compute_pass->executeWithConstant(commandbuffer, GRIDSIZE(elementCount, elementPerBlock), 1, 1, flight_idx, 3); };
+
+		
+		
 		sortPassClear = builder->addComputePassBackPool(shaderSortPassClear.get(), { offsetFromDigitStartsAggregate, offsetFromDigitStartPrefix }, "Sort Pass", 0);
 		sortShowKeys = builder->addComputePassBackPool(shaderSortShowKeys.get(), { inputKeys, sortedIndexWithDoubleBuffer, sortedKeys }, "Sort Test Pass", 0);
 

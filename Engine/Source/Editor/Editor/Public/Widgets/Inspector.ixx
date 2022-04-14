@@ -8,7 +8,6 @@ module;
 #include "entt.hpp"
 export module Editor.Inspector;
 import Editor.Widget;
-import Editor.Scene;
 import ECS.Entity;
 import ECS.UID;
 import ECS.TagComponent;
@@ -21,12 +20,10 @@ namespace SIByL::Editor
 	{
 		virtual auto onDrawGui() noexcept -> void override;
 
-		auto bindScene(Editor::Scene* scene) { binded_scene = scene; }
 		auto setCustomDraw(std::function<void()> func) noexcept -> void { customDraw = func; }
 		auto kickInspectorEmpty() noexcept -> void;
 
 		std::function<void()> customDraw;
-		Editor::Scene* binded_scene;
 	};
 
 	auto Inspector::onDrawGui() noexcept -> void

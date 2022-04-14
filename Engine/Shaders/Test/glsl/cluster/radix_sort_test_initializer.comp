@@ -26,6 +26,13 @@ layout(set = 0, binding = 1, std430) buffer SortedIndex
     uint indices[];
 };
 
+
+layout(set = 0, binding = 2, std430) buffer restrict GlobalCounter
+{
+    uint gWorkgroupCounter;
+    uint gDebugLogCounter;
+};
+
 float nrand( float n )
 {
 	return fract(sin(91.2228 * n)* 43758.5453);
@@ -35,6 +42,12 @@ void main()
 {
     uint gid = gl_GlobalInvocationID.x;
     if(gid >= PushConstants.elementCount) return;
-    keys[gid] = uint(ELEMENT_SIZE*nrand(float(gid)));
+    keys[gid] = gid;
     indices[gid] = gid;
+
+    if(gid == 0)
+    {
+        gWorkgroupCounter = 0;
+        gDebugLogCounter = 0;
+    }
 }

@@ -1,0 +1,181 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+#extension GL_KHR_shader_subgroup_shuffle: require
+
+#define INPUT_SIZE 100000
+#define ELEMENT_PER_THREAD 8
+#define BITS_PER_DIGIT 8
+#define THREADS_PER_BLOCK 256
+#define BINS_PER_THREAD 1
+
+#ifdef USE_ATOMIC_SUBDIVISION
+#define WARP_PRIVATE_ATOMIC_SUBDIVISION 1 // CURRENTLY NOT SUPPORTED
+#endif
+
+#define MAX_PASS_NUM (32/BITS_PER_DIGIT)
+#define NUM_SUBGROUPS (THREADS_PER_BLOCK/32)
+#define POSSIBLE_DIGITS (1<<BITS_PER_DIGIT)
+#define DIGIT_MASK ((1<<BITS_PER_DIGIT)-1)
+#define ELEMENT_PER_BLOCK (ELEMENT_PER_THREAD*THREADS_PER_BLOCK)
+#define ELEMENT_PER_WARP (ELEMENT_PER_THREAD*gl_SubgroupSize)
+
+const uint PREPARED = 0x80000000;
+const uint PPREPARED = 0xC0000000;
+const uint LOWPASS = 0x3FFFFFFF;
+
+layout (local_size_x = THREADS_PER_BLOCK) in;
+
+// SIZE = INPUT_SIZE
+layout(set = 0, binding = 0, std430) buffer restrict readonly InputValues
+{
+    uint values[];
+};
+// Intermediate Histogram
+layout(set = 0, binding = 1, std430) buffer IntermediateHistogram
+{
+    uvec4 histogram[];
+};
+
+// DecoupledLookBack
+layout(set = 0, binding = 2, std430) buffer volatile restrict DecoupledLookBackBuffer
+{
+    uvec4 decoupledBuffer[];
+};
+uint AccessOffsetAs2DArray(uint digit_value, uint workgroup)
+{
+    return digit_value + workgroup * POSSIBLE_DIGITS;
+}
+
+shared uvec4 sharedWarpHistogram[NUM_SUBGROUPS][POSSIBLE_DIGITS];
+void WarpPrivateHistograms()
+{
+    // When Load Data, we use Match-based ranking
+    // Each warp will fetch gl_SubgroupSize*ELEMENT_PER_THREAD consecutive elements
+    uint warp_fetch_offset = (gl_WorkGroupID.x * gl_NumSubgroups + gl_SubgroupID) * ELEMENT_PER_WARP;
+    uint invocation_fetch_idx = warp_fetch_offset + gl_SubgroupInvocationID;
+    // clear sharedWarpHistogram first
+    uint subgroup_clear_offset = gl_SubgroupInvocationID;
+    #pragma optionNV (unroll all)
+    for (int i = 0; i < POSSIBLE_DIGITS/gl_SubgroupSize; i++)
+    {
+        sharedWarpHistogram[gl_SubgroupID][subgroup_clear_offset] = uvec4(0);
+        subgroup_clear_offset += gl_SubgroupSize;
+    }
+    subgroupMemoryBarrierBuffer();
+
+    // Load all ELEMENT_PER_THREAD for this thread
+    #pragma optionNV (unroll all)
+    for(uint item = 0; item < ELEMENT_PER_THREAD; item++)
+    {
+        bool elements_valid = invocation_fetch_idx < INPUT_SIZE;
+        uint element = elements_valid ? values[invocation_fetch_idx] : 0;
+
+        uint digit_0 = (element>>(BITS_PER_DIGIT*0)) & DIGIT_MASK;
+        uint digit_1 = (element>>(BITS_PER_DIGIT*1)) & DIGIT_MASK;
+        uint digit_2 = (element>>(BITS_PER_DIGIT*2)) & DIGIT_MASK;
+        uint digit_3 = (element>>(BITS_PER_DIGIT*3)) & DIGIT_MASK;
+        if(elements_valid)
+        {
+            atomicAdd(sharedWarpHistogram[gl_SubgroupID][digit_0].r, 1);
+            atomicAdd(sharedWarpHistogram[gl_SubgroupID][digit_1].g, 1);
+            atomicAdd(sharedWarpHistogram[gl_SubgroupID][digit_2].b, 1);
+            atomicAdd(sharedWarpHistogram[gl_SubgroupID][digit_3].a, 1);
+        }
+        invocation_fetch_idx += gl_SubgroupSize;
+    }
+}
+
+// shared offset info to reduce useless read (as offset arrays are volatile)
+shared uvec4 sharedOffsetInfo[POSSIBLE_DIGITS];
+// Compute Sum of Warp-Private Histogram
+// preparing the Data for Decoupled Look-Back
+// we need to count totally POSSIBLE_DIGITS bins
+// therefore we should dispatch the jobs for different threads, 
+// let each thread do BINS_PER_THREAD bins counting.
+void sharedWarpHistogramsUpSweep()
+{
+    // Make Sure (BINS_PER_THREAD * THREADS_PER_BLOCK > POSSIBLE_DIGITS)
+    #pragma optionNV (unroll all)
+    for(uint i = 0; i < BINS_PER_THREAD; i++)
+    {
+        uint bin = gl_LocalInvocationID.x * BINS_PER_THREAD + i;
+        if(bin < POSSIBLE_DIGITS)
+        {
+            uvec4 bin_count = uvec4(0,0,0,0);
+            #pragma optionNV (unroll all)
+            for(uint warp = 0; warp < gl_NumSubgroups; warp++)
+            {
+                // In the up-sweep sharedWarpHistogram[warp][bin] will be exclusive prefix sum
+                bin_count += sharedWarpHistogram[warp][bin];
+            }
+            sharedOffsetInfo[bin] = bin_count;
+            bin_count.r |= PREPARED;
+            decoupledBuffer[AccessOffsetAs2DArray(bin, gl_WorkGroupID.x)] = bin_count;
+        }
+    }
+}
+
+// Do actually the Decoupled Look-Back
+// need previous blocks finish [digit counts for tile]
+// output the exclusive prefix sum for the block x digits
+void DecoupledLookBack()
+{
+    // Make Sure (BINS_PER_THREAD * THREADS_PER_BLOCK > POSSIBLE_DIGITS)
+    #pragma optionNV (unroll all)
+    for(uint i = 0; i < BINS_PER_THREAD; i++)
+    {
+        uint bin = gl_LocalInvocationID.x * BINS_PER_THREAD + i;
+        if(bin < POSSIBLE_DIGITS)
+        {
+            uint access_id = AccessOffsetAs2DArray(bin, gl_WorkGroupID.x);
+            uvec4 exclusive_prefix = uvec4(0);
+            // Do decoupled Look-back
+            for(int precursor = int(gl_WorkGroupID.x)-1; precursor >= 0; precursor--)
+            {
+                uint precursor_access_id = AccessOffsetAs2DArray(bin, precursor);
+                uvec4 precursor_value = decoupledBuffer[precursor_access_id];
+                if((precursor_value.r & PPREPARED) == PPREPARED) // If prefix is prepared
+                {
+                    precursor_value.r &= LOWPASS;
+                    exclusive_prefix += (precursor_value);
+                    break;
+                }
+                else
+                {
+                    // stall until aggregate is prepared
+                    while((precursor_value.r & PREPARED)==0){ precursor_value = decoupledBuffer[precursor_access_id]; }
+                    precursor_value.r &= LOWPASS;
+                    exclusive_prefix += precursor_value;
+                }
+            }
+            // sharedOffsetInfo is used. 
+            // but memory barrier is not need because it is written by this thread
+            uvec4 inclusive_prefix = (exclusive_prefix + sharedOffsetInfo[bin]);
+            inclusive_prefix.r |= PPREPARED;
+            decoupledBuffer[access_id] = inclusive_prefix;
+
+            if(gl_WorkGroupID.x == gl_NumWorkGroups.x-1)
+            {
+                histogram[bin] = exclusive_prefix + sharedOffsetInfo[bin];
+            }
+        }
+    }
+}
+
+void HistogramDigitCount()
+{
+    // Compute Warp-Private Histograms
+    WarpPrivateHistograms();
+    barrier();
+    // Then do up-sweep counting all the digits
+    sharedWarpHistogramsUpSweep();
+    memoryBarrier();
+    // Do actually the Decoupled Look-Back
+    DecoupledLookBack();
+}
+
+void main()
+{
+    HistogramDigitCount();
+}

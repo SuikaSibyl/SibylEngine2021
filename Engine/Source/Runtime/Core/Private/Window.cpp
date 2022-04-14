@@ -44,6 +44,7 @@ namespace SIByL::Core
 		uint32_t const& width,
 		uint32_t const& height,
 		std::string_view name)
+		:ILayer("Window Layer")
 	{
 		window.reset(IWindowFactory(vendor, width, height, name));
 		window->setEventCallback(event_callback);

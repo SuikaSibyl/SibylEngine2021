@@ -3,6 +3,7 @@ module;
 #include <utility>
 #include <type_traits>
 #include <Macros.h>
+#include <string_view>
 module Editor.ImGuiLayer;
 import Core.Layer;
 import Core.Log;
@@ -15,6 +16,7 @@ import Editor.ImGuiBackend.VK;
 namespace SIByL::Editor
 {
 	ImGuiLayer::ImGuiLayer(RHI::ILogicalDevice* logical_device)
+		:ILayer("ImGui Layer")
 	{
 		api = logical_device->getPhysicalDevice()->getGraphicContext()->getAPI();
 		switch (api)

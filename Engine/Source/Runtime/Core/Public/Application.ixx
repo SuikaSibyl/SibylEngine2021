@@ -40,6 +40,8 @@ namespace SIByL
 			void popLayer(ILayer* layer);
 			void popOverlay(ILayer* overlay);
 
+			auto getLayerStack() noexcept -> LayerStack* { return &layer_stack; }
+
 		protected:
 			bool is_running = false;
 			LayerStack layer_stack;

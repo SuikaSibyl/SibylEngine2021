@@ -15,34 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Public\Widgets\Viewport.ixx">
+    <ClCompile Include="Public\Asset.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Framework\Widget.ixx">
+    <ClCompile Include="Public\Assets\Mesh.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Framework\Segment.ixx">
+    <ClCompile Include="Public\RuntimeAssetManager.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Widgets\Scene.ixx">
+    <ClCompile Include="Public\Assets\Texture.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Widgets\Inspector.ixx">
+    <ClCompile Include="Private\RuntimeAssetManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Widgets\RenderPipeline.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\Segments\Component.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\Segments\AssetManager.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\Widgets\Introspection.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Public\EditorLayer.ixx">
+    <ClCompile Include="Public\AssetLayer.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

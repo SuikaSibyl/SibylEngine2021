@@ -47,39 +47,46 @@ namespace SIByL::GFX
 
 	auto SceneTree::moveNode(uint64_t const& handle, uint64_t const& parent) noexcept -> void
 	{
+		uint64_t handle_to_move = handle;
+		// check whether parent is not decestors
+		uint64_t parent_cursor = parent;
+		while (parent_cursor != 0)
+		{
+			parent_cursor = nodes[parent_cursor].parent;
+			if (parent_cursor == handle) return; // If set ancestor as child, no movement;
+		}
 		// remove node from its previous parent
 		// remove from parent
-		auto& parent_children = nodes[nodes[handle].parent].children;
+		auto& parent_children = nodes[nodes[handle_to_move].parent].children;
 		for (int i = 0; i < parent_children.size(); i++)
 		{
-			if (parent_children[i] = handle)
+			if (parent_children[i] == handle_to_move)
 			{
 				parent_children.erase(parent_children.begin() + i);
 				break;
 			}
 		}
 		// add node to its new parent
-		nodes[parent].children.emplace_back(handle);
+		nodes[parent].children.emplace_back(handle_to_move);
 		// change the node info
 		nodes[handle].parent = parent;
 	}
 
 	auto SceneTree::removeNode(uint64_t const& handle) noexcept -> void
 	{
-		//if (handle == root) return;
-		// remove children
-		context.destroyEntity(nodes[handle].entity);
-		for (int i = 0; i < nodes[handle].children.size(); i++)
+		uint64_t handle_to_delete = handle;
+		context.destroyEntity(nodes[handle_to_delete].entity);
+		for (int i = 0; i < nodes[handle_to_delete].children.size(); i++)
 		{
-			removeNode(nodes[handle].children[i]);
+			removeNode(nodes[handle_to_delete].children[i]);
 		}
 		// remove from parent
 		if (nodes[handle].parent != 0)
 		{
-			auto& parent_children = nodes[nodes[handle].parent].children;
+			auto& parent_children = nodes[nodes[handle_to_delete].parent].children;
 			for (int i = 0; i < parent_children.size(); i++)
 			{
-				if (parent_children[i] = handle)
+				if (parent_children[i] == handle_to_delete)
 				{
 					parent_children.erase(parent_children.begin() + i);
 					break;
@@ -87,8 +94,7 @@ namespace SIByL::GFX
 			}
 		}
 		// remove from nodes
-		auto iter = nodes.find(handle);
-		if (iter != nodes.end()) iter = nodes.erase(iter);
+		nodes.erase(handle_to_delete);
 	}
 
 	std::string const beg_braket = "╭";

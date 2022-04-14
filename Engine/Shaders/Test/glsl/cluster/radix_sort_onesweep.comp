@@ -26,12 +26,12 @@ layout(push_constant) uniform constants {
 } PushConstants;
 
 // SIZE = ELEMENT_COUNT
-layout(set = 0, binding = 0, std430) buffer InputKeys
+layout(set = 0, binding = 0, std430) buffer restrict readonly InputKeys
 {
     uint keys[];
 };
 
-layout(set = 0, binding = 1, std430) buffer SortedIndex
+layout(set = 0, binding = 1, std430) buffer restrict SortedIndex
 {
     uint indices[];
 };
@@ -45,11 +45,11 @@ layout(set = 0, binding = 1, std430) buffer SortedIndex
 // values       1  [.] [.] [.] [.] [.] ... [.]
 // (bins)       2  [.] [.] [.] [.] [.] ... [.]
 //              3  [.] [.] [.] [.] [.] ... [.]
-layout(set = 0, binding = 2, std430) buffer volatile OffsetFromDigitStartsAggregate
+layout(set = 0, binding = 2, std430) buffer volatile restrict OffsetFromDigitStartsAggregate
 {
     uint aggregate[];
 };
-layout(set = 0, binding = 3, std430) buffer volatile OffsetFromDigitStartsPrefix
+layout(set = 0, binding = 3, std430) buffer volatile restrict OffsetFromDigitStartsPrefix
 {
     uint prefix[];
 };
@@ -69,7 +69,7 @@ uint accessOffset2DArray(uint possible_value, uint workgroup)
 // //              3  [.] [.] [.] [.]
 // //              .   .   .   .   .
 // //              7  [.] [.] [.] [.]
-layout(set = 0, binding = 4, std430) buffer GlobalDigitHistogram
+layout(set = 0, binding = 4, std430) buffer restrict readonly GlobalDigitHistogram
 {
     uint gGlobalHistogram[];
 };
@@ -79,10 +79,15 @@ uint getGlobalDigitHistogram(uint pass, uint digit_value)
     return gGlobalHistogram[pass*POSSIBLE_DIGIT_VALUE + digit_value];
 }
 
-layout(set = 0, binding = 5, std430) buffer GlobalCounter
+layout(set = 0, binding = 5, std430) buffer restrict GlobalCounter
 {
     uint gWorkgroupCounter;
     uint gDebugLogCounter;
+};
+
+layout(set = 0, binding = 6, std430) buffer restrict DebugInfo
+{
+    uint gDebugInfo[];
 };
 
 const uint already_prepared = 0x80000000;
@@ -128,6 +133,13 @@ void main()
     {
         sharedWorkgroupID = atomicAdd(gWorkgroupCounter, 1);
         if(sharedWorkgroupID+1==gl_NumWorkGroups.x) gWorkgroupCounter = 0;
+
+        if(PushConstants.digitOffset==3)
+        {
+            uint debugIdx = atomicAdd(gDebugLogCounter, 1);
+            gDebugInfo[debugIdx] = 
+                sharedWorkgroupID;
+        }
     }
     barrier();
     uint workgroupID = sharedWorkgroupID;
