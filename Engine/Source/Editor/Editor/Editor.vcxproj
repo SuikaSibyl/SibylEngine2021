@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Public\EditorLayer.ixx" />
     <ClCompile Include="Public\Framework\Segment.ixx" />
+    <ClCompile Include="Public\Misc\EntityElucidator.ixx" />
     <ClCompile Include="Public\Segments\AssetManager.ixx" />
     <ClCompile Include="Public\Segments\Component.ixx" />
     <ClCompile Include="Public\Widgets\Introspection.ixx" />

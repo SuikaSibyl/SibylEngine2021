@@ -84,8 +84,8 @@ namespace SIByL::ECS
 		template<typename T>
 		bool removeComponent()
 		{
-			SE_CORE_ASSERT(HasComponent<T>(), "ECS :: Entity does not have component!");
-			context->OnComponentRemoved<T>(*this, GetComponent<T>());
+			SE_CORE_ASSERT(hasComponent<T>(), "ECS :: Entity does not have component!");
+			context->OnComponentRemoved<T>(*this, getComponent<T>());
 			return context->registry.remove<T>(entityHandle);
 		}
 

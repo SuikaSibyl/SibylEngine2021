@@ -14,6 +14,7 @@ import ECS.TagComponent;
 import GFX.SceneTree;
 import GFX.Scene;
 import Editor.Inspector;
+import Editor.EntityElucidator;
 
 namespace SIByL::Editor
 {
@@ -27,6 +28,7 @@ namespace SIByL::Editor
 		GFX::Scene* binded_scene;
 
 		GFX::SceneNodeHandle forceNodeOpen = 0;
+		GFX::SceneNodeHandle inspected = 0;
 		Inspector* inspector = nullptr;
 	};
 
@@ -110,7 +112,9 @@ namespace SIByL::Editor
 		// Clicked
 		if (ImGui::IsItemClicked())
 		{
-			
+			ECS::Entity entity = binded_scene->tree.getNodeEntity(node);
+			inspected = node;
+			if (inspector) inspector->setCustomDraw(std::bind(EntityElucidator::drawInspector, entity));
 		}
 
 		// Right-click on blank space
@@ -164,6 +168,18 @@ namespace SIByL::Editor
 
 		if (entityDeleted)
 		{
+			bool isParentOfInspected = false;
+			GFX::SceneNodeHandle inspected_parent = inspected;
+			while (inspected_parent != 0)
+			{
+				inspected_parent = binded_scene->tree.nodes[inspected_parent].parent;
+				if (node == node) { isParentOfInspected = true; break; } // If set ancestor as child, no movement;
+			}
+			if (node == inspected || isParentOfInspected)
+			{
+				if (inspector) inspector->setCustomDraw(nullptr);
+				inspected = 0;
+			}
 			binded_scene->tree.removeNode(node);
 		}
 	}
