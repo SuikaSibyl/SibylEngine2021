@@ -154,13 +154,19 @@
     <ClCompile Include="Private\GFXLayer\GFXLayer.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
+    <ClCompile Include="Public\Components\Camera.ixx" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
+    <ClCompile Include="Public\Components\Transform.ixx" />
     <ClCompile Include="Public\GFXLayer\GFXLayer.ixx" />
     <ClCompile Include="Public\PostProcessing\AcesBloom.ixx" />
     <ClCompile Include="Public\Scene\Scene.ixx" />
     <ClCompile Include="Public\Scene\SceneTree.ixx" />
+    <ClCompile Include="Public\Scene\Serializer.ixx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Asset\Asset.vcxproj">
+      <Project>{56d2e32e-7901-443f-ba06-a6bfb6245295}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
     </ProjectReference>

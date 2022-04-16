@@ -1,4 +1,5 @@
 module;
+#include <string>
 #include <cstdint>
 #include <functional>
 #include <string_view>
@@ -212,5 +213,4 @@ namespace SIByL::Core
 		width = static_cast<uint32_t>(_width);
 		height = static_cast<uint32_t>(_height);
 	}
-
 }

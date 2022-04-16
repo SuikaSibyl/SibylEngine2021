@@ -9,11 +9,15 @@ module;
 #include <imgui_internal.h>
 #include "entt.hpp"
 #include <map>
+#include <glm/glm.hpp>
 export module Editor.EntityElucidator;
 import ECS.Entity;
 import ECS.UID;
 import ECS.TagComponent;
 import GFX.Mesh;
+import GFX.Transform;
+import GFX.Camera;
+import Editor.CommonProperties;
 
 namespace SIByL::Editor
 {
@@ -55,6 +59,7 @@ namespace SIByL::Editor
 			{
 				T& component = entity.getComponent<T>();
 				uiFunction(component);
+				ImGui::Dummy(ImVec2(0.0f, 20.0f));
 				ImGui::TreePop();
 			}
 
@@ -77,6 +82,47 @@ namespace SIByL::Editor
 			}
 		}
 		// Draw Mesh Component
+		drawComponent<GFX::Transform>(entity, "Transform", [](auto& component)
+			{
+				// set translation
+				glm::vec3 translation = component.getTranslation();
+				drawVec3Control("Translation", translation);
+				bool translation_modified = (component.getTranslation() != translation);
+				if (translation_modified) component.setTranslation(translation);
+				// set rotation
+				glm::vec3 rotation = component.getEulerAngles();
+				drawVec3Control("Rotation", rotation);
+				bool rotation_modified = (component.getEulerAngles() != rotation);
+				if (rotation_modified) component.setEulerAngles(rotation);
+				// set scale
+				glm::vec3 scaling = component.getScale();
+				drawVec3Control("Scaling", scaling, 1);
+				bool scale_modified = (component.getScale() != scaling);
+				if (scale_modified) component.setScale(scaling);
+			});
+		// Draw Camera Component
+		drawComponent<GFX::Camera>(entity, "Camera", [](auto& component)
+			{
+				// fov
+				static float radians2degree = 180.f/3.1415926f;
+				float fov = radians2degree * component.getFovy();
+				drawFloatControl("FoV", fov, 1, 1, 180, 45);
+				bool fov_modified = (radians2degree*(component.getFovy()) != fov);
+				if (fov_modified && fov > 0) component.setFovy(glm::radians(fov));
+				// near
+				float near = component.getNear();
+				drawFloatControl("Near", near, 0.01, 0.001, 2, 0.1);
+				bool near_modified = (component.getNear() != near);
+				if (near_modified && near > 0) component.setNear(near);
+				// near
+				float far = component.getFar();
+				drawFloatControl("Far", far, 1, 1, 1000, 100);
+				bool far_modified = (component.getFar() != far);
+				if (far_modified && far > 0) component.setFar(far);
+
+				//SIByLEditor::DrawTriangleMeshSocket("Mesh", component);
+			});
+		// Draw Mesh Component
 		drawComponent<GFX::Mesh>(entity, "Mesh Filter", [](auto& component)
 			{
 				//SIByLEditor::DrawTriangleMeshSocket("Mesh", component);
@@ -97,6 +143,18 @@ namespace SIByL::Editor
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
+				if (ImGui::MenuItem("Transform"))
+				{
+					if (!entity.hasComponent<GFX::Transform>())
+						entity.addComponent<GFX::Transform>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Camera"))
+				{
+					if (!entity.hasComponent<GFX::Camera>())
+						entity.addComponent<GFX::Camera>();
+					ImGui::CloseCurrentPopup();
+				}
 				if (ImGui::MenuItem("Mesh Filter"))
 				{
 					//entity.addComponent<GFX::Mesh>();

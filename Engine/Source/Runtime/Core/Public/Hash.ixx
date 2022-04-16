@@ -8,6 +8,7 @@ namespace SIByL
 	{
 		export class Hash
 		{
+		public:
 			static auto path2hash(std::filesystem::path path) noexcept -> uint64_t;
 		};
 	}

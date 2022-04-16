@@ -9,6 +9,7 @@ module;
 #include "entt.hpp"
 export module Editor.EditorLayer;
 import Core.Layer;
+import Core.Window;
 import Editor.Scene;
 import Editor.Inspector;
 import Editor.Introspection;
@@ -19,7 +20,8 @@ namespace SIByL::Editor
 {
 	export struct EditorLayer :public ILayer
 	{
-		EditorLayer() :ILayer("Editor Layer") {}
+		EditorLayer(WindowLayer* window_layer) :ILayer("Editor Layer"), 
+			sceneGui(window_layer) {}
 		auto onDrawGui() noexcept -> void;
 
 		Viewport mainViewport;

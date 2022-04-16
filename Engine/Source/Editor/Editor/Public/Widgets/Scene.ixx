@@ -8,6 +8,8 @@ module;
 #include "entt.hpp"
 export module Editor.Scene;
 import Editor.Widget;
+import Core.Window;
+import Core.MemoryManager;
 import ECS.Entity;
 import ECS.UID;
 import ECS.TagComponent;
@@ -20,16 +22,21 @@ namespace SIByL::Editor
 {
 	export struct Scene :public Widget
 	{
+		Scene(WindowLayer* window_layer) :windowLayer(window_layer) {}
 		virtual auto onDrawGui() noexcept -> void override;
 
 		auto bindScene(GFX::Scene* scene) { binded_scene = scene; }
 		auto bindInspector(Inspector* inspector) noexcept -> void;
 		auto drawNode(GFX::SceneNodeHandle const& node) -> void;
+
 		GFX::Scene* binded_scene;
+		MemScope<GFX::Scene> hold_scene;
+		std::string currentPath = {};
 
 		GFX::SceneNodeHandle forceNodeOpen = 0;
 		GFX::SceneNodeHandle inspected = 0;
 		Inspector* inspector = nullptr;
+		WindowLayer* windowLayer = nullptr;
 	};
 
 	auto Scene::onDrawGui() noexcept -> void
@@ -41,23 +48,41 @@ namespace SIByL::Editor
 			ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
 			if (ImGui::BeginMenuBar())
 			{
+				// Menu - Scene
+				if (ImGui::BeginMenu("Scene"))
+				{
+					// Menu - File - Load
+					if (ImGui::MenuItem("New"))
+					{
+						hold_scene = MemNew<GFX::Scene>();
+						bindScene(hold_scene.get());
+					}
+					ImGui::EndMenu();
+				}
 				// Menu - File
 				if (ImGui::BeginMenu("File"))
 				{
 					// Menu - File - Load
 					if (ImGui::MenuItem("Load"))
 					{
-
+						std::string path = windowLayer->getWindow()->openFile("");
+						//binded_scene->deserialize(path);
 					}
 					// Menu - File - Save
+					bool should_save_as = false;
 					if (ImGui::MenuItem("Save"))
 					{
+						if (currentPath == std::string()) should_save_as = true;
+						else
+						{
 
+						}
 					}
 					// Menu - File - Save as
-					if (ImGui::MenuItem("Save as"))
+					if (ImGui::MenuItem("Save as") || should_save_as)
 					{
-
+						std::string path = windowLayer->getWindow()->saveFile("");
+						binded_scene->serialize(path);
 					}
 					ImGui::EndMenu();
 				}

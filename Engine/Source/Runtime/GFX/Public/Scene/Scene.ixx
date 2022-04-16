@@ -3,7 +3,7 @@ module;
 export module GFX.Scene;
 import GFX.SceneTree;
 import Core.File;
-import RHI.ILogicalDevice;
+import Asset.AssetLayer;
 
 namespace SIByL::GFX
 {
@@ -11,7 +11,7 @@ namespace SIByL::GFX
 	{
 	public:
 		auto serialize(std::filesystem::path path) noexcept -> void;
-		auto deserialize(std::filesystem::path path, RHI::ILogicalDevice* device) noexcept -> void;
+		auto deserialize(std::filesystem::path path, Asset::AssetLayer* asset_layer) noexcept -> void;
 
 		SceneTree tree;
 	};

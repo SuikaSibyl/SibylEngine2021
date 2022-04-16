@@ -9,6 +9,7 @@ module;
 #include "entt.hpp"
 export module Editor.AssetManager;
 import Editor.Segment;
+import Editor.CommonProperties;
 
 namespace SIByL::Editor
 {

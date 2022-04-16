@@ -80,11 +80,15 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(SolutionDir)Engine/Source/ThirdParty/assimp/include;$(SolutionDir)Engine/Source/ThirdParty/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine/Binaries/ThirdParty/assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(SolutionDir)Engine/Source/ThirdParty/assimp/include;$(SolutionDir)Engine/Source/ThirdParty/;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine/Binaries/ThirdParty/assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -145,19 +149,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Private\AssetLayer.cpp" />
+    <ClCompile Include="Private\Loader\MeshLoader.cpp" />
+    <ClCompile Include="Public\RuntimeAssetLibrary.ixx" />
     <ClCompile Include="Private\RuntimeAssetManager.cpp" />
     <ClCompile Include="Public\Asset.ixx" />
     <ClCompile Include="Public\AssetLayer.ixx" />
+    <ClCompile Include="Public\AssetLoader.ixx" />
     <ClCompile Include="Public\Assets\Mesh.ixx" />
     <ClCompile Include="Public\Assets\Texture.ixx" />
+    <ClCompile Include="Public\Loader\MeshLoader.ixx" />
     <ClCompile Include="Public\RuntimeAssetManager.ixx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ThirdParty\yaml\yaml.vcxproj">
+      <Project>{d5738559-a252-4307-bf8f-9f44e106e922}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ECS\ECS.vcxproj">
       <Project>{688c4381-ba51-4866-9827-eb59ae7008cb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\RHI\RHI.vcxproj">
+      <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

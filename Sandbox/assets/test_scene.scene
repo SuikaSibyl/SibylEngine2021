@@ -5,8 +5,7 @@ SceneNodes:
     components:
       TagComponent: particle
       MeshComponent:
-        uid: 13249460845096863866
-        path: ""
+        guid: 2267991365489773690
   - uid: 11454354189262129274
     parent: 0
     children:

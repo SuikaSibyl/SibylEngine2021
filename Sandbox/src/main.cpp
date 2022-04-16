@@ -148,21 +148,21 @@ public:
 		resourceFactory = MemNew<RHI::IResourceFactory>(logicalDevice.get());
 
 		// create asset layer
-		assetLayer = MemNew<Asset::AssetLayer>();
+		assetLayer = MemNew<Asset::AssetLayer>(resourceFactory.get());
 		pushLayer(assetLayer.get());
-		assetLayer->runtimeManager.addNewAsset({"Test"}); // TODO :: delete this only for test 
+
 		// create imgui layer
 		imguiLayer = MemNew<Editor::ImGuiLayer>(logicalDevice.get());
 		pushLayer(imguiLayer.get());
 		Editor::ImFactory imfactory(imguiLayer.get());
 		// create editor layer
-		editorLayer = MemNew<Editor::EditorLayer>();
+		editorLayer = MemNew<Editor::EditorLayer>(window_layer);
 		pushLayer(editorLayer.get());
 		editorLayer->introspectionGui.bindApplication(this);
 		editorLayer->introspectionGui.bindInspector(&(editorLayer->inspectorGui));
 
 		// create scene
-		scene.deserialize("test_scene.scene", logicalDevice.get());
+		scene.deserialize("test_scene.scene", assetLayer.get());
 		editorLayer->sceneGui.bindScene(&scene);
 		editorLayer->sceneGui.bindInspector(&(editorLayer->inspectorGui));
 		editorLayer->pipelineGui.bindRenderGraph(&rdg);
@@ -207,8 +207,8 @@ public:
 		rasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
 		{
 			std::function<void(ECS::TagComponent&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
-				commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer.get());
-				commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer.get());
+				commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
+				commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
 				RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
 				commandbuffer->cmdBindDescriptorSets(
 					RHI::PipelineBintPoint::GRAPHICS,
@@ -332,7 +332,6 @@ public:
 	    }
 		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 		rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, 1024), 1, 1, 0);
-		//transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
 
 		// ~Test
 		transientCommandbuffer->endRecording();

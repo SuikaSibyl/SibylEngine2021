@@ -10,6 +10,7 @@ import Core.Input;
 import Core.Layer;
 import Core.SObject;
 import Core.Window.GLFW;
+import Core.Window.GLFW.Win;
 
 namespace SIByL::Core
 {
@@ -27,7 +28,7 @@ namespace SIByL::Core
 		switch (vendor)
 		{
 		case SIByL::Core::EWindowVendor::GLFW:
-			return new IWindowGLFW(width, height, name);
+			return new IWindowGLFWWin(width, height, name);
 			break;
 		case SIByL::Core::EWindowVendor::WINDOWS:
 			break;

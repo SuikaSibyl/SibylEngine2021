@@ -11,12 +11,13 @@ import Core.Log;
 import ECS.Entity;
 import ECS.UID;
 import ECS.TagComponent;
+import GFX.Transform;
 
 namespace SIByL::GFX
 {
 	SceneTree::SceneTree()
 	{
-		root = addNode("Scene", 0);
+		root = addNode("NewScene", 0);
 	}
 
 	auto SceneTree::appointRoot(SceneNodeHandle const& new_root) noexcept -> void
@@ -40,6 +41,7 @@ namespace SIByL::GFX
 	auto SceneTree::addNode(std::string const& name, uint64_t const& uid, uint64_t const& parent, std::vector<uint64_t>&& children) noexcept -> uint64_t
 	{
 		ECS::Entity entity = context.createEntity(name);
+		entity.addComponent<GFX::Transform>();
 		nodes[uid] = SceneNode{ entity, uid, parent, std::move(children)};
 
 		return uid;

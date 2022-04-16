@@ -153,7 +153,6 @@
   <ItemGroup>
     <ClCompile Include="Private\Allocator.cpp" />
     <ClCompile Include="Private\Application.cpp" />
-    <ClCompile Include="Private\Asset.ixx" />
     <ClCompile Include="Private\Buffer.cpp" />
     <ClCompile Include="Private\Cache.cpp" />
     <ClCompile Include="Private\File.cpp" />
@@ -167,6 +166,8 @@
     </ClCompile>
     <ClCompile Include="Private\Memory.cpp" />
     <ClCompile Include="Private\Time.cpp" />
+    <ClCompile Include="Private\Vendors\GLFW\IWindowGLFWWin.cpp" />
+    <ClCompile Include="Private\Vendors\GLFW\IWindowGLFWWin.ixx" />
     <ClCompile Include="Public\LinearAlgebra.ixx" />
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.cpp" />
     <ClCompile Include="Private\Vendors\GLFW\IInputGLFW.ixx" />

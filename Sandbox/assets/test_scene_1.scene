@@ -1,0 +1,38 @@
+SceneName: Scene
+SceneNodes:
+  - uid: 11454354189262129274
+    parent: 0
+    children:
+      - 2267855375430191226
+      - 12510091768644750458
+    components:
+      TagComponent: Scene
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 2267855375430191226
+    parent: 11454354189262129274
+    components:
+      TagComponent: particle
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        uid: 13249460845096863866
+        path: ""
+  - uid: 12510091768644750458
+    parent: 11454354189262129274
+    components:
+      TagComponent: camera
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      Camera:
+        fov: 0.785398185
+        aspect: 1
+        near: 0.100000001
+        far: 100
+SceneEnd: TRUE

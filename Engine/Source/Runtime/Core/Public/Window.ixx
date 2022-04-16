@@ -1,6 +1,7 @@
 module;
 #include <cstdint>
 #include <functional>
+#include <string>
 #include <string_view>
 export module Core.Window;
 import Core.Enums;
@@ -29,6 +30,8 @@ namespace SIByL
 			virtual auto setEventCallback(EventCallbackFn const& callback) noexcept -> void = 0;
 			virtual auto getInput() const noexcept -> IInput* = 0;
 			virtual auto waitUntilNotMinimized(unsigned int& width, unsigned int height) const noexcept -> void = 0;
+			virtual auto openFile(const char* filter) noexcept -> std::string = 0;
+			virtual auto saveFile(const char* filter) noexcept -> std::string = 0;
 		};
 
 		export struct WindowLayerDesc

@@ -1,6 +1,7 @@
 module;
 #include <cstdint>
 #include <functional>
+#include <string>
 #include <string_view>
 #include <GLFW/glfw3.h>
 export module Core.Window.GLFW;
@@ -31,7 +32,7 @@ namespace SIByL
 
 			auto getFramebufferSize(uint32_t& width, uint32_t& height) const noexcept -> void;
 
-		private:
+		protected:
 			GLFWwindow* glfw_window;
 
 			struct WindowData

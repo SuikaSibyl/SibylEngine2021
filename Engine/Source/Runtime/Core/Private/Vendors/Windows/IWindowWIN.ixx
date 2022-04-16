@@ -28,6 +28,8 @@ namespace SIByL
 			virtual auto isVSync() const noexcept -> bool override;
 			virtual auto setEventCallback(const EventCallbackFn& callback) noexcept -> void override;
 			virtual auto getInput() const noexcept -> IInput* override;
+			virtual auto openFile(const char* filter) noexcept -> std::string override;
+			virtual auto saveFile(const char* filter) noexcept -> std::string override;
 
 		private:
 			struct WindowData

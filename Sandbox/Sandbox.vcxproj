@@ -80,12 +80,12 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty\glfw;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(SolutionDir)Engine\Binaries\ThirdParty\vulkan;$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty\glfw;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(SolutionDir)Engine\Binaries\ThirdParty\assimp;$(SolutionDir)Engine\Binaries\ThirdParty\vulkan;$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <IncludePath>$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\ThirdParty;$(SolutionDir)Engine\Source\ThirdParty\entt;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty\glfw;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(SolutionDir)Engine\Binaries\ThirdParty\vulkan;$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty\glfw;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(SolutionDir)Engine\Binaries\ThirdParty\assimp;$(SolutionDir)Engine\Binaries\ThirdParty\vulkan;$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)Engine\Source\Runtime\Core\Public;$(SolutionDir)Engine\Source\ThirdParty;$(SolutionDir)Engine\Source\ThirdParty\entt;$(IncludePath)</IncludePath>
@@ -132,7 +132,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;slang.lib;yaml.lib;imgui.lib;entt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;slang.lib;yaml.lib;imgui.lib;entt.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang.dll $(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\
@@ -159,7 +159,7 @@ xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang-llvm.dll $(Solut
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;slang.lib;yaml.lib;imgui.lib;entt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;slang.lib;yaml.lib;imgui.lib;entt.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang.dll $(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\

@@ -135,9 +135,6 @@
     <ClCompile Include="Private\Cache.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Asset.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Public\Hash.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -148,6 +145,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\LinearAlgebra.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\GLFW\IWindowGLFWWin.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\GLFW\IWindowGLFWWin.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
