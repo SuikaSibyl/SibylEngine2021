@@ -17,12 +17,14 @@ import GFX.SceneTree;
 import GFX.Scene;
 import Editor.Inspector;
 import Editor.EntityElucidator;
+import Asset.AssetLayer;
 
 namespace SIByL::Editor
 {
 	export struct Scene :public Widget
 	{
-		Scene(WindowLayer* window_layer) :windowLayer(window_layer) {}
+		Scene(WindowLayer* window_layer, Asset::AssetLayer* asset_layer) 
+			:windowLayer(window_layer), assetLayer(asset_layer) {}
 		virtual auto onDrawGui() noexcept -> void override;
 
 		auto bindScene(GFX::Scene* scene) { binded_scene = scene; }
@@ -37,6 +39,7 @@ namespace SIByL::Editor
 		GFX::SceneNodeHandle inspected = 0;
 		Inspector* inspector = nullptr;
 		WindowLayer* windowLayer = nullptr;
+		Asset::AssetLayer* assetLayer = nullptr;
 	};
 
 	auto Scene::onDrawGui() noexcept -> void
@@ -66,7 +69,10 @@ namespace SIByL::Editor
 					if (ImGui::MenuItem("Load"))
 					{
 						std::string path = windowLayer->getWindow()->openFile("");
-						//binded_scene->deserialize(path);
+						hold_scene = MemNew<GFX::Scene>();
+						bindScene(hold_scene.get());
+						binded_scene->deserialize(path, assetLayer);
+
 					}
 					// Menu - File - Save
 					bool should_save_as = false;
@@ -139,7 +145,7 @@ namespace SIByL::Editor
 		{
 			ECS::Entity entity = binded_scene->tree.getNodeEntity(node);
 			inspected = node;
-			if (inspector) inspector->setCustomDraw(std::bind(EntityElucidator::drawInspector, entity));
+			if (inspector) inspector->setCustomDraw(std::bind(EntityElucidator::drawInspector, entity, assetLayer, node, binded_scene));
 		}
 
 		// Right-click on blank space

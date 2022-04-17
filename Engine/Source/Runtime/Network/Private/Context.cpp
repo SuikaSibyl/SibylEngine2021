@@ -20,7 +20,7 @@ namespace SIByL::Network
 		WSADATA wsa_Data;
 		int wsa_ReturnCode = WSAStartup(0x101, &wsa_Data);
 
-		// Get the local hostname
+		// get the local hostname
 		char szHostName[255];
 		gethostname(szHostName, 255);
 		struct hostent* host_entry;

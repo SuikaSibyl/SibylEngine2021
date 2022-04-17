@@ -4,11 +4,13 @@ module;
 #include <optional>
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
+#include <Macros.h>
 module RHI.GraphicContext.VK;
 import Core.Log;
 import Core.Window;
 import Core.BitFlag;
 import Core.Window.GLFW;
+import Core.Profiler;
 import RHI.GraphicContext;
 
 namespace SIByL
@@ -80,6 +82,7 @@ namespace SIByL
 
 		IGraphicContextVK::IGraphicContextVK(GraphicContextExtensionFlags _extensions)
 		{
+			PROFILE_SCOPE_FUNCTION()
 			extensions = _extensions;
 			createInstance();
 			setupDebugMessenger();
@@ -101,6 +104,8 @@ namespace SIByL
 
 		auto IGraphicContextVK::createInstance() -> void
 		{
+			PROFILE_SCOPE_FUNCTION();
+
 			if (enableValidationLayers && !checkValidationLayerSupport()) {
 				SE_CORE_ERROR("validation layers requested, but not available!");
 			}
@@ -140,10 +145,13 @@ namespace SIByL
 				createInfo.pNext = nullptr;
 			}
 
-			// check error
+
+			InstrumentationTimer* whateverElse = new InstrumentationTimer("vkCreateInstance");
 			if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
 				SE_CORE_ERROR("failed to create instance!");
 			}
+			delete whateverElse;
+			// check error
 		}
 
 		auto IGraphicContextVK::checkExtension() -> void
@@ -191,9 +199,19 @@ namespace SIByL
 
 		auto IGraphicContextVK::getRequiredExtensions()->std::vector<const char*>
 		{
+			PROFILE_SCOPE_FUNCTION();
+
 			uint32_t glfwExtensionCount = 0;
+
+			InstrumentationTimer* getGLFW = new InstrumentationTimer("getGLFW");
+
+			// local speed up
+			//glfwExtensionCount = 2;
+			//const char* glfwExtensions[] = { "VK_KHR_surface","VK_KHR_win32_surface" };
+
 			const char** glfwExtensions;
 			glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
 			// add extensions that glfw needs
 			std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
@@ -230,6 +248,7 @@ namespace SIByL
 
 		auto IGraphicContextVK::setupDebugMessenger() -> void
 		{
+			PROFILE_SCOPE_FUNCTION()
 			if (!enableValidationLayers) return;
 			
 			VkDebugUtilsMessengerCreateInfoEXT createInfo;
@@ -278,6 +297,7 @@ namespace SIByL
 
 		auto IGraphicContextVK::setupExtensions() -> void
 		{
+			PROFILE_SCOPE_FUNCTION()
 			if (hasBit(this->extensions, GraphicContextExtensionFlagBits::MESH_SHADER))
 			{
 				vkCmdDrawMeshTasksNV = (PFN_vkCmdDrawMeshTasksNV)vkGetInstanceProcAddrStub(instance, "vkCmdDrawMeshTasksNV");

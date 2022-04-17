@@ -153,6 +153,7 @@
     <ClCompile Include="Public\Segments\AssetManager.ixx" />
     <ClCompile Include="Public\Misc\CommonProperties.ixx" />
     <ClCompile Include="Public\Segments\Component.ixx" />
+    <ClCompile Include="Public\Widgets\ContentBrowser.ixx" />
     <ClCompile Include="Public\Widgets\Introspection.ixx" />
     <ClCompile Include="Public\Widgets\Inspector.ixx" />
     <ClCompile Include="Public\Widgets\RenderPipeline.ixx" />

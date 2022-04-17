@@ -72,10 +72,10 @@ namespace SIByL::Demo
 
 		// load texture & baked curves image from file
 		sampler = factory->createSampler({});
-		Image image("./assets/Sparkle.tga");
+		Image image("./portal/Sparkle.tga");
 		texture = factory->createTexture(&image);
 		textureView = factory->createTextureView(texture.get());
-		Image baked_image("./assets/portal_bake.tga");
+		Image baked_image("./portal/portal_bake.tga");
 		bakedCurves = factory->createTexture(&baked_image);
 		bakedCurvesView = factory->createTextureView(bakedCurves.get());
 

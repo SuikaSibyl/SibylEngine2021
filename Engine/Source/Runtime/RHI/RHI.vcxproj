@@ -80,14 +80,14 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/ThirdParty/slang/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/Runtime/Core/Public;$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/ThirdParty/slang/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/ThirdParty/slang/include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/Runtime/Core/Public;$(SolutionDir)Engine/Source/Runtime/RHI/Private;$(SolutionDir)Engine/Source/Runtime/RHI/Public;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/ThirdParty/slang/include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine\Binaries\ThirdParty;$(SolutionDir)Engine\Binaries\ThirdParty\slang;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

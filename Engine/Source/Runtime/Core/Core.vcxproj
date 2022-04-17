@@ -198,6 +198,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">TurnOffAllWarnings</WarningLevel>
     </ClCompile>
     <ClCompile Include="Public\Memory.ixx" />
+    <ClCompile Include="Public\Profiler.ixx" />
     <ClCompile Include="Public\SObject.ixx" />
     <ClCompile Include="Public\SPointer.ixx" />
     <ClCompile Include="Public\Test.ixx" />

@@ -7,6 +7,7 @@ import Asset.RuntimeAssetManager;
 import Asset.RuntimeAssetLibrary;
 import Asset.Asset;
 import Asset.Mesh;
+import Asset.Texture;
 
 namespace SIByL::Asset
 {
@@ -17,6 +18,7 @@ namespace SIByL::Asset
 		~AssetLayer() { runtimeManager.exit(); }
 
 		auto mesh(GUID guid) noexcept -> Mesh*;
+		auto texture(GUID guid) noexcept -> Texture*;
 
 		RHI::IResourceFactory* resourceFactory;
 		RuntimeAssetManager runtimeManager;

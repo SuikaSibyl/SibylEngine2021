@@ -71,12 +71,6 @@ namespace SIByL::GFX::RDG
 		RenderGraph* rg = (RenderGraph*)graph;
 
 		// vertex buffer layout
-		RHI::BufferLayout vertex_buffer_layout =
-		{
-			{RHI::DataType::Float3, "Position"},
-			{RHI::DataType::Float3, "Color"},
-			{RHI::DataType::Float2, "UV"},
-		};
 		vertexLayout = factory->createVertexLayout(vertex_buffer_layout);
 
 		// input assembly
@@ -242,7 +236,7 @@ namespace SIByL::GFX::RDG
 		};
 		pipeline = factory->createPipeline(pipeline_desc);
 
-		// Get Indirect Draw Buffer
+		// get Indirect Draw Buffer
 		if (indirectDrawBufferHandle)
 		{
 			indirectDrawBuffer = rg->getIndirectDrawBufferNode(indirectDrawBufferHandle)->storageBuffer.get();

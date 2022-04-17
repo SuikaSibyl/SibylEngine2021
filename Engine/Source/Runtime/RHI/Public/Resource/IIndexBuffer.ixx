@@ -11,6 +11,7 @@ namespace SIByL
 		public:
 			virtual ~IIndexBuffer() = default;
 			virtual auto getElementSize() noexcept -> uint32_t = 0;
+			virtual auto getIndicesCount() noexcept -> uint32_t = 0;
 
 		private:
 

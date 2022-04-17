@@ -13,8 +13,11 @@ namespace SIByL
 		export class Image
 		{
 		public:
+			Image() = default;
+			Image(Image&& image);
 			Image(std::filesystem::path path);
 			Image(uint32_t width, uint32_t height);
+			Image& operator=(Image&& src);
 			virtual ~Image();
 
 			auto getWidth() noexcept -> uint32_t;
@@ -27,17 +30,17 @@ namespace SIByL
 			void savePPM(std::filesystem::path path) const;
 			void saveTGA(std::filesystem::path path) const;
 
-		private:
 			enum struct ImageAttribute :uint32_t
 			{
-				FROM_STB,
+				FROM_STB = 1 << 0,
 			};
-			uint32_t attributes;
+			uint32_t attributes = 0;
 			uint32_t width;
 			uint32_t height;
 			uint32_t channels;
 			uint32_t size;
-			char* data;
+
+			char* data = nullptr;
 		};
 	}
 }

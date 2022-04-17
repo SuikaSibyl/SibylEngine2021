@@ -34,6 +34,10 @@ namespace SIByL::Asset
 	}
 
 	// Manager Functions
+	auto RuntimeAssetManager::addNewAssetWithGUID(ResourceItem const& item, GUID const& guid) noexcept -> void
+	{
+		assetsMap.emplace(guid, item);
+	}
 
 	auto RuntimeAssetManager::addNewAsset(ResourceItem const& item) noexcept -> GUID
 	{

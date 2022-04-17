@@ -130,6 +130,10 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\assimp\assimp-vc143-mt.dll $(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -147,10 +151,16 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\assimp\assimp-vc143-mt.dll $(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\AssetLayer.cpp" />
     <ClCompile Include="Private\Loader\MeshLoader.cpp" />
+    <ClCompile Include="Public\Assets\Material.ixx" />
+    <ClCompile Include="Public\Loader\TextureLoader.ixx" />
     <ClCompile Include="Public\RuntimeAssetLibrary.ixx" />
     <ClCompile Include="Private\RuntimeAssetManager.cpp" />
     <ClCompile Include="Public\Asset.ixx" />
@@ -170,6 +180,9 @@
     </ProjectReference>
     <ProjectReference Include="..\ECS\ECS.vcxproj">
       <Project>{688c4381-ba51-4866-9827-eb59ae7008cb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Math\Math.vcxproj">
+      <Project>{c8fbbaf5-0331-46ba-bbf5-66704df8204b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\RHI\RHI.vcxproj">
       <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>

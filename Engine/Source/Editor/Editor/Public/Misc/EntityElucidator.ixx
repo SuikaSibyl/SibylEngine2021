@@ -9,21 +9,37 @@ module;
 #include <imgui_internal.h>
 #include "entt.hpp"
 #include <map>
+#include <filesystem>
 #include <glm/glm.hpp>
 export module Editor.EntityElucidator;
+import Asset.Asset;
+import Asset.Mesh;
+import Asset.AssetLayer;
+import Asset.MeshLoader;
+import Asset.RuntimeAssetManager;
+import Asset.DedicatedLoader;
+
+import Core.Log;
+import Core.Hash;
+import Core.Buffer;
+import Core.Cache;
+
 import ECS.Entity;
 import ECS.UID;
 import ECS.TagComponent;
 import GFX.Mesh;
 import GFX.Transform;
 import GFX.Camera;
+import GFX.Renderer;
+import GFX.SceneTree;
+import GFX.Scene;
 import Editor.CommonProperties;
 
 namespace SIByL::Editor
 {
 	export struct EntityElucidator
 	{
-		static auto drawInspector(ECS::Entity entity) -> void;
+		static auto drawInspector(ECS::Entity entity, Asset::AssetLayer* assetLayer, GFX::SceneNodeHandle const& node, GFX::Scene* scene) -> void;
 	};
 
 	template<typename T, typename UIFunction>
@@ -68,7 +84,38 @@ namespace SIByL::Editor
 		}
 	}
 
-	auto EntityElucidator::drawInspector(ECS::Entity entity) -> void
+	auto snifferExternalMeshForASingleNode(Asset::ExternalMeshSniffer::Node node, Asset::ExternalMeshSniffer* sniffer, GFX::SceneNodeHandle const& parent, GFX::Scene* scene, Asset::AssetLayer* assetLayer) noexcept -> void
+	{
+		uint32_t mesh_nums, children_nums;
+		std::string name;
+		sniffer->interpretNode(node, mesh_nums, children_nums, name);
+		GFX::SceneNodeHandle new_parent = scene->tree.addNode(name, parent);
+		for (uint32_t i = 0; i < children_nums; i++)
+		{
+			auto child = sniffer->getNodeChildren(node, i);
+			snifferExternalMeshForASingleNode(child, sniffer, new_parent, scene, assetLayer);
+		}
+		if (mesh_nums > 0)
+		{
+			auto entity = scene->tree.nodes[new_parent].entity;
+			auto& mesh_component = entity.addComponent<GFX::Mesh>();
+			Asset::Mesh tmp_mesh;
+			Asset::MeshLoader tmp_loader(tmp_mesh);
+			uint64_t cache_id = ECS::UniqueID::RequestUniqueID();
+			sniffer->fillVertexIndex(node, tmp_loader.vb, tmp_loader.ib);
+			tmp_loader.saveAsCache(cache_id);
+			Asset::ResourceItem new_item = 
+			{
+				Asset::ResourceKind::MESH,
+				0,
+				cache_id,
+			};
+			uint64_t guid = assetLayer->runtimeManager.addNewAsset(new_item);
+			mesh_component = GFX::Mesh::query(guid, assetLayer);
+		}
+	}
+
+	auto EntityElucidator::drawInspector(ECS::Entity entity, Asset::AssetLayer* assetLayer, GFX::SceneNodeHandle const& node, GFX::Scene* scene) -> void
 	{
 		// Draw Tag Component
 		{
@@ -119,18 +166,115 @@ namespace SIByL::Editor
 				drawFloatControl("Far", far, 1, 1, 1000, 100);
 				bool far_modified = (component.getFar() != far);
 				if (far_modified && far > 0) component.setFar(far);
-
-				//SIByLEditor::DrawTriangleMeshSocket("Mesh", component);
 			});
 		// Draw Mesh Component
-		drawComponent<GFX::Mesh>(entity, "Mesh Filter", [](auto& component)
+		drawComponent<GFX::Mesh>(entity, "Mesh Filter", [assetLayer = assetLayer, node = node, scene = scene](auto& component)
 			{
-				//SIByLEditor::DrawTriangleMeshSocket("Mesh", component);
+				// Position
+				{
+					bool hasPosition = (component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::POSITION) != 0;
+					ImGui::Checkbox("POSITION", &hasPosition);
+					if (hasPosition != ((component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::POSITION) != 0))
+						component.meshDesc.vertexInfo ^= (uint32_t)Asset::VertexInfoBits::POSITION;
+				}
+				ImGui::SameLine();
+				// Color
+				{
+					bool hasColor = (component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::COLOR) != 0;
+					ImGui::Checkbox("COLOR", &hasColor);
+					if (hasColor != ((component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::COLOR) != 0))
+						component.meshDesc.vertexInfo ^= (uint32_t)Asset::VertexInfoBits::COLOR;
+				}
+				ImGui::SameLine();
+				// UV
+				{
+					bool hasUV = (component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::UV) != 0;
+					ImGui::Checkbox("UV", &hasUV);
+					if (hasUV != ((component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::UV) != 0))
+						component.meshDesc.vertexInfo ^= (uint32_t)Asset::VertexInfoBits::UV;
+				}
+				// NORMAL
+				{
+					bool hasNormal = (component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::NORMAL) != 0;
+					ImGui::Checkbox("NORMAL ", &hasNormal);
+					if (hasNormal != ((component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::NORMAL) != 0))
+						component.meshDesc.vertexInfo ^= (uint32_t)Asset::VertexInfoBits::NORMAL;
+				}
+				ImGui::SameLine();
+				// TANGENT
+				{
+					bool hasTangent = (component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::TANGENT) != 0;
+					ImGui::Checkbox("TANGENT", &hasTangent);
+					if (hasTangent != ((component.meshDesc.vertexInfo & (uint32_t)Asset::VertexInfoBits::TANGENT) != 0))
+						component.meshDesc.vertexInfo ^= (uint32_t)Asset::VertexInfoBits::TANGENT;
+				}
+				// Socket
+				{
+					std::string guid = std::to_string(component.guid);
+					ImGui::PushID(guid.c_str());
+					ImGui::Text("Mesh GUID");
+					ImGui::SameLine();
+
+					ImGui::Button(guid.c_str(), ImVec2(250.0f, 0.0f));
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET"))
+						{
+							const wchar_t* path = (const wchar_t*)payload->Data;
+							std::filesystem::path meshPath = path;
+							SE_CORE_INFO("Dragged Path: {0}", meshPath);
+							Asset::GUID guid = Hash::path2hash(meshPath);
+							auto find_result = assetLayer->runtimeManager.findAsset(guid);
+							if (!find_result)//if not already exists
+							{
+								Asset::ExternalMeshSniffer sniffer;
+								uint32_t mesh_nums, children_nums;
+								std::string name;
+								auto parent_node = sniffer.loadFromFile(meshPath);
+								sniffer.interpretNode(parent_node, mesh_nums, children_nums, name);
+								for (uint32_t i = 0; i < children_nums; i++)
+								{
+									auto child = sniffer.getNodeChildren(parent_node, i);
+									snifferExternalMeshForASingleNode(child, &sniffer, node, scene, assetLayer);
+								}
+							}
+							else
+							{
+								component = GFX::Mesh::query(guid, assetLayer);
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+					ImGui::PopID();
+				}
+			});
+		// Draw Renderer Component
+		drawComponent<GFX::Renderer>(entity, "Renderer", [](auto& component)
+			{
+				for (int i = 0; i < component.subRenderers.size(); i++)
+				{
+					auto& subRenderer = component.subRenderers[i];
+					ImGui::PushID(i);
+					ImGui::Columns(2);
+
+					ImGui::SetColumnWidth(0, 150);
+					ImGui::Text("Pass Handle");
+					ImGui::NextColumn();
+					ImGui::Text(std::to_string(subRenderer.pass).c_str());
+
+					ImGui::Columns(1);
+					ImGui::PopID();
+					ImGui::Separator();
+				}
+				// Draw Add SubPass
+				ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+				ImGui::SetCursorPosX(contentRegionAvailable.x / 2 - 50);
+				ImVec2 buttonSize(100, 30);
+				if (ImGui::Button("Add Pass", buttonSize))
+					component.subRenderers.emplace_back();
 			});
 
-		//Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 1), "Consume History", []() {
-
-
+		// Add Components
 		{
 			ImGui::Separator();
 			ImGui::Dummy(ImVec2(0.0f, 20.0f));
@@ -157,7 +301,14 @@ namespace SIByL::Editor
 				}
 				if (ImGui::MenuItem("Mesh Filter"))
 				{
-					//entity.addComponent<GFX::Mesh>();
+					if (!entity.hasComponent<GFX::Mesh>())
+						entity.addComponent<GFX::Mesh>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Renderer"))
+				{
+					if (!entity.hasComponent<GFX::Renderer>())
+						entity.addComponent<GFX::Renderer>();
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();

@@ -48,5 +48,11 @@
     <ClCompile Include="Private\Loader\MeshLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Assets\Material.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Loader\TextureLoader.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

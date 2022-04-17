@@ -13,6 +13,7 @@ namespace SIByL::Asset
 {
 	export struct DedicatedLoader
 	{
+		DedicatedLoader() = default;
 		DedicatedLoader(RHI::IResourceFactory* factory, RuntimeAssetManager* manager) 
 			:resourceFactory(factory), runtimeManager(manager) {}
 		virtual auto loadFromFile(std::filesystem::path path) noexcept -> void = 0;

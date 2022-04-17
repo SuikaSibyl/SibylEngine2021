@@ -79,7 +79,7 @@ namespace SIByL::Editor
 		const ImGuiTreeNodeFlags treeNodeFlags =
 			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding |
 			ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
-		static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg;
+		static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
 
 		ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
@@ -110,6 +110,8 @@ namespace SIByL::Editor
 					ImGui::NextColumn();
 					if (ImGui::BeginTable(guid_str.c_str(), 2, flags))
 					{
+						//ImGui::TableSetupColumn("key", 0, 100.0f);
+						//ImGui::TableSetupColumn("value", 1);
 						ImGui::TableNextRow();
 						ImGui::TableSetColumnIndex(0);
 						ImGui::Text("path");

@@ -22,12 +22,14 @@ namespace SIByL
 			virtual ~IIndexBufferVK() = default;
 
 			virtual auto getElementSize() noexcept -> uint32_t override;
-			
+			virtual auto getIndicesCount() noexcept -> uint32_t override;
+
 			auto getVkBuffer() noexcept ->VkBuffer*;
 			auto getVkIndexType() noexcept -> VkIndexType;
 
 		private:
 			uint32_t elementSize;
+			uint32_t indicesCount;
 			IBufferVK buffer;
 			ILogicalDeviceVK* logicalDevice;
 		};

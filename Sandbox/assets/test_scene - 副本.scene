@@ -1,0 +1,16 @@
+SceneName: Scene
+SceneNodes:
+  - uid: 2267855375430191226
+    parent: 11454354189262129274
+    components:
+      TagComponent: particle
+      MeshComponent:
+        guid: 2267991365489773690
+        vert: 7
+  - uid: 11454354189262129274
+    parent: 0
+    children:
+      - 2267855375430191226
+    components:
+      TagComponent: Scene
+SceneEnd: TRUE

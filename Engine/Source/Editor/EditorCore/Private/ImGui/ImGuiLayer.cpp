@@ -4,6 +4,7 @@ module;
 #include <type_traits>
 #include <Macros.h>
 #include <string_view>
+#include <unordered_map>
 module Editor.ImGuiLayer;
 import Core.Layer;
 import Core.Log;
@@ -11,13 +12,39 @@ import Core.Event;
 import Core.MemoryManager;
 import RHI.IEnum;
 import RHI.ILogicalDevice;
+import RHI.ISampler;
+import RHI.IFactory;
+import RHI.ITextureView;
+import Editor.ImImage;
+
 import Editor.ImGuiBackend.VK;
+import RHI.IEnum.VK;
+import RHI.ISampler.VK;
+import RHI.ITextureView.VK;
+import Editor.ImImage.VK;
 
 namespace SIByL::Editor
 {
+	auto ImImageLibrary::findImImage(Asset::GUID guid) noexcept -> ImImage*
+	{
+		auto iter = imageLib.find(guid);
+		if (iter == imageLib.end()) return nullptr;
+		else return iter->second.get();
+	}
+
+	auto ImImageLibrary::addImImage(Asset::GUID guid, MemScope<ImImage>&& image) noexcept -> ImImage*
+	{
+		imageLib.emplace(guid, std::move(image));
+		return findImImage(guid);
+	}
+
 	ImGuiLayer::ImGuiLayer(RHI::ILogicalDevice* logical_device)
 		:ILayer("ImGui Layer")
 	{
+		RHI::IResourceFactory factory(logical_device);
+		sampler = factory.createSampler({});
+
+
 		api = logical_device->getPhysicalDevice()->getGraphicContext()->getAPI();
 		switch (api)
 		{
@@ -217,4 +244,33 @@ namespace SIByL::Editor
 		if (!main_is_minimized)
 			backend->present();
 	}
+
+	auto ImGuiLayer::createImImage(RHI::ISampler* sampler, RHI::ITextureView* view, RHI::ImageLayout layout) noexcept -> MemScope<ImImage>
+	{
+		MemScope<ImImage> imimage = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ImImageVK> imimage_vk = MemNew<ImImageVK>(sampler, view, layout);
+			imimage = MemCast<ImImage>(imimage_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return imimage;
+	}
+
+	auto ImGuiLayer::getImImage(GFX::Texture const& texture) noexcept -> ImImage*
+	{
+		ImImage* image = imImageLibrary.findImImage(texture.guid);
+		if (image == nullptr)
+		{
+			MemScope<ImImage> tmp = createImImage(sampler.get(), texture.view, RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+			image = imImageLibrary.addImImage(texture.guid, std::move(tmp));
+		}
+		return image;
+	}
+
 }

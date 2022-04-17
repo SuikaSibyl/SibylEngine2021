@@ -15,13 +15,17 @@ import Editor.Inspector;
 import Editor.Introspection;
 import Editor.RenderPipeline;
 import Editor.Viewport;
+import Editor.ContentBrowser;
+import Asset.AssetLayer;
+import Editor.ImGuiLayer;
 
 namespace SIByL::Editor
 {
 	export struct EditorLayer :public ILayer
 	{
-		EditorLayer(WindowLayer* window_layer) :ILayer("Editor Layer"), 
-			sceneGui(window_layer) {}
+		EditorLayer(WindowLayer* window_layer, Asset::AssetLayer* asset_layer, ImGuiLayer* imgui_layer) :ILayer("Editor Layer"),
+			sceneGui(window_layer, asset_layer),
+			contentBrowserGui(window_layer, asset_layer, imgui_layer) {}
 		auto onDrawGui() noexcept -> void;
 
 		Viewport mainViewport;
@@ -29,12 +33,14 @@ namespace SIByL::Editor
 		Inspector inspectorGui;
 		Introspection introspectionGui;
 		RenderPipeline pipelineGui;
+		ContentBrowser contentBrowserGui;
 	};
 
 	auto EditorLayer::onDrawGui() noexcept -> void
 	{
 		sceneGui.onDrawGui();
 		pipelineGui.onDrawGui();
+		contentBrowserGui.onDrawGui();
 		introspectionGui.onDrawGui();
 		inspectorGui.onDrawGui();
 

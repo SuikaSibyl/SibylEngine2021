@@ -43,7 +43,7 @@ namespace SIByL
             ~Vec2f() { }
 
             // ACCESSORS
-            void Get(float& d0, float& d1) const {
+            void get(float& d0, float& d1) const {
                 d0 = data[0];
                 d1 = data[1];
             }
@@ -180,7 +180,7 @@ namespace SIByL
             ~Vec3f() { }
 
             // ACCESSORS
-            void Get(float& d0, float& d1, float& d2) const {
+            void get(float& d0, float& d1, float& d2) const {
                 d0 = data[0];
                 d1 = data[1];
                 d2 = data[2];
@@ -420,7 +420,7 @@ namespace SIByL
             ~Vec4f() { }
 
             // ACCESSORS
-            void Get(float& d0, float& d1, float& d2, float& d3) const {
+            void get(float& d0, float& d1, float& d2, float& d3) const {
                 d0 = data[0];
                 d1 = data[1];
                 d2 = data[2];
@@ -640,7 +640,7 @@ namespace SIByL
                 glMat[12] = data[0][3]; glMat[13] = data[1][3]; glMat[14] = data[2][3]; glMat[15] = data[3][3];
                 return glMat;
             }
-            float Get(int x, int y) const {
+            float get(int x, int y) const {
                 assert(x >= 0 && x < 4);
                 assert(y >= 0 && y < 4);
                 return data[y][x];

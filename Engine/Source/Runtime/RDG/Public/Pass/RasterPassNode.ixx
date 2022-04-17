@@ -63,6 +63,12 @@ namespace SIByL::GFX::RDG
 		std::vector<NodeHandle> ins;
 		std::vector<NodeHandle> textures;
 		std::vector<RHI::ShaderStageFlags> stageMasks;
+		RHI::BufferLayout vertex_buffer_layout =
+		{
+			{RHI::DataType::Float3, "Position"},
+			{RHI::DataType::Float3, "Color"},
+			{RHI::DataType::Float2, "UV"},
+		};
 
 		MemScope<RHI::IVertexLayout> vertexLayout;
 		MemScope<RHI::IInputAssembly> inputAssembly;

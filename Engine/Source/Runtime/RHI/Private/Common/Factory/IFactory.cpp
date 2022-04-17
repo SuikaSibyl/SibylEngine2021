@@ -6,6 +6,7 @@ module;
 #include <functional>
 #include <string_view>
 #include <filesystem>
+#include <Macros.h>
 module RHI.IFactory;
 import Core.SObject;
 import Core.SPointer;
@@ -13,6 +14,7 @@ import Core.MemoryManager;
 import Core.Buffer;
 import Core.Image;
 import Core.File;
+import Core.Profiler;
 import RHI.IEnum;
 
 import RHI.GraphicContext;
@@ -74,6 +76,7 @@ namespace SIByL::RHI
 {
 	auto IFactory::createGraphicContext(GraphicContextDesc const& desc) noexcept -> MemScope<IGraphicContext>
 	{
+		PROFILE_SCOPE_FUNCTION()
 		MemScope<IGraphicContext> res = nullptr;
 		switch (desc.api)
 		{
@@ -94,6 +97,7 @@ namespace SIByL::RHI
 
 	auto IFactory::createPhysicalDevice(PhysicalDeviceDesc const& desc) noexcept -> MemScope<IPhysicalDevice>
 	{
+		PROFILE_SCOPE_FUNCTION()
 		MemScope<IPhysicalDevice> res = nullptr;
 		switch (desc.context->getAPI())
 		{
@@ -113,6 +117,7 @@ namespace SIByL::RHI
 
 	auto IFactory::createLogicalDevice(LogicalDeviceDesc const& desc) noexcept -> MemScope<ILogicalDevice>
 	{
+		PROFILE_SCOPE_FUNCTION()
 		IPhysicalDevice* physical_device = desc.physicalDevice;
 		MemScope<ILogicalDevice> res = nullptr;
 		switch (physical_device->getGraphicContext()->getAPI())

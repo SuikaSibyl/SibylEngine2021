@@ -147,17 +147,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Private\ImGui\ImFactory.cpp" />
     <ClCompile Include="Private\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="Private\ImGui\Vulkan\ImGuiBackendVK.ixx" />
     <ClCompile Include="Private\ImGui\Vulkan\ImImageVK.ixx" />
-    <ClCompile Include="Public\ImGui\ImFactory.ixx" />
     <ClCompile Include="Public\ImGui\ImGuiImage.ixx" />
     <ClCompile Include="Public\ImGui\ImGuiLayer.ixx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Asset\Asset.vcxproj">
+      <Project>{56d2e32e-7901-443f-ba06-a6bfb6245295}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Core\Core.vcxproj">
       <Project>{1d8e4d1c-5a87-4ef4-891e-ec0b21b08905}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\GFX\GFX.vcxproj">
+      <Project>{a207e2a1-8b21-4977-b486-e77f05dfb7d7}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\RHI\RHI.vcxproj">
       <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>

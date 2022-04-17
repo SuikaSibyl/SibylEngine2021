@@ -153,22 +153,39 @@ namespace SIByL::RHI
 		vkEnumeratePhysicalDevices(IGraphicContextVK::getVKInstance(), &deviceCount, devices.data());
 
 		// check if any of the physical devices meet the requirements
+		int i = 0;
 		for (const auto& device : devices) {
 			VkPhysicalDeviceProperties deviceProperties;
 			vkGetPhysicalDeviceProperties(device, &deviceProperties);
-
-			SE_CORE_INFO("VULKAN :: Physical Device Found, {0}", deviceProperties.deviceName);
+			SE_CORE_INFO("VULKAN :: Physical Device [{0}] Found, {1}", i, deviceProperties.deviceName);
+			i++;
 		}
 
 		// Find the best
+		int max_rate = 0;
+		int choosen_device = 0;
+		i = 0;
 		std::vector<std::string> diagnosis;
 		for (const auto& device : devices) {
 			std::string device_diagnosis;
 			if (isDeviceSuitable(device, device_diagnosis)) {
-				physicalDevice = device;
-				break;
+				int rate = rateDeviceSuitability(device);
+				if (rate > max_rate)
+				{
+					physicalDevice = device;
+					max_rate = rate;
+					choosen_device = i;
+				}
 			}
-			diagnosis.emplace_back(std::move(device_diagnosis));
+			else
+			{
+				diagnosis.emplace_back(std::move(device_diagnosis));
+			}
+			i++;
+		}
+		if (physicalDevice != VK_NULL_HANDLE) {
+			SE_CORE_INFO("VULKAN :: Physical Device [{0}] is chosen，with best rate {1}", choosen_device, max_rate);
+
 		}
 
 		if (physicalDevice == VK_NULL_HANDLE) {

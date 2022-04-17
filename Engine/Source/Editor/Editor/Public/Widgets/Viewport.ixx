@@ -25,7 +25,7 @@ namespace SIByL::Editor
 
 		//m_ViewportFocused = ImGui::IsWindowFocused();
 		//m_ViewportHoverd = ImGui::IsWindowHovered();
-		//Application::Get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHoverd);
+		//Application::get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHoverd);
 
 		ImVec2 viewport_panel_size = ImGui::GetContentRegionAvail();
 		if ((viewportPanelSize.x != viewport_panel_size.x) || (viewportPanelSize.y != viewport_panel_size.y))

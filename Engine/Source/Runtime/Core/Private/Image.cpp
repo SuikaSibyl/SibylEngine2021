@@ -14,6 +14,8 @@ namespace SIByL::Core
 {
     Image::Image(std::filesystem::path path)
     {
+        std::filesystem::path asset_path = "./assets";
+        path = asset_path / path;
         int texWidth, texHeight, texChannels;
         stbi_uc* pixels = stbi_load(path.string().c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
         
@@ -26,6 +28,29 @@ namespace SIByL::Core
         channels = (uint32_t)texChannels;
         data = (char*)pixels;
         attributes |= addBit(ImageAttribute::FROM_STB);
+    }
+
+    Image::Image(Image&& image)
+    {
+        attributes = image.attributes;
+        width = image.width;
+        height = image.height;
+        channels = image.channels;
+        size = image.size;
+        data = image.data;
+        image.data = nullptr;
+    }
+
+    Image& Image::operator=(Image&& image)
+    {
+        attributes = image.attributes;
+        width = image.width;
+        height = image.height;
+        channels = image.channels;
+        size = image.size;
+        data = image.data;
+        image.data = nullptr;
+        return *this;
     }
 
     Image::Image(uint32_t width, uint32_t height)

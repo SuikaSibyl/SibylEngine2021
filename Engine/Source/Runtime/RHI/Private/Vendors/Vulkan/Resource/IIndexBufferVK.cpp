@@ -44,6 +44,7 @@ namespace SIByL::RHI
 		vkMapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()), 0, stagingBuffer.getSize(), 0, &data);
 		memcpy(data, _buffer->getData(), (unsigned int)_buffer->getSize());
 		vkUnmapMemory(logicalDevice->getDeviceHandle(), *(stagingBuffer.getVkDeviceMemory()));
+		indicesCount = (uint32_t)_buffer->getSize() / elementSize;
 
 		// create vertex buffer
 		BufferDesc bufferDesc =
@@ -69,6 +70,11 @@ namespace SIByL::RHI
 	auto IIndexBufferVK::getElementSize() noexcept -> uint32_t
 	{
 		return elementSize;
+	}
+	
+	auto IIndexBufferVK::getIndicesCount() noexcept -> uint32_t
+	{
+		return indicesCount;
 	}
 
 	auto IIndexBufferVK::getVkBuffer() noexcept ->VkBuffer*

@@ -10,6 +10,8 @@ import Asset.Asset;
 import Asset.DedicatedLoader;
 import Asset.Mesh;
 import Asset.MeshLoader;
+import Asset.Texture;
+import Asset.TextureLoader;
 import Asset.RuntimeAssetLibrary;
 
 namespace SIByL::Asset
@@ -25,5 +27,18 @@ namespace SIByL::Asset
 			mesh= runtimeLibrary.meshLib.emplace(guid, std::move(tmp_mesh));
 		}
 		return mesh;
+	}
+
+	auto AssetLayer::texture(GUID guid) noexcept -> Texture*
+	{
+		Texture* texture = runtimeLibrary.textureLib.tryFind(guid);
+		if (texture == nullptr)
+		{
+			MemScope<Texture> tmp_texture = MemNew<Texture>();
+			TextureLoader loader(*(tmp_texture.get()), resourceFactory, &runtimeManager);
+			loader.fromGUID(guid);
+			texture = runtimeLibrary.textureLib.emplace(guid, std::move(tmp_texture));
+		}
+		return texture;
 	}
 }

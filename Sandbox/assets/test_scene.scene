@@ -1,15 +1,36 @@
 SceneName: Scene
 SceneNodes:
+  - uid: 2638201337233017978
+    parent: 11454354189262129274
+    components:
+      TagComponent: dust2
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
   - uid: 2267855375430191226
     parent: 11454354189262129274
     components:
       TagComponent: particle
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
       MeshComponent:
         guid: 2267991365489773690
+        vert: 7
+      Renderer:
+        SubRenderer:
+          - PassHandle: 0
   - uid: 11454354189262129274
     parent: 0
     children:
       - 2267855375430191226
+      - 2638201337233017978
     components:
       TagComponent: Scene
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
 SceneEnd: TRUE

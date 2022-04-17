@@ -4,6 +4,7 @@ export module Asset.RuntimeAssetLibrary;
 import Core.MemoryManager;
 import Asset.Asset;
 import Asset.Mesh;
+import Asset.Texture;
 
 namespace SIByL::Asset
 {
@@ -36,5 +37,6 @@ namespace SIByL::Asset
 	{
 
 		DedicateAssetLibrary<Mesh> meshLib;
+		DedicateAssetLibrary<Texture> textureLib;
 	};
 }

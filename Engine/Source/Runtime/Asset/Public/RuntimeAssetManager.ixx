@@ -34,6 +34,7 @@ namespace SIByL::Asset
 
 		// Manager Functions
 		auto addNewAsset(ResourceItem const& item) noexcept -> GUID;
+		auto addNewAssetWithGUID(ResourceItem const& item, GUID const& guid) noexcept -> void;
 		auto findAsset(GUID const& guid) noexcept -> ResourceItem*;
 
 		auto getAssetMap() const noexcept -> std::map<GUID, ResourceItem> const& { return assetsMap; }

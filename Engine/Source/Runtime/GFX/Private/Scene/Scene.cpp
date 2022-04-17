@@ -18,6 +18,7 @@ import GFX.Mesh;
 import GFX.Camera;
 import GFX.Transform;
 import GFX.Serializer;
+import GFX.Renderer;
 import RHI.ILogicalDevice;
 import Asset.AssetLayer;
 import Asset.Mesh;
@@ -77,6 +78,26 @@ namespace SIByL::GFX
 			auto& mesh = entity.getComponent<GFX::Mesh>();
 			out << YAML::Value << YAML::BeginMap;
 			out << YAML::Key << "guid" << YAML::Value << mesh.guid;
+			out << YAML::Key << "vert" << YAML::Value << mesh.meshDesc.vertexInfo;
+			out << YAML::EndMap;
+		}
+
+		if (entity.hasComponent<GFX::Renderer>())
+		{
+			out << YAML::Key << "Renderer";
+			auto& renderer = entity.getComponent<GFX::Renderer>();
+			out << YAML::Value << YAML::BeginMap;
+			// subRenderer
+			out << YAML::Key << "SubRenderer" << YAML::Value << YAML::BeginSeq;
+			for (int i = 0; i < renderer.subRenderers.size(); i++)
+			{
+				auto& subRenderer = renderer.subRenderers[i];
+				out << YAML::BeginMap;
+				out << YAML::Key << "PassHandle" << YAML::Value << subRenderer.pass;
+				out << YAML::EndMap;
+			}
+			out << YAML::EndSeq;
+
 			out << YAML::EndMap;
 		}
 
@@ -133,7 +154,7 @@ namespace SIByL::GFX
 			glm::vec3 translation = transform["translation"].as<glm::vec3>();
 			glm::vec3 eulerAngles = transform["eulerAngles"].as<glm::vec3>();
 			glm::vec3 scale = transform["scale"].as<glm::vec3>();
-			auto& tc = entity.addComponent<GFX::Transform>();
+			auto& tc = entity.getComponent<GFX::Transform>();
 			tc.setTranslation(translation);
 			tc.setEulerAngles(eulerAngles);
 			tc.setScale(scale);
@@ -142,12 +163,12 @@ namespace SIByL::GFX
 		// Camera Component
 		// -----------------------------------------------
 		auto camera = components["Camera"];
-		if (transform)
+		if (camera)
 		{
-			float fov = transform["fov"].as<float>();
-			float aspect = transform["aspect"].as<float>();
-			float near = transform["near"].as<float>();
-			float far = transform["far"].as<float>();
+			float fov = camera["fov"].as<float>();
+			float aspect = camera["aspect"].as<float>();
+			float near = camera["near"].as<float>();
+			float far = camera["far"].as<float>();
 
 			auto& cc = entity.addComponent<GFX::Camera>();
 			cc.setFovy(fov);
@@ -162,11 +183,27 @@ namespace SIByL::GFX
 		if (meshComponent)
 		{
 			uint64_t guid = meshComponent["guid"].as<uint64_t>();
+			uint32_t desc = meshComponent["vert"].as<uint32_t>();
 			auto& mc = entity.addComponent<GFX::Mesh>();
 			mc.guid = guid;
+			mc.meshDesc = { (Asset::VertexInfoFlags)desc };
 			Asset::Mesh* asset_mesh = asset_layer->mesh(guid);
 			mc.vertexBuffer = asset_mesh->vertexBuffer.get();
 			mc.indexBuffer = asset_mesh->indexBuffer.get();
+			if (mc.meshDesc.vertexInfo != asset_mesh->desc.vertexInfo) SE_CORE_ERROR("GFX :: Scene Deserialize :: Mesh Component Deserialize failed :: Scene Vertex Desc != Cache Vertex Desc");
+		}
+
+		auto rendererComponent = components["Renderer"];
+		if (rendererComponent)
+		{
+			auto subRenderers = rendererComponent["SubRenderer"];
+			auto& rc = entity.addComponent<GFX::Renderer>();
+			if (subRenderers)
+				for (auto sub : subRenderers)
+				{
+					uint64_t pass_handle = sub["PassHandle"].as<uint64_t>();
+					rc.subRenderers.emplace_back(pass_handle);
+				}
 		}
 	}
 
