@@ -129,33 +129,33 @@ public:
 
 	GFX::RDG::NodeHandle renderPassNodeSRGB;
 	GFX::RDG::NodeHandle renderPassNodeSRGB_mesh;
-	
+
 	virtual void onAwake() override
 	{
 		PROFILE_BEGIN_SESSION("onAwake", "onAwake");
 
 		{
 			PROFILE_SCOPE("create window layer")
-			// create window
-			WindowLayerDesc window_layer_desc = {
-				SIByL::EWindowVendor::GLFW,
-				1280,
-				720,
-				"Hello"
+				// create window
+				WindowLayerDesc window_layer_desc = {
+					SIByL::EWindowVendor::GLFW,
+					1280,
+					720,
+					"Hello"
 			};
 			window_layer = attachWindowLayer(window_layer_desc);
 		}
 
 		{
 			PROFILE_SCOPE("create RHI layer")
-			// create device
+				// create device
 #ifdef MACRO_USE_MESH
-			graphicContext = (RHI::IFactory::createGraphicContext({
-				RHI::API::VULKAN,
-				(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
+				graphicContext = (RHI::IFactory::createGraphicContext({
+					RHI::API::VULKAN,
+					(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
 #else
-			graphicContext = (RHI::IFactory::createGraphicContext({
-				RHI::API::VULKAN }));
+				graphicContext = (RHI::IFactory::createGraphicContext({
+					RHI::API::VULKAN }));
 #endif
 
 			graphicContext->attachWindow(window_layer->getWindow());
@@ -166,22 +166,22 @@ public:
 
 		{
 			PROFILE_SCOPE("create asset layer")
-			// create asset layer
-			assetLayer = MemNew<Asset::AssetLayer>(resourceFactory.get());
+				// create asset layer
+				assetLayer = MemNew<Asset::AssetLayer>(resourceFactory.get());
 			pushLayer(assetLayer.get());
 		}
-		
+
 		{
 			PROFILE_SCOPE("create ImGui layer")
-			// create imgui layer
-			imguiLayer = MemNew<Editor::ImGuiLayer>(logicalDevice.get());
+				// create imgui layer
+				imguiLayer = MemNew<Editor::ImGuiLayer>(logicalDevice.get());
 			pushLayer(imguiLayer.get());
 		}
 
 		{
 			PROFILE_SCOPE("create Editor layer")
-			// create editor layer
-			editorLayer = MemNew<Editor::EditorLayer>(window_layer, assetLayer.get(), imguiLayer.get());
+				// create editor layer
+				editorLayer = MemNew<Editor::EditorLayer>(window_layer, assetLayer.get(), imguiLayer.get());
 			pushLayer(editorLayer.get());
 			editorLayer->introspectionGui.bindApplication(this);
 			editorLayer->introspectionGui.bindInspector(&(editorLayer->inspectorGui));
@@ -189,8 +189,8 @@ public:
 
 		{
 			PROFILE_SCOPE("create scene layer")
-			// create scene
-			scene.deserialize("test_scene.scene", assetLayer.get());
+				// create scene
+				scene.deserialize("test_scene.scene", assetLayer.get());
 			editorLayer->sceneGui.bindScene(&scene);
 			editorLayer->sceneGui.bindInspector(&(editorLayer->inspectorGui));
 			editorLayer->pipelineGui.bindRenderGraph(&rdg);
@@ -199,8 +199,8 @@ public:
 
 		{
 			PROFILE_SCOPE("create RDG")
-			// Create RDG register proxy
-			acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
+				// Create RDG register proxy
+				acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
 			sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
 
@@ -218,42 +218,42 @@ public:
 			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
-			//// HDR Opaque raster pass
-			//GFX::RDG::NodeHandle opaqueRenderPassNodeSRGB;
-			//opaqueRenderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights });
-			//rdg.tag(opaqueRenderPassNodeSRGB, "Opaque Raster HDR");
-			//GFX::RDG::RasterPassNode* opaqueRasterPassNodeSRGB = rdg.getRasterPassNode(opaqueRenderPassNodeSRGB);
-			//opaqueRasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
-			//opaqueRasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-			//opaqueRasterPassNodeSRGB->framebuffer = srgb_framebuffer;
-			//opaqueRasterPassNodeSRGB->stageMasks = {
-			//	(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-			//};
-			//opaqueRasterPassNodeSRGB->vertex_buffer_layout =
-			//{
-			//	{RHI::DataType::Float3, "Position"},
-			//	{RHI::DataType::Float3, "Normal"},
-			//	{RHI::DataType::Float2, "UV"},
-			//	{RHI::DataType::Float4, "Tangent"},
-			//};
-			//opaqueRasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			//{
-			//	std::function<void(ECS::TagComponent&, GFX::Mesh&, GFX::Renderer&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh, GFX::Renderer& renderer) {
-			//		if (!renderer.hasPass(0)) return;
+			// HDR Opaque raster pass
+			GFX::RDG::NodeHandle opaqueRenderPassNodeSRGB;
+			opaqueRenderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights });
+			rdg.tag(opaqueRenderPassNodeSRGB, "Opaque Raster HDR");
+			GFX::RDG::RasterPassNode* opaqueRasterPassNodeSRGB = rdg.getRasterPassNode(opaqueRenderPassNodeSRGB);
+			opaqueRasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
+			opaqueRasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+			opaqueRasterPassNodeSRGB->framebuffer = srgb_framebuffer;
+			opaqueRasterPassNodeSRGB->stageMasks = {
+				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+			};
+			opaqueRasterPassNodeSRGB->vertex_buffer_layout =
+			{
+				{RHI::DataType::Float3, "Position"},
+				{RHI::DataType::Float3, "Normal"},
+				{RHI::DataType::Float2, "UV"},
+				{RHI::DataType::Float4, "Tangent"},
+			};
+			opaqueRasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+			{
+				std::function<void(ECS::TagComponent&, GFX::Mesh&, GFX::Renderer&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh, GFX::Renderer& renderer) {
+					if (!renderer.hasPass(0)) return;
 
-			//		commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
-			//		commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
+					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
+					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
 
-			//		RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
-			//		commandbuffer->cmdBindDescriptorSets(
-			//			RHI::PipelineBintPoint::GRAPHICS,
-			//			raster_pass->pipelineLayout.get(),
-			//			0, 1, &set, 0, nullptr);
+					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
+					commandbuffer->cmdBindDescriptorSets(
+						RHI::PipelineBintPoint::GRAPHICS,
+						raster_pass->pipelineLayout.get(),
+						0, 1, &set, 0, nullptr);
 
-			//		commandbuffer->cmdDrawIndexed(mesh.indexBuffer->getIndicesCount(), 1, 0, 0, 0);
-			//	};
-			//	scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
-			//};
+					commandbuffer->cmdDrawIndexed(mesh.indexBuffer->getIndicesCount(), 1, 0, 0, 0);
+				};
+				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
+			};
 
 
 			// HDR raster pass
@@ -353,11 +353,11 @@ public:
 
 		{
 			PROFILE_SCOPE("create Misc")
-			// create ImImage for viewport
-			viewportImImage = imguiLayer->createImImage(
-				rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
-				rdg.getTextureBufferNode(acesbloom->bloomCombined)->getTextureView(),
-				RHI::ImageLayout::GENERAL);
+				// create ImImage for viewport
+				viewportImImage = imguiLayer->createImImage(
+					rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
+					rdg.getTextureBufferNode(acesbloom->bloomCombined)->getTextureView(),
+					RHI::ImageLayout::GENERAL);
 			editorLayer->mainViewport.bindImImage(viewportImImage.get());
 
 			// comand stuffs
@@ -377,10 +377,10 @@ public:
 		{
 			PROFILE_SCOPE("run First Pass")
 
-			MemScope<RHI::IMemoryBarrier> compute_compute_memory_barrier = resourceFactory->createMemoryBarrier({
-				(uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
-				(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
-				});
+				MemScope<RHI::IMemoryBarrier> compute_compute_memory_barrier = resourceFactory->createMemoryBarrier({
+					(uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
+					(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
+					});
 			MemScope<RHI::IBarrier> compute_compute_barrier = resourceFactory->createBarrier({
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
 				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
@@ -415,7 +415,7 @@ public:
 			transientCommandbuffer->submit();
 			logicalDevice->waitIdle();
 		}
-		
+
 		SE_CORE_INFO("OnAwake End");
 		PROFILE_END_SESSION();
 	}
@@ -445,7 +445,7 @@ public:
 						}
 					}
 				}
-				else if(rdg.passes[i] == renderPassNodeSRGB_mesh)
+				else if (rdg.passes[i] == renderPassNodeSRGB_mesh)
 				{
 					for (int j = 0; j < rdg.passesBackPool.size(); j++)
 					{

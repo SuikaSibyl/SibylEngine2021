@@ -43,7 +43,7 @@ namespace SIByL
 			virtual auto submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void override;
 			virtual auto beginRecording(CommandBufferUsageFlags flags = 0) noexcept -> void override;
 			virtual auto endRecording() noexcept -> void override;
-			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void override;
+			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer, bool clear = true) noexcept -> void override;
 			virtual auto cmdEndRenderPass() noexcept -> void override;
 			virtual auto cmdBindPipeline(IPipeline* pipeline) noexcept -> void override;
 			virtual auto cmdBindComputePipeline(IPipeline* pipeline) noexcept -> void override;
@@ -54,7 +54,7 @@ namespace SIByL
 			virtual auto cmdCopyBuffer(IBuffer* src, IBuffer* dst, uint32_t const& src_offset, uint32_t const& dst_offset, uint32_t const& size) noexcept -> void override;
 			virtual auto cmdDrawIndexed(uint32_t const& index_count, uint32_t const& instance_count,
 				uint32_t const& first_index, uint32_t const& index_offset, uint32_t const& first_instance) noexcept -> void override;
-			virtual auto cmdBindDescriptorSets(PipelineBintPoint point, IPipelineLayout* pipeline_layout, uint32_t const& idx_first_descset, 
+			virtual auto cmdBindDescriptorSets(PipelineBintPoint point, IPipelineLayout* pipeline_layout, uint32_t const& idx_first_descset,
 				uint32_t const& count_sets_to_bind, IDescriptorSet** sets, uint32_t const&, uint32_t const*) noexcept -> void override;
 			virtual auto cmdPipelineBarrier(IBarrier* barrier) noexcept -> void override;
 			virtual auto cmdCopyBufferToImage(IBuffer* buffer, ITexture* image, IBufferImageCopy*) noexcept -> void override;

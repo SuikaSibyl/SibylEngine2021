@@ -94,7 +94,7 @@ namespace SIByL
 			virtual auto submit(ISemaphore* wait, ISemaphore* signal, IFence* fence) noexcept -> void = 0;
 			virtual auto beginRecording(CommandBufferUsageFlags flags = 0) noexcept -> void = 0;
 			virtual auto endRecording() noexcept -> void = 0;
-			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void = 0;
+			virtual auto cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer, bool clear = true) noexcept -> void = 0;
 			virtual auto cmdEndRenderPass() noexcept -> void = 0;
 			virtual auto cmdBindPipeline(IPipeline* pipeline) noexcept -> void = 0;
 			virtual auto cmdBindComputePipeline(IPipeline* pipeline) noexcept -> void = 0;

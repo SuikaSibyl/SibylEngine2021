@@ -179,7 +179,7 @@ namespace SIByL::Asset
 			SE_CORE_ERROR("Asset :: Assimp :: Too Much Indices to handle by uint32_t");
 		}
 
-		ib = std::move(Buffer(indices_count * indices_width / 4, indices_width / 4));
+		ib = std::move(Buffer(indices_count * indices_width / 8, indices_width / 8));
 		if (indices_width == 32)
 		{
 			uint32_t* indices = (uint32_t*)ib.getData();

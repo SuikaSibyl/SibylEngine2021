@@ -51,14 +51,14 @@ namespace SIByL::RHI
 	{
 		vkResetCommandBuffer(commandBuffer, 0);
 	}
-	
+
 	auto ICommandBufferVK::submit() noexcept -> void
 	{
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &commandBuffer;
-		
+
 		vkQueueSubmit(*(logicalDevice->getVkGraphicQueue()), 1, &submitInfo, VK_NULL_HANDLE);
 	}
 
@@ -75,10 +75,10 @@ namespace SIByL::RHI
 			submitInfo.pWaitSemaphores = waitSemaphores;
 			submitInfo.pWaitDstStageMask = waitStages;
 		}
-		
+
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &commandBuffer;
-		
+
 		if (signal)
 		{
 			VkSemaphore signalSemaphores[] = { *((ISemaphoreVK*)signal)->getVkSemaphore() };
@@ -113,7 +113,7 @@ namespace SIByL::RHI
 		}
 	}
 
-	auto ICommandBufferVK::cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer) noexcept -> void
+	auto ICommandBufferVK::cmdBeginRenderPass(IRenderPass* render_pass, IFramebuffer* framebuffer, bool clear) noexcept -> void
 	{
 		uint32_t width, height;
 		static_cast<IFramebufferVK*>(framebuffer)->getSize(width, height);
@@ -125,8 +125,11 @@ namespace SIByL::RHI
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = VkExtent2D{ width, height };
 
-		renderPassInfo.clearValueCount = static_cast<IRenderPassVK*>(render_pass)->getVkClearValueSize();
-		renderPassInfo.pClearValues = static_cast<IRenderPassVK*>(render_pass)->getVkClearValues();
+		if (clear)
+		{
+			renderPassInfo.clearValueCount = static_cast<IRenderPassVK*>(render_pass)->getVkClearValueSize();
+			renderPassInfo.pClearValues = static_cast<IRenderPassVK*>(render_pass)->getVkClearValues();
+		}
 
 		vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}
@@ -135,10 +138,10 @@ namespace SIByL::RHI
 	{
 		vkCmdEndRenderPass(commandBuffer);
 	}
-	
+
 	auto ICommandBufferVK::cmdBindPipeline(IPipeline* pipeline) noexcept -> void
 	{
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, 
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
 			*static_cast<IPipelineVK*>(pipeline)->getVkPipeline());
 	}
 
@@ -150,7 +153,7 @@ namespace SIByL::RHI
 
 	auto ICommandBufferVK::cmdBindVertexBuffer(IVertexBuffer* buffer) noexcept -> void
 	{
-		VkBuffer vertexBuffers[] = { *((IVertexBufferVK*)buffer)->getVkBuffer()};
+		VkBuffer vertexBuffers[] = { *((IVertexBufferVK*)buffer)->getVkBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 	}
@@ -165,7 +168,7 @@ namespace SIByL::RHI
 	{
 		vkCmdDraw(commandBuffer, vertex_count, instance_count, first_vertex, first_instance);
 	}
-	
+
 	auto ICommandBufferVK::cmdDrawIndexed(uint32_t const& index_count, uint32_t const& instance_count,
 		uint32_t const& first_index, uint32_t const& index_offset, uint32_t const& first_instance) noexcept -> void
 	{
@@ -208,8 +211,8 @@ namespace SIByL::RHI
 		}
 
 		//VkPipelineBindPoint test = getVkPipelineBindPoint(point);
-		vkCmdBindDescriptorSets(commandBuffer, getVkPipelineBindPoint(point), 
-			*((IPipelineLayoutVK*)pipeline_layout)->getVkPipelineLayout(), 
+		vkCmdBindDescriptorSets(commandBuffer, getVkPipelineBindPoint(point),
+			*((IPipelineLayoutVK*)pipeline_layout)->getVkPipelineLayout(),
 			idx_first_descset, count_sets_to_bind, tmp_sets.data(), offset_count, offsets);
 	}
 
@@ -273,11 +276,11 @@ namespace SIByL::RHI
 			blits[i].dstOffsets[0] = VkOffset3D{ 0,0,0 };
 			blits[i].dstOffsets[1] = VkOffset3D{ (int)((ITextureVK*)src)->getDescription().width,(int)((ITextureVK*)src)->getDescription().height,1 };
 		}
-		vkCmdBlitImage(commandBuffer, 
+		vkCmdBlitImage(commandBuffer,
 			*((ITextureVK*)src)->getVkImage(), getVkImageLayout(srcLayout),
-			*((ITextureVK*)dst)->getVkImage(), getVkImageLayout(dstLayout), 
+			*((ITextureVK*)dst)->getVkImage(), getVkImageLayout(dstLayout),
 			blit_info.size(),
-			blits.data(), 
+			blits.data(),
 			VkFilter::VK_FILTER_NEAREST);
 	}
 
@@ -287,6 +290,6 @@ namespace SIByL::RHI
 			commandBuffer,
 			taskCount,
 			firstTask
-			);
+		);
 	}
 }

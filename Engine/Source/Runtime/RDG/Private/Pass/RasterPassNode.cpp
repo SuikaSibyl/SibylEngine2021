@@ -37,7 +37,7 @@ import GFX.RDG.RenderGraph;
 namespace SIByL::GFX::RDG
 {
 	RasterPassNode::RasterPassNode(
-		void* graph, 
+		void* graph,
 		std::vector<NodeHandle> const& ins,
 		uint32_t const& constant_size)
 		:ins(ins)
@@ -95,7 +95,7 @@ namespace SIByL::GFX::RDG
 		{
 			RHI::PolygonMode::FILL,
 			0.0f,
-			RHI::CullMode::BACK,
+			RHI::CullMode::NONE,
 		};
 		rasterizer = factory->createRasterizer(rasterizer_desc);
 
@@ -303,7 +303,7 @@ namespace SIByL::GFX::RDG
 					(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET });
 			}
 		}
-		else 
+		else
 		{
 			// TODO
 		}
@@ -357,7 +357,7 @@ namespace SIByL::GFX::RDG
 	}
 
 	auto RasterPassNode::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
-	{			
+	{
 		// render pass
 		commandbuffer->cmdBeginRenderPass(
 			((FramebufferContainer*)registry->getNode(framebuffer))->getRenderPass(),
