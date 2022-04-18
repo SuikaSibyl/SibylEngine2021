@@ -22,6 +22,8 @@ import GFX.RDG.StorageBufferNode;
 import GFX.RDG.RasterPassNode;
 import GFX.RDG.Common;
 import GFX.RDG.MultiDispatchScope;
+import GFX.RDG.RasterNodes;
+
 
 namespace SIByL::Editor
 {
@@ -84,7 +86,60 @@ namespace SIByL::Editor
 				ImGui::TreePop();
 			}
 
+			ImGui::PushID("Pass List");
+			if (ImGui::TreeNode("Pass List"))
+			{
+				for (int i = 0; i < rg->passList.size(); i++)
+				{
+					ImGui::PushID(i);
+					auto pass_node_handle = rg->passList[i];
+					bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, base_flags, std::string(rg->getResourceNode(rg->passList[i])->tag).c_str(), i);
+					//if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+					//{
+					//	selectedType = SelectedType::RESOURCE;
+					//	selectedId = i;
+					//	kickInspector();
+					//}
+					if (node_open)
+					{
+						// if pass_node is a RasterPassScope
+						if (true)
+						{
+							GFX::RDG::RasterPassScope* pass_node = (GFX::RDG::RasterPassScope*)(rg->registry.getNode(pass_node_handle));
+							for (int i = 0; i < pass_node->pipelineScopes.size(); i++)
+							{
+								auto pipeline_node_handle = pass_node->pipelineScopes[i];
+								GFX::RDG::RasterPipelineScope* pipeline_node = (GFX::RDG::RasterPipelineScope*)(rg->registry.getNode(pipeline_node_handle));
+								ImGui::PushID(i);
+								bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, base_flags, pipeline_node->tag.c_str(), i);
+								if (node_open)
+								{
+									// all material passes
+									for (int i = 0; i < pipeline_node->materialScopes.size(); i++)
+									{
+										auto material_node_handle = pipeline_node->materialScopes[i];
+										GFX::RDG::RasterMaterialScope* material_node = (GFX::RDG::RasterMaterialScope*)(rg->registry.getNode(material_node_handle));
+										ImGui::PushID(i);
+										bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, base_flags, material_node->tag.c_str(), i);
+										if (node_open)
+										{
 
+											ImGui::TreePop();
+										}
+										ImGui::PopID();
+									}
+									ImGui::TreePop();
+								}
+								ImGui::PopID();
+							}
+						}
+						ImGui::TreePop();
+					}
+					ImGui::PopID();
+				}
+				ImGui::TreePop();
+			}
+			ImGui::PopID();
 		}
 
 		ImGui::End();

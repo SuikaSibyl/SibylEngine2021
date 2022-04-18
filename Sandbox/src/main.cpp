@@ -255,7 +255,6 @@ public:
 				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
 			};
 
-
 			// HDR raster pass
 			renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 			rdg.tag(renderPassNodeSRGB, "Raster HDR");
@@ -342,6 +341,14 @@ public:
 			portal.registerUpdatePasses(&rdg_builder);
 			sortTest.registerUpdatePasses(&rdg_builder);
 			GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
+
+			// New Pipeline Building
+			GFX::RDG::RenderGraphWorkshop workshop(rdg);
+			workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
+			workshop.addRasterPipelineScope("Opaque Pass", "Phongs");
+			workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
+			
+
 
 			// building ...
 			rdg_builder.build(resourceFactory.get(), 1280, 720);

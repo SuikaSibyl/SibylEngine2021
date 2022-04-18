@@ -78,5 +78,11 @@
     <ClCompile Include="Public\Core\ProxyUnity.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Nodes\RasterSeries.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Nodes\RasterSerires.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

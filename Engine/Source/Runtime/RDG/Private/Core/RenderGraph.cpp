@@ -20,6 +20,7 @@ import GFX.RDG.ColorBufferNode;
 import GFX.RDG.SamplerNode;
 import GFX.RDG.RasterPassNode;
 import GFX.RDG.MultiDispatchScope;
+import GFX.RDG.RasterNodes;
 
 namespace SIByL::GFX::RDG
 {
@@ -475,4 +476,71 @@ namespace SIByL::GFX::RDG
 		attached.passesBackPool.emplace_back(handle);
 		return handle;
 	}
+
+	auto RenderGraphWorkshop::addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void
+	{
+		if (renderGraph.rasterPassRegister.find(pass) != renderGraph.rasterPassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPassScope() pass name \'{0}\' not found !", pass);
+			return;
+		}
+		// create RasterPassScope
+		MemScope<RasterPassScope> rps = MemNew<RasterPassScope>();
+		rps->tag = pass;
+		rps->framebuffer = framebuffer;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(rps));
+		renderGraph.rasterPassRegister.emplace(pass, handle);
+		renderGraph.passList.emplace_back(handle);
+	}
+
+	auto RenderGraphWorkshop::addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> void
+	{
+		if (renderGraph.rasterPassRegister.find(pass) == renderGraph.rasterPassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPipelineScope() pass name \'{0}\' not found !", pass);
+			return;
+		}
+		auto pass_node_handle = renderGraph.rasterPassRegister.find(pass)->second;
+		RasterPassScope* pass_node = (RasterPassScope*)renderGraph.registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) != pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPipelineScope() pipeline name \'{0}\' duplicated !", pipeline);
+			return;
+		}
+		// create RasterPipelineScope
+		MemScope<RasterPipelineScope> rps = MemNew<RasterPipelineScope>();
+		rps->tag = pipeline;
+		//FramebufferContainer* framebuffer = renderGraph.getFramebufferContainer(pass_node->framebuffer);
+		//RHI::Extend extend{ framebuffer->getWidth(), framebuffer->getHeight() };
+		//rps->viewportExtend = extend;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(rps));
+		pass_node->pipelineScopesRegister.emplace(pipeline, handle);
+		pass_node->pipelineScopes.emplace_back(handle);
+	}
+
+	auto RenderGraphWorkshop::addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> void
+	{
+		if (renderGraph.rasterPassRegister.find(pass) == renderGraph.rasterPassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterMaterialScope() pass name \'{0}\' not found !", pass);
+			return;
+		}
+		auto pass_node_handle = renderGraph.rasterPassRegister.find(pass)->second;
+		RasterPassScope* pass_node = (RasterPassScope*)renderGraph.registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterMaterialScope() pipeline name \'{0}\' not found !", pipeline);
+			return;
+		}
+		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
+		RasterPipelineScope* pipeline_node = (RasterPipelineScope*)renderGraph.registry.getNode(pipeline_node_handle);
+		// create RasterMaterialScope
+		MemScope<RasterMaterialScope> rms = MemNew<RasterMaterialScope>();
+		rms->tag = mat;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(rms));
+		pipeline_node->materialScopesRegister.emplace(pipeline, handle);
+		pipeline_node->materialScopes.emplace_back(handle);
+
+	}
+
 }

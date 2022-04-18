@@ -115,6 +115,21 @@ namespace SIByL::GFX::RDG
 		RHI::IResourceFactory* factory;
 		friend struct RenderGraphBuilder;
 		MemScope<RHI::IDescriptorPool> descriptorPool;
+
+		std::vector<NodeHandle> passList;
+		std::unordered_map<std::string, NodeHandle> rasterPassRegister;
+	};
+
+	export struct RenderGraphWorkshop
+	{
+		RenderGraphWorkshop(RenderGraph& attached) :renderGraph(attached) {}
+
+		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void;
+		auto addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> void;
+		auto addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> void;
+
+
+		RenderGraph& renderGraph;
 	};
 
 	export struct RenderGraphBuilder
