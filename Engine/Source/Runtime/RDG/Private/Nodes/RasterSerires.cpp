@@ -344,7 +344,7 @@ namespace SIByL::GFX::RDG
 	{
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		perViewUniformBuffer = buffer;
-		Buffer ubo_proxy((void*)&perViewUniformBufferFlight, sizeof(PerViewUniformBuffer), 1);
+		Buffer ubo_proxy((void*)&perViewUniformBuffer, sizeof(PerViewUniformBuffer), 1);
 		render_graph->getUniformBufferFlight(perViewUniformBufferFlight, current_frame)->updateBuffer(&ubo_proxy);
 	}
 }

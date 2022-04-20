@@ -2,21 +2,37 @@ module;
 #include <cstdint>
 #include <imgui.h>
 export module Editor.Viewport;
+import Core.Window;
+import Core.Time;
+import GFX.Transform;
 import Editor.Widget;
 import Editor.ImImage;
+import Editor.CameraController;
 
 namespace SIByL::Editor
 {
 	export struct Viewport :public Widget
 	{
+		Viewport(WindowLayer* window_layer, Timer* timer);
+
 		virtual auto onDrawGui() noexcept -> void override;
+		virtual auto onUpdate() noexcept -> void override;
+
 		auto getWidth() noexcept -> uint32_t { return viewportPanelSize.x; }
 		auto getHeight() noexcept -> uint32_t { return viewportPanelSize.y; }
 		auto bindImImage(ImImage* image) noexcept -> void { bindedImage = image; }
 
+		GFX::Transform cameraTransform;
 		ImImage* bindedImage;
 		ImVec2 viewportPanelSize = { 1280,720 };
+		SimpleCameraController cameraController;
 	};
+
+	Viewport::Viewport(WindowLayer* window_layer, Timer* timer)
+		:cameraController(window_layer->getWindow()->getInput(), timer) 
+	{ 
+		cameraController.bindTransform(&cameraTransform);
+	}
 
 	auto Viewport::onDrawGui() noexcept -> void
 	{
@@ -53,4 +69,10 @@ namespace SIByL::Editor
 		ImGui::End();
 		ImGui::PopStyleVar();
 	}
+
+	auto Viewport::onUpdate() noexcept -> void
+	{
+		cameraController.onUpdate();
+	}
+
 }

@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Public\AnimationCurve.ixx" />
     <ClCompile Include="Public\Hermite.ixx" />
     <ClCompile Include="Public\IInterpolator.ixx" />
     <ClCompile Include="Public\Sampler.ixx" />

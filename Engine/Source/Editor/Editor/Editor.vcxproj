@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Public\EditorLayer.ixx" />
     <ClCompile Include="Public\Framework\Segment.ixx" />
+    <ClCompile Include="Public\Misc\CameraController.ixx" />
     <ClCompile Include="Public\Misc\EntityElucidator.ixx" />
     <ClCompile Include="Public\Segments\AssetManager.ixx" />
     <ClCompile Include="Public\Misc\CommonProperties.ixx" />
@@ -173,6 +174,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\GFX\GFX.vcxproj">
       <Project>{a207e2a1-8b21-4977-b486-e77f05dfb7d7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Interpolatior\Interpolatior.vcxproj">
+      <Project>{77f3d9c3-7516-4e3e-b42a-98332988b66c}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\RDG\RDG.vcxproj">
       <Project>{5ab39c8d-66d2-4c46-bf4b-6b55b8f24b20}</Project>

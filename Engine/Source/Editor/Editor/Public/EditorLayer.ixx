@@ -9,6 +9,7 @@ module;
 #include "entt.hpp"
 export module Editor.EditorLayer;
 import Core.Layer;
+import Core.Time;
 import Core.Window;
 import Editor.Scene;
 import Editor.Inspector;
@@ -23,11 +24,12 @@ namespace SIByL::Editor
 {
 	export struct EditorLayer :public ILayer
 	{
-		EditorLayer(WindowLayer* window_layer, Asset::AssetLayer* asset_layer, ImGuiLayer* imgui_layer) :ILayer("Editor Layer"),
+		EditorLayer(WindowLayer* window_layer, Asset::AssetLayer* asset_layer, ImGuiLayer* imgui_layer, Timer* timer) :ILayer("Editor Layer"),
+			mainViewport(window_layer, timer),
 			sceneGui(window_layer, asset_layer),
 			contentBrowserGui(window_layer, asset_layer, imgui_layer) {}
 		auto onDrawGui() noexcept -> void;
-
+		virtual auto onUpdate() -> void override;
 		Viewport mainViewport;
 		Scene sceneGui;
 		Inspector inspectorGui;
@@ -45,6 +47,11 @@ namespace SIByL::Editor
 		inspectorGui.onDrawGui();
 
 		mainViewport.onDrawGui();
+	}
+	
+	auto EditorLayer::onUpdate() -> void
+	{
+		mainViewport.onUpdate();
 	}
 
 }

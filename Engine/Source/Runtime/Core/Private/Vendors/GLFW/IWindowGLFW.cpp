@@ -119,6 +119,9 @@ namespace SIByL::Core
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				MouseScrolledEvent event((float)xOffset, (float)yOffset);
 				data.event_callback(event);
+				IInputGLFW* input_glfw = (IInputGLFW*)(data.window->getInput());
+				input_glfw->scrollX = xOffset;
+				input_glfw->scrollY = yOffset;
 			});
 
 		glfwSetCursorPosCallback(glfw_window, [](GLFWwindow* window, double xPos, double yPos)

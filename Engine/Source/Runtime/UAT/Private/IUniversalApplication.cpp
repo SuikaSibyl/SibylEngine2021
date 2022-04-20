@@ -36,8 +36,8 @@ namespace SIByL
 			{
 				if ((*iter)->getWindow() == (IWindow*)e.window)
 				{
-					delete (*iter);
-					layer_stack.popLayer((ILayer*)*iter);
+					//delete (*iter);
+					//layer_stack.popLayer((ILayer*)*iter);
 					windowLayers.erase(iter);
 					break;
 				}

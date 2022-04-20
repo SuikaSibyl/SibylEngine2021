@@ -10,17 +10,17 @@ namespace SIByL::Core
 
 	}
 
-	auto IInputGLFW::isKeyPressed(int keycode) noexcept -> bool
+	auto IInputGLFW::isKeyPressed(CodeEnum const& keycode) noexcept -> bool
 	{
 		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
-		auto state = glfwGetKey(window, keycode);
+		auto state = glfwGetKey(window, keycode.GLFWCode);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	auto IInputGLFW::isMouseButtonPressed(int button) noexcept -> bool
+	auto IInputGLFW::isMouseButtonPressed(CodeEnum const& button) noexcept -> bool
 	{
 		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
-		auto state = glfwGetMouseButton(window, button);
+		auto state = glfwGetMouseButton(window, button.GLFWCode);
 		return state == GLFW_PRESS;
 	}
 
@@ -49,5 +49,17 @@ namespace SIByL::Core
 		glfwGetCursorPos(window, &xpos, &ypos);
 
 		return (float)ypos;
+	}
+
+	auto IInputGLFW::disableCursor() noexcept -> void
+	{
+		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
+	auto IInputGLFW::enableCursor() noexcept -> void
+	{
+		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
