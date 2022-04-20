@@ -246,6 +246,7 @@ namespace SIByL
 
 		export enum class ShaderStageFlagBits :uint32_t
 		{
+			NONE_BIT = 0x00000000,
 			VERTEX_BIT = 0x00000001,
 			TESSELLATION_CONTROL_BIT = 0x00000002,
 			TESSELLATION_EVALUATION_BIT = 0x00000004,
@@ -263,7 +264,18 @@ namespace SIByL
 			SUBPASS_SHADING_BIT = 0x00004000,
 		};
 		export using ShaderStageFlags = uint32_t;
-
+		export inline auto ShaderStage2FlagBit(ShaderStage stage) noexcept -> ShaderStageFlagBits
+		{
+			switch (stage)
+			{
+			case ShaderStage::VERTEX:	return ShaderStageFlagBits::VERTEX_BIT; break;
+			case ShaderStage::FRAGMENT:	return ShaderStageFlagBits::FRAGMENT_BIT; break;
+			case ShaderStage::GEOMETRY:	return ShaderStageFlagBits::GEOMETRY_BIT; break;
+			case ShaderStage::COMPUTE:	return ShaderStageFlagBits::COMPUTE_BIT; break;
+			case ShaderStage::MESH:		return ShaderStageFlagBits::MESH_BIT; break;
+			}
+			return ShaderStageFlagBits::NONE_BIT;
+		}
 		export enum class PipelineBintPoint :uint32_t
 		{
 			GRAPHICS,

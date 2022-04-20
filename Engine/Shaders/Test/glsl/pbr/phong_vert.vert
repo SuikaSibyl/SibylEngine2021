@@ -7,14 +7,17 @@ layout(location = 3) in vec4 inTangent;
 
 layout(location = 0) out vec3 fragColor;
 
-layout(binding = 0) uniform UniformBufferObject {
-    vec4 cameraPos;
+layout(push_constant) uniform PushConstantObject {
     mat4 model;
+} PushConstants;
+
+layout(binding = 0) uniform PerViewUniformBuffer {
     mat4 view;
     mat4 proj;
-} ubo;
+    vec4 cameraPos;
+} view_ubo;
 
 void main() {
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(0.1*inPosition, 1.0);
+    gl_Position = view_ubo.proj * view_ubo.view * PushConstants.model * vec4(0.1*inPosition, 1.0);
     fragColor = vec3(1,1,1);
 }

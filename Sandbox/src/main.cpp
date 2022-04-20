@@ -83,6 +83,7 @@ import Asset.RuntimeAssetManager;
 import GFX.SceneTree;
 import GFX.Scene;
 import GFX.Mesh;
+import GFX.Transform;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
 import GFX.RDG.RasterPassNode;
@@ -90,6 +91,8 @@ import GFX.RDG.Common;
 import GFX.RDG.MultiDispatchScope;
 import GFX.PostProcessing.AcesBloom;
 import GFX.Renderer;
+import GFX.RDG.RasterNodes;
+import GFX.RDG.ExternalAccess;
 
 import UAT.IUniversalApplication;
 
@@ -196,11 +199,11 @@ public:
 			editorLayer->pipelineGui.bindRenderGraph(&rdg);
 			editorLayer->pipelineGui.bindInspector(&(editorLayer->inspectorGui));
 		}
-
+		GFX::RDG::NodeHandle srgb_color_attachment;
 		{
 			PROFILE_SCOPE("create RDG")
-				// Create RDG register proxy
-				acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
+			// Create RDG register proxy
+			acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
 			sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
 
@@ -214,145 +217,139 @@ public:
 			GFX::RDG::NodeHandle depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
 			uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
 			// raster pass sono 1
-			GFX::RDG::NodeHandle srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
+			srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
 			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
-			// HDR Opaque raster pass
-			GFX::RDG::NodeHandle opaqueRenderPassNodeSRGB;
-			opaqueRenderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights });
-			rdg.tag(opaqueRenderPassNodeSRGB, "Opaque Raster HDR");
-			GFX::RDG::RasterPassNode* opaqueRasterPassNodeSRGB = rdg.getRasterPassNode(opaqueRenderPassNodeSRGB);
-			opaqueRasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
-			opaqueRasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-			opaqueRasterPassNodeSRGB->framebuffer = srgb_framebuffer;
-			opaqueRasterPassNodeSRGB->stageMasks = {
-				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-			};
-			opaqueRasterPassNodeSRGB->vertex_buffer_layout =
-			{
-				{RHI::DataType::Float3, "Position"},
-				{RHI::DataType::Float3, "Normal"},
-				{RHI::DataType::Float2, "UV"},
-				{RHI::DataType::Float4, "Tangent"},
-			};
-			opaqueRasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				std::function<void(ECS::TagComponent&, GFX::Mesh&, GFX::Renderer&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh, GFX::Renderer& renderer) {
-					if (!renderer.hasPass(0)) return;
-
-					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
-					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
-
-					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
-					commandbuffer->cmdBindDescriptorSets(
-						RHI::PipelineBintPoint::GRAPHICS,
-						raster_pass->pipelineLayout.get(),
-						0, 1, &set, 0, nullptr);
-
-					commandbuffer->cmdDrawIndexed(mesh.indexBuffer->getIndicesCount(), 1, 0, 0, 0);
-				};
-				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
-			};
-
-			// HDR raster pass
-			renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
-			rdg.tag(renderPassNodeSRGB, "Raster HDR");
-			GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
-			rasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("portal/portal_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
-			rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("portal/portal_vert_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-			rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
-			rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
-			rasterPassNodeSRGB->textures = { portal.spriteHandle, portal.bakedCurveHandle };
-			rasterPassNodeSRGB->stageMasks = {
-				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT
-			};
-			rasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				std::function<void(ECS::TagComponent&, GFX::Mesh&, GFX::Renderer&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh, GFX::Renderer& renderer) {
-					if (!renderer.hasPass(1)) return;
-					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
-					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
-					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
-					commandbuffer->cmdBindDescriptorSets(
-						RHI::PipelineBintPoint::GRAPHICS,
-						raster_pass->pipelineLayout.get(),
-						0, 1, &set, 0, nullptr);
-
-					commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
-				};
-				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
-			};
-#ifdef MACRO_USE_MESH
-			// Mesh Based Raster Pass
-			renderPassNodeSRGB_mesh = rdg_builder.addRasterPassBackPool({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
-			rdg.tag(renderPassNodeSRGB_mesh, "Raster HDR Mesh");
-			GFX::RDG::RasterPassNode* rasterPassNodeSRGB_mesh = rdg.getRasterPassNode(renderPassNodeSRGB_mesh);
-			rasterPassNodeSRGB_mesh->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-			rasterPassNodeSRGB_mesh->shaderMesh = resourceFactory->createShaderFromBinaryFile("portal/portal_mesh.spv", { RHI::ShaderStage::MESH,"main" });
-			rasterPassNodeSRGB_mesh->framebuffer = srgb_framebuffer;
-			rasterPassNodeSRGB_mesh->indirectDrawBufferHandle = portal.indirectDrawBuffer;
-			rasterPassNodeSRGB_mesh->textures = { portal.spriteHandle, portal.bakedCurveHandle };
-			rasterPassNodeSRGB_mesh->stageMasks = {
-				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
-				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT
-			};
-			rasterPassNodeSRGB_mesh->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-			{
-				std::function<void(ECS::TagComponent&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
-					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer.get());
-					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer.get());
-					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
-					commandbuffer->cmdBindDescriptorSets(
-						RHI::PipelineBintPoint::GRAPHICS,
-						raster_pass->pipelineLayout.get(),
-						0, 1, &set, 0, nullptr);
-
-					commandbuffer->cmdDrawMeshTasks(100000u / 16, 0);
-				};
-				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
-			};
-#endif
-
-			// ACES
-			acesbloom->iHdrImage = srgb_color_attachment;
-			acesbloom->iExternalSampler = portal.samplerHandle;
-			acesbloom->registerComputePasses(&rdg_builder);
-
-			// particle system update pass
-			GFX::RDG::NodeHandle scope_begin = rdg_builder.beginMultiDispatchScope("Scope Begin Portal-Update Multi-Dispatch");
-			rdg.getMultiDispatchScope(scope_begin)->customDispatchCount = [&timer = timer]()
-			{
-				static float deltaTime = 0;
-				deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
-				unsigned int dispatch_times = (unsigned int)(deltaTime / 20);
-				deltaTime -= dispatch_times * 20;
-				return dispatch_times;
-			};
-			portal.registerUpdatePasses(&rdg_builder);
-			sortTest.registerUpdatePasses(&rdg_builder);
-			GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
+//			// HDR Opaque raster pass
+//
+//			// HDR raster pass
+//			renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
+//			rdg.tag(renderPassNodeSRGB, "Raster HDR");
+//			GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
+//			rasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("portal/portal_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
+//			rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("portal/portal_vert_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+//			rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
+//			rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
+//			rasterPassNodeSRGB->textures = { portal.spriteHandle, portal.bakedCurveHandle };
+//			rasterPassNodeSRGB->stageMasks = {
+//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT
+//			};
+//			rasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+//			{
+//				std::function<void(ECS::TagComponent&, GFX::Mesh&, GFX::Renderer&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh, GFX::Renderer& renderer) {
+//					if (!renderer.hasPass(1)) return;
+//					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
+//					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
+//					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
+//					commandbuffer->cmdBindDescriptorSets(
+//						RHI::PipelineBintPoint::GRAPHICS,
+//						raster_pass->pipelineLayout.get(),
+//						0, 1, &set, 0, nullptr);
+//
+//					commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+//				};
+//				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
+//			};
+//#ifdef MACRO_USE_MESH
+//			// Mesh Based Raster Pass
+//			renderPassNodeSRGB_mesh = rdg_builder.addRasterPassBackPool({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
+//			rdg.tag(renderPassNodeSRGB_mesh, "Raster HDR Mesh");
+//			GFX::RDG::RasterPassNode* rasterPassNodeSRGB_mesh = rdg.getRasterPassNode(renderPassNodeSRGB_mesh);
+//			rasterPassNodeSRGB_mesh->shaderFrag = resourceFactory->createShaderFromBinaryFile("fs_sampler.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+//			rasterPassNodeSRGB_mesh->shaderMesh = resourceFactory->createShaderFromBinaryFile("portal/portal_mesh.spv", { RHI::ShaderStage::MESH,"main" });
+//			rasterPassNodeSRGB_mesh->framebuffer = srgb_framebuffer;
+//			rasterPassNodeSRGB_mesh->indirectDrawBufferHandle = portal.indirectDrawBuffer;
+//			rasterPassNodeSRGB_mesh->textures = { portal.spriteHandle, portal.bakedCurveHandle };
+//			rasterPassNodeSRGB_mesh->stageMasks = {
+//				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT,
+//				(uint32_t)RHI::ShaderStageFlagBits::MESH_BIT
+//			};
+//			rasterPassNodeSRGB_mesh->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+//			{
+//				std::function<void(ECS::TagComponent&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh) {
+//					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer.get());
+//					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer.get());
+//					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
+//					commandbuffer->cmdBindDescriptorSets(
+//						RHI::PipelineBintPoint::GRAPHICS,
+//						raster_pass->pipelineLayout.get(),
+//						0, 1, &set, 0, nullptr);
+//
+//					commandbuffer->cmdDrawMeshTasks(100000u / 16, 0);
+//				};
+//				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
+//			};
+//#endif
+//
+//			// ACES
+//			acesbloom->iHdrImage = srgb_color_attachment;
+//			acesbloom->iExternalSampler = portal.samplerHandle;
+//			acesbloom->registerComputePasses(&rdg_builder);
+//
+//			// particle system update pass
+//			GFX::RDG::NodeHandle scope_begin = rdg_builder.beginMultiDispatchScope("Scope Begin Portal-Update Multi-Dispatch");
+//			rdg.getMultiDispatchScope(scope_begin)->customDispatchCount = [&timer = timer]()
+//			{
+//				static float deltaTime = 0;
+//				deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
+//				unsigned int dispatch_times = (unsigned int)(deltaTime / 20);
+//				deltaTime -= dispatch_times * 20;
+//				return dispatch_times;
+//			};
+//			portal.registerUpdatePasses(&rdg_builder);
+//			sortTest.registerUpdatePasses(&rdg_builder);
+//			GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
 
 			// New Pipeline Building
 			GFX::RDG::RenderGraphWorkshop workshop(rdg);
+			// Raster Pass "Opaque Pass"
 			workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
-			workshop.addRasterPipelineScope("Opaque Pass", "Phongs");
-			workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
-			
+			GFX::RDG::RasterPipelineScope* opaque_phongs_pipeline = workshop.addRasterPipelineScope("Opaque Pass", "Phongs");
+			{
+				opaque_phongs_pipeline->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
+				opaque_phongs_pipeline->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+				opaque_phongs_pipeline->vertexBufferLayout =
+				{
+					{RHI::DataType::Float3, "Position"},
+					{RHI::DataType::Float3, "Normal"},
+					{RHI::DataType::Float2, "UV"},
+					{RHI::DataType::Float4, "Tangent"},
+				};
 
+				auto dust2_01_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
+				{
+					std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh) {
+						auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall("dust2_part1", &rdg);
+						auto drawcall = workshop.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
 
-			// building ...
-			rdg_builder.build(resourceFactory.get(), 1280, 720);
-			rdg.print();
+						drawcall->vertexBuffer = mesh.vertexBuffer;
+						drawcall->indexBuffer = mesh.indexBuffer;
+						drawcall->uniform.model = transform.getTransform();
+					};
+					scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh>(per_mesh_behavior);
+
+				}
+			}
+			// External Access Pass "ImGui Read Pass"
+			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
+			auto imGuiReadPass = workshop.getNode<GFX::RDG::ExternalAccessPass>(imGuiReadPassHandle);
+			imGuiReadPass->insertExternalAccessItem({ srgb_color_attachment, GFX::RDG::ConsumeKind::IMAGE_SAMPLE });
+
+			workshop.build(resourceFactory.get(), 1280, 720);
+
+			//// building ...
+			//rdg_builder.build(resourceFactory.get(), 1280, 720);
+			//rdg.print();
 #ifdef MACRO_USE_MESH
 			rasterPassNodeSRGB_mesh->barriers = rasterPassNodeSRGB->barriers;
 #endif
@@ -363,8 +360,9 @@ public:
 				// create ImImage for viewport
 				viewportImImage = imguiLayer->createImImage(
 					rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
-					rdg.getTextureBufferNode(acesbloom->bloomCombined)->getTextureView(),
-					RHI::ImageLayout::GENERAL);
+					rdg.getTextureBufferNode(srgb_color_attachment)->getTextureView(),
+					RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+					//RHI::ImageLayout::GENERAL);
 			editorLayer->mainViewport.bindImImage(viewportImImage.get());
 
 			// comand stuffs
@@ -381,47 +379,47 @@ public:
 			timer.start();
 		}
 
-		{
-			PROFILE_SCOPE("run First Pass")
+		//{
+		//	PROFILE_SCOPE("run First Pass")
 
-				MemScope<RHI::IMemoryBarrier> compute_compute_memory_barrier = resourceFactory->createMemoryBarrier({
-					(uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
-					(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
-					});
-			MemScope<RHI::IBarrier> compute_compute_barrier = resourceFactory->createBarrier({
-				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
-				(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
-				0,
-				{compute_compute_memory_barrier.get()}
-				}
-			);
+		//		MemScope<RHI::IMemoryBarrier> compute_compute_memory_barrier = resourceFactory->createMemoryBarrier({
+		//			(uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT,
+		//			(uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT
+		//			});
+		//	MemScope<RHI::IBarrier> compute_compute_barrier = resourceFactory->createBarrier({
+		//		(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+		//		(uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT,
+		//		0,
+		//		{compute_compute_memory_barrier.get()}
+		//		}
+		//	);
 
-			// init storage buffer
-			RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getTransientCommandPool();
-			MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
-			transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
-			rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
-			// Test
-			rdg.getComputePassNode(sortTest.sortInit)->executeWithConstant(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, 1024), 1, 1, 0, sortTest.elementCount);
-			transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-			rdg.getComputePassNode(sortTest.sortHistogramSubgroup_8_4)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, sortTest.subgroupHistogramElementPerBlock), 1, 1, 0);
-			transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-			rdg.getComputePassNode(sortTest.sortHistogramIntegrate_8_4)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
-			for (uint32_t i = 0; i < 4; i++)
-			{
-				//transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-				//rdg.getComputePassNode(sortTest.sortPassClear)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
-				transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-				//rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), sortTest.possibleDigitValue * GRIDSIZE(sortTest.elementCount,2048), 1, 1, 0, i);
-				rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, sortTest.elementPerBlock), 1, 1, 0, i);
-			}
-			transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
-			rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, 1024), 1, 1, 0);
-			// ~Test
-			transientCommandbuffer->endRecording();
-			transientCommandbuffer->submit();
-			logicalDevice->waitIdle();
-		}
+		//	// init storage buffer
+		//	RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getTransientCommandPool();
+		//	MemScope<RHI::ICommandBuffer> transientCommandbuffer = RHI::DeviceToGlobal::getGlobal(logicalDevice.get())->getResourceFactory()->createCommandBuffer(transientPool);
+		//	transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+		//	rdg.getComputePassNode(portal.initPass)->executeWithConstant(transientCommandbuffer.get(), 200, 1, 1, 0, 100000u);
+		//	// Test
+		//	rdg.getComputePassNode(sortTest.sortInit)->executeWithConstant(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, 1024), 1, 1, 0, sortTest.elementCount);
+		//	transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//	rdg.getComputePassNode(sortTest.sortHistogramSubgroup_8_4)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, sortTest.subgroupHistogramElementPerBlock), 1, 1, 0);
+		//	transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//	rdg.getComputePassNode(sortTest.sortHistogramIntegrate_8_4)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
+		//	for (uint32_t i = 0; i < 4; i++)
+		//	{
+		//		//transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//		//rdg.getComputePassNode(sortTest.sortPassClear)->execute(transientCommandbuffer.get(), 1, 1, 1, 0);
+		//		transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//		//rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), sortTest.possibleDigitValue * GRIDSIZE(sortTest.elementCount,2048), 1, 1, 0, i);
+		//		rdg.getComputePassNode(sortTest.sortPass)->executeWithConstant(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, sortTest.elementPerBlock), 1, 1, 0, i);
+		//	}
+		//	transientCommandbuffer->cmdPipelineBarrier(compute_compute_barrier.get());
+		//	rdg.getComputePassNode(sortTest.sortShowKeys)->execute(transientCommandbuffer.get(), GRIDSIZE(sortTest.elementCount, 1024), 1, 1, 0);
+		//	// ~Test
+		//	transientCommandbuffer->endRecording();
+		//	transientCommandbuffer->submit();
+		//	logicalDevice->waitIdle();
+		//}
 
 		SE_CORE_INFO("OnAwake End");
 		PROFILE_END_SESSION();
@@ -494,14 +492,23 @@ public:
 			uint32_t height = 720;
 			//auto [width, height] = swapchain->getExtend();
 
-			UniformBufferObject ubo;
-			ubo.cameraPos = glm::vec4(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
-			ubo.model = glm::mat4(1.0f);
-			ubo.view = glm::lookAt(glm::vec3(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-			ubo.proj[1][1] *= -1;
-			Buffer ubo_proxy((void*)&ubo, sizeof(UniformBufferObject), 4);
-			rdg.getUniformBufferFlight(uniformBufferFlights, currentFrame)->updateBuffer(&ubo_proxy);
+			GFX::RDG::PerViewUniformBuffer per_view_ubo;
+			per_view_ubo.cameraPos = glm::vec4(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
+			per_view_ubo.view = glm::lookAt(glm::vec3(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			per_view_ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+			per_view_ubo.proj[1][1] *= -1;
+
+			auto opaque_pass = rdg.getRasterPassScope("Opaque Pass");
+			opaque_pass->updatePerViewUniformBuffer(per_view_ubo, currentFrame);
+
+			//UniformBufferObject ubo;
+			//ubo.cameraPos = glm::vec4(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
+			//ubo.model = glm::mat4(1.0f);
+			//ubo.view = glm::lookAt(glm::vec3(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			//ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
+			//ubo.proj[1][1] *= -1;
+			//Buffer ubo_proxy((void*)&ubo, sizeof(UniformBufferObject), 4);
+			//rdg.getUniformBufferFlight(uniformBufferFlights, currentFrame)->updateBuffer(&ubo_proxy);
 		}
 		// drawFrame
 		{
@@ -510,7 +517,8 @@ public:
 			commandbuffers[currentFrame]->beginRecording();
 
 			// render pass
-			rdg.recordCommands(commandbuffers[currentFrame].get(), currentFrame);
+			//rdg.recordCommands(commandbuffers[currentFrame].get(), currentFrame);
+			rdg.recordCommandsNEW(commandbuffers[currentFrame].get(), currentFrame);
 
 			// submit the recorded command buffer
 			commandbuffers[currentFrame]->endRecording();

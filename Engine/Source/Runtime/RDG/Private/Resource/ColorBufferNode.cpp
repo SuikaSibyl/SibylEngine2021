@@ -206,6 +206,40 @@ namespace SIByL::GFX::RDG
 					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
 					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
 				}
+				// RENDER_TARGET -> IMAGE_SAMPLE
+				else if (consumeHistory[left].kind == ConsumeKind::RENDER_TARGET && consumeHistory[right].kind == ConsumeKind::IMAGE_SAMPLE)
+				{
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
+						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT;
+					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> IMAGE_SAMPLE, RENDER_TARGET is not consumed by a raster pass!");
+
+					dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
+									| (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
+									| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+
+					oldLayout = RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL;
+					newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
+
+					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT;
+					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
+				}
+				// IMAGE_SAMPLE -> RENDER_TARGET
+				else if (consumeHistory[left].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[right].kind == ConsumeKind::RENDER_TARGET)
+				{
+					srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
+						| (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
+						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
+						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT;
+					else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> RENDER_TARGET, RENDER_TARGET is not consumed by a raster pass!");
+
+					oldLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
+					newLayout = RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL;
+
+					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
+					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT;
+				}
 				else
 				{
 					if (consumeHistory[right].kind != consumeHistory[left].kind)

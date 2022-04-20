@@ -5,6 +5,7 @@ module;
 export module RHI.IShader;
 import Core.SObject;
 import RHI.IEnum;
+import RHI.IShaderReflection;
 
 namespace SIByL
 {
@@ -31,6 +32,7 @@ namespace SIByL
 			IShader(IShader&&) = default;
 			virtual ~IShader() = default;
 			virtual auto injectDesc(ShaderDesc const& desc) noexcept -> void = 0;
+			virtual auto getReflection() noexcept -> IShaderReflection* = 0;
 		};
 	}
 }

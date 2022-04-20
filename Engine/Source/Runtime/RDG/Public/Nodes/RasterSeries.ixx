@@ -1,6 +1,7 @@
 module;
 #include <vector>
 #include <string>
+#include <glm/glm.hpp>
 #include <unordered_map>
 export module GFX.RDG.RasterNodes;
 import Core.MemoryManager;
@@ -38,37 +39,93 @@ import GFX.RDG.Common;
 
 namespace SIByL::GFX::RDG
 {
+	export struct PerObjectUniformBuffer {
+		glm::mat4 model;
+	};
+
+	export struct PerViewUniformBuffer{
+	   glm::mat4 view;
+	   glm::mat4 proj;
+	   glm::vec4 cameraPos;
+	};
+
+	struct RasterPassScope;
+	struct RasterPipelineScope;
+	struct RasterMaterialScope;
+
 	export struct RasterDrawCall :public PassNode
 	{
+		RasterDrawCall(RHI::IPipelineLayout** pipeline_layout);
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
-		std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
+		RHI::IVertexBuffer* vertexBuffer;
+		RHI::IIndexBuffer* indexBuffer;
+
+		PerObjectUniformBuffer uniform;
+
+	private:
+		friend struct RasterMaterialScope;
+		RHI::IPipelineLayout** pipelineLayout;
 	};
 
 	export struct RasterMaterialScope :public PassNode
 	{
-		std::vector<NodeHandle> drawCalls;
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+
+		auto addRasterDrawCall(std::string const& tag, void* graph) noexcept -> NodeHandle;
+
+		std::vector<NodeHandle> resources;
+		std::vector<NodeHandle> sampled_textures;
+
+		std::vector<NodeHandle> drawCalls;
+
+	private:
+		friend struct RasterPipelineScope;
+		// member
+		std::vector<MemScope<RHI::IDescriptorSet>> descriptorSets;
+		// Desc :: desciptor set layout
+		RHI::IDescriptorSetLayout* desciptorSetLayout;
+		RHI::IPipelineLayout* pipelineLayout;
+		int hasPerFrameUniformBuffer = -1;
+		int hasPerViewUniformBuffer = -1;
+		unsigned int totalResourceNum = 0;
+		NodeHandle perFrameUniformBufferFlight;
+		NodeHandle perViewUniformBufferFlight;
+		void* renderGraph;
 	};
 
 	export struct RasterPipelineScope :public PassNode
 	{
-		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
+		auto fillRasterMaterialScopeDesc(RasterMaterialScope* raster_material, void* graph) noexcept -> void;
+
+		// Desc :: Shaders
+		MemScope<RHI::IShader> shaderVert = nullptr;
+		MemScope<RHI::IShader> shaderFrag = nullptr;
+		MemScope<RHI::IShader> shaderTask = nullptr;
+		MemScope<RHI::IShader> shaderMesh = nullptr;
+		// Desc :: Fixed Functional Paras
 		RHI::BufferLayout vertexBufferLayout = {};
 		RHI::TopologyKind topologyKind = RHI::TopologyKind::TriangleList;
-		RHI::Extend viewportExtend;
 		RHI::PolygonMode polygonMode = RHI::PolygonMode::FILL;
 		RHI::CullMode cullMode = RHI::CullMode::NONE;
 		float lineWidth = 0.0f;
-
+		// Devirtualized :: IPipeline
 		MemScope<RHI::IPipeline> pipeline;
-
+		// Node children
 		std::vector<NodeHandle> materialScopes;
 		std::unordered_map<std::string, NodeHandle> materialScopesRegister;
 	
 	private:
+		friend struct RasterPassScope;
+		// Desc :: Frame buffer binded / will be filled by RasterPassScope
+		RHI::IRenderPass* renderPass = nullptr;
+		RHI::Extend viewportExtend;
+		// Created Fixed-Function components
 		MemScope<RHI::IVertexLayout> vertexLayout;
 		MemScope<RHI::IInputAssembly> inputAssembly;
 		MemScope<RHI::IViewportsScissors> viewportScissors;
@@ -79,14 +136,33 @@ namespace SIByL::GFX::RDG
 		MemScope<RHI::IDynamicState> dynamicStates;
 		MemScope<RHI::IPipelineLayout> pipelineLayout;
 		MemScope<RHI::IDescriptorSetLayout> desciptorSetLayout;
+		//
+		int hasPerFrameUniformBuffer = -1;
+		int hasPerViewUniformBuffer = -1;
+		unsigned int totalResourceNum = 0;
+		NodeHandle perFrameUniformBufferFlight;
+		NodeHandle perViewUniformBufferFlight;
+		void* renderGraph;
 	};
 
 	export struct RasterPassScope :public PassNode
 	{
+		virtual auto onRegistered(void* graph, void* render_graph_workshop) noexcept -> void override;
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+
+		auto fillRasterPipelineScopeDesc(RasterPipelineScope* raster_pipeline, void* graph) noexcept -> void;
+		auto updatePerViewUniformBuffer(PerViewUniformBuffer const& buffer, uint32_t const& current_frame) noexcept -> void;
 
 		NodeHandle framebuffer;
 		std::vector<NodeHandle> pipelineScopes;
 		std::unordered_map<std::string, NodeHandle> pipelineScopesRegister;
+
+	private:
+		PerViewUniformBuffer perViewUniformBuffer;
+		NodeHandle perFrameUniformBufferFlight;
+		NodeHandle perViewUniformBufferFlight;
+		void* renderGraph;
 	};
 }

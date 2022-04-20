@@ -84,5 +84,11 @@
     <ClCompile Include="Private\Nodes\RasterSerires.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Nodes\ExternalAccess.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Nodes\ExternalAccess.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -20,6 +20,8 @@ import GFX.RDG.ColorBufferNode;
 import GFX.RDG.SamplerNode;
 import GFX.RDG.RasterPassNode;
 import GFX.RDG.MultiDispatchScope;
+import GFX.RDG.RasterNodes;
+import GFX.RDG.ExternalAccess;
 
 namespace SIByL::GFX::RDG
 {
@@ -98,6 +100,7 @@ namespace SIByL::GFX::RDG
 
 		auto reDatum(uint32_t const& width, uint32_t const& height) noexcept -> void;
 		auto recordCommands(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void;
+		auto recordCommandsNEW(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void;
 
 		// Node manage
 		NodeRegistry registry;
@@ -116,6 +119,8 @@ namespace SIByL::GFX::RDG
 		friend struct RenderGraphBuilder;
 		MemScope<RHI::IDescriptorPool> descriptorPool;
 
+		auto getRasterPassScope(std::string const& pass) noexcept -> RasterPassScope*;
+
 		std::vector<NodeHandle> passList;
 		std::unordered_map<std::string, NodeHandle> rasterPassRegister;
 	};
@@ -124,10 +129,18 @@ namespace SIByL::GFX::RDG
 	{
 		RenderGraphWorkshop(RenderGraph& attached) :renderGraph(attached) {}
 
-		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void;
-		auto addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> void;
-		auto addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> void;
+		template <class T>
+		auto getNode(NodeHandle handle) noexcept -> T* { return (T*)(renderGraph.registry.getNode(handle)); }
 
+		auto build(RHI::IResourceFactory* factory, uint32_t const& width, uint32_t const& height) noexcept -> void;
+
+		auto addUniformBuffer(size_t size, std::string const& name = "Uniform Buffer Anonymous") noexcept -> NodeHandle;
+		auto addUniformBufferFlights(size_t size, std::string const& name = "Uniform Buffer Flights Anonymous") noexcept -> NodeHandle;
+
+		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void;
+		auto addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*;
+		auto addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
+		auto addExternalAccessPass(std::string const& pass) noexcept -> NodeHandle;
 
 		RenderGraph& renderGraph;
 	};

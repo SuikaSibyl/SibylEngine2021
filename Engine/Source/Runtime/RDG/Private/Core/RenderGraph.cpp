@@ -1,4 +1,5 @@
 module;
+#include <string>
 #include <unordered_map>
 module GFX.RDG.RenderGraph;
 import Core.Log;
@@ -21,6 +22,7 @@ import GFX.RDG.SamplerNode;
 import GFX.RDG.RasterPassNode;
 import GFX.RDG.MultiDispatchScope;
 import GFX.RDG.RasterNodes;
+import GFX.RDG.ExternalAccess;
 
 namespace SIByL::GFX::RDG
 {
@@ -121,6 +123,14 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
+	auto RenderGraph::recordCommandsNEW(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
+	{
+		for (auto const& passHandle : passList)
+		{
+			getPassNode(passHandle)->onCommandRecord(commandbuffer, flight);
+		}
+	}
+
 	auto RenderGraph::getDescriptorPool() noexcept -> RHI::IDescriptorPool*
 	{
 		return descriptorPool.get();
@@ -202,6 +212,11 @@ namespace SIByL::GFX::RDG
 	auto RenderGraph::getMultiDispatchScope(NodeHandle handle) noexcept -> MultiDispatchScope*
 	{
 		return (MultiDispatchScope*)registry.getNode(handle);
+	}
+
+	auto RenderGraph::getRasterPassScope(std::string const& pass) noexcept -> RasterPassScope*
+	{
+		return (RasterPassScope*)registry.getNode(rasterPassRegister[pass]);
 	}
 
 	// =====================================================
@@ -414,6 +429,8 @@ namespace SIByL::GFX::RDG
 		// devirtualize passes
 		for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
 			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
+		for (auto iter = attached.passList.begin(); iter != attached.passList.end(); iter++)
+			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
 		// devirtualize passes onetime
 		for (auto iter = attached.passesBackPool.begin(); iter != attached.passesBackPool.end(); iter++)
 			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
@@ -477,6 +494,78 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
+	// ==============================================================================================
+	// ==============================================================================================
+	// ==============================================================================================
+
+	auto RenderGraphWorkshop::build(RHI::IResourceFactory* factory, uint32_t const& width, uint32_t const& height) noexcept -> void
+	{
+		renderGraph.factory = factory;
+		renderGraph.datumWidth = width;
+		renderGraph.datumHeight = height;
+
+		// create descripotr pool
+		uint32_t MAX_FRAMES_IN_FLIGHT = renderGraph.getMaxFrameInFlight();
+		RHI::DescriptorPoolDesc descriptor_pool_desc{ {}, 1000 };
+		descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_BUFFER, 1000);
+		descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::UNIFORM_BUFFER, 1000);
+		descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, 1000);
+		descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_IMAGE, 1000);
+		renderGraph.descriptorPool = factory->createDescriptorPool(descriptor_pool_desc);
+
+		// devirtualize resources
+		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
+			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
+		// devirtualize passes
+		for (auto iter = renderGraph.passList.begin(); iter != renderGraph.passList.end(); iter++)
+			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
+
+		// clear barriers
+		renderGraph.barrierPool.barriers.clear();
+
+		// compile resources
+		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
+			renderGraph.registry.getNode((*iter))->onCompile((void*)&renderGraph, factory);
+		// compile passes
+		for (auto iter = renderGraph.passList.begin(); iter != renderGraph.passList.end(); iter++)
+			renderGraph.registry.getNode((*iter))->onCompile((void*)&renderGraph, factory);
+
+		// build resources
+		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
+			renderGraph.registry.getNode((*iter))->onBuild((void*)&renderGraph, factory);
+		//// build passes
+		//for (auto iter = attached.passes.begin(); iter != attached.passes.end(); iter++)
+		//	attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
+	}
+
+	auto RenderGraphWorkshop::addUniformBuffer(size_t size, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<UniformBufferNode> ubn = MemNew<UniformBufferNode>();
+		ubn->size = size;
+		ubn->tag = name;
+		ubn->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(ubn));
+		renderGraph.resources.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addUniformBufferFlights(size_t size, std::string const& name) noexcept -> NodeHandle
+	{
+		uint32_t flights_count = renderGraph.getMaxFrameInFlight();
+		std::vector<NodeHandle> handles(flights_count);
+		for (uint32_t i = 0; i < flights_count; i++)
+		{
+			handles[i] = addUniformBuffer(size, name + " Sub-Flight=" + std::to_string(i));
+		}
+		MemScope<FlightContainer> fc = MemNew<FlightContainer>(std::move(handles));
+		fc->type = NodeDetailedType::UNIFORM_BUFFER;
+		fc->tag = name;
+		fc->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(fc));
+		renderGraph.resources.emplace_back(handle);
+		return handle;
+	}
+
 	auto RenderGraphWorkshop::addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void
 	{
 		if (renderGraph.rasterPassRegister.find(pass) != renderGraph.rasterPassRegister.end())
@@ -487,60 +576,72 @@ namespace SIByL::GFX::RDG
 		// create RasterPassScope
 		MemScope<RasterPassScope> rps = MemNew<RasterPassScope>();
 		rps->tag = pass;
+		rps->type = NodeDetailedType::RASTER_PASS_SCOPE;
 		rps->framebuffer = framebuffer;
+		rps->onRegistered(&renderGraph, this);
 		NodeHandle handle = renderGraph.registry.registNode(std::move(rps));
 		renderGraph.rasterPassRegister.emplace(pass, handle);
 		renderGraph.passList.emplace_back(handle);
 	}
 
-	auto RenderGraphWorkshop::addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> void
+	auto RenderGraphWorkshop::addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*
 	{
 		if (renderGraph.rasterPassRegister.find(pass) == renderGraph.rasterPassRegister.end())
 		{
 			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPipelineScope() pass name \'{0}\' not found !", pass);
-			return;
+			return nullptr;
 		}
 		auto pass_node_handle = renderGraph.rasterPassRegister.find(pass)->second;
 		RasterPassScope* pass_node = (RasterPassScope*)renderGraph.registry.getNode(pass_node_handle);
 		if (pass_node->pipelineScopesRegister.find(pipeline) != pass_node->pipelineScopesRegister.end())
 		{
 			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPipelineScope() pipeline name \'{0}\' duplicated !", pipeline);
-			return;
+			return nullptr;
 		}
 		// create RasterPipelineScope
 		MemScope<RasterPipelineScope> rps = MemNew<RasterPipelineScope>();
 		rps->tag = pipeline;
-		//FramebufferContainer* framebuffer = renderGraph.getFramebufferContainer(pass_node->framebuffer);
-		//RHI::Extend extend{ framebuffer->getWidth(), framebuffer->getHeight() };
-		//rps->viewportExtend = extend;
+		rps->onRegistered(&renderGraph, this);
 		NodeHandle handle = renderGraph.registry.registNode(std::move(rps));
 		pass_node->pipelineScopesRegister.emplace(pipeline, handle);
 		pass_node->pipelineScopes.emplace_back(handle);
+		return (RasterPipelineScope*)(renderGraph.registry.getNode(handle));
 	}
 
-	auto RenderGraphWorkshop::addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> void
+	auto RenderGraphWorkshop::addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*
 	{
 		if (renderGraph.rasterPassRegister.find(pass) == renderGraph.rasterPassRegister.end())
 		{
 			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterMaterialScope() pass name \'{0}\' not found !", pass);
-			return;
+			return nullptr;
 		}
 		auto pass_node_handle = renderGraph.rasterPassRegister.find(pass)->second;
 		RasterPassScope* pass_node = (RasterPassScope*)renderGraph.registry.getNode(pass_node_handle);
 		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
 		{
 			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterMaterialScope() pipeline name \'{0}\' not found !", pipeline);
-			return;
+			return nullptr;
 		}
 		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
 		RasterPipelineScope* pipeline_node = (RasterPipelineScope*)renderGraph.registry.getNode(pipeline_node_handle);
 		// create RasterMaterialScope
 		MemScope<RasterMaterialScope> rms = MemNew<RasterMaterialScope>();
 		rms->tag = mat;
+		rms->onRegistered(&renderGraph, this);
 		NodeHandle handle = renderGraph.registry.registNode(std::move(rms));
 		pipeline_node->materialScopesRegister.emplace(pipeline, handle);
 		pipeline_node->materialScopes.emplace_back(handle);
-
+		return (RasterMaterialScope*)(renderGraph.registry.getNode(handle));
 	}
 
+	auto RenderGraphWorkshop::addExternalAccessPass(std::string const& pass) noexcept -> NodeHandle
+	{
+		MemScope<ExternalAccessPass> eap = MemNew<ExternalAccessPass>();
+		eap->tag = pass;
+		eap->type = NodeDetailedType::EXTERNAL_ACCESS_PASS;
+		eap->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(eap));
+		renderGraph.passList.emplace_back(handle);
+		return handle;
+	}
 }

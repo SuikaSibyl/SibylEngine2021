@@ -354,6 +354,15 @@
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IStorageBufferVK.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Shader\IShaderReflection.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderReflectionVK.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Vendors\Vulkan\Shader\IShaderReflectionVK.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Private\Vendors\DX12\WindowsPlatform.h">

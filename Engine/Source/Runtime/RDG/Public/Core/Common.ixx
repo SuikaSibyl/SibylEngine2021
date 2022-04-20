@@ -74,6 +74,9 @@ namespace SIByL::GFX::RDG
 		RASTER_PASS,
 		COMPUTE_PASS,
 		BLIT_PASS,
+		// NEW API
+		RASTER_PASS_SCOPE,
+		EXTERNAL_ACCESS_PASS,
 		// Pass Scope
 		SCOPE,
 		MULTI_DISPATCH_SCOPE,
@@ -91,6 +94,7 @@ namespace SIByL::GFX::RDG
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 
+		virtual auto onRegistered(void* graph, void* render_graph_workshop) noexcept -> void {} // optional
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
@@ -146,6 +150,7 @@ namespace SIByL::GFX::RDG
 	{
 		NodeHandle pass;
 		ConsumeKind kind;
+		RHI::AccessFlags accessFlags = 0;
 	};
 
 	export struct ResourceNode :public Node

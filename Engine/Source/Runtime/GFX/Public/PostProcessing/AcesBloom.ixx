@@ -78,6 +78,7 @@ namespace SIByL::GFX::PostProcessing
 	{
 		bloomExtract = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f, 1.f, "Bloom Extract Image");
 		ldrImage = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "LDR Image");
+		bloomCombined = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "Combined Image");
 
 	}
 
@@ -218,7 +219,6 @@ namespace SIByL::GFX::PostProcessing
 			};
 		}
 
-		bloomCombined = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "Combined Image");
 		bloomCombinedPass = builder->addComputePass(BlurCombine.get(), { bloomCombined,
 			iExternalSampler, iExternalSampler, iExternalSampler,
 			iExternalSampler, iExternalSampler, iExternalSampler },

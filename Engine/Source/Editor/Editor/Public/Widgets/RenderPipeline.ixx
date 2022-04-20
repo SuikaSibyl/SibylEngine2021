@@ -102,10 +102,11 @@ namespace SIByL::Editor
 					//}
 					if (node_open)
 					{
+						GFX::RDG::PassNode* passnode = (GFX::RDG::PassNode*)(rg->registry.getNode(pass_node_handle));
 						// if pass_node is a RasterPassScope
-						if (true)
+						if (passnode->type == GFX::RDG::NodeDetailedType::RASTER_PASS_SCOPE)
 						{
-							GFX::RDG::RasterPassScope* pass_node = (GFX::RDG::RasterPassScope*)(rg->registry.getNode(pass_node_handle));
+							GFX::RDG::RasterPassScope* pass_node = (GFX::RDG::RasterPassScope*)passnode;
 							for (int i = 0; i < pass_node->pipelineScopes.size(); i++)
 							{
 								auto pipeline_node_handle = pass_node->pipelineScopes[i];
@@ -132,6 +133,10 @@ namespace SIByL::Editor
 								}
 								ImGui::PopID();
 							}
+						}
+						else if (passnode->type == GFX::RDG::NodeDetailedType::EXTERNAL_ACCESS_PASS)
+						{
+
 						}
 						ImGui::TreePop();
 					}
