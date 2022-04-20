@@ -95,8 +95,15 @@ namespace SIByL::GFX::RDG
 
 		auto getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*;
 
+		auto getRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
+
 		auto getDatumWidth() noexcept -> uint32_t { return datumWidth; }
 		auto getDatumHeight() noexcept -> uint32_t { return datumHeight; }
+
+		auto onFrameStart() noexcept -> void;
+
+		template <class T>
+		auto getNode(NodeHandle handle) noexcept -> T* { return (T*)(registry.getNode(handle)); }
 
 		auto reDatum(uint32_t const& width, uint32_t const& height) noexcept -> void;
 		auto recordCommands(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void;

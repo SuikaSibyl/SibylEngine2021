@@ -189,6 +189,38 @@ namespace SIByL::GFX::RDG
 		return ((UniformBufferNode*)registry.getNode(flight_handle))->uniformBuffer.get();
 	}
 
+	auto RenderGraph::getRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*
+	{
+		if (rasterPassRegister.find(pass) == rasterPassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getRasterMaterialScope() pass name \'{0}\' not found !", pass);
+			return nullptr;
+		}
+		auto pass_node_handle = rasterPassRegister.find(pass)->second;
+		RasterPassScope* pass_node = (RasterPassScope*)registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getRasterMaterialScope() pipeline name \'{0}\' not found !", pipeline);
+			return nullptr;
+		}
+		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
+		RasterPipelineScope* pipeline_node = (RasterPipelineScope*)registry.getNode(pipeline_node_handle);
+		if (pipeline_node->materialScopesRegister.find(mat) == pipeline_node->materialScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getRasterMaterialScope() material name \'{0}\' not found !", mat);
+			return nullptr;
+		}
+		auto material_node_handle = pipeline_node->materialScopesRegister.find(mat)->second;
+		RasterMaterialScope* material_node = (RasterMaterialScope*)registry.getNode(material_node_handle);
+		return material_node;
+	}
+
+	auto RenderGraph::onFrameStart() noexcept -> void
+	{
+		for (auto iter = passList.begin(); iter != passList.end(); iter++)
+			registry.getNode((*iter))->onFrameStart((void*)this);
+	}
+
 	auto RenderGraph::getContainer(NodeHandle handle) noexcept -> Container*
 	{
 		return (Container*)registry.getNode(handle);
@@ -629,7 +661,7 @@ namespace SIByL::GFX::RDG
 		rms->tag = mat;
 		rms->onRegistered(&renderGraph, this);
 		NodeHandle handle = renderGraph.registry.registNode(std::move(rms));
-		pipeline_node->materialScopesRegister.emplace(pipeline, handle);
+		pipeline_node->materialScopesRegister.emplace(mat, handle);
 		pipeline_node->materialScopes.emplace_back(handle);
 		return (RasterMaterialScope*)(renderGraph.registry.getNode(handle));
 	}

@@ -97,7 +97,10 @@ namespace SIByL::GFX::RDG
 		virtual auto onRegistered(void* graph, void* render_graph_workshop) noexcept -> void {} // optional
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
+
+		virtual auto onFrameStart(void* graph) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
+
 		// Debug Print
 		virtual auto onPrint() noexcept -> void;
 		// Members

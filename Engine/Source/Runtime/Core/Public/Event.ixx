@@ -92,7 +92,7 @@ namespace SIByL
 		export class KeyEvent : public Event
 		{
 		public:
-			inline int GetKeyCode() const { return m_KeyCode; }
+			inline int getKeyCode() const { return m_KeyCode; }
 
 			EVENT_CLASS_CATEGORY(EventCategory::EventCategoryKeyboard | EventCategory::EventCategoryInput);
 

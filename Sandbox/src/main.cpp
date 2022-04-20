@@ -103,6 +103,7 @@ import Editor.ImImage;
 import Editor.Inspector;
 import Editor.RenderPipeline;
 import Editor.EditorLayer;
+import Editor.RDGImImageManager;
 
 import Demo.Portal;
 import Demo.SortTest;
@@ -184,7 +185,7 @@ public:
 		{
 			PROFILE_SCOPE("create Editor layer")
 				// create editor layer
-			editorLayer = MemNew<Editor::EditorLayer>(window_layer, assetLayer.get(), imguiLayer.get(), &timer);
+			editorLayer = MemNew<Editor::EditorLayer>(window_layer, assetLayer.get(), imguiLayer.get(), &timer, &rdg);
 			pushLayer(editorLayer.get());
 			editorLayer->introspectionGui.bindApplication(this);
 			editorLayer->introspectionGui.bindInspector(&(editorLayer->inspectorGui));
@@ -327,18 +328,6 @@ public:
 				};
 
 				auto dust2_01_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
-				{
-					std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh) {
-						auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall("dust2_part1", &rdg);
-						auto drawcall = workshop.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
-
-						drawcall->vertexBuffer = mesh.vertexBuffer;
-						drawcall->indexBuffer = mesh.indexBuffer;
-						drawcall->uniform.model = transform.getTransform();
-					};
-					scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh>(per_mesh_behavior);
-
-				}
 			}
 			// External Access Pass "ImGui Read Pass"
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
@@ -356,14 +345,16 @@ public:
 		}
 
 		{
-			PROFILE_SCOPE("create Misc")
-				// create ImImage for viewport
-				viewportImImage = imguiLayer->createImImage(
-					rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
-					rdg.getTextureBufferNode(srgb_color_attachment)->getTextureView(),
-					RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
-					//RHI::ImageLayout::GENERAL);
-			editorLayer->mainViewport.bindImImage(viewportImImage.get());
+			PROFILE_SCOPE("create Misc");
+
+			auto imimage = editorLayer->imImageManager.addImImage(srgb_color_attachment, portal.samplerHandle);
+				//// create ImImage for viewport
+				//viewportImImage = imguiLayer->createImImage(
+				//	rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
+				//	rdg.getTextureBufferNode(srgb_color_attachment)->getTextureView(),
+				//	RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
+
+			editorLayer->mainViewport.bindImImage(imimage);
 
 			// comand stuffs
 			commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
@@ -433,7 +424,7 @@ public:
 
 	virtual auto onKeyPressedEvent(KeyPressedEvent& e) -> bool override
 	{
-		int keycode = e.GetKeyCode();
+		int keycode = e.getKeyCode();
 		if (keycode == 32)
 		{
 			for (int i = 0; i < rdg.passes.size(); i++)
@@ -482,7 +473,6 @@ public:
 		// Timer update
 		{
 			timer.tick();
-			//SE_CORE_INFO("FPS: {0}", timer.getFPS());
 		}
 		// update uniform buffer
 		{
@@ -501,15 +491,21 @@ public:
 			// use transform as Per View Uniform
 			auto opaque_pass = rdg.getRasterPassScope("Opaque Pass");
 			opaque_pass->updatePerViewUniformBuffer(per_view_ubo, currentFrame);
+		}
+		// update draw calls
+		{
+			rdg.onFrameStart();
+			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
 
-			//UniformBufferObject ubo;
-			//ubo.cameraPos = glm::vec4(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation), 0.0f);
-			//ubo.model = glm::mat4(1.0f);
-			//ubo.view = glm::lookAt(glm::vec3(8.0f * cosf(rotation), 2.0f, 8.0f * sinf(rotation)), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			//ubo.proj = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-			//ubo.proj[1][1] *= -1;
-			//Buffer ubo_proxy((void*)&ubo, sizeof(UniformBufferObject), 4);
-			//rdg.getUniformBufferFlight(uniformBufferFlights, currentFrame)->updateBuffer(&ubo_proxy);
+			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh) {
+				auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall("dust2_part1", &rdg);
+				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
+
+				drawcall->vertexBuffer = mesh.vertexBuffer;
+				drawcall->indexBuffer = mesh.indexBuffer;
+				drawcall->uniform.model = transform.invalidTransform();
+			};
+			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh>(per_mesh_behavior);
 		}
 		// drawFrame
 		{
@@ -536,6 +532,15 @@ public:
 		ImGui::ShowDemoWindow(&show_demo_window);
 		editorLayer->onDrawGui();
 		imguiLayer->render();
+
+		bool needReize = editorLayer->mainViewport.getNeedResize();
+		if(needReize)
+		{
+			logicalDevice->waitIdle();
+			GFX::RDG::RenderGraphWorkshop workshop(rdg);
+			workshop.build(resourceFactory.get(), editorLayer->mainViewport.getWidth(), editorLayer->mainViewport.getHeight());
+			editorLayer->imImageManager.invalidAll();
+		}
 	}
 
 	virtual void onShutdown() override

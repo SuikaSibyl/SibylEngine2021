@@ -17,11 +17,13 @@ namespace SIByL
 			virtual auto getMousePosition(int button) noexcept -> std::pair<float, float> override;
 			virtual auto getMouseX() noexcept -> float override;
 			virtual auto getMouseY() noexcept -> float override;
-			virtual auto getMouseScrollX() noexcept -> float override { return scrollX; }
-			virtual auto getMouseScrollY() noexcept -> float override { return scrollY; }
+			virtual auto getMouseScrollX() noexcept -> float override { float tmp = scrollX; scrollX = 0; return tmp; }
+			virtual auto getMouseScrollY() noexcept -> float override { float tmp = scrollY; scrollY = 0; return tmp; }
 
 			virtual auto disableCursor() noexcept -> void override;
 			virtual auto enableCursor() noexcept -> void override;
+
+			virtual auto decodeCodeEnum(CodeEnum const& code) noexcept -> int override;
 
 			float scrollX = 0;
 			float scrollY = 0;

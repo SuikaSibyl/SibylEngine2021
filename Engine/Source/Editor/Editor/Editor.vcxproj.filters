@@ -57,5 +57,8 @@
     <ClCompile Include="Public\Misc\CameraController.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Misc\RDGImImageManager.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

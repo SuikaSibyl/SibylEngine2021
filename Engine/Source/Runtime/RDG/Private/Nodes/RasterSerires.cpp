@@ -55,6 +55,13 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
+	auto RasterDrawCall::clearDrawCallInfo() noexcept -> void
+	{
+		vertexBuffer = nullptr;
+		indexBuffer = nullptr;
+		uniform = PerObjectUniformBuffer();
+	}
+
 	// ==============================================================================
 	// RasterMaterialScope
 	// ==============================================================================
@@ -120,20 +127,43 @@ namespace SIByL::GFX::RDG
 			pipelineLayout,
 			0, 1, &set, 0, nullptr);
 
-		for (auto handle : drawCalls)
+		for (unsigned int i = 0; i < validDrawcallCount; i++)
 		{
+			auto handle = drawCalls[i];
 			RasterDrawCall* drawcall = (RasterDrawCall*)render_graph->registry.getNode(handle);
 			drawcall->onCommandRecord(commandbuffer, flight);
 		}
 	}
 
+	auto RasterMaterialScope::onFrameStart(void* graph) noexcept -> void
+	{
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		for (auto handle : drawCalls)
+		{
+			RasterDrawCall* drawcall = (RasterDrawCall*)render_graph->registry.getNode(handle);
+			drawcall->clearDrawCallInfo();
+		}
+		validDrawcallCount = 0;
+	}
+
 	auto RasterMaterialScope::addRasterDrawCall(std::string const& tag, void* graph) noexcept -> NodeHandle
 	{
 		RenderGraph* rg = (RenderGraph*)graph;
-		MemScope<RasterDrawCall> rdc = MemNew<RasterDrawCall>(&pipelineLayout);
-		rdc->tag = tag;
-		NodeHandle handle = rg->registry.registNode(std::move(rdc));
-		drawCalls.emplace_back(handle);
+		NodeHandle handle = 0;
+		if (validDrawcallCount < drawCalls.size())
+		{
+			handle = drawCalls[validDrawcallCount];
+			RasterDrawCall* rdc = (RasterDrawCall*)rg->registry.getNode(handle);
+			rdc->tag = tag;
+		}
+		else
+		{
+			MemScope<RasterDrawCall> rdc = MemNew<RasterDrawCall>(&pipelineLayout);
+			rdc->tag = tag;
+			handle = rg->registry.registNode(std::move(rdc));
+			drawCalls.emplace_back(handle);
+		}
+		validDrawcallCount++;
 		return handle;
 	}
 
@@ -239,6 +269,7 @@ namespace SIByL::GFX::RDG
 
 	auto RasterPipelineScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		barriers.clear();
 		RenderGraph* render_graph = (RenderGraph*)graph;
 		for (auto handle : materialScopes)
 		{
@@ -255,6 +286,16 @@ namespace SIByL::GFX::RDG
 		{
 			RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);
 			material_scope->onCommandRecord(commandbuffer, flight);
+		}
+	}
+
+	auto RasterPipelineScope::onFrameStart(void* graph) noexcept -> void
+	{
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		for (auto handle : materialScopes)
+		{
+			RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);
+			material_scope->onFrameStart(graph);
 		}
 	}
 
@@ -293,6 +334,7 @@ namespace SIByL::GFX::RDG
 	
 	auto RasterPassScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		barriers.clear();
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		// add consume history to frame buffer
 		FramebufferContainer* framebuffer_container = render_graph->getFramebufferContainer(framebuffer);
@@ -327,6 +369,16 @@ namespace SIByL::GFX::RDG
 		}
 
 		commandbuffer->cmdEndRenderPass();
+	}
+	
+	auto RasterPassScope::onFrameStart(void* graph) noexcept -> void
+	{
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		for (auto handle : pipelineScopes)
+		{
+			RasterPipelineScope* pipeline_scope = (RasterPipelineScope*)render_graph->registry.getNode(handle);
+			pipeline_scope->onFrameStart(graph);
+		}
 	}
 
 	auto RasterPassScope::fillRasterPipelineScopeDesc(RasterPipelineScope* raster_pipeline, void* graph) noexcept -> void

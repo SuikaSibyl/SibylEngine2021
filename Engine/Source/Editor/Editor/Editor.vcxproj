@@ -80,7 +80,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imguizmo;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -151,6 +151,7 @@
     <ClCompile Include="Public\Framework\Segment.ixx" />
     <ClCompile Include="Public\Misc\CameraController.ixx" />
     <ClCompile Include="Public\Misc\EntityElucidator.ixx" />
+    <ClCompile Include="Public\Misc\RDGImImageManager.ixx" />
     <ClCompile Include="Public\Segments\AssetManager.ixx" />
     <ClCompile Include="Public\Misc\CommonProperties.ixx" />
     <ClCompile Include="Public\Segments\Component.ixx" />
@@ -178,11 +179,17 @@
     <ProjectReference Include="..\..\Runtime\Interpolatior\Interpolatior.vcxproj">
       <Project>{77f3d9c3-7516-4e3e-b42a-98332988b66c}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Math\Math.vcxproj">
+      <Project>{c8fbbaf5-0331-46ba-bbf5-66704df8204b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\RDG\RDG.vcxproj">
       <Project>{5ab39c8d-66d2-4c46-bf4b-6b55b8f24b20}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\RHI\RHI.vcxproj">
       <Project>{57d1ed0c-7818-473f-a88e-20cd0f8b0875}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ThirdParty\imguizmo\imguizmo.vcxproj">
+      <Project>{e53fff1a-e23e-48b8-a23c-6cda694e901a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\EditorCore\EditorCore.vcxproj">
       <Project>{38abb082-3018-4f4d-8b37-0f87c7665494}</Project>

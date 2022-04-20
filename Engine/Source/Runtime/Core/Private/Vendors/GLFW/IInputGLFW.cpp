@@ -62,4 +62,9 @@ namespace SIByL::Core
 		auto window = static_cast<GLFWwindow*>(attached_window->getNativeWindow());
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
+
+	auto IInputGLFW::decodeCodeEnum(CodeEnum const& code) noexcept -> int
+	{
+		return code.GLFWCode;
+	}
 }

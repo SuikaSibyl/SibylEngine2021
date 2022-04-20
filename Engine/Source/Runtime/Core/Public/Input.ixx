@@ -26,6 +26,8 @@ namespace SIByL
 
 			virtual auto disableCursor() noexcept -> void = 0;
 			virtual auto enableCursor() noexcept -> void = 0;
+
+			virtual auto decodeCodeEnum(CodeEnum const& code) noexcept -> int = 0;
 		};
 
 

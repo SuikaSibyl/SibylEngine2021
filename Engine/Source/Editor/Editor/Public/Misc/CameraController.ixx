@@ -178,7 +178,8 @@ namespace SIByL::Editor
 			}
 
 			// modify movement by a boost factor ( defined in Inspector and modified in play mode through the mouse scroll wheel)
-			boost += input->getMouseScrollY() * 0.01f;
+			float y = input->getMouseScrollY();
+			SE_CORE_DEBUG("Boost {0}, {1}", boost, y);
 			translation *= powf(2.0f, boost);
 
 			targetCameraState.translate(translation);

@@ -57,6 +57,7 @@ namespace SIByL::GFX::RDG
 	{
 		RasterDrawCall(RHI::IPipelineLayout** pipeline_layout);
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+		auto clearDrawCallInfo() noexcept -> void;
 
 		RHI::IVertexBuffer* vertexBuffer;
 		RHI::IIndexBuffer* indexBuffer;
@@ -72,12 +73,14 @@ namespace SIByL::GFX::RDG
 	{
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+		virtual auto onFrameStart(void* graph) noexcept -> void override;
 
 		auto addRasterDrawCall(std::string const& tag, void* graph) noexcept -> NodeHandle;
 
 		std::vector<NodeHandle> resources;
 		std::vector<NodeHandle> sampled_textures;
 
+		unsigned int validDrawcallCount = 0;
 		std::vector<NodeHandle> drawCalls;
 
 	private:
@@ -100,6 +103,7 @@ namespace SIByL::GFX::RDG
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+		virtual auto onFrameStart(void* graph) noexcept -> void override;
 
 		auto fillRasterMaterialScopeDesc(RasterMaterialScope* raster_material, void* graph) noexcept -> void;
 
@@ -151,6 +155,8 @@ namespace SIByL::GFX::RDG
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+		virtual auto onFrameStart(void* graph) noexcept -> void override;
+
 
 		auto fillRasterPipelineScopeDesc(RasterPipelineScope* raster_pipeline, void* graph) noexcept -> void;
 		auto updatePerViewUniformBuffer(PerViewUniformBuffer const& buffer, uint32_t const& current_frame) noexcept -> void;
