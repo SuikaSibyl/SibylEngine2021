@@ -177,10 +177,9 @@ namespace SIByL::Editor
 			{
 				glm::vec3 translation, rotation, scale;
 				Math::decomposeTransform(transform, translation, rotation, scale);
-				glm::vec3 deltaRotation = rotation - tc.getEulerAngles();
 				tc.setTranslation(translation);
 				tc.setScale(scale);
-				tc.setEulerAngles(deltaRotation);
+				tc.setEulerAngles(rotation);
 				transform = tc.invalidTransform();
 			}
 		}

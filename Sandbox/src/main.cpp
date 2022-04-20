@@ -479,14 +479,12 @@ public:
 			////auto [width, height] = swapchain->getExtend();
 			//float time = (float)timer.getTotalTimeSeconds();
 			//float rotation = time;// 0.5 * 3.1415926;
-			uint32_t width = 1280;
-			uint32_t height = 720;
 			// get transform from viewport
 			GFX::Transform camera_transform = editorLayer->mainViewport.cameraTransform;
 			GFX::RDG::PerViewUniformBuffer per_view_ubo;
 			per_view_ubo.cameraPos = glm::vec4(camera_transform.getTranslation(), 1);
 			per_view_ubo.view = glm::lookAtLH(camera_transform.getTranslation(), camera_transform.getTranslation() + camera_transform.getRotatedForward(), glm::vec3(0.0f, 1.0f, 0.0f));
-			per_view_ubo.proj = glm::perspectiveLH_NO(glm::radians(45.0f), (float)width / (float)height, 0.1f, 5000.0f);
+			per_view_ubo.proj = glm::perspectiveLH_NO(glm::radians(45.0f), (float)editorLayer->mainViewport.getWidth() / (float)editorLayer->mainViewport.getHeight(), 0.1f, 5000.0f);
 			per_view_ubo.proj[1][1] *= -1;
 			// use transform as Per View Uniform
 			auto opaque_pass = rdg.getRasterPassScope("Opaque Pass");
