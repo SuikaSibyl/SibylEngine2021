@@ -117,6 +117,9 @@ namespace SIByL::GFX::RDG
 		RHI::TopologyKind topologyKind = RHI::TopologyKind::TriangleList;
 		RHI::PolygonMode polygonMode = RHI::PolygonMode::FILL;
 		RHI::CullMode cullMode = RHI::CullMode::NONE;
+		RHI::ColorBlendingDesc colorBlendingDesc = RHI::NoBlending;
+		RHI::DepthStencilDesc depthStencilDesc = RHI::TestLessAndWrite;
+
 		float lineWidth = 0.0f;
 		// Devirtualized :: IPipeline
 		MemScope<RHI::IPipeline> pipeline;

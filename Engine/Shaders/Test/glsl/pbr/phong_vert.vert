@@ -19,5 +19,5 @@ layout(binding = 0) uniform PerViewUniformBuffer {
 
 void main() {
     gl_Position = view_ubo.proj * view_ubo.view * PushConstants.model * vec4(0.1*inPosition, 1.0);
-    fragColor = vec3(1,1,1);
+    fragColor = inNormal;
 }

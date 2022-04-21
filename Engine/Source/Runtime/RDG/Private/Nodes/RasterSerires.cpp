@@ -191,21 +191,9 @@ namespace SIByL::GFX::RDG
 			false,
 			});
 		// depth stencil
-		depthstencil = factory->createDepthStencil({
-			true,
-			false,
-			RHI::CompareOp::LESS
-			});
+		depthstencil = factory->createDepthStencil(depthStencilDesc);
 		// color blending 
-		colorBlending = factory->createColorBlending({
-			RHI::BlendOperator::ADD,
-			RHI::BlendFactor::ONE,
-			RHI::BlendFactor::ONE,
-			RHI::BlendOperator::ADD,
-			RHI::BlendFactor::ONE,
-			RHI::BlendFactor::ONE,
-			true,
-			});
+		colorBlending = factory->createColorBlending(colorBlendingDesc);
 		// pipeline state
 		dynamicStates = factory->createDynamicState({
 			RHI::PipelineState::VIEWPORT,

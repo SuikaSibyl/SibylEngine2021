@@ -176,6 +176,20 @@ namespace SIByL
 			bool stencilTest;
 		};
 
+		export inline DepthStencilDesc TestLessAndWrite
+		{
+			true,
+			true,
+			RHI::CompareOp::LESS
+		};
+
+		export inline DepthStencilDesc TestLessButNoWrite
+		{
+			true,
+			false,
+			RHI::CompareOp::LESS
+		};
+
 		export class IDepthStencil
 		{
 		public:
@@ -202,6 +216,26 @@ namespace SIByL
 			BlendFactor srcAlphaFactor;
 			BlendFactor dstAlphaFactor;
 			bool blendEnable;
+		};
+
+		export inline ColorBlendingDesc NoBlending = {
+			RHI::BlendOperator::ADD,
+			RHI::BlendFactor::ONE,
+			RHI::BlendFactor::ZERO,
+			RHI::BlendOperator::ADD,
+			RHI::BlendFactor::ONE,
+			RHI::BlendFactor::ZERO,
+			false,
+		};
+
+		export inline ColorBlendingDesc AdditionBlending = {
+			RHI::BlendOperator::ADD,
+			RHI::BlendFactor::ONE,
+			RHI::BlendFactor::ONE,
+			RHI::BlendOperator::ADD,
+			RHI::BlendFactor::ONE,
+			RHI::BlendFactor::ONE,
+			true,
 		};
 
 		export class IColorBlending

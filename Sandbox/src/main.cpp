@@ -319,6 +319,7 @@ public:
 			{
 				opaque_phongs_pipeline->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
 				opaque_phongs_pipeline->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+				opaque_phongs_pipeline->cullMode = RHI::CullMode::NONE;
 				opaque_phongs_pipeline->vertexBufferLayout =
 				{
 					{RHI::DataType::Float3, "Position"},
