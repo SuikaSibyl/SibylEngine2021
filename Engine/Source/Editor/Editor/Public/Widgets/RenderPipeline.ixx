@@ -124,6 +124,17 @@ namespace SIByL::Editor
 										bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, base_flags, material_node->tag.c_str(), i);
 										if (node_open)
 										{
+											// all draw call
+											for (int i = 0; i < material_node->validDrawcallCount; i++)
+											{
+												auto drawcall_handle = material_node->drawCalls[i];
+												GFX::RDG::RasterDrawCall* drawcall_node = (GFX::RDG::RasterDrawCall*)(rg->registry.getNode(drawcall_handle));
+												bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, bullet_flags, drawcall_node->tag.c_str(), i);
+												//if (node_open)
+												//{
+												//	ImGui::TreePop();
+												//}
+											}
 
 											ImGui::TreePop();
 										}

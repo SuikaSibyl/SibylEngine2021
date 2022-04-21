@@ -501,7 +501,7 @@ public:
 			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
 
 			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh) {
-				auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall("dust2_part1", &rdg);
+				auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall(tag.Tag, &rdg);
 				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
 
 				drawcall->vertexBuffer = mesh.vertexBuffer;
