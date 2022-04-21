@@ -194,7 +194,7 @@ public:
 		{
 			PROFILE_SCOPE("create scene layer")
 				// create scene
-				scene.deserialize("test_scene.scene", assetLayer.get());
+			scene.deserialize("test_scene.scene", assetLayer.get());
 			editorLayer->sceneGui.bindScene(&scene);
 			editorLayer->sceneGui.bindInspector(&(editorLayer->inspectorGui));
 			editorLayer->pipelineGui.bindRenderGraph(&rdg);
@@ -292,9 +292,9 @@ public:
 //			};
 //#endif
 //
-//			// ACES
-//			acesbloom->iHdrImage = srgb_color_attachment;
-//			acesbloom->iExternalSampler = portal.samplerHandle;
+			// ACES
+			acesbloom->iHdrImage = srgb_color_attachment;
+			acesbloom->iExternalSampler = portal.samplerHandle;
 //			acesbloom->registerComputePasses(&rdg_builder);
 //
 //			// particle system update pass
@@ -327,14 +327,21 @@ public:
 					{RHI::DataType::Float2, "UV"},
 					{RHI::DataType::Float4, "Tangent"},
 				};
-
+				// Add Materials
 				auto dust2_01_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
 			}
+			// Compute Pass "Post Processing"
+			workshop.addComputePassScope("PostProcessing Pass");
+			// Add Pipeline "Extract + Tone Mapping"
+			acesbloom->registerComputePasses(workshop);
+
+
 			// External Access Pass "ImGui Read Pass"
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
 			auto imGuiReadPass = workshop.getNode<GFX::RDG::ExternalAccessPass>(imGuiReadPassHandle);
-			imGuiReadPass->insertExternalAccessItem({ srgb_color_attachment, GFX::RDG::ConsumeKind::IMAGE_SAMPLE });
+			imGuiReadPass->insertExternalAccessItem({ acesbloom->bloomCombined, GFX::RDG::ConsumeKind::IMAGE_SAMPLE });
 
+			// Pipeline Build
 			workshop.build(resourceFactory.get(), 1280, 720);
 
 			//// building ...
@@ -348,7 +355,7 @@ public:
 		{
 			PROFILE_SCOPE("create Misc");
 
-			auto imimage = editorLayer->imImageManager.addImImage(srgb_color_attachment, portal.samplerHandle);
+			auto imimage = editorLayer->imImageManager.addImImage(acesbloom->bloomCombined, portal.samplerHandle);
 				//// create ImImage for viewport
 				//viewportImImage = imguiLayer->createImImage(
 				//	rdg.getSamplerNode(portal.samplerHandle)->getSampler(),

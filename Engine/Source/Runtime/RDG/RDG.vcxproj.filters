@@ -90,5 +90,11 @@
     <ClCompile Include="Private\Nodes\ExternalAccess.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Nodes\ComputeSeries.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Nodes\ComputeSeries.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

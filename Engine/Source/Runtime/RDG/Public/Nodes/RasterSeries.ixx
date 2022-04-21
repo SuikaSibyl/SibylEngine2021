@@ -72,6 +72,7 @@ namespace SIByL::GFX::RDG
 	export struct RasterMaterialScope :public PassNode
 	{
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 		virtual auto onFrameStart(void* graph) noexcept -> void override;
 

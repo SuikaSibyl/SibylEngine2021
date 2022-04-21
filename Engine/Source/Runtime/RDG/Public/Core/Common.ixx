@@ -76,6 +76,9 @@ namespace SIByL::GFX::RDG
 		BLIT_PASS,
 		// NEW API
 		RASTER_PASS_SCOPE,
+		RASTER_MATERIAL_SCOPE,
+		COMPUTE_PASS_SCOPE,
+		COMPUTE_MATERIAL_SCOPE,
 		EXTERNAL_ACCESS_PASS,
 		// Pass Scope
 		SCOPE,
@@ -103,6 +106,7 @@ namespace SIByL::GFX::RDG
 
 		// Debug Print
 		virtual auto onPrint() noexcept -> void;
+
 		// Members
 		NodeRegistry* registry = nullptr;
 		NodeDetailedType type = NodeDetailedType::NONE;

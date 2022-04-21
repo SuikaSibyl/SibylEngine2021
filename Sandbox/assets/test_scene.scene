@@ -1,41 +1,5 @@
 SceneName: Scene
 SceneNodes:
-  - uid: 2267855375430191226
-    parent: 11454354189262129274
-    components:
-      TagComponent: particle
-      Transform:
-        translation: [0, 0, 0]
-        eulerAngles: [0, 0, 0]
-        scale: [1, 1, 1]
-      MeshComponent:
-        guid: 2267991365489773690
-        vert: 7
-      Renderer:
-        SubRenderer:
-          - PassHandle: 1
-  - uid: 11454354189262129274
-    parent: 0
-    children:
-      - 2267855375430191226
-      - 2638201337233017978
-    components:
-      TagComponent: Scene
-      Transform:
-        translation: [0, 0, 0]
-        eulerAngles: [0, 0, 0]
-        scale: [1, 1, 1]
-  - uid: 910296861950364794
-    parent: 12509880652196498554
-    components:
-      TagComponent: part11
-      Transform:
-        translation: [0, 0, 0]
-        eulerAngles: [0, 0, 0]
-        scale: [1, 1, 1]
-      MeshComponent:
-        guid: 3116779204385197178
-        vert: 3435973836
   - uid: 16019310661824957562
     parent: 2638201337233017978
     children:
@@ -77,9 +41,6 @@ SceneNodes:
         translation: [0, 0, 0]
         eulerAngles: [-1.5704509, -0, 0]
         scale: [1, 1, 1]
-      MeshComponent:
-        guid: 0
-        vert: 0
   - uid: 7726776372952321146
     parent: 2638201337233017978
     children:
@@ -90,12 +51,38 @@ SceneNodes:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
         scale: [1, 1, 1]
-  - uid: 2637990269000371322
-    parent: 2638201337233017978
-    children:
-      - 12509880652196498554
+  - uid: 910296861950364794
+    parent: 12509880652196498554
     components:
-      TagComponent: part11_$AssimpFbx$_PreRotation
+      TagComponent: part11
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 3116779204385197178
+        vert: 3435973836
+  - uid: 2267855375430191226
+    parent: 11454354189262129274
+    components:
+      TagComponent: particle
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 2267991365489773690
+        vert: 7
+      Renderer:
+        SubRenderer:
+          - PassHandle: 1
+  - uid: 11454354189262129274
+    parent: 0
+    children:
+      - 2267855375430191226
+      - 2638201337233017978
+    components:
+      TagComponent: Scene
       Transform:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
@@ -111,12 +98,12 @@ SceneNodes:
       MeshComponent:
         guid: 3587405365445414010
         vert: 3435973836
-  - uid: 12509880652196498554
-    parent: 2637990269000371322
+  - uid: 2637990269000371322
+    parent: 2638201337233017978
     children:
-      - 910296861950364794
+      - 12509880652196498554
     components:
-      TagComponent: part11_$AssimpFbx$_Scaling
+      TagComponent: part11_$AssimpFbx$_PreRotation
       Transform:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
@@ -127,6 +114,16 @@ SceneNodes:
       - 13325313659727268986
     components:
       TagComponent: part9_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 12509880652196498554
+    parent: 2637990269000371322
+    children:
+      - 910296861950364794
+    components:
+      TagComponent: part11_$AssimpFbx$_Scaling
       Transform:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
@@ -162,12 +159,12 @@ SceneNodes:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
         scale: [1, 1, 1]
-  - uid: 15863373524727254138
-    parent: 1182764639406279802
+  - uid: 4453222393807391866
+    parent: 2638201337233017978
     children:
-      - 1943872976431893626
+      - 4994217299045272698
     components:
-      TagComponent: part2_$AssimpFbx$_Scaling
+      TagComponent: part5_$AssimpFbx$_PreRotation
       Transform:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
@@ -183,12 +180,12 @@ SceneNodes:
       MeshComponent:
         guid: 10836511915651648634
         vert: 3435973836
-  - uid: 4453222393807391866
-    parent: 2638201337233017978
+  - uid: 15863373524727254138
+    parent: 1182764639406279802
     children:
-      - 4994217299045272698
+      - 1943872976431893626
     components:
-      TagComponent: part5_$AssimpFbx$_PreRotation
+      TagComponent: part2_$AssimpFbx$_Scaling
       Transform:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
@@ -204,22 +201,22 @@ SceneNodes:
       MeshComponent:
         guid: 12542813224471645306
         vert: 3435973836
-  - uid: 11471237988134177914
-    parent: 2638201337233017978
-    children:
-      - 12331144041985231994
-    components:
-      TagComponent: part3_$AssimpFbx$_PreRotation
-      Transform:
-        translation: [0, 0, 0]
-        eulerAngles: [0, 0, 0]
-        scale: [1, 1, 1]
   - uid: 17952480801873742970
     parent: 8743182513854499962
     children:
       - 9646717189095705722
     components:
       TagComponent: part4_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 11471237988134177914
+    parent: 2638201337233017978
+    children:
+      - 12331144041985231994
+    components:
+      TagComponent: part3_$AssimpFbx$_PreRotation
       Transform:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
@@ -244,6 +241,16 @@ SceneNodes:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
         scale: [1, 1, 1]
+  - uid: 10327323682782071930
+    parent: 2638201337233017978
+    children:
+      - 6782990776041491578
+    components:
+      TagComponent: part7_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
   - uid: 9646717189095705722
     parent: 17952480801873742970
     components:
@@ -255,16 +262,6 @@ SceneNodes:
       MeshComponent:
         guid: 14392103821460655226
         vert: 3435973836
-  - uid: 10327323682782071930
-    parent: 2638201337233017978
-    children:
-      - 6782990776041491578
-    components:
-      TagComponent: part7_$AssimpFbx$_PreRotation
-      Transform:
-        translation: [0, 0, 0]
-        eulerAngles: [0, 0, 0]
-        scale: [1, 1, 1]
   - uid: 4994217299045272698
     parent: 4453222393807391866
     children:
@@ -316,6 +313,16 @@ SceneNodes:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
         scale: [1, 1, 1]
+  - uid: 8291133701257186426
+    parent: 7490900342468791418
+    children:
+      - 14254181082872433786
+    components:
+      TagComponent: part10_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
   - uid: 4421978671392509050
     parent: 6782990776041491578
     components:
@@ -327,16 +334,6 @@ SceneNodes:
       MeshComponent:
         guid: 8606385675173121146
         vert: 3435973836
-  - uid: 8291133701257186426
-    parent: 7490900342468791418
-    children:
-      - 14254181082872433786
-    components:
-      TagComponent: part10_$AssimpFbx$_Scaling
-      Transform:
-        translation: [0, 0, 0]
-        eulerAngles: [0, 0, 0]
-        scale: [1, 1, 1]
   - uid: 13917537010726489210
     parent: 16019310661824957562
     children:

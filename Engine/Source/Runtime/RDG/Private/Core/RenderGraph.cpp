@@ -23,6 +23,7 @@ import GFX.RDG.RasterPassNode;
 import GFX.RDG.MultiDispatchScope;
 import GFX.RDG.RasterNodes;
 import GFX.RDG.ExternalAccess;
+import GFX.RDG.ComputeSeries;
 
 namespace SIByL::GFX::RDG
 {
@@ -545,22 +546,21 @@ namespace SIByL::GFX::RDG
 		descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_IMAGE, 1000);
 		renderGraph.descriptorPool = factory->createDescriptorPool(descriptor_pool_desc);
 
-		// devirtualize resources
-		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
-			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
-		// devirtualize passes
-		for (auto iter = renderGraph.passList.begin(); iter != renderGraph.passList.end(); iter++)
-			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
-
 		// clear barriers
 		renderGraph.barrierPool.barriers.clear();
-
 		// compile resources
 		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
 			renderGraph.registry.getNode((*iter))->onCompile((void*)&renderGraph, factory);
 		// compile passes
 		for (auto iter = renderGraph.passList.begin(); iter != renderGraph.passList.end(); iter++)
 			renderGraph.registry.getNode((*iter))->onCompile((void*)&renderGraph, factory);
+
+		// devirtualize resources
+		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
+			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
+		// devirtualize passes
+		for (auto iter = renderGraph.passList.begin(); iter != renderGraph.passList.end(); iter++)
+			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
 
 		// build resources
 		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
@@ -602,7 +602,7 @@ namespace SIByL::GFX::RDG
 	{
 		if (renderGraph.rasterPassRegister.find(pass) != renderGraph.rasterPassRegister.end())
 		{
-			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPassScope() pass name \'{0}\' not found !", pass);
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPassScope() pass name \'{0}\' duplicated !", pass);
 			return;
 		}
 		// create RasterPassScope
@@ -664,6 +664,106 @@ namespace SIByL::GFX::RDG
 		pipeline_node->materialScopesRegister.emplace(mat, handle);
 		pipeline_node->materialScopes.emplace_back(handle);
 		return (RasterMaterialScope*)(renderGraph.registry.getNode(handle));
+	}
+
+	auto RenderGraphWorkshop::addComputePassScope(std::string const& pass) noexcept -> void
+	{
+		if (renderGraph.computePassRegister.find(pass) != renderGraph.computePassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputePassScope() pass name \'{0}\' duplicated !", pass);
+			return;
+		}
+		// create RasterPassScope
+		MemScope<ComputePassScope> cps = MemNew<ComputePassScope>();
+		cps->tag = pass;
+		cps->type = NodeDetailedType::COMPUTE_PASS_SCOPE;
+		cps->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cps));
+		renderGraph.computePassRegister.emplace(pass, handle);
+		renderGraph.passList.emplace_back(handle);
+	}
+
+	auto RenderGraphWorkshop::addComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*
+	{
+		if (renderGraph.computePassRegister.find(pass) == renderGraph.computePassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputePipelineScope() pass name \'{0}\' not found !", pass);
+			return nullptr;
+		}
+		auto pass_node_handle = renderGraph.computePassRegister.find(pass)->second;
+		ComputePassScope* pass_node = (ComputePassScope*)renderGraph.registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) != pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputePipelineScope() pipeline name \'{0}\' duplicated !", pipeline);
+			return nullptr;
+		}
+		// create ComputePipelineScope
+		MemScope<ComputePipelineScope> cps = MemNew<ComputePipelineScope>();
+		cps->tag = pipeline;
+		cps->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cps));
+		pass_node->pipelineScopesRegister.emplace(pipeline, handle);
+		pass_node->pipelineScopes.emplace_back(handle);
+		return (ComputePipelineScope*)(renderGraph.registry.getNode(handle));
+	}
+
+	auto RenderGraphWorkshop::addComputeMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> ComputeMaterialScope*
+	{
+		if (renderGraph.computePassRegister.find(pass) == renderGraph.computePassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputeMaterialScope() pass name \'{0}\' not found !", pass);
+			return nullptr;
+		}
+		auto pass_node_handle = renderGraph.computePassRegister.find(pass)->second;
+		ComputePassScope* pass_node = (ComputePassScope*)renderGraph.registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputeMaterialScope() pipeline name \'{0}\' not found !", pipeline);
+			return nullptr;
+		}
+		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
+		ComputePipelineScope* pipeline_node = (ComputePipelineScope*)renderGraph.registry.getNode(pipeline_node_handle);
+		// create ComputeMaterialScope
+		MemScope<ComputeMaterialScope> cms = MemNew<ComputeMaterialScope>();
+		cms->tag = mat;
+		cms->type = NodeDetailedType::COMPUTE_MATERIAL_SCOPE;
+		cms->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cms));
+		pipeline_node->materialScopesRegister.emplace(mat, handle);
+		pipeline_node->materialScopes.emplace_back(handle);
+		return (ComputeMaterialScope*)(renderGraph.registry.getNode(handle));
+	}
+
+	auto RenderGraphWorkshop::addComputeDispatch(std::string const& pass, std::string const& pipeline, std::string const& mat, std::string const& dispatch) noexcept -> ComputeDispatch*
+	{
+		if (renderGraph.computePassRegister.find(pass) == renderGraph.computePassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputeDispatch() pass name \'{0}\' not found !", pass);
+			return nullptr;
+		}
+		auto pass_node_handle = renderGraph.computePassRegister.find(pass)->second;
+		ComputePassScope* pass_node = (ComputePassScope*)renderGraph.registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputeDispatch() pipeline name \'{0}\' not found !", pipeline);
+			return nullptr;
+		}
+		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
+		ComputePipelineScope* pipeline_node = (ComputePipelineScope*)renderGraph.registry.getNode(pipeline_node_handle);
+		if (pipeline_node->materialScopesRegister.find(mat) == pipeline_node->materialScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputeDispatch() pipeline name \'{0}\' not found !", mat);
+			return nullptr;
+		}
+		auto material_node_handle = pipeline_node->materialScopesRegister.find(mat)->second;
+		ComputeMaterialScope* material_node = (ComputeMaterialScope*)renderGraph.registry.getNode(material_node_handle);
+		// create ComputeMaterialScope
+		MemScope<ComputeDispatch> dsp = MemNew<ComputeDispatch>();
+		dsp->tag = dispatch;
+		dsp->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(dsp));
+		material_node->dispatches.emplace_back(handle);
+		return (ComputeDispatch*)(renderGraph.registry.getNode(handle));
 	}
 
 	auto RenderGraphWorkshop::addExternalAccessPass(std::string const& pass) noexcept -> NodeHandle

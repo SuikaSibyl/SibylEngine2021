@@ -22,6 +22,7 @@ import GFX.RDG.RasterPassNode;
 import GFX.RDG.MultiDispatchScope;
 import GFX.RDG.RasterNodes;
 import GFX.RDG.ExternalAccess;
+import GFX.RDG.ComputeSeries;
 
 namespace SIByL::GFX::RDG
 {
@@ -130,6 +131,7 @@ namespace SIByL::GFX::RDG
 
 		std::vector<NodeHandle> passList;
 		std::unordered_map<std::string, NodeHandle> rasterPassRegister;
+		std::unordered_map<std::string, NodeHandle> computePassRegister;
 	};
 
 	export struct RenderGraphWorkshop
@@ -144,9 +146,17 @@ namespace SIByL::GFX::RDG
 		auto addUniformBuffer(size_t size, std::string const& name = "Uniform Buffer Anonymous") noexcept -> NodeHandle;
 		auto addUniformBufferFlights(size_t size, std::string const& name = "Uniform Buffer Flights Anonymous") noexcept -> NodeHandle;
 
+		// Raster Pass Series
 		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void;
 		auto addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*;
 		auto addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
+		// Compute Pass Series
+		auto addComputePassScope(std::string const& pass) noexcept -> void;
+		auto addComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*;
+		auto addComputeMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> ComputeMaterialScope*;
+		auto addComputeDispatch(std::string const& pass, std::string const& pipeline, std::string const& mat, std::string const& dispatch) noexcept -> ComputeDispatch*;
+
+		// External Access Pass
 		auto addExternalAccessPass(std::string const& pass) noexcept -> NodeHandle;
 
 		RenderGraph& renderGraph;

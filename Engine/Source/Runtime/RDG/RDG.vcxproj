@@ -161,7 +161,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Core\Common.cpp" />
+    <ClCompile Include="Private\Nodes\ComputeSeries.cpp" />
     <ClCompile Include="Private\Nodes\ExternalAccess.cpp" />
+    <ClCompile Include="Public\Nodes\ComputeSeries.ixx" />
     <ClCompile Include="Public\Nodes\ExternalAccess.ixx" />
     <ClCompile Include="Private\Nodes\RasterSerires.cpp" />
     <ClCompile Include="Private\Pass\ComputePassNode.cpp" />

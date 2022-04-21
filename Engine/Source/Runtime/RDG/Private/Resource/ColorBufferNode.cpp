@@ -119,11 +119,11 @@ namespace SIByL::GFX::RDG
 				// STORE_READ_WRITE -> RENDER_TARGET
 				if (consumeHistory[left].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[right].kind == ConsumeKind::RENDER_TARGET)
 				{
-					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> RENDER_TARGET, STORAGE_READ_WRITE is not consumed by a compute pass!");
 
-					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_PASS)
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT;
 					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> RENDER_TARGET, RENDER_TARGET is not consumed by a raster pass!");
 
@@ -136,11 +136,11 @@ namespace SIByL::GFX::RDG
 				// RENDER_TARGET -> STORE_READ_WRITE
 				else if (consumeHistory[left].kind == ConsumeKind::RENDER_TARGET && consumeHistory[right].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
 				{
-					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_PASS)
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT;
 					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> STORAGE_READ_WRITE, RENDER_TARGET is not consumed by a raster pass!");
 
-					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
 
@@ -153,11 +153,11 @@ namespace SIByL::GFX::RDG
 				// STORE_READ_WRITE -> STORE_READ_WRITE
 				else if (consumeHistory[left].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[right].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
 				{
-					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> STORAGE_READ_WRITE, RENDER_TARGET is not consumed by a compute pass!");
 
-					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
 
@@ -170,16 +170,18 @@ namespace SIByL::GFX::RDG
 				// STORE_READ_WRITE -> IMAGE_SAMPLE
 				else if (consumeHistory[left].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[right].kind == ConsumeKind::IMAGE_SAMPLE)
 				{
-					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> IMAGE_SAMPLE, STORAGE_READ_WRITE is not consumed by a compute pass!");
 
-					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_PASS)
+					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT 
 									 | (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-									 //| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
+						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+
 					oldLayout = RHI::ImageLayout::GENERAL;
 					newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
 
@@ -189,14 +191,16 @@ namespace SIByL::GFX::RDG
 				// IMAGE_SAMPLE -> STORE_READ_WRITE
 				else if (consumeHistory[left].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[right].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
 				{
-					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_PASS)
+					else if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
 									 | (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 									 //| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+					else if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
+						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 
-					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_PASS)
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
 

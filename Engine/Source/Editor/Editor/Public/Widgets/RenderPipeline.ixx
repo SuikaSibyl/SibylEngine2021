@@ -23,7 +23,7 @@ import GFX.RDG.RasterPassNode;
 import GFX.RDG.Common;
 import GFX.RDG.MultiDispatchScope;
 import GFX.RDG.RasterNodes;
-
+import GFX.RDG.ComputeSeries;
 
 namespace SIByL::Editor
 {
@@ -134,6 +134,44 @@ namespace SIByL::Editor
 												//{
 												//	ImGui::TreePop();
 												//}
+											}
+
+											ImGui::TreePop();
+										}
+										ImGui::PopID();
+									}
+									ImGui::TreePop();
+								}
+								ImGui::PopID();
+							}
+						}
+						// if pass_node is a ComputePassScope
+						if (passnode->type == GFX::RDG::NodeDetailedType::COMPUTE_PASS_SCOPE)
+						{
+							GFX::RDG::ComputePassScope* pass_node = (GFX::RDG::ComputePassScope*)passnode;
+							for (int i = 0; i < pass_node->pipelineScopes.size(); i++)
+							{
+								auto pipeline_node_handle = pass_node->pipelineScopes[i];
+								GFX::RDG::ComputePipelineScope* pipeline_node = (GFX::RDG::ComputePipelineScope*)(rg->registry.getNode(pipeline_node_handle));
+								ImGui::PushID(i);
+								bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, base_flags, pipeline_node->tag.c_str(), i);
+								if (node_open)
+								{
+									// all material passes
+									for (int i = 0; i < pipeline_node->materialScopes.size(); i++)
+									{
+										auto material_node_handle = pipeline_node->materialScopes[i];
+										GFX::RDG::ComputeMaterialScope* material_node = (GFX::RDG::ComputeMaterialScope*)(rg->registry.getNode(material_node_handle));
+										ImGui::PushID(i);
+										bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, base_flags, material_node->tag.c_str(), i);
+										if (node_open)
+										{
+											// all draw call
+											for (int i = 0; i < material_node->dispatches.size(); i++)
+											{
+												auto dispatch_handle = material_node->dispatches[i];
+												GFX::RDG::ComputeDispatch* dispatch_node = (GFX::RDG::ComputeDispatch*)(rg->registry.getNode(dispatch_handle));
+												bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, bullet_flags, dispatch_node->tag.c_str(), i);
 											}
 
 											ImGui::TreePop();

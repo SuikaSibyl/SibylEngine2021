@@ -21,7 +21,7 @@ namespace SIByL::RHI
 		{
 			unsigned set = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
 			unsigned binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
-			descriptorItems.emplace_back(set, binding, RHI::DescriptorType::SAMPLER, resource.name, (uint32_t)stage);
+			descriptorItems.emplace_back(set, binding, RHI::DescriptorType::COMBINED_IMAGE_SAMPLER, resource.name, (uint32_t)stage);
 		}
 		// Get all uniform buffers in the shader.
 		for (auto& resource : resources.uniform_buffers)

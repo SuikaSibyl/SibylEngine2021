@@ -117,10 +117,47 @@ namespace SIByL::GFX::RDG
 			}
 		}
 	}
+	
+	auto RasterMaterialScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		barriers.clear();
+		RenderGraph* rg = (RenderGraph*)graph;
+		// Add History
+		unsigned textureIdx = 0;
+		for (unsigned int i = 0; i < resources.size(); i++)
+		{
+			switch (rg->getResourceNode(resources[i])->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+			{
+				rg->getResourceNode(resources[i])->consumeHistory.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
+			}
+			break;
+			case NodeDetailedType::UNIFORM_BUFFER:
+				break;
+			case NodeDetailedType::SAMPLER:
+			{
+				rg->getTextureBufferNode(sampled_textures[textureIdx++])->consumeHistory.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+			}
+			break;
+			case NodeDetailedType::COLOR_TEXTURE:
+			{
+				rg->getTextureBufferNode(resources[i])->consumeHistory.emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
+			}
+			break;
+			default:
+				break;
+			}
+		}
+	}
 
 	auto RasterMaterialScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
 		RHI::IDescriptorSet* set = descriptorSets[flight].get();
 		commandbuffer->cmdBindDescriptorSets(
 			RHI::PipelineBintPoint::GRAPHICS,
@@ -258,6 +295,7 @@ namespace SIByL::GFX::RDG
 	auto RasterPipelineScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		barriers.clear();
+		this->renderGraph = graph;
 		RenderGraph* render_graph = (RenderGraph*)graph;
 		for (auto handle : materialScopes)
 		{
@@ -323,6 +361,7 @@ namespace SIByL::GFX::RDG
 	auto RasterPassScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		barriers.clear();
+		this->renderGraph = graph;
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		// add consume history to frame buffer
 		FramebufferContainer* framebuffer_container = render_graph->getFramebufferContainer(framebuffer);
