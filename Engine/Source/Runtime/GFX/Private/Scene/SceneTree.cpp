@@ -4,6 +4,7 @@ module;
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <glm/glm.hpp>
 #include <algorithm>
 #include "entt/entt.hpp"
 module GFX.SceneTree;
@@ -118,5 +119,22 @@ namespace SIByL::GFX
 			printNode2Console(nodes[node].children[i], bracket_num + 1);
 		}
 		SE_CORE_INFO("{0}{1}", prefix, end_braket);
+	}
+
+	auto SceneTree::updateTransformForNode(SceneNodeHandle const& node, glm::mat4x4 const& precursor_transform) noexcept -> void
+	{
+		ECS::Entity entity = nodes[node].entity;
+		auto& transform = entity.getComponent<GFX::Transform>();
+		transform.propagateFromPrecursor(precursor_transform);
+
+		for (int i = 0; i < nodes[node].children.size(); i++)
+		{
+			updateTransformForNode(nodes[node].children[i], transform.getAccumulativeTransform());
+		}
+	}
+
+	auto SceneTree::updateTransforms() noexcept -> void
+	{
+		updateTransformForNode(root, glm::mat4x4(1.0f));
 	}
 }

@@ -159,7 +159,7 @@ namespace SIByL::Editor
 
 			// Entity transform
 			auto& tc = selectedEntity.getComponent<GFX::Transform>();
-			glm::mat4 transform = tc.invalidTransform();
+			glm::mat4x4 transform = tc.getAccumulativeTransform();
 
 			// Snapping 
 			bool snap = input->isKeyPressed(SIByL_KEY_LEFT_CONTROL);
@@ -175,12 +175,14 @@ namespace SIByL::Editor
 
 			if (ImGuizmo::IsUsing())
 			{
+				transform = tc.getInversePrecursorTransform() * transform;
 				glm::vec3 translation, rotation, scale;
 				Math::decomposeTransform(transform, translation, rotation, scale);
 				tc.setTranslation(translation);
 				tc.setScale(scale);
 				tc.setEulerAngles(rotation);
 				transform = tc.invalidTransform();
+				tc.reAccumule();
 			}
 		}
 	}

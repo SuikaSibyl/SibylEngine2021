@@ -474,6 +474,10 @@ public:
 		{
 			timer.tick();
 		}
+		// update scene transform propagation
+		{
+			scene.tree.updateTransforms();
+		}
 		// update uniform buffer
 		{
 			////auto [width, height] = swapchain->getExtend();
@@ -501,7 +505,7 @@ public:
 
 				drawcall->vertexBuffer = mesh.vertexBuffer;
 				drawcall->indexBuffer = mesh.indexBuffer;
-				drawcall->uniform.model = transform.invalidTransform();
+				drawcall->uniform.model = transform.getAccumulativeTransform();
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh>(per_mesh_behavior);
 		}

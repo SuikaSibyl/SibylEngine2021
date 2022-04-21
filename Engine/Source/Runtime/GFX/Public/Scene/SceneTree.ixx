@@ -2,6 +2,7 @@ module;
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <glm/glm.hpp>
 #include "entt/entt.hpp"
 export module GFX.SceneTree;
 import ECS.Entity;
@@ -30,6 +31,8 @@ namespace SIByL::GFX
 		auto getRootHandle() noexcept -> SceneNodeHandle { return root; }
 		auto getNodeEntity(SceneNodeHandle const& handle) noexcept -> ECS::Entity& { return nodes[handle].entity; }
 
+		auto updateTransforms() noexcept -> void;
+
 		auto addNode(std::string const& name, uint64_t const& parent) noexcept -> uint64_t;
 		auto addNode(std::string const& name, uint64_t const& uid, uint64_t const& parent, std::vector<uint64_t>&& children) noexcept -> uint64_t;
 		auto moveNode(uint64_t const& node, uint64_t const& parent) noexcept -> void;
@@ -37,5 +40,9 @@ namespace SIByL::GFX
 
 		auto print2Console() noexcept -> void;
 		auto printNode2Console(SceneNodeHandle const& node, size_t bracket_num) noexcept -> void;
+
+	private:
+		auto updateTransformForNode(SceneNodeHandle const& node, glm::mat4x4 const& precursor_transform) noexcept -> void;
+
 	};
 }

@@ -14,6 +14,8 @@ namespace SIByL::GFX
 	export struct Transform
 	{
 	public:
+		Transform() = default;
+
 		auto getTranslation() const noexcept -> glm::vec3 { return translation; }
 		auto getEulerAngles() const noexcept -> glm::vec3 { return eulerAngles; }
 		auto getScale() const noexcept -> glm::vec3 { return scale; }
@@ -27,6 +29,8 @@ namespace SIByL::GFX
 		auto invalidTransform() noexcept -> glm::mat4x4;
 
 		auto getAccumulativeTransform() noexcept -> glm::mat4x4 { return accumulativeTransform; }
+		auto getInversePrecursorTransform() noexcept -> glm::mat4x4 { return inversePrecursorTransform; }
+		auto reAccumule() noexcept -> void { accumulativeTransform = precursorTransform * invalidTransform(); }
 		auto propagateFromPrecursor(glm::mat4x4 const& precursor_transform) noexcept;
 
 	private:
@@ -35,6 +39,7 @@ namespace SIByL::GFX
 		glm::vec3 scale = { 1.0f, 1.0f, 1.0f };
 		glm::mat4x4 transform = invalidTransform();
 		glm::mat4x4 precursorTransform;
+		glm::mat4x4 inversePrecursorTransform;
 		glm::mat4x4 accumulativeTransform;
 	};
 
@@ -55,6 +60,7 @@ namespace SIByL::GFX
 	auto Transform::propagateFromPrecursor(glm::mat4x4 const& precursor_transform) noexcept
 	{
 		precursorTransform = precursor_transform;
-		accumulativeTransform = getTransform() * accumulativeTransform;
+		inversePrecursorTransform = glm::inverse(precursorTransform);
+		accumulativeTransform = precursorTransform * invalidTransform();
 	}
 }
