@@ -1,5 +1,5 @@
 module;
-
+#include <cstdint>
 export module GFX.RDG.IndirectDrawBufferNode;
 import Core.MemoryManager;
 import RHI.IFactory;
@@ -13,8 +13,11 @@ namespace SIByL::GFX::RDG
 	public:
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override
 		{
-			size = sizeof(unsigned int) * 5;
-			storageBuffer = factory->createIndirectDrawBuffer();
+			if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
+			{
+				size = sizeof(unsigned int) * 5;
+				storageBuffer = factory->createIndirectDrawBuffer();
+			}
 		}
 	};
 }

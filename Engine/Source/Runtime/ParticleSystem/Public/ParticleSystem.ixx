@@ -19,7 +19,7 @@ namespace SIByL::ParticleSystem
 			RHI::IShader* updateShader
 			) noexcept -> void;
 
-		virtual auto registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void = 0;
+		virtual auto registerResources(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void = 0;
 		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void = 0;
 
 		uint32_t particleDataSize;

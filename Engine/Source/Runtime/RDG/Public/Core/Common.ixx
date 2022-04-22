@@ -55,6 +55,7 @@ namespace SIByL::GFX::RDG
 		PRESENT			 = 0x00000020,
 		ONE_TIME_SUBMIT	 = 0x00000040,
 		INCLUSION		 = 0x00000080,
+		REFERENCE		 = 0x00000100,
 	};
 
 	export enum class NodeDetailedType :uint32_t

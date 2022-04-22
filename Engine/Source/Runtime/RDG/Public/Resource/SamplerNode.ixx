@@ -12,6 +12,14 @@ namespace SIByL::GFX::RDG
     {
         SamplerNode() { type = NodeDetailedType::SAMPLER; }
 
+        auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+        {
+            if (!(attributes & (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER))
+            {
+                sampler = factory->createSampler(desc);
+            }
+        }
+
         auto getSampler() noexcept -> RHI::ISampler*
         {
             if (hasBit(attributes, NodeAttrbutesFlagBits::PLACEHOLDER))
@@ -20,6 +28,7 @@ namespace SIByL::GFX::RDG
                 return sampler.get();
         }
 
+        RHI::SamplerDesc desc;
         RHI::ISampler* extSampler;
         MemScope<RHI::ISampler> sampler;
     };

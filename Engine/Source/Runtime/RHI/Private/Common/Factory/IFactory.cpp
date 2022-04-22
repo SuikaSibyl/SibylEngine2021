@@ -16,6 +16,7 @@ import Core.Image;
 import Core.File;
 import Core.Profiler;
 import RHI.IEnum;
+import RHI.IDeviceGlobal;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -895,4 +896,14 @@ namespace SIByL::RHI
 		return sampler;
 	}
 
+	auto IResourceFactory::createTransientCommandBuffer() noexcept -> MemScope<ICommandBuffer>
+	{
+		RHI::ICommandPool* transientPool = RHI::DeviceToGlobal::getGlobal(logicalDevice)->getTransientCommandPool();
+		return RHI::DeviceToGlobal::getGlobal(logicalDevice)->getResourceFactory()->createCommandBuffer(transientPool);
+	}
+
+	auto IResourceFactory::deviceIdle() noexcept -> void
+	{
+		logicalDevice->waitIdle();
+	}
 }

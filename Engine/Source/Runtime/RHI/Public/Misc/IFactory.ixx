@@ -112,7 +112,10 @@ namespace SIByL
 			auto createTextureView(ITexture* texture, ImageUsageFlags extra_usages = 0) noexcept -> MemScope<ITextureView>;
 			auto createSampler(SamplerDesc const&) noexcept -> MemScope<ISampler>;
 
+			auto createTransientCommandBuffer() noexcept -> MemScope<ICommandBuffer>;
 			auto createShaderFromBinaryFile(std::filesystem::path path, ShaderDesc const& desc) noexcept -> MemScope<IShader>;
+
+			auto deviceIdle() noexcept -> void;
 
 		private:
 			API api;

@@ -132,6 +132,7 @@ namespace SIByL::GFX::RDG
 		std::vector<NodeHandle> passList;
 		std::unordered_map<std::string, NodeHandle> rasterPassRegister;
 		std::unordered_map<std::string, NodeHandle> computePassRegister;
+		std::unordered_map<std::string, NodeHandle> samplerRegister;
 	};
 
 	export struct RenderGraphWorkshop
@@ -143,9 +144,23 @@ namespace SIByL::GFX::RDG
 
 		auto build(RHI::IResourceFactory* factory, uint32_t const& width, uint32_t const& height) noexcept -> void;
 
+		// Resources
+		//------------------------------------------
+		auto addInternalSampler() noexcept -> void;
+		auto getInternalSampler(std::string const& name) noexcept -> NodeHandle;
+		//------------------------------------------
 		auto addUniformBuffer(size_t size, std::string const& name = "Uniform Buffer Anonymous") noexcept -> NodeHandle;
 		auto addUniformBufferFlights(size_t size, std::string const& name = "Uniform Buffer Flights Anonymous") noexcept -> NodeHandle;
+		auto addStorageBuffer(size_t size, std::string const& name = "Storage Buffer Anonymous") noexcept -> NodeHandle;
+		auto addStorageBufferExt(RHI::IStorageBuffer* external, std::string const& name = "Storage Buffer Ext Anonymous") noexcept -> NodeHandle;
+		auto addIndirectDrawBuffer(std::string const& name = "Indirect Draw Buffer Anonymous") noexcept -> NodeHandle;
+		auto addIndirectDrawBufferExt(RHI::IStorageBuffer* external, std::string const& name = "Indirect Draw Buffer Ext Anonymous") noexcept -> NodeHandle;
+		auto addSampler(RHI::SamplerDesc const& desc, std::string const& name = "Sampler Anonymous") noexcept -> NodeHandle;
+		auto addSamplerExt(RHI::ISampler* sampler, std::string const& name = "Sampler Ext Anonymous") noexcept -> NodeHandle;
+		auto addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view, std::string const& name = "Color Buffer Ext Anonymous", bool present = false) noexcept -> NodeHandle;
 
+		// Passes
+		//------------------------------------------
 		// Raster Pass Series
 		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void;
 		auto addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*;
@@ -155,7 +170,6 @@ namespace SIByL::GFX::RDG
 		auto addComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*;
 		auto addComputeMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> ComputeMaterialScope*;
 		auto addComputeDispatch(std::string const& pass, std::string const& pipeline, std::string const& mat, std::string const& dispatch) noexcept -> ComputeDispatch*;
-
 		// External Access Pass
 		auto addExternalAccessPass(std::string const& pass) noexcept -> NodeHandle;
 

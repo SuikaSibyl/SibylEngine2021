@@ -208,10 +208,14 @@ public:
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
 			sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
 
+			// New Pipeline Building
+			GFX::RDG::RenderGraphWorkshop workshop(rdg);
+			workshop.addInternalSampler();
+
 			// Build Up Pipeline
 			GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 			// sub-pipeline building helper components
-			portal.registerResources(&rdg_builder);
+			portal.registerResources(&workshop);
 			sortTest.registerResources(&rdg_builder);
 			acesbloom->registerResources(&rdg_builder);
 			// renderer
@@ -222,8 +226,6 @@ public:
 			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
-//			// HDR Opaque raster pass
-//
 //			// HDR raster pass
 //			renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 //			rdg.tag(renderPassNodeSRGB, "Raster HDR");
@@ -291,12 +293,7 @@ public:
 //				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 //			};
 //#endif
-//
-			// ACES
-			acesbloom->iHdrImage = srgb_color_attachment;
-			acesbloom->iExternalSampler = portal.samplerHandle;
-//			acesbloom->registerComputePasses(&rdg_builder);
-//
+
 //			// particle system update pass
 //			GFX::RDG::NodeHandle scope_begin = rdg_builder.beginMultiDispatchScope("Scope Begin Portal-Update Multi-Dispatch");
 //			rdg.getMultiDispatchScope(scope_begin)->customDispatchCount = [&timer = timer]()
@@ -311,8 +308,6 @@ public:
 //			sortTest.registerUpdatePasses(&rdg_builder);
 //			GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
 
-			// New Pipeline Building
-			GFX::RDG::RenderGraphWorkshop workshop(rdg);
 			// Raster Pass "Opaque Pass"
 			workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
 			GFX::RDG::RasterPipelineScope* opaque_phongs_pipeline = workshop.addRasterPipelineScope("Opaque Pass", "Phongs");
@@ -332,9 +327,10 @@ public:
 			}
 			// Compute Pass "Post Processing"
 			workshop.addComputePassScope("PostProcessing Pass");
-			// Add Pipeline "Extract + Tone Mapping"
+			// Add Pipeline "ACES + BLOOM"
+			acesbloom->iHdrImage = srgb_color_attachment;
+			acesbloom->iExternalSampler = workshop.getInternalSampler("Default Sampler");
 			acesbloom->registerComputePasses(workshop);
-
 
 			// External Access Pass "ImGui Read Pass"
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
@@ -343,6 +339,9 @@ public:
 
 			// Pipeline Build
 			workshop.build(resourceFactory.get(), 1280, 720);
+
+			auto imimage = editorLayer->imImageManager.addImImage(acesbloom->bloomCombined, workshop.getInternalSampler("Default Sampler"));
+			editorLayer->mainViewport.bindImImage(imimage);
 
 			//// building ...
 			//rdg_builder.build(resourceFactory.get(), 1280, 720);
@@ -354,15 +353,6 @@ public:
 
 		{
 			PROFILE_SCOPE("create Misc");
-
-			auto imimage = editorLayer->imImageManager.addImImage(acesbloom->bloomCombined, portal.samplerHandle);
-				//// create ImImage for viewport
-				//viewportImImage = imguiLayer->createImImage(
-				//	rdg.getSamplerNode(portal.samplerHandle)->getSampler(),
-				//	rdg.getTextureBufferNode(srgb_color_attachment)->getTextureView(),
-				//	RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL);
-
-			editorLayer->mainViewport.bindImImage(imimage);
 
 			// comand stuffs
 			commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
@@ -569,12 +559,12 @@ private:
 	// Editor Layer
 	MemScope<Editor::ImGuiLayer> imguiLayer;
 	MemScope<Editor::EditorLayer> editorLayer;
-
 	MemScope<Editor::ImImage> viewportImImage;
 
 	// Application
 	GFX::Scene scene;
 	GFX::RDG::RenderGraph rdg;
+
 
 	// RDG Proxy
 	Demo::PortalSystem portal;

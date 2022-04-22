@@ -570,6 +570,24 @@ namespace SIByL::GFX::RDG
 		//	attached.registry.getNode((*iter))->onBuild((void*)&attached, factory);
 	}
 
+	auto RenderGraphWorkshop::addInternalSampler() noexcept -> void
+	{
+		NodeHandle default_sampler = addSampler({}, "Default Sampler");
+		renderGraph.samplerRegister.emplace("Default Sampler", default_sampler);
+	}
+
+	auto RenderGraphWorkshop::getInternalSampler(std::string const& name) noexcept -> NodeHandle
+	{
+		auto iter = renderGraph.samplerRegister.find(name);
+		if (iter == renderGraph.samplerRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: getInternalSampler() name \'{0}\'not registry", name);
+			return NodeHandle{};
+		}
+		else
+			return iter->second;
+	}
+
 	auto RenderGraphWorkshop::addUniformBuffer(size_t size, std::string const& name) noexcept -> NodeHandle
 	{
 		MemScope<UniformBufferNode> ubn = MemNew<UniformBufferNode>();
@@ -597,6 +615,86 @@ namespace SIByL::GFX::RDG
 		renderGraph.resources.emplace_back(handle);
 		return handle;
 	}
+
+	auto RenderGraphWorkshop::addStorageBuffer(size_t size, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<StorageBufferNode> sbn = MemNew<StorageBufferNode>();
+		sbn->size = size;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(sbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addStorageBufferExt(RHI::IStorageBuffer* external, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<StorageBufferNode> sbn = MemNew<StorageBufferNode>();
+		sbn->size = external->getSize();
+		sbn->attributes |= (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER;
+		sbn->externalStorageBuffer = external;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(sbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addIndirectDrawBuffer(std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<IndirectDrawBufferNode> sbn = MemNew<IndirectDrawBufferNode>();
+		sbn->size = sizeof(unsigned int) * 5;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(sbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addIndirectDrawBufferExt(RHI::IStorageBuffer* external, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<IndirectDrawBufferNode> sbn = MemNew<IndirectDrawBufferNode>();
+		sbn->size = sizeof(unsigned int) * 5;
+		sbn->attributes |= (uint32_t)NodeAttrbutesFlagBits::PLACEHOLDER;
+		sbn->externalStorageBuffer = external;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(sbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addSampler(RHI::SamplerDesc const& desc, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<SamplerNode> sn = MemNew<SamplerNode>();
+		sn->tag = name;
+		sn->desc = desc;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(sn));
+		renderGraph.resources.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addSamplerExt(RHI::ISampler* sampler, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<SamplerNode> sn = MemNew<SamplerNode>();
+		sn->tag = name;
+		sn->extSampler = sampler;
+		sn->attributes |= addBit(NodeAttrbutesFlagBits::PLACEHOLDER);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(sn));
+		renderGraph.resources.emplace_back(handle);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view, std::string const& name, bool present) noexcept -> NodeHandle
+	{
+		MemScope<ColorBufferNode> cbn = MemNew<ColorBufferNode>();
+		cbn->attributes |= addBit(NodeAttrbutesFlagBits::PLACEHOLDER);
+		cbn->texture.ref = texture;
+		cbn->textureView.ref = view;
+		cbn->format = texture->getDescription().format;
+		if (present) cbn->attributes |= (uint32_t)NodeAttrbutesFlagBits::PRESENT;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
 
 	auto RenderGraphWorkshop::addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void
 	{

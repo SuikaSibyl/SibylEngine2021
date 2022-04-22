@@ -48,7 +48,7 @@ void main()
         return;
     
     vec3 hdrCol = texture_color.rgb;
-    vec3 ldrCol = ACESToneMapping(hdrCol, 15);
+    vec3 ldrCol = ACESToneMapping(hdrCol, 1);
     imageStore(resultImage, ivec2(x, y), vec4(ldrCol, 1));
-    imageStore(bloomExtract, ivec2(x, y), vec4(extractBright(hdrCol, 0.1), 1.0));
+    imageStore(bloomExtract, ivec2(x, y), vec4(extractBright(hdrCol, 0.8), 1.0));
 }

@@ -23,6 +23,7 @@ import GFX.RDG.Common;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.StorageBufferNode;
 import GFX.RDG.ComputePassNode;
+import GFX.RDG.ComputeSeries;
 
 import ParticleSystem.ParticleSystem;
 
@@ -34,7 +35,7 @@ namespace SIByL::Demo
 		PortalSystem() = default;
 		PortalSystem(RHI::IResourceFactory* factory, Timer* timer);
 
-		virtual auto registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void override;
+		virtual auto registerResources(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
 		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void override;
 
 		Timer* timer;
@@ -58,6 +59,7 @@ namespace SIByL::Demo
 		MemScope<RHI::ITextureView> bakedCurvesView;
 
 		RHI::IResourceFactory* factory;
+		GFX::RDG::RenderGraph portal_rdg;
 	};
 
 	PortalSystem::PortalSystem(RHI::IResourceFactory* factory, Timer* timer)
@@ -86,20 +88,58 @@ namespace SIByL::Demo
 		init(sizeof(float) * 4 * 4, 100000, shaderPortalInit.get(), shaderPortalEmit.get(), shaderPortalUpdate.get());
 	}
 
-	auto PortalSystem::registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void
+	auto PortalSystem::registerResources(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
 	{
-		// Resources
-		samplerHandle = builder->addSamplerExt(sampler.get());
-		spriteHandle = builder->addColorBufferExt(texture.get(), textureView.get(), "Sprite");
-		bakedCurveHandle = builder->addColorBufferExt(bakedCurves.get(), bakedCurvesView.get(), "Baked Curves");
-		emitterVolumeHandle = builder->addStorageBufferExt(torusBuffer.get(), "Emitter Volume Samples");
+		GFX::RDG::RenderGraphWorkshop local_workshop(portal_rdg);
+		local_workshop.addInternalSampler();
+		// Build Up Local Resources
+		auto particle_buffer_handle = local_workshop.addStorageBuffer(particleDataSize * maxParticleCount, "Particle Buffer");
+		auto dead_index_buffer_handle = local_workshop.addStorageBuffer(sizeof(unsigned int) * maxParticleCount, "Dead Index Buffer");
+		auto live_index_buffer_handle = local_workshop.addStorageBuffer(sizeof(unsigned int) * maxParticleCount, "Live Index Buffer");
+		auto counter_buffer_handle = local_workshop.addStorageBuffer(sizeof(unsigned int) * 5, "Counter Buffer");
+		auto indirect_draw_buffer_handle = local_workshop.addIndirectDrawBuffer("Indirect Draw Buffer");
+		// Build Up Local Init Pass
+		local_workshop.addComputePassScope("Local Init");
+		GFX::RDG::ComputePipelineScope* particle_init_pipeline = local_workshop.addComputePipelineScope("Local Init", "Particle Init");
+		{
+			particle_init_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_init.spv", { RHI::ShaderStage::COMPUTE,"main" });
+			// Add Materials "Common"
+			{
+				auto particle_init_mat_scope = local_workshop.addComputeMaterialScope("Local Init", "Particle Init", "Common");
+				particle_init_mat_scope->resources = { particle_buffer_handle, counter_buffer_handle, live_index_buffer_handle, dead_index_buffer_handle, indirect_draw_buffer_handle };
+				auto particle_init_dispatch_scope = local_workshop.addComputeDispatch("Local Init", "Particle Init", "Common", "Only");
+				particle_init_dispatch_scope->pushConstant = [](Buffer& buffer) {
+					uint32_t size = 100000u;
+					buffer = std::move(Buffer(sizeof(size), 1));
+					memcpy(buffer.getData(), &size, sizeof(size));
+				};
+				particle_init_dispatch_scope->customSize = [](uint32_t& x, uint32_t& y, uint32_t& z) {
+					x = 200;
+					y = 1;
+					z = 1;
+				};
+			}
+		}
+		// Build Up Local Render Graph
+		local_workshop.build(factory, 0, 0);
+		MemScope<RHI::ICommandBuffer> transientCommandbuffer = factory->createTransientCommandBuffer();
+		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+		transientCommandbuffer->endRecording();
+		transientCommandbuffer->submit();
+		factory->deviceIdle();
 
-		// Buffers
-		particleBuffer = builder->addStorageBuffer(particleDataSize * maxParticleCount, "Particle Buffer");
-		deadIndexBuffer = builder->addStorageBuffer(sizeof(unsigned int) * maxParticleCount, "Dead Index Buffer");
-		liveIndexBuffer = builder->addStorageBuffer(sizeof(unsigned int) * maxParticleCount, "Live Index Buffer");
-		counterBuffer = builder->addStorageBuffer(sizeof(unsigned int) * 5, "Counter Buffer");
-		indirectDrawBuffer = builder->addIndirectDrawBuffer("Indirect Draw Buffer");
+		// Build Up Main Resources - Buffers
+		particleBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(particle_buffer_handle)->getStorageBuffer(), "Particle Buffer");
+		deadIndexBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(dead_index_buffer_handle)->getStorageBuffer(), "Dead Index Buffer");
+		liveIndexBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(live_index_buffer_handle)->getStorageBuffer(), "Live Index Buffer");
+		counterBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(counter_buffer_handle)->getStorageBuffer(), "Counter Buffer");
+		indirectDrawBuffer = workshop->addIndirectDrawBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(indirect_draw_buffer_handle)->getStorageBuffer(), "Indirect Draw Buffer");
+
+		// Build Up Main Resources - Misc
+		samplerHandle = workshop->getInternalSampler("Default Sampler");
+		spriteHandle = workshop->addColorBufferExt(texture.get(), textureView.get(), "Sprite");
+		bakedCurveHandle = workshop->addColorBufferExt(bakedCurves.get(), bakedCurvesView.get(), "Baked Curves");
+		emitterVolumeHandle = workshop->addStorageBufferExt(torusBuffer.get(), "Emitter Volume Samples");
 	}
 
 	struct EmitConstant
