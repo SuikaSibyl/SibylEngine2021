@@ -49,6 +49,7 @@ namespace SIByL
 			ITexture(ITexture const&) = delete;
 			virtual ~ITexture() = default;
 
+			virtual auto getNativeHandle() noexcept -> uint64_t = 0;
 			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void = 0;
 			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> = 0;
 			virtual auto getDescription() noexcept -> TextureDesc const& = 0;

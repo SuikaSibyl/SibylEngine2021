@@ -33,6 +33,7 @@ namespace SIByL::GFX::RDG
 
 			for (int i = 0; i < history_size; i++)
 			{
+				bool need_barrier = true;
 				int left = i_minus;
 				int right = i;
 				// - A - BEGIN - B -
@@ -68,53 +69,59 @@ namespace SIByL::GFX::RDG
 					{
 						left--;
 					}
+					if (left < 0) left += consumeHistory.size();
+					if (left = right) need_barrier = false;
 					right = right + 1;
 				}
 
-				if (left < 0) left += consumeHistory.size();
-				if (right >= consumeHistory.size()) right -= consumeHistory.size();
+				if (need_barrier)
+				{
+					if (left < 0) left += consumeHistory.size();
+					if (right >= consumeHistory.size()) right -= consumeHistory.size();
 
-				while (consumeHistory[left].kind >= ConsumeKind::SCOPE) left--;
-				while (consumeHistory[right].kind >= ConsumeKind::SCOPE) right++;
+					while (consumeHistory[left].kind >= ConsumeKind::SCOPE) left--;
+					while (consumeHistory[right].kind >= ConsumeKind::SCOPE) right++;
 
-				RHI::PipelineStageFlags srcStageMask = 0;
-				RHI::PipelineStageFlags dstStageMask = 0;
-				RHI::AccessFlags srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
-				RHI::AccessFlags dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+					RHI::PipelineStageFlags srcStageMask = 0;
+					RHI::PipelineStageFlags dstStageMask = 0;
+					RHI::AccessFlags srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+					RHI::AccessFlags dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
 
-				if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_PASS)
-					srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-				else if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_PASS)
-					srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-								 | (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-								 //| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
-				else SE_CORE_ERROR("RDG :: STORAGE BUFFER unknown access switch!");
-
-				if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_PASS)
-					dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-				else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_PASS)
-					dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-					| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+					else if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
+						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
+						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 					//| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
-				else SE_CORE_ERROR("RDG :: STORAGE BUFFER unknown access switch!");
+					else SE_CORE_ERROR("RDG :: STORAGE BUFFER unknown access switch!");
 
-				MemScope<RHI::IBufferMemoryBarrier> buffer_memory_barrier = factory->createBufferMemoryBarrier({
-					getStorageBuffer()->getIBuffer(),
-					srcAccessFlags, //AccessFlags srcAccessMask;
-					dstAccessFlags, //AccessFlags dstAccessMask;
-					});
+					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
+						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
+						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+					//| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+					else SE_CORE_ERROR("RDG :: STORAGE BUFFER unknown access switch!");
 
-				MemScope<RHI::IBarrier> barrier = factory->createBarrier({
-					srcStageMask,//srcStageMask
-					dstStageMask,//dstStageMask
-					0,
-					{},
-					{buffer_memory_barrier.get()},
-					{}
-					});
+					MemScope<RHI::IBufferMemoryBarrier> buffer_memory_barrier = factory->createBufferMemoryBarrier({
+						getStorageBuffer()->getIBuffer(),
+						srcAccessFlags, //AccessFlags srcAccessMask;
+						dstAccessFlags, //AccessFlags dstAccessMask;
+						});
 
-				BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(barrier));
-				rg->getPassNode(consumeHistory[i].pass)->barriers.emplace_back(barrier_handle);
+					MemScope<RHI::IBarrier> barrier = factory->createBarrier({
+						srcStageMask,//srcStageMask
+						dstStageMask,//dstStageMask
+						0,
+						{},
+						{buffer_memory_barrier.get()},
+						{}
+						});
+
+					BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(barrier));
+					rg->getPassNode(consumeHistory[i].pass)->barriers.emplace_back(barrier_handle);
+				}
+
 				i_minus = i;
 			}
 		}

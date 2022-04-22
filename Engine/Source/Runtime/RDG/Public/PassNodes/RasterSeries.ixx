@@ -59,8 +59,9 @@ namespace SIByL::GFX::RDG
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 		auto clearDrawCallInfo() noexcept -> void;
 
-		RHI::IVertexBuffer* vertexBuffer;
-		RHI::IIndexBuffer* indexBuffer;
+		RHI::IVertexBuffer* vertexBuffer = nullptr;
+		RHI::IIndexBuffer* indexBuffer = nullptr;
+		RHI::IStorageBuffer* indirectDrawBuffer = nullptr;
 
 		PerObjectUniformBuffer uniform;
 

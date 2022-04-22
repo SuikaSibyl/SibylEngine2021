@@ -167,6 +167,7 @@ namespace SIByL::GFX::RDG
 		auto addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
 		// Compute Pass Series
 		auto addComputePassScope(std::string const& pass) noexcept -> void;
+		auto addComputePassIndefiniteScope(std::string const& pass) noexcept -> ComputePassIndefiniteScope*;
 		auto addComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*;
 		auto addComputeMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> ComputeMaterialScope*;
 		auto addComputeDispatch(std::string const& pass, std::string const& pipeline, std::string const& mat, std::string const& dispatch) noexcept -> ComputeDispatch*;

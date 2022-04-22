@@ -201,6 +201,7 @@
     <ClCompile Include="Public\Profiler.ixx" />
     <ClCompile Include="Public\SObject.ixx" />
     <ClCompile Include="Public\SPointer.ixx" />
+    <ClCompile Include="Public\String.ixx" />
     <ClCompile Include="Public\Test.ixx" />
     <ClCompile Include="Public\Time.ixx" />
     <ClCompile Include="Public\Window.ixx" />

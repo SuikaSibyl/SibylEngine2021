@@ -758,6 +758,7 @@ namespace SIByL::GFX::RDG
 		MemScope<RasterMaterialScope> rms = MemNew<RasterMaterialScope>();
 		rms->tag = mat;
 		rms->onRegistered(&renderGraph, this);
+		rms->type = NodeDetailedType::RASTER_MATERIAL_SCOPE;
 		NodeHandle handle = renderGraph.registry.registNode(std::move(rms));
 		pipeline_node->materialScopesRegister.emplace(mat, handle);
 		pipeline_node->materialScopes.emplace_back(handle);
@@ -779,6 +780,24 @@ namespace SIByL::GFX::RDG
 		NodeHandle handle = renderGraph.registry.registNode(std::move(cps));
 		renderGraph.computePassRegister.emplace(pass, handle);
 		renderGraph.passList.emplace_back(handle);
+	}
+
+	auto RenderGraphWorkshop::addComputePassIndefiniteScope(std::string const& pass) noexcept -> ComputePassIndefiniteScope*
+	{
+		if (renderGraph.computePassRegister.find(pass) != renderGraph.computePassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addComputePassIndefiniteScope() pass name \'{0}\' duplicated !", pass);
+			return nullptr;
+		}
+		// create RasterPassScope
+		MemScope<ComputePassIndefiniteScope> cps = MemNew<ComputePassIndefiniteScope>();
+		cps->tag = pass;
+		cps->type = NodeDetailedType::COMPUTE_PASS_SCOPE;
+		cps->onRegistered(&renderGraph, this);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cps));
+		renderGraph.computePassRegister.emplace(pass, handle);
+		renderGraph.passList.emplace_back(handle);
+		return (ComputePassIndefiniteScope*)(renderGraph.registry.getNode(handle));
 	}
 
 	auto RenderGraphWorkshop::addComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*

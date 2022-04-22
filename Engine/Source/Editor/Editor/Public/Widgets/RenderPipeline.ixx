@@ -8,6 +8,7 @@ module;
 #include <imgui_internal.h>
 #include "entt.hpp"
 export module Editor.RenderPipeline;
+import Core.String;
 import Editor.Widget;
 import Editor.Scene;
 import Editor.Inspector;
@@ -24,6 +25,8 @@ import GFX.RDG.Common;
 import GFX.RDG.MultiDispatchScope;
 import GFX.RDG.RasterNodes;
 import GFX.RDG.ComputeSeries;
+import GFX.RDG.ColorBufferNode;
+import GFX.RDG.TextureBufferNode;
 
 namespace SIByL::Editor
 {
@@ -220,8 +223,63 @@ namespace SIByL::Editor
 			{
 				resourceNode->tag = std::string(buffer);
 			}
-			Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 0), "Resource Information", []() {
+			Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 0), "Resource Information", [&]() {
+				const ImGuiTreeNodeFlags treeNodeFlags =
+					ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_FramePadding |
+					ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap;
+				static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
 
+				ImGui::NextColumn();
+				if (ImGui::BeginTable(resourceNode->tag.c_str(), 2, flags))
+				{
+					ImGui::TableNextRow();
+					ImGui::TableSetColumnIndex(0);
+					ImGui::Text("Type");
+					ImGui::TableSetColumnIndex(1);
+					switch (resourceNode->type)
+					{
+					case GFX::RDG::NodeDetailedType::NONE:
+						ImGui::Text("None");
+						break;
+					case GFX::RDG::NodeDetailedType::SAMPLER:
+						ImGui::Text("Sampler");
+						break;
+					case GFX::RDG::NodeDetailedType::COLOR_TEXTURE:
+					{
+						ImGui::Text("Color Texture");
+						GFX::RDG::ColorBufferNode* colorBufferNode = (GFX::RDG::ColorBufferNode*)resourceNode;
+						uint64_t native_handle = colorBufferNode->getTexture()->getNativeHandle();
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("Native Image");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(to_hex_string(native_handle).c_str());
+					}
+						break;
+					case GFX::RDG::NodeDetailedType::DEPTH_TEXTURE:
+						ImGui::Text("Depth Texture");
+						break;
+					case GFX::RDG::NodeDetailedType::STORAGE_BUFFER:
+						ImGui::Text("Storage Buffer");
+						break;
+					case GFX::RDG::NodeDetailedType::UNIFORM_BUFFER:
+						ImGui::Text("Uniform Buffer");
+						break;
+					case GFX::RDG::NodeDetailedType::FRAME_BUFFER:
+						ImGui::Text("Frame Buffer");
+						break;
+					case GFX::RDG::NodeDetailedType::FRAME_BUFFER_FLIGHTS:
+						ImGui::Text("Frame Buffer Flights");
+						break;
+					case GFX::RDG::NodeDetailedType::UNIFORM_BUFFER_FLIGHTS:
+						ImGui::Text("Uniform Buffer Flights");
+						break;
+					default:
+						ImGui::Text("UNKNOWN");
+						break;
+					}
+					ImGui::EndTable();
+				}
 				}, []() {});
 
 			Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 1), "Consume History", []() {

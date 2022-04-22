@@ -1,11 +1,14 @@
 #version 450
 
-layout(binding = 0) uniform UniformBufferObject {
-    vec4 cameraPos;
+layout(push_constant) uniform PushConstantObject {
     mat4 model;
+} PushConstants;
+
+layout(binding = 0) uniform PerViewUniformBuffer {
     mat4 view;
     mat4 proj;
-} ubo;
+    vec4 cameraPos;
+} view_ubo;
 
 struct Particle
 {
@@ -51,7 +54,7 @@ mat4 billboardTowardCameraPlane(vec3 cameraPos)
 mat4 billboardAlongVelocity(vec3 velocity, vec3 cameraPos)
 {
     vec3 up = - normalize(velocity);
-    vec3 right = normalize(cross(up, normalize(cameraPos)));
+    vec3 right = normalize(cross(up, -normalize(cameraPos)));
     vec3 look = normalize(cross(right, up));
     return mat4(
         right.x,right.y,right.z,0,
@@ -69,12 +72,12 @@ void main() {
     Particle particle = particles.particle[livePool.indices[gl_InstanceIndex.x]];
     vec3 instance_pos = particle.pos.xyz;
 
-    mat4 billboardMat = billboardAlongVelocity(particle.vel.xyz, ubo.cameraPos.xyz);
+    mat4 billboardMat = billboardAlongVelocity(particle.vel.xyz, view_ubo.cameraPos.xyz);
 
     float clamped_speed = clamp(length(particle.vel.xyz), 0, 4) / 4;
-    vec4 modelPosition = billboardMat *  ubo.model * vec4(inPosition * vec3(0.2,0.2,0.2) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
+    vec4 modelPosition = billboardMat *  PushConstants.model * vec4(inPosition * vec3(0.2,0.2,0.2) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
 
-    gl_Position = ubo.proj * ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
+    gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
 
     float lifeAlpha = 1 - particle.pos.w / particle.ext.x;
     vec4 colorOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.75));

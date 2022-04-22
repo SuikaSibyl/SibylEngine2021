@@ -20,7 +20,8 @@ namespace SIByL::ParticleSystem
 			) noexcept -> void;
 
 		virtual auto registerResources(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void = 0;
-		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void = 0;
+		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void = 0;
+		virtual auto registerRenderPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void = 0;
 
 		uint32_t particleDataSize;
 		uint32_t maxParticleCount;

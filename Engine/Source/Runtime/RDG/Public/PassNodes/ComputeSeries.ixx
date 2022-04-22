@@ -109,20 +109,28 @@ namespace SIByL::GFX::RDG
 
 	export struct ComputePassScope :public PassNode
 	{
-		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
 		std::vector<NodeHandle> pipelineScopes;
 		std::unordered_map<std::string, NodeHandle> pipelineScopesRegister;
 
-	private:
+	protected:
 		void* renderGraph;
 	};
 
-	export struct ComputePassIndefiniteScope :public PassNode
+	export struct ComputePassIndefiniteScope :public ComputePassScope
 	{
+		virtual auto onRegistered(void* graph, void* render_graph_workshop) noexcept -> void override;
+		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+		// desc
+		std::function<uint32_t(void)> customDispatchCount;
 
+	private:
+		NodeHandle multiDispatchBegin;
+		NodeHandle multiDispatchEnd;
 	};
 
 }

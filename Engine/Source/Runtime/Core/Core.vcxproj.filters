@@ -156,6 +156,9 @@
     <ClCompile Include="Public\Profiler.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\String.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Public\EntryPoint.h">

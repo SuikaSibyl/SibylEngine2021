@@ -38,6 +38,7 @@ import RHI.IBarrier;
 import RHI.ICommandBuffer;
 import GFX.RDG.Common;
 import GFX.RDG.RenderGraph;
+import GFX.RDG.MultiDispatchScope;
 
 namespace SIByL::GFX::RDG
 {
@@ -270,6 +271,70 @@ namespace SIByL::GFX::RDG
 		{
 			ComputePipelineScope* pipeline_scope = (ComputePipelineScope*)render_graph->registry.getNode(handle);
 			pipeline_scope->onCommandRecord(commandbuffer, flight);
+		}
+	}
+
+	// ===========================================================
+	// ComputePassIndefiniteScope
+	// ===========================================================
+	auto ComputePassIndefiniteScope::onRegistered(void* graph, void* render_graph_workshop) noexcept -> void
+	{
+		// Create Multi Dispatch Begin
+		RenderGraph* rg = (RenderGraph*)graph;
+		MemScope<MultiDispatchScope> mds = MemNew<MultiDispatchScope>();
+		multiDispatchBegin = rg->registry.registNode(std::move(mds));
+		rg->tag(multiDispatchBegin, "Compute Pass Indefinite Scope Begin");
+
+		// Create Multi Dispatch End
+		MemScope<PassScopeEnd> pse = MemNew<PassScopeEnd>();
+		pse->scopeBeginHandle = (multiDispatchBegin);
+		pse->type = NodeDetailedType::SCOPE_END;
+		multiDispatchEnd = rg->registry.registNode(std::move(pse));
+		rg->tag(multiDispatchEnd, "Compute Pass Indefinite Scope End");
+	}
+
+	auto ComputePassIndefiniteScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
+	{
+		this->renderGraph = graph;
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		// onCompile Begin Multi Dispatch
+		render_graph->registry.getNode(multiDispatchBegin)->onCompile(graph, factory);
+		// Compute Pass Scope
+		barriers.clear();
+		// make all pipeline_scopes to compile
+		for (auto handle : pipelineScopes)
+		{
+			ComputePipelineScope* pipeline_scope = (ComputePipelineScope*)render_graph->registry.getNode(handle);
+			pipeline_scope->onCompile(graph, factory);
+		}
+		// onCompile End Multi Dispatch
+		render_graph->registry.getNode(multiDispatchEnd)->onCompile(graph, factory);
+	}
+
+	auto ComputePassIndefiniteScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
+	{
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		uint32_t dispatch_times = customDispatchCount();
+		// If no dispatch, call the EndPass Barrier
+		if (dispatch_times == 0)
+		{
+			for (auto barrier : render_graph->getPassNode(multiDispatchEnd)->barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+		}
+		// If have dispatch, call the BeginPass Barrier
+		else
+		{
+			// BEGIN barrier
+			for (auto barrier : render_graph->getPassNode(multiDispatchBegin)->barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+
+			for (int i = 0; i < dispatch_times; i++)
+			{
+				//for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+				for (auto handle : pipelineScopes)
+				{
+					ComputePipelineScope* pipeline_scope = (ComputePipelineScope*)render_graph->registry.getNode(handle);
+					pipeline_scope->onCommandRecord(commandbuffer, flight);
+				}
+			}
 		}
 	}
 

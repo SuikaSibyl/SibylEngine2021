@@ -51,7 +51,11 @@ namespace SIByL::GFX::RDG
 			commandbuffer->cmdBindVertexBuffer(vertexBuffer);
 			commandbuffer->cmdBindIndexBuffer(indexBuffer);
 			commandbuffer->cmdPushConstants(*pipelineLayout, RHI::ShaderStage::VERTEX, sizeof(PerObjectUniformBuffer), &uniform);
-			commandbuffer->cmdDrawIndexed(indexBuffer->getIndicesCount(), 1, 0, 0, 0);
+
+			if (indirectDrawBuffer)
+				commandbuffer->cmdDrawIndexedIndirect(indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
+			else
+				commandbuffer->cmdDrawIndexed(indexBuffer->getIndicesCount(), 1, 0, 0, 0);
 		}
 	}
 
@@ -83,6 +87,7 @@ namespace SIByL::GFX::RDG
 		// bind descriptor sets
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
+			unsigned int resourceIdx = 0;
 			unsigned int textureIdx = 0;
 			for (unsigned int j = 0; j < totalResourceNum; j++)
 			{
@@ -96,18 +101,19 @@ namespace SIByL::GFX::RDG
 				}
 				else
 				{
-					ResourceNode* resource = rg->getResourceNode(resources[j]);
+					ResourceNode* resource = rg->getResourceNode(resources[resourceIdx]);
 					switch (resource->type)
 					{
 					case NodeDetailedType::STORAGE_BUFFER:
 						descriptorSets[i]->update(((StorageBufferNode*)resource)->getStorageBuffer(), j, 0);
+						resourceIdx++;
 						break;
 					case NodeDetailedType::UNIFORM_BUFFER:
-						descriptorSets[i]->update(rg->getUniformBufferFlight(resources[j], i), j, 0);
+						descriptorSets[i]->update(rg->getUniformBufferFlight(resources[resourceIdx++], i), j, 0);
 						break;
 					case NodeDetailedType::SAMPLER:
 						descriptorSets[i]->update(rg->getTextureBufferNode(sampled_textures[textureIdx++])->getTextureView(),
-							rg->getSamplerNode(resources[j])->getSampler(), j, 0);
+							rg->getSamplerNode(resources[resourceIdx++])->getSampler(), j, 0);
 						break;
 					default:
 						SE_CORE_ERROR("GFX :: Raster Pass Node Binding Resource Type unsupported!");
@@ -157,7 +163,7 @@ namespace SIByL::GFX::RDG
 	auto RasterMaterialScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
-		for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+		//for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
 		RHI::IDescriptorSet* set = descriptorSets[flight].get();
 		commandbuffer->cmdBindDescriptorSets(
 			RHI::PipelineBintPoint::GRAPHICS,
@@ -320,6 +326,12 @@ namespace SIByL::GFX::RDG
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto handle : materialScopes)
 		{
+			for (auto handle : materialScopes)
+			{
+				RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);
+				material_scope->onFrameStart(graph);
+			}
+
 			RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);
 			material_scope->onFrameStart(graph);
 		}
@@ -383,6 +395,16 @@ namespace SIByL::GFX::RDG
 		// push all barriers
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+
+		for (auto handle : pipelineScopes)
+		{
+			RasterPipelineScope* pipeline_scope = (RasterPipelineScope*)render_graph->registry.getNode(handle);
+			for (auto handle : pipeline_scope->materialScopes)
+			{
+				RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);
+				for (auto barrier : material_scope->barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+			}
+		}
 
 		// begin render pass, actually bind the FrameBuffer
 		commandbuffer->cmdBeginRenderPass(

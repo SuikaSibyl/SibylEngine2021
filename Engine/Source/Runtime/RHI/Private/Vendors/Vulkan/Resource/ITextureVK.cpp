@@ -93,6 +93,11 @@ namespace SIByL::RHI
 		vkBindImageMemory(logical_device->getDeviceHandle(), *texture_image, *device_memory, 0);
 	}
 
+	auto ITextureVK::getNativeHandle() noexcept -> uint64_t
+	{
+		return (uint64_t)image;
+	}
+
 	ITextureVK::ITextureVK(Image* image, ILogicalDeviceVK* _logical_device)
 		:logicalDevice(_logical_device)
 	{

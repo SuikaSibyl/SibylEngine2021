@@ -36,7 +36,8 @@ namespace SIByL::Demo
 		PortalSystem(RHI::IResourceFactory* factory, Timer* timer);
 
 		virtual auto registerResources(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
-		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void override;
+		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
+		virtual auto registerRenderPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
 
 		Timer* timer;
 
@@ -124,6 +125,7 @@ namespace SIByL::Demo
 		local_workshop.build(factory, 0, 0);
 		MemScope<RHI::ICommandBuffer> transientCommandbuffer = factory->createTransientCommandBuffer();
 		transientCommandbuffer->beginRecording((uint32_t)RHI::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
+		portal_rdg.recordCommandsNEW(transientCommandbuffer.get(), 0);
 		transientCommandbuffer->endRecording();
 		transientCommandbuffer->submit();
 		factory->deviceIdle();
@@ -150,26 +152,81 @@ namespace SIByL::Demo
 		float y;
 	};
 
-	auto PortalSystem::registerUpdatePasses(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void
+	auto PortalSystem::registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
 	{
-		// Create Init Pass
-		initPass = builder->addComputePassBackPool(initShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, indirectDrawBuffer }, "Particles Init", sizeof(unsigned int));
+		auto indefinite_scope = workshop->addComputePassIndefiniteScope("Portal Particle System");
+		indefinite_scope->customDispatchCount = [&timer = timer]()
+			{
+				static float deltaTime = 0;
+				deltaTime += timer->getMsPF() > 100 ? 100 : timer->getMsPF();
+				unsigned int dispatch_times = (unsigned int)(deltaTime / 20);
+				deltaTime -= dispatch_times * 20;
+				return dispatch_times;
+			};
 
 		// Create Emit Pass
-		emitPass = builder->addComputePass(emitShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle }, "Particles Emit", sizeof(unsigned int) * 4);
-		builder->attached.getComputePassNode(emitPass)->customDispatch = [&timer = timer](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+		GFX::RDG::ComputePipelineScope* portal_emit_pipeline = workshop->addComputePipelineScope("Portal Particle System", "Emit");
 		{
-			EmitConstant constant_1{ 400000u / 50, (float)timer->getTotalTime(), 0, 1.07 };
-			compute_pass->executeWithConstant(commandbuffer, 200, 1, 1, flight_idx, constant_1);
-		};
-		GFX::RDG::ComputePassNode* emitPassNode = builder->attached.getComputePassNode(emitPass);
-		emitPassNode->textures = { bakedCurveHandle };
+			portal_emit_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
+			// Add Materials "Common"
+			{
+				auto particle_emit_mat_scope = workshop->addComputeMaterialScope("Portal Particle System", "Emit", "Common");
+				particle_emit_mat_scope->resources = { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle };
+				particle_emit_mat_scope->sampled_textures = { bakedCurveHandle };
+				auto particle_emit_dispatch_scope = workshop->addComputeDispatch("Portal Particle System", "Emit", "Common", "Only");
+				particle_emit_dispatch_scope->pushConstant = [&timer = timer](Buffer& buffer) {
+					EmitConstant emitConstant{ 400000u / 50, (float)timer->getTotalTime(), 0, 1.07 };
+					buffer = std::move(Buffer(sizeof(emitConstant), 1));
+					memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
+				};
+				particle_emit_dispatch_scope->customSize = [](uint32_t& x, uint32_t& y, uint32_t& z) {
+					x = 200;
+					y = 1;
+					z = 1;
+				};
+			}
+		}
 
 		// Create Update Pass
-		updatePass = builder->addComputePass(updateShader, { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, indirectDrawBuffer }, "Particles Update");
-		builder->attached.getComputePassNode(updatePass)->customDispatch = [](GFX::RDG::ComputePassNode* compute_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
+		GFX::RDG::ComputePipelineScope* portal_update_pipeline = workshop->addComputePipelineScope("Portal Particle System", "Update");
 		{
-			compute_pass->execute(commandbuffer, 200, 1, 1, flight_idx);
-		};
+			portal_update_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
+			// Add Materials "Common"
+			{
+				auto particle_update_mat_scope = workshop->addComputeMaterialScope("Portal Particle System", "Update", "Common");
+				particle_update_mat_scope->resources = { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, indirectDrawBuffer };
+				particle_update_mat_scope->sampled_textures = { bakedCurveHandle };
+				auto particle_update_dispatch_scope = workshop->addComputeDispatch("Portal Particle System", "Update", "Common", "Only");
+				particle_update_dispatch_scope->customSize = [](uint32_t& x, uint32_t& y, uint32_t& z) {
+					x = 200;
+					y = 1;
+					z = 1;
+				};
+			}
+		}
 	}
+
+	auto PortalSystem::registerRenderPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
+	{
+		GFX::RDG::RasterPipelineScope* trancparency_portal_pipeline = workshop->addRasterPipelineScope("Opaque Pass", "Particle Portal");
+		{
+			trancparency_portal_pipeline->shaderVert = factory->createShaderFromBinaryFile("portal/portal_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
+			trancparency_portal_pipeline->shaderFrag = factory->createShaderFromBinaryFile("portal/portal_vert_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+			trancparency_portal_pipeline->cullMode = RHI::CullMode::BACK;
+			trancparency_portal_pipeline->vertexBufferLayout =
+			{
+				{RHI::DataType::Float3, "Position"},
+				{RHI::DataType::Float3, "Color"},
+				{RHI::DataType::Float2, "UV"},
+			};
+			trancparency_portal_pipeline->colorBlendingDesc = RHI::AdditionBlending;
+			trancparency_portal_pipeline->depthStencilDesc = RHI::TestLessButNoWrite;
+
+			// Add Materials
+			auto portal_mat_scope = workshop->addRasterMaterialScope("Opaque Pass", "Particle Portal", "Portal");
+			portal_mat_scope->resources = { samplerHandle, particleBuffer, samplerHandle, liveIndexBuffer };
+			portal_mat_scope->sampled_textures = { spriteHandle, bakedCurveHandle };
+		}
+	}
+
 }

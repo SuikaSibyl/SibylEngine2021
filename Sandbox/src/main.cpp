@@ -304,7 +304,7 @@ public:
 //				deltaTime -= dispatch_times * 20;
 //				return dispatch_times;
 //			};
-//			portal.registerUpdatePasses(&rdg_builder);
+
 //			sortTest.registerUpdatePasses(&rdg_builder);
 //			GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
 
@@ -325,20 +325,28 @@ public:
 				// Add Materials
 				auto dust2_01_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
 			}
+			// Raster Pass "Transparency Pass"
+			//workshop.addRasterPassScope("Transparency Pass", srgb_framebuffer);
+			portal.registerRenderPasses(&workshop);
+
 			// Compute Pass "Post Processing"
 			workshop.addComputePassScope("PostProcessing Pass");
 			// Add Pipeline "ACES + BLOOM"
 			acesbloom->iHdrImage = srgb_color_attachment;
 			acesbloom->iExternalSampler = workshop.getInternalSampler("Default Sampler");
 			acesbloom->registerComputePasses(workshop);
-
+			// Compute Pass "Portal Particle System Update"
+			portal.registerUpdatePasses(&workshop);
 			// External Access Pass "ImGui Read Pass"
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
 			auto imGuiReadPass = workshop.getNode<GFX::RDG::ExternalAccessPass>(imGuiReadPassHandle);
 			imGuiReadPass->insertExternalAccessItem({ acesbloom->bloomCombined, GFX::RDG::ConsumeKind::IMAGE_SAMPLE });
 
+
+
 			// Pipeline Build
 			workshop.build(resourceFactory.get(), 1280, 720);
+			rdg.print();
 
 			auto imimage = editorLayer->imImageManager.addImImage(acesbloom->bloomCombined, workshop.getInternalSampler("Default Sampler"));
 			editorLayer->mainViewport.bindImImage(imimage);
@@ -496,6 +504,7 @@ public:
 		{
 			rdg.onFrameStart();
 			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
+			auto portal_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Particle Portal", "Portal");
 
 			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh) {
 				auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall(tag.Tag, &rdg);
@@ -506,6 +515,18 @@ public:
 				drawcall->uniform.model = transform.getAccumulativeTransform();
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh>(per_mesh_behavior);
+
+			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&, GFX::Renderer&)> per_particle_system_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh, GFX::Renderer& renderer) {
+				auto drawcall_handle = portal_mat_scope->addRasterDrawCall(tag.Tag, &rdg);
+				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
+
+				drawcall->vertexBuffer = mesh.vertexBuffer;
+				drawcall->indexBuffer = mesh.indexBuffer;
+				drawcall->uniform.model = transform.getAccumulativeTransform();
+				drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
+			};
+			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh, GFX::Renderer>(per_particle_system_behavior);
+
 		}
 		// drawFrame
 		{
@@ -540,6 +561,7 @@ public:
 			GFX::RDG::RenderGraphWorkshop workshop(rdg);
 			workshop.build(resourceFactory.get(), editorLayer->mainViewport.getWidth(), editorLayer->mainViewport.getHeight());
 			editorLayer->imImageManager.invalidAll();
+			logicalDevice->waitIdle();
 		}
 	}
 

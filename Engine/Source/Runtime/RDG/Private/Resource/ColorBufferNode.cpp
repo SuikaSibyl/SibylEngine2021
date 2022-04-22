@@ -309,6 +309,7 @@ namespace SIByL::GFX::RDG
 				default: SE_CORE_ERROR("RDG :: Color Buffer Undefined initial usage!");
 					break;
 				}
+				SE_CORE_DEBUG("LAYOUT {0}", (uint32_t)first_layout);
 				getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, first_layout);
 			}
 
