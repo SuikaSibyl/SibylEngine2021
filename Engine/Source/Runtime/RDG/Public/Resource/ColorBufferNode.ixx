@@ -18,6 +18,8 @@ namespace SIByL::GFX::RDG
 		ColorBufferNode() { type = NodeDetailedType::COLOR_TEXTURE; }
 		ColorBufferNode(RHI::ResourceFormat format, float const& rel_width, float const& rel_height);
 		
+		RHI::ImageLayout first_layout = RHI::ImageLayout::UNDEFINED;
+
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 

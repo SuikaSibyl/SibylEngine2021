@@ -1,5 +1,6 @@
 module;
 #include <cstdint>
+#include <string>
 export module RHI.IEnum;
 
 namespace SIByL
@@ -331,6 +332,35 @@ namespace SIByL
 			READ_ONLY_OPTIMAL,
 			ATTACHMENT_OPTIMAL,
 		};
+
+		export inline auto to_string(ImageLayout imageLayout) noexcept -> std::string
+		{
+			switch (imageLayout)
+			{
+			case SIByL::RHI::ImageLayout::UNDEFINED:return "UNDEFINED"; break;
+			case SIByL::RHI::ImageLayout::GENERAL:return "GENERAL"; break;
+			case SIByL::RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL:return "COLOR_ATTACHMENT_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA:return "DEPTH_STENCIL_ATTACHMENT_OPTIMA"; break;
+			case SIByL::RHI::ImageLayout::DEPTH_STENCIL_READ_ONLY_OPTIMAL:return "DEPTH_STENCIL_READ_ONLY_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL:return "SHADER_READ_ONLY_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::TRANSFER_SRC_OPTIMAL:return "TRANSFER_SRC_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::TRANSFER_DST_OPTIMAL:return "TRANSFER_DST_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::PREINITIALIZED:return "PREINITIALIZED"; break;
+			case SIByL::RHI::ImageLayout::DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL:return "DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL:return "DEPTH_ATTACHMENT_STENCIL_READ_ONLY_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::DEPTH_ATTACHMENT_OPTIMAL:return "DEPTH_ATTACHMENT_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::DEPTH_READ_ONLY_OPTIMAL:return "DEPTH_READ_ONLY_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::STENCIL_ATTACHMENT_OPTIMAL:return "STENCIL_ATTACHMENT_OPTIMAL";break;
+			case SIByL::RHI::ImageLayout::STENCIL_READ_ONLY_OPTIMAL:return "STENCIL_READ_ONLY_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::PRESENT_SRC:return "PRESENT_SRC"; break;
+			case SIByL::RHI::ImageLayout::SHARED_PRESENT:return "SHARED_PRESENT"; break;
+			case SIByL::RHI::ImageLayout::FRAGMENT_DENSITY_MAP_OPTIMAL:return "FRAGMENT_DENSITY_MAP_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::FRAGMENT_SHADING_RATE_ATTACHMENT_OPTIMAL:return "FRAGMENT_SHADING_RATE_ATTACHMENT_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::READ_ONLY_OPTIMAL:return "READ_ONLY_OPTIMAL"; break;
+			case SIByL::RHI::ImageLayout::ATTACHMENT_OPTIMAL:return "ATTACHMENT_OPTIMAL"; break;
+			default:return "ERROR"; break;
+			}
+		}
 
 		export inline auto flagBitSwitch(uint32_t const& input, uint32_t const& flag, uint32_t const& vendor_flag, uint32_t& target) noexcept -> void;
 	}

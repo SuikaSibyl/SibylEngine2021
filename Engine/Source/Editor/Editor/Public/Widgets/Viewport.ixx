@@ -46,11 +46,12 @@ namespace SIByL::Editor
 
 		auto getCameraView() noexcept -> glm::mat4;
 		auto getCameraProjection() noexcept -> glm::mat4;
-		auto getNeedResize() noexcept -> bool { return needResize; }
+		auto getNeedResize() noexcept -> bool { return needResize != 0; }
 		GFX::Transform cameraTransform;
 
 	private:
-		bool needResize = false;
+		bool firstResize = true;
+		int needResize = 0;
 		IInput* input;
 		int gizmozType = 0;
 		auto handleTransformGizmo() noexcept -> void;
@@ -88,10 +89,16 @@ namespace SIByL::Editor
 		{
 			// Viewport Change Size
 			viewportPanelSize = viewport_panel_size;
-			needResize = true;
+			//if (firstResize)
+			//{
+			//	needResize = 3;
+			//	firstResize = false;
+			//}
+			//else
+			needResize = 1;
 		}
 		else if (needResize)
-			needResize = false;
+			needResize--;
 
 		if (bindedImage)
 		{

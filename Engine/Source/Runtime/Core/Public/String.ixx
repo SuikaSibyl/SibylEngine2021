@@ -10,10 +10,10 @@ namespace SIByL
 		uint64_t number = i;
 		uint64_t nibble = 0;
 		char hexes[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-		for (int i = 0; i < 64 / 4; i++)
+		for (int i = 64 / 4 - 1; i >= 0; i--)
 		{
-			nibble = number & 0x0f;
-			number = number >> 4;
+			nibble = number >> i * 4;
+			nibble = nibble & 0xf;
 			result.push_back(hexes[nibble]);
 		}
 		return result;

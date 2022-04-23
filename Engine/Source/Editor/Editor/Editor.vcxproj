@@ -86,7 +86,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine\Source\ThirdParty\entt\entt\;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/ThirdParty/vulkan/Include;$(SolutionDir)Engine/Source/ThirdParty/glfw/include;$(SolutionDir)Engine/Source/Editor/EditorCore/Public;$(SolutionDir)Engine/Source/Editor/EditorCore/Private;$(SolutionDir)Engine\Source\ThirdParty\imguizmo;$(SolutionDir)Engine\Source\ThirdParty\imgui\imgui;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

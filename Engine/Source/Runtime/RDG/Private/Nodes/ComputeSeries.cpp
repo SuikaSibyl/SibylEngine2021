@@ -157,7 +157,11 @@ namespace SIByL::GFX::RDG
 	auto ComputeMaterialScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
-		for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
+		for (auto barrier : barriers)
+		{
+			auto barrier_ptr = render_graph->barrierPool.getBarrier(barrier);
+			commandbuffer->cmdPipelineBarrier(barrier_ptr);
+		}
 
 		RHI::IDescriptorSet* set = descriptorSets[flight].get();
 		commandbuffer->cmdBindDescriptorSets(

@@ -65,9 +65,29 @@ namespace SIByL::Editor
 			if (ImGui::TreeNode("Resources Registered"))
 			{
 				ImGui::NextColumn();
+
+				static bool show_COLOR_TEXTURE = true;
+				static bool show_DEPTH_TEXTURE = true;
+				static bool show_STORAGE_BUFFER = true;
+				static bool show_UNIFORM_BUFFER = true;
+				static bool show_FRAME_BUFFER = true;
+				ImGui::Checkbox("COLOR_TEXTURE", &show_COLOR_TEXTURE);
+				ImGui::Checkbox("DEPTH_TEXTURE", &show_DEPTH_TEXTURE);
+				ImGui::Checkbox("STORAGE_BUFFER", &show_STORAGE_BUFFER);
+				ImGui::Checkbox("UNIFORM_BUFFER", &show_UNIFORM_BUFFER);
+				ImGui::Checkbox("FRAME_BUFFER", &show_FRAME_BUFFER);
+
+
 				for (int i = 0; i < rg->resources.size(); i++)
 				{
-					bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, bullet_flags, std::string(rg->getResourceNode(rg->resources[i])->tag).c_str(), i);
+					auto resourceNode = rg->getResourceNode(rg->resources[i]);
+					if (resourceNode->type == GFX::RDG::NodeDetailedType::COLOR_TEXTURE && !show_COLOR_TEXTURE) continue;
+					if (resourceNode->type == GFX::RDG::NodeDetailedType::DEPTH_TEXTURE && !show_DEPTH_TEXTURE) continue;
+					if (resourceNode->type == GFX::RDG::NodeDetailedType::STORAGE_BUFFER && !show_STORAGE_BUFFER) continue;
+					if (resourceNode->type == GFX::RDG::NodeDetailedType::UNIFORM_BUFFER && !show_UNIFORM_BUFFER) continue;
+					if (resourceNode->type == GFX::RDG::NodeDetailedType::FRAME_BUFFER && !show_FRAME_BUFFER) continue;
+
+					bool node_open = ImGui::TreeNodeEx((void*)(intptr_t)i, bullet_flags, std::string(resourceNode->tag).c_str(), i);
 					if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 					{
 						selectedType = SelectedType::RESOURCE;
@@ -254,6 +274,11 @@ namespace SIByL::Editor
 						ImGui::Text("Native Image");
 						ImGui::TableSetColumnIndex(1);
 						ImGui::Text(to_hex_string(native_handle).c_str());
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("First Layout");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(RHI::to_string(colorBufferNode->first_layout).c_str());
 					}
 						break;
 					case GFX::RDG::NodeDetailedType::DEPTH_TEXTURE:
@@ -282,7 +307,39 @@ namespace SIByL::Editor
 				}
 				}, []() {});
 
-			Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 1), "Consume History", []() {
+			Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 1), "Consume History", [&]() {
+				static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
+				ImGui::NextColumn();
+				if (ImGui::BeginTable("Consume History", 2, flags))
+				{
+					for (auto& consumeHistory : resourceNode->consumeHistory)
+					{
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text(GFX::RDG::getString(consumeHistory.kind).c_str());
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(GFX::RDG::getString(rg->getPassNode(consumeHistory.pass)->type).c_str());
+					}
+					ImGui::EndTable();
+				}
+
+				}, []() {});
+
+			Component::onDrawGui((void*)(typeid(GFX::RDG::ResourceNode).hash_code() + 2), "Barriers", [&]() {
+				static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
+				ImGui::NextColumn();
+				if (ImGui::BeginTable("Barriers", 2, flags))
+				{
+					for (auto& pair : resourceNode->createdBarriers)
+					{
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text(std::to_string(pair.first).c_str());
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text("whatever");
+					}
+					ImGui::EndTable();
+				}
 
 				}, []() {});
 		}

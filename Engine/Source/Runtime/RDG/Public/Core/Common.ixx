@@ -161,6 +161,7 @@ namespace SIByL::GFX::RDG
 		RHI::AccessFlags accessFlags = 0;
 	};
 
+	export using BarrierHandle = uint64_t;
 	export struct ResourceNode :public Node
 	{
 		ResourceNode() { attributes |= addBit(NodeAttrbutesFlagBits::RESOURCE); }
@@ -174,6 +175,7 @@ namespace SIByL::GFX::RDG
 
 		std::vector<ConsumeHistory> consumeHistoryOnetime;
 		std::vector<ConsumeHistory> consumeHistory;
+		std::vector<std::pair<uint32_t, BarrierHandle>> createdBarriers;
 	};
 
 	// Some resource could be either external or localy owned
@@ -191,7 +193,6 @@ namespace SIByL::GFX::RDG
 
 	// Barrier is managed together
 	// There ref (by handle) will be dispatched to each pass
-	export using BarrierHandle = uint64_t;
 	export struct BarrierPool
 	{
 		auto registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle;
@@ -267,7 +268,7 @@ namespace SIByL::GFX::RDG
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 	};
 
-	export auto getString(ConsumeKind kind) noexcept -> std::string
+	export inline auto getString(ConsumeKind kind) noexcept -> std::string
 	{
 		switch (kind)
 		{
@@ -283,4 +284,33 @@ namespace SIByL::GFX::RDG
 		default:														return "ERROR         "; break;
 		}
 	}
+
+	export inline auto getString(NodeDetailedType type) noexcept -> std::string
+	{
+		switch (type)
+		{
+			case SIByL::GFX::RDG::NodeDetailedType::NONE					:return "NONE					"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::SAMPLER					:return "SAMPLER				"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::COLOR_TEXTURE			:return "COLOR_TEXTURE			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::DEPTH_TEXTURE			:return "DEPTH_TEXTURE			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::STORAGE_BUFFER			:return "STORAGE_BUFFER			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::UNIFORM_BUFFER			:return "UNIFORM_BUFFER			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::FRAME_BUFFER			:return "FRAME_BUFFER			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::FRAME_BUFFER_FLIGHTS	:return "FRAME_BUFFER_FLIGHTS	"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::UNIFORM_BUFFER_FLIGHTS	:return "UNIFORM_BUFFER_FLIGHTS	"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::RASTER_PASS				:return "RASTER_PASS			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::COMPUTE_PASS			:return "COMPUTE_PASS			"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::BLIT_PASS				:return "BLIT_PASS				"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::RASTER_PASS_SCOPE		:return "RASTER_PASS_SCOPE		"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::RASTER_MATERIAL_SCOPE	:return "RASTER_MATERIAL_SCOPE	"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::COMPUTE_PASS_SCOPE		:return "COMPUTE_PASS_SCOPE		"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::COMPUTE_MATERIAL_SCOPE	:return "COMPUTE_MATERIAL_SCOPE	"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::EXTERNAL_ACCESS_PASS	:return "EXTERNAL_ACCESS_PASS	"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::SCOPE					:return "SCOPE					"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::MULTI_DISPATCH_SCOPE	:return "MULTI_DISPATCH_SCOPE	"; break;
+			case SIByL::GFX::RDG::NodeDetailedType::SCOPE_END				:return "SCOPE_END				"; break;
+			default															:return "ERROR                  "; break;
+		}
+	}
+
 }

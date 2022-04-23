@@ -561,7 +561,6 @@ public:
 			GFX::RDG::RenderGraphWorkshop workshop(rdg);
 			workshop.build(resourceFactory.get(), editorLayer->mainViewport.getWidth(), editorLayer->mainViewport.getHeight());
 			editorLayer->imImageManager.invalidAll();
-			logicalDevice->waitIdle();
 		}
 	}
 

@@ -54,6 +54,7 @@ namespace SIByL::GFX::RDG
 
 	auto ColorBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		createdBarriers.clear();
 		RenderGraph* rg = (RenderGraph*)graph;
 
 		if (consumeHistory.size() > 1)
@@ -177,8 +178,8 @@ namespace SIByL::GFX::RDG
 					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT 
-									 | (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
+						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 
@@ -279,6 +280,7 @@ namespace SIByL::GFX::RDG
 				});
 
 				BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(attach_read_barrier));
+				createdBarriers.emplace_back(i, barrier_handle);
 				rg->getPassNode(consumeHistory[i].pass)->barriers.emplace_back(barrier_handle);
 				i_minus = i;
 			}
@@ -288,7 +290,6 @@ namespace SIByL::GFX::RDG
 		{
 			if (consumeHistory.size() > 0)
 			{
-				RHI::ImageLayout first_layout = RHI::ImageLayout::UNDEFINED;
 				unsigned int idx = consumeHistory.size() - 1;
 				while (consumeHistory[idx].kind > ConsumeKind::SCOPE) idx--;
 				switch (consumeHistory[idx].kind)
