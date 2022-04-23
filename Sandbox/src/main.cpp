@@ -226,6 +226,7 @@ public:
 			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 
+
 //			// HDR raster pass
 //			renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
 //			rdg.tag(renderPassNodeSRGB, "Raster HDR");
@@ -519,6 +520,12 @@ public:
 			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&, GFX::Renderer&)> per_particle_system_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh, GFX::Renderer& renderer) {
 				auto drawcall_handle = portal_mat_scope->addRasterDrawCall(tag.Tag, &rdg);
 				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
+
+				portal.emitDispatch->pushConstant = [&timer = timer, &transform = transform](Buffer& buffer) {
+					Demo::EmitConstant emitConstant = {transform.getAccumulativeTransform(), 400000u / 50,(float)timer.getTotalTime()};
+					buffer = std::move(Buffer(sizeof(emitConstant), 1));
+					memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
+				};
 
 				drawcall->vertexBuffer = mesh.vertexBuffer;
 				drawcall->indexBuffer = mesh.indexBuffer;

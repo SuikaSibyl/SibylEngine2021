@@ -160,6 +160,8 @@
     <ClCompile Include="Private\AssetLayer.cpp" />
     <ClCompile Include="Private\Loader\MeshLoader.cpp" />
     <ClCompile Include="Public\Assets\Material.ixx" />
+    <ClCompile Include="Public\Assets\Shader.ixx" />
+    <ClCompile Include="Public\Loader\ShaderLoader.ixx" />
     <ClCompile Include="Public\Loader\TextureLoader.ixx" />
     <ClCompile Include="Public\RuntimeAssetLibrary.ixx" />
     <ClCompile Include="Private\RuntimeAssetManager.cpp" />

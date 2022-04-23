@@ -218,7 +218,7 @@ namespace SIByL::RHI
 			dstAccessMask = (uint32_t)AccessFlagBits::SHADER_READ_BIT;
 
 			sourceStage = (uint32_t)PipelineStageFlagBits::TOP_OF_PIPE_BIT;
-			destinationStage = (uint32_t)PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+			destinationStage = (uint32_t)PipelineStageFlagBits::ALL_COMMANDS_BIT;
 		}
 		else if (old_layout == ImageLayout::UNDEFINED && new_layout == ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA) {
 			srcAccessMask = 0;

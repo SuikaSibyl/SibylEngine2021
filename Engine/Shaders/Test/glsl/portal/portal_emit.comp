@@ -1,10 +1,9 @@
  #version 450
 
 layout(push_constant) uniform constants {
+    mat4 offset;
     uint emitCount;
     float time;
-    float offset_x;
-    float offset_y;
 } PushConstants;
 
 struct Particle
@@ -97,6 +96,11 @@ float randPerThread(float seed)
     return nrand(gl_GlobalInvocationID.x + seed * fract(PushConstants.time));
 }
 
+vec3 getScale(mat4 mat)
+{
+    return vec3(length(mat[0].rgb),length(mat[1].rgb),length(mat[2].rgb));
+}
+
 float remapWithClamp(float i, float old_range_min, float old_range_max, float new_range_min, float new_range_max)
 {
     float clamped = clamp(i, old_range_min, old_range_max);
@@ -133,7 +137,8 @@ void main()
     );
     particle_to_center = (pos_rotation_matrix * vec4(particle_to_center, 1.0)).xyz;
 
-    new_particle.pos.xyz = particle_to_center.xyz + vec3(PushConstants.offset_x, PushConstants.offset_y, 0);
+    vec3 pos_offset = vec3(PushConstants.offset[3].rgb);
+    new_particle.pos.xyz = particle_to_center.xyz + pos_offset;
 
     // # Height Mask
     // We generate a (0..1) mask based particle elevation.
@@ -157,7 +162,7 @@ void main()
 
     // Pulse rotation mask
     float total_time = PushConstants.time * 0.001;
-    float angle_on_torus = total_time * -30 + atan(new_particle.pos.y, new_particle.pos.x);
+    float angle_on_torus = total_time * -30 + atan(particle_to_center.y, particle_to_center.x);
     float rotation_mask = mod(angle_on_torus, 6.283185) / 6.283185;
     float brightness = texture(texSampler, vec2((0.5 + rotation_mask * 127)/128, 0.25)).r * 3.2;
     // float brightness = rotation_mask < 0.672 ? 0.1 : 3.2;
@@ -186,6 +191,12 @@ void main()
     // Set Color
     new_particle.color = vec4(brightness,brightness,brightness,1);
 
+    vec3 inverse_scale = getScale(PushConstants.offset);
+    inverse_scale = vec3(1/inverse_scale.x, 1/inverse_scale.y, 1/inverse_scale.z);
+    new_particle.pos.xyz = mat3(PushConstants.offset) * new_particle.pos.xyz;
+    new_particle.pos.xyz *= inverse_scale;
+    new_particle.vel.xyz = mat3(PushConstants.offset) * new_particle.vel.xyz;
+    new_particle.vel.xyz *= inverse_scale;
 
     // ========================================================================
     // Custom Part Over

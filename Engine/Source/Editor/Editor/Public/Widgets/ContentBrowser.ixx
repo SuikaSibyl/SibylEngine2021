@@ -71,7 +71,7 @@ namespace SIByL::Editor
 			return materialIm;
 		else if (ext == "fbx" || ext == "FBX")
 			return meshIm;
-		else if (ext == "png" || ext == "jpg")
+		else if (ext == "png" || ext == "jpg" || ext == "jpeg")
 			return imageIm;
 		else if (ext == "scene")
 			return sceneIm;
@@ -114,6 +114,9 @@ namespace SIByL::Editor
 			auto relativePath = std::filesystem::relative(directoryEntry.path(), root);
 			std::string relativePathString = relativePath.string();
 			std::string filenameString = relativePath.filename().string();
+
+			if (filenameString == ".adb" || filenameString == ".iadb")
+				continue;
 
 			ImGui::PushID(filenameString.c_str());
 			// If is directory

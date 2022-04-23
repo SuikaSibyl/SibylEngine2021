@@ -3,6 +3,7 @@ module;
 #include <filesystem>
 #include <vector>
 #include <functional>
+#include <glm/glm.hpp>
 export module Demo.Portal;
 import Core.Buffer;
 import Core.Cache;
@@ -58,6 +59,8 @@ namespace SIByL::Demo
 		MemScope<RHI::ITextureView> textureView;
 		MemScope<RHI::ITexture> bakedCurves;
 		MemScope<RHI::ITextureView> bakedCurvesView;
+
+		GFX::RDG::ComputeDispatch* emitDispatch = nullptr;
 
 		RHI::IResourceFactory* factory;
 		GFX::RDG::RenderGraph portal_rdg;
@@ -144,12 +147,11 @@ namespace SIByL::Demo
 		emitterVolumeHandle = workshop->addStorageBufferExt(torusBuffer.get(), "Emitter Volume Samples");
 	}
 
-	struct EmitConstant
+	export struct EmitConstant
 	{
+		glm::mat4 matrix;
 		unsigned int emitCount;
 		float time;
-		float x;
-		float y;
 	};
 
 	auto PortalSystem::registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
@@ -174,8 +176,9 @@ namespace SIByL::Demo
 				particle_emit_mat_scope->resources = { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle };
 				particle_emit_mat_scope->sampled_textures = { bakedCurveHandle };
 				auto particle_emit_dispatch_scope = workshop->addComputeDispatch("Portal Particle System", "Emit", "Common", "Only");
+				emitDispatch = particle_emit_dispatch_scope;
 				particle_emit_dispatch_scope->pushConstant = [&timer = timer](Buffer& buffer) {
-					EmitConstant emitConstant{ 400000u / 50, (float)timer->getTotalTime(), 0, 1.07 };
+					EmitConstant emitConstant{ glm::mat4(), 400000u / 50,(float)timer->getTotalTime()};
 					buffer = std::move(Buffer(sizeof(emitConstant), 1));
 					memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
 				};

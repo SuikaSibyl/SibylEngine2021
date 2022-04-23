@@ -1,4 +1,5 @@
 module;
+#include <unordered_map>
 #include <map>
 #include <string>
 export module Asset.RuntimeAssetManager;
@@ -45,5 +46,6 @@ namespace SIByL::Asset
 		auto deserialize() noexcept -> void;
 		Core::AssetLoader assetLoader;
 		std::map<GUID, ResourceItem> assetsMap;
+		std::unordered_map<std::string, GUID> inverseMap;
 	};
 }

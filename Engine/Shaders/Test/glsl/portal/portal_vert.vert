@@ -68,6 +68,12 @@ float speed_y_curve(float i)
     if(i > 1) return 0.769;
     return 0.769 * i;
 }
+
+vec3 getScale(mat4 matrix)
+{
+    return vec3(1,1,1);
+}
+
 void main() {
     Particle particle = particles.particle[livePool.indices[gl_InstanceIndex.x]];
     vec3 instance_pos = particle.pos.xyz;
@@ -75,7 +81,7 @@ void main() {
     mat4 billboardMat = billboardAlongVelocity(particle.vel.xyz, view_ubo.cameraPos.xyz);
 
     float clamped_speed = clamp(length(particle.vel.xyz), 0, 4) / 4;
-    vec4 modelPosition = billboardMat *  PushConstants.model * vec4(inPosition * vec3(0.2,0.2,0.2) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
+    vec4 modelPosition = billboardMat * vec4(inPosition * vec3(0.2,0.2,0.2) * getScale(PushConstants.model) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
 
     gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
 

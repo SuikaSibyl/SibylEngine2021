@@ -175,7 +175,9 @@ namespace SIByL::GFX::PostProcessing
 					auto tone_mapping_dispatch_scope = workshop.addComputeDispatch("PostProcessing Pass", pipelineNames[i], "Horizontal", "Only");
 					tone_mapping_dispatch_scope->pushConstant = [rdg = &(workshop.renderGraph), framebuffer_size = framebuffer_size](Buffer& buffer) {
 						glm::vec2 screenSize = { rdg->datumWidth, rdg->datumHeight };
-						BlurPassConstants blurPassConstant = { screenSize * glm::vec2{framebuffer_size,framebuffer_size}, screenSize, screenSize * glm::vec2{2 * framebuffer_size,2 * framebuffer_size}, {0,1} };
+						glm::vec2 outputSize = floor(screenSize * glm::vec2{ framebuffer_size,framebuffer_size });
+						glm::vec2 inputSize = floor(screenSize * glm::vec2{ 2 * framebuffer_size,2 * framebuffer_size });
+						BlurPassConstants blurPassConstant = { outputSize, screenSize, inputSize, {0,1} };
 						buffer = std::move(Buffer(sizeof(blurPassConstant), 1));
 						memcpy(buffer.getData(), &blurPassConstant, sizeof(blurPassConstant));
 					};
@@ -194,7 +196,9 @@ namespace SIByL::GFX::PostProcessing
 					auto tone_mapping_dispatch_scope = workshop.addComputeDispatch("PostProcessing Pass", pipelineNames[i], "Vertical", "Only");
 					tone_mapping_dispatch_scope->pushConstant = [rdg = &(workshop.renderGraph), framebuffer_size = framebuffer_size](Buffer& buffer) {
 						glm::vec2 screenSize = { rdg->datumWidth, rdg->datumHeight };
-						BlurPassConstants blurPassConstant = { screenSize * glm::vec2{framebuffer_size,framebuffer_size}, screenSize, screenSize * glm::vec2{framebuffer_size,framebuffer_size}, {1,0} };
+						glm::vec2 outputSize = floor(screenSize * glm::vec2{ framebuffer_size,framebuffer_size });
+						glm::vec2 inputSize = floor(screenSize * glm::vec2{ framebuffer_size,framebuffer_size });
+						BlurPassConstants blurPassConstant = { outputSize, screenSize, inputSize, {1,0} };
 						buffer = std::move(Buffer(sizeof(blurPassConstant), 1));
 						memcpy(buffer.getData(), &blurPassConstant, sizeof(blurPassConstant));
 					};
