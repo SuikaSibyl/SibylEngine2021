@@ -218,48 +218,13 @@ public:
 			portal.registerResources(&workshop);
 			sortTest.registerResources(&rdg_builder);
 			acesbloom->registerResources(&rdg_builder);
-			// renderer
-			GFX::RDG::NodeHandle depthBuffer = rdg_builder.addDepthBuffer(1.f, 1.f);
-			uniformBufferFlights = rdg_builder.addUniformBufferFlights(sizeof(UniformBufferObject));
 			// raster pass sono 1
 			srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
-			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
+			//GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
+			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, 1.f, 1.f, "SRGB Depth Attach");
 			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
+			GFX::RDG::NodeHandle prez_framebuffer = rdg_builder.addFrameBufferRef({  }, srgb_depth_attachment);
 
-
-//			// HDR raster pass
-//			renderPassNodeSRGB = rdg_builder.addRasterPass({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
-//			rdg.tag(renderPassNodeSRGB, "Raster HDR");
-//			GFX::RDG::RasterPassNode* rasterPassNodeSRGB = rdg.getRasterPassNode(renderPassNodeSRGB);
-//			rasterPassNodeSRGB->shaderVert = resourceFactory->createShaderFromBinaryFile("portal/portal_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
-//			rasterPassNodeSRGB->shaderFrag = resourceFactory->createShaderFromBinaryFile("portal/portal_vert_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
-//			rasterPassNodeSRGB->framebuffer = srgb_framebuffer;
-//			rasterPassNodeSRGB->indirectDrawBufferHandle = portal.indirectDrawBuffer;
-//			rasterPassNodeSRGB->textures = { portal.spriteHandle, portal.bakedCurveHandle };
-//			rasterPassNodeSRGB->stageMasks = {
-//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-//				(uint32_t)RHI::ShaderStageFlagBits::FRAGMENT_BIT,
-//				(uint32_t)RHI::ShaderStageFlagBits::COMPUTE_BIT | (uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT,
-//				(uint32_t)RHI::ShaderStageFlagBits::VERTEX_BIT
-//			};
-//			rasterPassNodeSRGB->customCommandRecord = [&scene = scene](GFX::RDG::RasterPassNode* raster_pass, RHI::ICommandBuffer* commandbuffer, uint32_t flight_idx)
-//			{
-//				std::function<void(ECS::TagComponent&, GFX::Mesh&, GFX::Renderer&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Mesh& mesh, GFX::Renderer& renderer) {
-//					if (!renderer.hasPass(1)) return;
-//					commandbuffer->cmdBindVertexBuffer(mesh.vertexBuffer);
-//					commandbuffer->cmdBindIndexBuffer(mesh.indexBuffer);
-//					RHI::IDescriptorSet* set = raster_pass->descriptorSets[flight_idx].get();
-//					commandbuffer->cmdBindDescriptorSets(
-//						RHI::PipelineBintPoint::GRAPHICS,
-//						raster_pass->pipelineLayout.get(),
-//						0, 1, &set, 0, nullptr);
-//
-//					commandbuffer->cmdDrawIndexedIndirect(raster_pass->indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
-//				};
-//				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh, GFX::Renderer>(per_mesh_behavior);
-//			};
 //#ifdef MACRO_USE_MESH
 //			// Mesh Based Raster Pass
 //			renderPassNodeSRGB_mesh = rdg_builder.addRasterPassBackPool({ uniformBufferFlights, portal.samplerHandle, portal.particleBuffer, portal.samplerHandle, portal.liveIndexBuffer, portal.indirectDrawBuffer });
@@ -294,20 +259,25 @@ public:
 //				scene.tree.context.traverse<ECS::TagComponent, GFX::Mesh>(per_mesh_behavior);
 //			};
 //#endif
-
-//			// particle system update pass
-//			GFX::RDG::NodeHandle scope_begin = rdg_builder.beginMultiDispatchScope("Scope Begin Portal-Update Multi-Dispatch");
-//			rdg.getMultiDispatchScope(scope_begin)->customDispatchCount = [&timer = timer]()
-//			{
-//				static float deltaTime = 0;
-//				deltaTime += timer.getMsPF() > 100 ? 100 : timer.getMsPF();
-//				unsigned int dispatch_times = (unsigned int)(deltaTime / 20);
-//				deltaTime -= dispatch_times * 20;
-//				return dispatch_times;
-//			};
-
 //			sortTest.registerUpdatePasses(&rdg_builder);
-//			GFX::RDG::NodeHandle scope_end = rdg_builder.endScope();
+
+			// Raster Pass "Pre Z"
+			workshop.addRasterPassScope("Pre-Z Pass", srgb_framebuffer);
+			GFX::RDG::RasterPipelineScope* prez_opaque_pipeline = workshop.addRasterPipelineScope("Pre-Z Pass", "Opaque");
+			{
+				prez_opaque_pipeline->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/prez_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
+				prez_opaque_pipeline->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/prez_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+				prez_opaque_pipeline->cullMode = RHI::CullMode::NONE;
+				prez_opaque_pipeline->vertexBufferLayout =
+				{
+					{RHI::DataType::Float3, "Position"},
+					{RHI::DataType::Float3, "Normal"},
+					{RHI::DataType::Float2, "UV"},
+					{RHI::DataType::Float4, "Tangent"},
+				};
+				// Add Materials
+				auto only_mat_scope = workshop.addRasterMaterialScope("Pre-Z Pass", "Opaque", "Only");
+			}
 
 			// Raster Pass "Opaque Pass"
 			workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
@@ -324,7 +294,28 @@ public:
 					{RHI::DataType::Float4, "Tangent"},
 				};
 				// Add Materials
-				auto dust2_01_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
+				auto default_sampler = workshop.getInternalSampler("Default Sampler");
+				uint64_t texture_guids[] = {
+					2267850664238763130,
+					2267991406240189562,
+					2267850670916095098,
+					13249315412305628282,
+					12673417609955626106,
+					660628553898249338,
+					11971981967992671354,
+					14779131910728043642,
+					2267921049340726394,
+					13249385790730259578,
+					12673487988380257402,
+				};
+				for (int i = 1; i <= 11; i++)
+				{
+					auto dust2_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_" + std::to_string(i));
+					Asset::Texture* texture = assetLayer->texture(texture_guids[i - 1]);
+					auto dust2_01_texture_handle = workshop.addColorBufferExt(texture->texture.get(), texture->view.get(), "dust2-" + std::to_string(texture_guids[i]));
+					dust2_mat_scope->resources = { default_sampler };
+					dust2_mat_scope->sampled_textures = { dust2_01_texture_handle };
+				}
 			}
 			// Raster Pass "Transparency Pass"
 			//workshop.addRasterPassScope("Transparency Pass", srgb_framebuffer);
@@ -342,8 +333,6 @@ public:
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
 			auto imGuiReadPass = workshop.getNode<GFX::RDG::ExternalAccessPass>(imGuiReadPassHandle);
 			imGuiReadPass->insertExternalAccessItem({ acesbloom->bloomCombined, GFX::RDG::ConsumeKind::IMAGE_SAMPLE });
-
-
 
 			// Pipeline Build
 			workshop.build(resourceFactory.get(), 1280, 720);
@@ -498,41 +487,53 @@ public:
 			per_view_ubo.proj = glm::perspectiveLH_NO(glm::radians(45.0f), (float)editorLayer->mainViewport.getWidth() / (float)editorLayer->mainViewport.getHeight(), 0.1f, 5000.0f);
 			per_view_ubo.proj[1][1] *= -1;
 			// use transform as Per View Uniform
+			auto prez_pass = rdg.getRasterPassScope("Pre-Z Pass");
+			prez_pass->updatePerViewUniformBuffer(per_view_ubo, currentFrame);
 			auto opaque_pass = rdg.getRasterPassScope("Opaque Pass");
 			opaque_pass->updatePerViewUniformBuffer(per_view_ubo, currentFrame);
 		}
 		// update draw calls
 		{
 			rdg.onFrameStart();
-			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Phongs", "dust2_01");
+			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Phongs", "dust2_1");
 			auto portal_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Particle Portal", "Portal");
 
-			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&)> per_mesh_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh) {
-				auto drawcall_handle = dust2_01_mat_scope->addRasterDrawCall(tag.Tag, &rdg);
-				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
-
-				drawcall->vertexBuffer = mesh.vertexBuffer;
-				drawcall->indexBuffer = mesh.indexBuffer;
-				drawcall->uniform.model = transform.getAccumulativeTransform();
-			};
-			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh>(per_mesh_behavior);
-
 			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&, GFX::Renderer&)> per_particle_system_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh, GFX::Renderer& renderer) {
-				auto drawcall_handle = portal_mat_scope->addRasterDrawCall(tag.Tag, &rdg);
-				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
+				for (auto& subrenderer : renderer.subRenderers)
+				{
+					auto mat_scope = rdg.getRasterMaterialScope(subrenderer.passName, subrenderer.pipelineName, subrenderer.materialName);
+					if (mat_scope == nullptr) continue;
+					auto drawcall_handle = mat_scope->addRasterDrawCall(tag.Tag, &rdg);
+					auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
 
-				portal.emitDispatch->pushConstant = [&timer = timer, &transform = transform](Buffer& buffer) {
-					Demo::EmitConstant emitConstant = {transform.getAccumulativeTransform(), 400000u / 50,(float)timer.getTotalTime()};
-					buffer = std::move(Buffer(sizeof(emitConstant), 1));
-					memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
-				};
+					drawcall->vertexBuffer = mesh.vertexBuffer;
+					drawcall->indexBuffer = mesh.indexBuffer;
+					drawcall->uniform.model = transform.getAccumulativeTransform();
 
-				drawcall->vertexBuffer = mesh.vertexBuffer;
-				drawcall->indexBuffer = mesh.indexBuffer;
-				drawcall->uniform.model = transform.getAccumulativeTransform();
-				drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
+					if (portal_mat_scope == mat_scope)
+					{
+						portal.emitDispatch->pushConstant = [&timer = timer, &transform = transform](Buffer& buffer) {
+							Demo::EmitConstant emitConstant = { transform.getAccumulativeTransform(), 400000u / 50,(float)timer.getTotalTime() };
+							buffer = std::move(Buffer(sizeof(emitConstant), 1));
+							memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
+						};
+						drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
+					}
+				}
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh, GFX::Renderer>(per_particle_system_behavior);
+
+
+			//portal.emitDispatch->pushConstant = [&timer = timer, &transform = transform](Buffer& buffer) {
+			//	Demo::EmitConstant emitConstant = { transform.getAccumulativeTransform(), 400000u / 50,(float)timer.getTotalTime() };
+			//	buffer = std::move(Buffer(sizeof(emitConstant), 1));
+			//	memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
+			//};
+
+			//drawcall->vertexBuffer = mesh.vertexBuffer;
+			//drawcall->indexBuffer = mesh.indexBuffer;
+			//drawcall->uniform.model = transform.getAccumulativeTransform();
+			//drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
 
 		}
 		// drawFrame

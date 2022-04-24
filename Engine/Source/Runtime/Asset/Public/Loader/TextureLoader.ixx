@@ -1,18 +1,19 @@
 module;
 #include <string>
 #include <filesystem>
+#include <Macros.h>
 export module Asset.TextureLoader;
 import Core.Buffer;
 import Core.Image;
 import Core.Cache;
 import Core.MemoryManager;
+import Core.Profiler;
 import Asset.Asset;
 import Asset.DedicatedLoader;
 import Asset.Texture;
 import RHI.IFactory;
 import RHI.ITexture;
 import RHI.ITextureView;
-
 
 namespace SIByL::Asset
 {
@@ -47,27 +48,41 @@ namespace SIByL::Asset
 
 	auto TextureLoader::loadFromCache(uint64_t const& path) noexcept -> void
 	{
-		//TextureHeader header;
-		//Buffer image_proxy(image.data, 0, 1);
-		//Buffer* buffers[1] = { &image_proxy };
-		//CacheBrain::instance()->loadCache(path, header, buffers);
-		//image.attributes = header.attributes;
-		//image.width = header.width;
-		//image.height = header.height;
-		//image.channels = header.channels;
-		//image.size = header.size;
+		PROFILE_SCOPE_FUNCTION();
+
+		InstrumentationTimer* timer1 = new InstrumentationTimer("Load From File");
+		TextureHeader header;
+		Buffer image_proxy;
+		Buffer* buffers[1] = { &image_proxy };
+		CacheBrain::instance()->loadCache(path, header, buffers);
+		delete timer1;
+
+		InstrumentationTimer* timer2 = new InstrumentationTimer("Load Create GPU Resource");
+
+		image.attributes = header.attributes;
+		image.width = header.width;
+		image.height = header.height;
+		image.channels = header.channels;
+		image.size = header.size;
+		image.data = image_proxy.getData();
+
+		texture.texture = resourceFactory->createTexture(&image);
+		texture.view = resourceFactory->createTextureView(texture.texture.get());
+		delete timer2;
+
+		image.data = nullptr;
 	}
 
 	auto TextureLoader::saveAsCache(uint64_t const& path) noexcept -> void
 	{
-		//TextureHeader header;
-		//header.attributes = image.attributes;
-		//header.width = image.width;
-		//header.height = image.height;
-		//header.channels = image.channels;
-		//header.size = image.size;
-		//Buffer image_proxy(image.data, image.size, 1);
-		//Buffer* buffers[1] = { &image_proxy };
-		//CacheBrain::instance()->saveCache(path, header, buffers, 1, 0);
+		TextureHeader header;
+		header.attributes = image.attributes;
+		header.width = image.width;
+		header.height = image.height;
+		header.channels = image.channels;
+		header.size = image.size;
+		Buffer image_proxy(image.data, image.size, 1);
+		Buffer* buffers[1] = { &image_proxy };
+		CacheBrain::instance()->saveCache(path, header, buffers, 1, 0);
 	}
 }

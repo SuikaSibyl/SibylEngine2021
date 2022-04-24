@@ -14,7 +14,7 @@ namespace SIByL
 {
 	namespace RHI
 	{
-		auto createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView* imageView, ILogicalDeviceVK* logical_device) noexcept -> void
+		auto createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectMask, VkImageView* imageView, ILogicalDeviceVK* logical_device, TextureDesc const& desc) noexcept -> void
 		{
 			VkImageViewCreateInfo viewInfo{};
 			viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -23,7 +23,7 @@ namespace SIByL
 			viewInfo.format = format;
 			viewInfo.subresourceRange.aspectMask = aspectMask;
 			viewInfo.subresourceRange.baseMipLevel = 0;
-			viewInfo.subresourceRange.levelCount = 1;
+			viewInfo.subresourceRange.levelCount = desc.mipLevels;
 			viewInfo.subresourceRange.baseArrayLayer = 0;
 			viewInfo.subresourceRange.layerCount = 1;
 
@@ -63,7 +63,7 @@ namespace SIByL
 				break;
 			}
 
-			createImageView(*((ITextureVK*)texture)->getVkImage(), getVKFormat(((ITextureVK*)texture)->getDescription().format), accessMask, &imageView, logicalDevice);
+			createImageView(*((ITextureVK*)texture)->getVkImage(), getVKFormat(((ITextureVK*)texture)->getDescription().format), accessMask, &imageView, logicalDevice, texture->getDescription());
 		}
 
 		ITextureViewVK::~ITextureViewVK()

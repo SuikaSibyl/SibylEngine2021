@@ -19,13 +19,21 @@ import Editor.Inspector;
 import Editor.EntityElucidator;
 import Asset.AssetLayer;
 import Editor.Viewport;
+import GFX.RDG.RenderGraph;
+import GFX.RDG.StorageBufferNode;
+import GFX.RDG.RasterPassNode;
+import GFX.RDG.Common;
+import GFX.RDG.MultiDispatchScope;
+import GFX.Renderer;
+import GFX.RDG.RasterNodes;
+import GFX.RDG.ExternalAccess;
 
 namespace SIByL::Editor
 {
 	export struct Scene :public Widget
 	{
-		Scene(WindowLayer* window_layer, Asset::AssetLayer* asset_layer, Viewport* viewport)
-			:windowLayer(window_layer), assetLayer(asset_layer), viewport(viewport) {}
+		Scene(WindowLayer* window_layer, Asset::AssetLayer* asset_layer, Viewport* viewport, GFX::RDG::RenderGraph* rdg)
+			:windowLayer(window_layer), assetLayer(asset_layer), viewport(viewport), rdg(rdg) {}
 		virtual auto onDrawGui() noexcept -> void override;
 
 		auto bindScene(GFX::Scene* scene) { binded_scene = scene; }
@@ -42,6 +50,7 @@ namespace SIByL::Editor
 		Inspector* inspector = nullptr;
 		WindowLayer* windowLayer = nullptr;
 		Asset::AssetLayer* assetLayer = nullptr;
+		GFX::RDG::RenderGraph* rdg = nullptr;
 	};
 
 	auto Scene::onDrawGui() noexcept -> void
@@ -148,7 +157,7 @@ namespace SIByL::Editor
 		{
 			ECS::Entity entity = binded_scene->tree.getNodeEntity(node);
 			inspected = node;
-			if (inspector) inspector->setCustomDraw(std::bind(EntityElucidator::drawInspector, entity, assetLayer, node, binded_scene));
+			if (inspector) inspector->setCustomDraw(std::bind(EntityElucidator::drawInspector, entity, assetLayer, node, binded_scene, rdg));
 			if (viewport) viewport->selectedEntity = entity;
 		}
 

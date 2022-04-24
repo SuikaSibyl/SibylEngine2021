@@ -1,3 +1,24 @@
 InverseMap:
-  []
+  - path: dust2/part1.jpeg
+    GUID: 2267850664238763130
+  - path: dust2/part2.jpeg
+    GUID: 2267991406240189562
+  - path: dust2/part3.jpeg
+    GUID: 2267850670916095098
+  - path: dust2/part11.jpeg
+    GUID: 12673487988380257402
+  - path: dust2/part4.jpeg
+    GUID: 13249315412305628282
+  - path: dust2/part10.jpeg
+    GUID: 13249385790730259578
+  - path: dust2/part5.jpeg
+    GUID: 12673417609955626106
+  - path: dust2/part6.jpeg
+    GUID: 660628553898249338
+  - path: dust2/part7.jpeg
+    GUID: 11971981967992671354
+  - path: dust2/part9a.jpg
+    GUID: 2267921049340726394
+  - path: dust2/part8.jpeg
+    GUID: 14779131910728043642
 End: true

@@ -39,20 +39,7 @@ namespace SIByL
 			ImageLayout layout;
 			uint32_t width;
 			uint32_t height;
-		};
-
-		export class ITexture :public SObject
-		{
-		public:
-			ITexture() = default;
-			ITexture(ITexture&&) = default;
-			ITexture(ITexture const&) = delete;
-			virtual ~ITexture() = default;
-
-			virtual auto getNativeHandle() noexcept -> uint64_t = 0;
-			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void = 0;
-			virtual auto createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView> = 0;
-			virtual auto getDescription() noexcept -> TextureDesc const& = 0;
+			uint32_t mipLevels = 1; // If mipmap levels is set to 0, it will be automatically set to a meaningful & maximum value according to width & height
 		};
 
 		export enum class ImageAspectFlagBits :uint32_t
@@ -96,5 +83,18 @@ namespace SIByL
 		};
 		export struct IBufferImageCopy
 		{};
+
+		export class ITexture :public SObject
+		{
+		public:
+			ITexture() = default;
+			ITexture(ITexture&&) = default;
+			ITexture(ITexture const&) = delete;
+			virtual ~ITexture() = default;
+
+			virtual auto getNativeHandle() noexcept -> uint64_t = 0;
+			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void = 0;
+			virtual auto getDescription() noexcept -> TextureDesc const& = 0;
+		};
 	}
 }

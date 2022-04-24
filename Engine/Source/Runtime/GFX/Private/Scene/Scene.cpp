@@ -93,7 +93,9 @@ namespace SIByL::GFX
 			{
 				auto& subRenderer = renderer.subRenderers[i];
 				out << YAML::BeginMap;
-				out << YAML::Key << "PassHandle" << YAML::Value << subRenderer.pass;
+				out << YAML::Key << "PassName" << YAML::Value << subRenderer.passName;
+				out << YAML::Key << "PipelineName" << YAML::Value << subRenderer.pipelineName;
+				out << YAML::Key << "MaterialName" << YAML::Value << subRenderer.materialName;
 				out << YAML::EndMap;
 			}
 			out << YAML::EndSeq;
@@ -201,8 +203,10 @@ namespace SIByL::GFX
 			if (subRenderers)
 				for (auto sub : subRenderers)
 				{
-					uint64_t pass_handle = sub["PassHandle"].as<uint64_t>();
-					rc.subRenderers.emplace_back(pass_handle);
+					std::string passName = sub["PassName"].as<std::string>();
+					std::string pipelineName = sub["PipelineName"].as<std::string>();
+					std::string materialName = sub["MaterialName"].as<std::string>();
+					rc.subRenderers.emplace_back(passName, pipelineName, materialName);
 				}
 		}
 	}

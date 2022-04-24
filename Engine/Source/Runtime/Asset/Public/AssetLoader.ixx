@@ -8,6 +8,7 @@ import Core.Hash;
 import Asset.Asset;
 import Asset.RuntimeAssetManager;
 import RHI.IFactory;
+import ECS.UID;
 
 namespace SIByL::Asset
 {
@@ -45,7 +46,7 @@ namespace SIByL::Asset
 			else if (file_exist)
 			{
 				loadFromFile(item->path);
-				if (item->cacheID == 0) item->cacheID = Hash::path2hash(item->path);
+				if (item->cacheID == 0) item->cacheID = ECS::UniqueID::RequestUniqueID();
 				saveAsCache(item->cacheID);
 				item->cachedTime = last_write;
 			}

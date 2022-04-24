@@ -80,14 +80,14 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(SolutionDir)Engine/Source/ThirdParty/assimp/include;$(SolutionDir)Engine/Source/ThirdParty/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(SolutionDir)Engine/Source/ThirdParty/assimp/include;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine/Binaries/ThirdParty/assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Engine\Binaries\Source\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Engine\Binaries-Int\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(SolutionDir)Engine/Source/ThirdParty/assimp/include;$(SolutionDir)Engine/Source/ThirdParty/;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Engine/Source/ThirdParty/yaml/include;$(SolutionDir)Engine/Source/ThirdParty/assimp/include;$(SolutionDir)Engine/Source/ThirdParty/;$(SolutionDir)Engine/Source/Runtime/Core/Public;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine/Binaries/ThirdParty/assimp;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

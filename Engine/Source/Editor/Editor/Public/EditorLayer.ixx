@@ -23,6 +23,7 @@ import Editor.ContentBrowser;
 import Asset.AssetLayer;
 import Editor.ImGuiLayer;
 import Editor.RDGImImageManager;
+import GFX.RDG.RenderGraph;
 
 namespace SIByL::Editor
 {
@@ -31,7 +32,7 @@ namespace SIByL::Editor
 		EditorLayer(WindowLayer* window_layer, Asset::AssetLayer* asset_layer, ImGuiLayer* imgui_layer, Timer* timer, GFX::RDG::RenderGraph* renderGraph) :ILayer("Editor Layer"),
 			imImageManager(renderGraph, imgui_layer),
 			mainViewport(window_layer, timer),
-			sceneGui(window_layer, asset_layer, &mainViewport),
+			sceneGui(window_layer, asset_layer, &mainViewport, renderGraph),
 			contentBrowserGui(window_layer, asset_layer, imgui_layer) {}
 
 		auto onDrawGui() noexcept -> void;

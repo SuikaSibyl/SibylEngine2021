@@ -1,6 +1,7 @@
 module;
 #include <vector>
 #include <cstdint>
+#include <string>
 export module GFX.Renderer;
 
 import GFX.Material;
@@ -10,8 +11,9 @@ namespace SIByL::GFX
 {
 	export struct SubRenderer
 	{
-		RDG::NodeHandle pass;
-		Material material;
+		std::string passName;
+		std::string pipelineName;
+		std::string materialName;
 	};
 
 	export struct Renderer
@@ -19,17 +21,4 @@ namespace SIByL::GFX
 		auto hasPass(RDG::NodeHandle) noexcept -> bool;
 		std::vector<SubRenderer> subRenderers;
 	};
-
-	auto Renderer::hasPass(RDG::NodeHandle pass) noexcept -> bool
-	{
-		for (auto& sub : subRenderers)
-		{
-			if (sub.pass == pass)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 }

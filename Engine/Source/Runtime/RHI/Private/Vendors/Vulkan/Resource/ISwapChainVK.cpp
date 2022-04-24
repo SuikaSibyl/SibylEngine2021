@@ -6,6 +6,7 @@ module;
 #include <utility>
 module RHI.ISwapChain.VK;
 import Core.Log;
+import Core.MemoryManager;
 import RHI.IEnum;
 import RHI.ISwapChain;
 import RHI.IPhysicalDevice.VK;
@@ -159,7 +160,8 @@ namespace SIByL::RHI
 				extent.height
 			};
 			ITextureVK texture(images[i], std::move(resource), desc, logicalDevice);
-			swapchainViews.emplace_back(texture.createView({}));
+			MemScope<ITextureViewVK> tv_vk = MemNew<ITextureViewVK>(&texture, logicalDevice);
+			swapchainViews.emplace_back(MemCast<ITextureView>(tv_vk));
 			swapChainTextures.emplace_back(std::move(texture));
 		}
 	}

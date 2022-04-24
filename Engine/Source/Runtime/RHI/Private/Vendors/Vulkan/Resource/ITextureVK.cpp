@@ -1,6 +1,7 @@
 module;
 #include <vulkan/vulkan.h>
 #include <utility>
+#include <cmath>
 module RHI.ITexture.VK;
 import Core.Log;
 import Core.MemoryManager;
@@ -24,38 +25,16 @@ import RHI.IMemoryBarrier;
 
 namespace SIByL::RHI
 {
-	auto createImageViews(TextureViewDesc const& desc, IResourceVK* resource, VkImage* image, ILogicalDeviceVK* logical_device, VkImageView* image_view) noexcept -> void
-	{
-		VkImageViewCreateInfo createInfo{};
-		createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		createInfo.image = *image;
-		createInfo.viewType = resource->getVKImageViewType();
-		createInfo.format = resource->getVKFormat();
-		// The components field allows you to swizzle the color channels around
-		createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		// The subresourceRange field describes what the image's purpose is and 
-		// which part of the image should be accessed. 
-		// Our images will be used as color targets without any mipmapping levels or multiple layers.
-		createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		createInfo.subresourceRange.baseMipLevel = 0;
-		createInfo.subresourceRange.levelCount = 1;
-		createInfo.subresourceRange.baseArrayLayer = 0;
-		createInfo.subresourceRange.layerCount = 1;
-;
-		if (vkCreateImageView(logical_device->getDeviceHandle(), &createInfo, nullptr, image_view) != VK_SUCCESS) {
-			SE_CORE_ERROR("VULKAN :: failed to create image views!");
-		}
-	}
-
 	auto createVkImage(
-		TextureDesc const& desc,
+		TextureDesc& desc,
 		VkImage* texture_image,
 		VkDeviceMemory* device_memory,
 		ILogicalDeviceVK* logical_device) noexcept -> void
 	{
+		// if mipLevels is set to 0, calculate it 
+		if (desc.mipLevels == 0)
+			desc.mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(desc.width, desc.height)))) + 1;
+
 		// create actual image
 		VkImageCreateInfo imageInfo{};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -63,7 +42,7 @@ namespace SIByL::RHI
 		imageInfo.extent.width = static_cast<uint32_t>(desc.width);
 		imageInfo.extent.height = static_cast<uint32_t>(desc.height);
 		imageInfo.extent.depth = 1;
-		imageInfo.mipLevels = 1;
+		imageInfo.mipLevels = desc.mipLevels;
 		imageInfo.arrayLayers = 1;
 		imageInfo.format = getVKFormat(desc.format);
 		imageInfo.tiling = getVkImageTiling(desc.tiling);
@@ -227,6 +206,13 @@ namespace SIByL::RHI
 			sourceStage = (uint32_t)PipelineStageFlagBits::TOP_OF_PIPE_BIT;
 			destinationStage = (uint32_t)PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT;
 		}
+		else if (old_layout == ImageLayout::UNDEFINED && new_layout == ImageLayout::COLOR_ATTACHMENT_OPTIMAL) {
+			srcAccessMask = 0;
+			dstAccessMask = (uint32_t)AccessFlagBits::COLOR_ATTACHMENT_READ_BIT | (uint32_t)AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT;
+
+			sourceStage = (uint32_t)PipelineStageFlagBits::TOP_OF_PIPE_BIT;
+			destinationStage = (uint32_t)PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT;
+		}
 		else if (old_layout == ImageLayout::UNDEFINED && new_layout == ImageLayout::PRESENT_SRC) {
 			srcAccessMask = 0;
 			dstAccessMask = (uint32_t)AccessFlagBits::TRANSFER_WRITE_BIT;
@@ -270,7 +256,7 @@ namespace SIByL::RHI
 			ImageSubresourceRange{
 				aspectMask,
 				0,
-				1,
+				desc.mipLevels,
 				0,
 				1
 			},//ImageSubresourceRange subresourceRange;
@@ -295,14 +281,6 @@ namespace SIByL::RHI
 		commandbuffer->endRecording();
 		commandbuffer->submit();
 		logicalDevice->waitIdle();
-	}
-
-	auto ITextureVK::createView(TextureViewDesc const& desc) noexcept -> MemScope<ITextureView>
-	{
-		MemScope<ITextureViewVK> view = MemNew<ITextureViewVK>(logicalDevice);
-		createImageViews(desc, &resource, &image, logicalDevice, view->getpVkImageView());
-		MemScope<ITextureView> general_view = MemCast<ITextureView>(view);
-		return general_view;
 	}
 
 	ITextureVK::~ITextureVK()

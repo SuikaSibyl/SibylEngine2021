@@ -135,8 +135,8 @@ namespace SIByL::Asset
 
 			if (mesh->HasTextureCoords(0))
 			{
-				vertices[vidx++] = (mesh->mTextureCoords[0][i].x);
-				vertices[vidx++] = (mesh->mTextureCoords[0][i].y);
+				vertices[vidx++] = (mesh->mTextureCoords[1][i].x);
+				vertices[vidx++] = (mesh->mTextureCoords[1][i].y);
 			}
 			else
 			{

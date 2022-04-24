@@ -35,11 +35,20 @@ import GFX.SceneTree;
 import GFX.Scene;
 import Editor.CommonProperties;
 
+import GFX.RDG.RenderGraph;
+import GFX.RDG.StorageBufferNode;
+import GFX.RDG.RasterPassNode;
+import GFX.RDG.Common;
+import GFX.RDG.MultiDispatchScope;
+import GFX.Renderer;
+import GFX.RDG.RasterNodes;
+import GFX.RDG.ExternalAccess;
+
 namespace SIByL::Editor
 {
 	export struct EntityElucidator
 	{
-		static auto drawInspector(ECS::Entity entity, Asset::AssetLayer* assetLayer, GFX::SceneNodeHandle const& node, GFX::Scene* scene) -> void;
+		static auto drawInspector(ECS::Entity entity, Asset::AssetLayer* assetLayer, GFX::SceneNodeHandle const& node, GFX::Scene* scene, GFX::RDG::RenderGraph* renderGraph) -> void;
 	};
 
 	template<typename T, typename UIFunction>
@@ -115,7 +124,7 @@ namespace SIByL::Editor
 		}
 	}
 
-	auto EntityElucidator::drawInspector(ECS::Entity entity, Asset::AssetLayer* assetLayer, GFX::SceneNodeHandle const& node, GFX::Scene* scene) -> void
+	auto EntityElucidator::drawInspector(ECS::Entity entity, Asset::AssetLayer* assetLayer, GFX::SceneNodeHandle const& node, GFX::Scene* scene, GFX::RDG::RenderGraph* renderGraph) -> void
 	{
 		// Draw Tag Component
 		{
@@ -249,29 +258,122 @@ namespace SIByL::Editor
 				}
 			});
 		// Draw Renderer Component
-		drawComponent<GFX::Renderer>(entity, "Renderer", [](auto& component)
+		drawComponent<GFX::Renderer>(entity, "Renderer", [&renderGraph = renderGraph ](auto& component)
 			{
+				static ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
+
+				int remov_subRenderer = -1;
 				for (int i = 0; i < component.subRenderers.size(); i++)
 				{
 					auto& subRenderer = component.subRenderers[i];
 					ImGui::PushID(i);
-					ImGui::Columns(2);
 
-					ImGui::SetColumnWidth(0, 150);
-					ImGui::Text("Pass Handle");
-					ImGui::NextColumn();
-					ImGui::Text(std::to_string(subRenderer.pass).c_str());
+					if (ImGui::BeginTable("SubPass", 2, flags))
+					{
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("Pass Name");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(subRenderer.passName.c_str());
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("Pipeline Name");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(subRenderer.pipelineName.c_str());
+						ImGui::TableNextRow();
+						ImGui::TableSetColumnIndex(0);
+						ImGui::Text("Material Name");
+						ImGui::TableSetColumnIndex(1);
+						ImGui::Text(subRenderer.materialName.c_str());
+						ImGui::EndTable();
+					}
+					ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
-					ImGui::Columns(1);
+					ImGui::SetCursorPosX(contentRegionAvailable.x - 200);
+					ImVec2 buttonSize(100, 30);
+					if (ImGui::Button("Choose", buttonSize))
+						ImGui::OpenPopup("choose_material");
+					if (ImGui::BeginPopup("choose_material"))
+					{
+						for (auto iter : renderGraph->rasterPassRegister)
+						{
+							auto pass_scope = renderGraph->getNode<GFX::RDG::RasterPassScope>(iter.second);
+							if (ImGui::BeginMenu(iter.first.c_str()))
+							{
+								std::string pass_name = iter.first;
+								for (auto iter : pass_scope->pipelineScopesRegister)
+								{
+									auto pipeline_scope = renderGraph->getNode<GFX::RDG::RasterPipelineScope>(iter.second);
+									if (ImGui::BeginMenu(iter.first.c_str()))
+									{
+										std::string pipeline_name = iter.first;
+										auto material_scope = renderGraph->getNode<GFX::RDG::RasterMaterialScope>(iter.second);
+										for (auto iter : pipeline_scope->materialScopesRegister)
+										{
+											std::string material_name = iter.first;
+											bool is_choosen = false;
+											ImGui::MenuItem(iter.first.c_str(), "", &is_choosen);
+											if (is_choosen)
+											{
+												subRenderer.passName = pass_name;
+												subRenderer.pipelineName = pipeline_name;
+												subRenderer.materialName = material_name;
+											}
+										}
+										ImGui::EndMenu();
+									}
+								}
+								ImGui::EndMenu();
+							}
+						}
+						//for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+						//	ImGui::MenuItem(names[i], "", &toggles[i]);
+
+						//ImGui::Separator();
+						//ImGui::Text("Tooltip here");
+						//if (ImGui::IsItemHovered())
+						//	ImGui::SetTooltip("I am a tooltip over a popup");
+
+						//if (ImGui::Button("Stacked Popup"))
+						//	ImGui::OpenPopup("another popup");
+						//if (ImGui::BeginPopup("another popup"))
+						//{
+						//	for (int i = 0; i < IM_ARRAYSIZE(names); i++)
+						//		ImGui::MenuItem(names[i], "", &toggles[i]);
+						//	if (ImGui::BeginMenu("Sub-menu"))
+						//	{
+						//		ImGui::MenuItem("Click me");
+						//		if (ImGui::Button("Stacked Popup"))
+						//			ImGui::OpenPopup("another popup");
+						//		if (ImGui::BeginPopup("another popup"))
+						//		{
+						//			ImGui::Text("I am the last one here.");
+						//			ImGui::EndPopup();
+						//		}
+						//		ImGui::EndMenu();
+						//	}
+						//	ImGui::EndPopup();
+						//}
+						ImGui::EndPopup();
+					}
+
+					ImGui::SameLine(contentRegionAvailable.x - 80);
+					if (ImGui::Button("Remove", buttonSize))
+						remov_subRenderer = i;
+
 					ImGui::PopID();
 					ImGui::Separator();
 				}
+
+				if (remov_subRenderer >= 0)
+					component.subRenderers.erase(component.subRenderers.begin() + remov_subRenderer);
+
 				// Draw Add SubPass
 				ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 				ImGui::SetCursorPosX(contentRegionAvailable.x / 2 - 50);
 				ImVec2 buttonSize(100, 30);
 				if (ImGui::Button("Add Pass", buttonSize))
-					component.subRenderers.emplace_back();
+					component.subRenderers.emplace_back("NONE", "NONE", "NONE");
 			});
 
 		// Add Components

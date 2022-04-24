@@ -27,6 +27,7 @@ namespace SIByL::Core
         height = (uint32_t)texHeight;
         channels = (uint32_t)texChannels;
         data = (char*)pixels;
+        size = width * height * 4 * sizeof(uint8_t);
         attributes |= addBit(ImageAttribute::FROM_STB);
     }
 
