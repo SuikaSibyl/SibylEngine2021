@@ -162,7 +162,7 @@ namespace SIByL::GFX::RDG
 		// Passes
 		//------------------------------------------
 		// Raster Pass Series
-		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void;
+		auto addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> RasterPassScope*;
 		auto addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*;
 		auto addRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
 		// Compute Pass Series
@@ -197,7 +197,7 @@ namespace SIByL::GFX::RDG
 		auto addColorBuffer(RHI::ResourceFormat format, float const& rel_width, float const& rel_height, std::string_view name) noexcept -> NodeHandle;
 		auto addIndirectDrawBuffer(std::string_view name) noexcept -> NodeHandle;
 		auto addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle;
-		auto addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment) noexcept -> NodeHandle;
+		auto addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment, std::vector<NodeHandle> const& unclear = {}) noexcept -> NodeHandle;
 		auto addFrameBufferFlightsRef(std::vector<std::pair<std::vector<NodeHandle> const&, NodeHandle>> infos) noexcept -> NodeHandle;
 		auto beginMultiDispatchScope(std::string_view name) noexcept -> NodeHandle;
 		auto endScope() noexcept -> NodeHandle;

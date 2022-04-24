@@ -190,6 +190,13 @@ namespace SIByL
 			RHI::CompareOp::LESS
 		};
 
+		export inline DepthStencilDesc TestLessEqualAndWrite
+		{
+			true,
+			true,
+			RHI::CompareOp::LESS_OR_EQUAL
+		};
+
 		export class IDepthStencil
 		{
 		public:

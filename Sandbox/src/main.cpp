@@ -222,8 +222,8 @@ public:
 			srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
 			//GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
 			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, 1.f, 1.f, "SRGB Depth Attach");
-			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment);
 			GFX::RDG::NodeHandle prez_framebuffer = rdg_builder.addFrameBufferRef({  }, srgb_depth_attachment);
+			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment, { srgb_depth_attachment });
 
 //#ifdef MACRO_USE_MESH
 //			// Mesh Based Raster Pass
@@ -262,7 +262,7 @@ public:
 //			sortTest.registerUpdatePasses(&rdg_builder);
 
 			// Raster Pass "Pre Z"
-			workshop.addRasterPassScope("Pre-Z Pass", srgb_framebuffer);
+			workshop.addRasterPassScope("Pre-Z Pass", prez_framebuffer);
 			GFX::RDG::RasterPipelineScope* prez_opaque_pipeline = workshop.addRasterPipelineScope("Pre-Z Pass", "Opaque");
 			{
 				prez_opaque_pipeline->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/prez_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
@@ -280,12 +280,13 @@ public:
 			}
 
 			// Raster Pass "Opaque Pass"
-			workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
+			auto forward_pass = workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
 			GFX::RDG::RasterPipelineScope* opaque_phongs_pipeline = workshop.addRasterPipelineScope("Opaque Pass", "Phongs");
 			{
 				opaque_phongs_pipeline->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
 				opaque_phongs_pipeline->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
 				opaque_phongs_pipeline->cullMode = RHI::CullMode::NONE;
+				opaque_phongs_pipeline->depthStencilDesc = RHI::TestLessEqualAndWrite;
 				opaque_phongs_pipeline->vertexBufferLayout =
 				{
 					{RHI::DataType::Float3, "Position"},
@@ -561,6 +562,7 @@ public:
 		ImGui::ShowDemoWindow(&show_demo_window);
 		editorLayer->onDrawGui();
 		imguiLayer->render();
+		logicalDevice->waitIdle();
 
 		bool needReize = editorLayer->mainViewport.getNeedResize();
 		if(needReize)

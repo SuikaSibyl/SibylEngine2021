@@ -124,12 +124,8 @@ namespace SIByL::RHI
 		renderPassInfo.framebuffer = *static_cast<IFramebufferVK*>(framebuffer)->getVkFramebuffer();
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = VkExtent2D{ width, height };
-
-		if (clear)
-		{
-			renderPassInfo.clearValueCount = static_cast<IRenderPassVK*>(render_pass)->getVkClearValueSize();
-			renderPassInfo.pClearValues = static_cast<IRenderPassVK*>(render_pass)->getVkClearValues();
-		}
+		renderPassInfo.pClearValues = static_cast<IRenderPassVK*>(render_pass)->getVkClearValues();
+		renderPassInfo.clearValueCount = static_cast<IRenderPassVK*>(render_pass)->getVkClearValueSize();
 
 		vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 	}

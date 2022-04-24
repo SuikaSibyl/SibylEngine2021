@@ -140,7 +140,8 @@ namespace SIByL::GFX::RDG
 					newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
 
 					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT;
-					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : 
+						(uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
 				}
 				// RENDER_TARGET -> STORE_READ_WRITE
 				else if (consumeHistory[left].kind == ConsumeKind::RENDER_TARGET && consumeHistory[right].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
@@ -254,7 +255,8 @@ namespace SIByL::GFX::RDG
 					newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
 
 					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
-					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : 
+						(uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
 				}
 				// RENDER_TARGET -> RENDER_TARGET
 				else if (consumeHistory[left].kind == ConsumeKind::RENDER_TARGET && consumeHistory[right].kind == ConsumeKind::RENDER_TARGET)
@@ -269,7 +271,7 @@ namespace SIByL::GFX::RDG
 					newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
 
 					srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
 				}
 				else
 				{

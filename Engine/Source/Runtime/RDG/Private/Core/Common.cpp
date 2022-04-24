@@ -4,6 +4,7 @@ module;
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <algorithm>
 #include <string_view>
 module GFX.RDG.Common;
 import Core.BitFlag;
@@ -114,7 +115,7 @@ namespace SIByL::GFX::RDG
 			{
 				RHI::SampleCount::COUNT_1_BIT,
 				rg->getColorBufferNode(handles[i])->format,
-				RHI::AttachmentLoadOp::CLEAR,
+				(std::find(unclearHandles.begin(),unclearHandles.end(),handles[i]) == unclearHandles.end()) ? RHI::AttachmentLoadOp::CLEAR : RHI::AttachmentLoadOp::LOAD,
 				RHI::AttachmentStoreOp::STORE,
 				RHI::AttachmentLoadOp::DONT_CARE,
 				RHI::AttachmentStoreOp::DONT_CARE,
@@ -129,8 +130,8 @@ namespace SIByL::GFX::RDG
 			{
 				RHI::SampleCount::COUNT_1_BIT,
 				RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT,
-				RHI::AttachmentLoadOp::CLEAR,
-				RHI::AttachmentStoreOp::DONT_CARE,
+				(std::find(unclearHandles.begin(),unclearHandles.end(),handles.back()) == unclearHandles.end()) ? RHI::AttachmentLoadOp::CLEAR : RHI::AttachmentLoadOp::LOAD,
+				RHI::AttachmentStoreOp::STORE,
 				RHI::AttachmentLoadOp::DONT_CARE,
 				RHI::AttachmentStoreOp::DONT_CARE,
 				RHI::ImageLayout::UNDEFINED,

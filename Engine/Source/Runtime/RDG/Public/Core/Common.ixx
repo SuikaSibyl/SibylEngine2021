@@ -249,6 +249,7 @@ namespace SIByL::GFX::RDG
 
 		uint32_t colorAttachCount = 0;
 		uint32_t depthAttachCount = 0;
+		std::vector<NodeHandle> unclearHandles = {};
 
 		MemScope<RHI::IRenderPass> renderPass;
 		MemScope<RHI::IFramebuffer> framebuffer;

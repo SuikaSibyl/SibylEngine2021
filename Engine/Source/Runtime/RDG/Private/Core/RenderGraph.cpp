@@ -409,11 +409,12 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
-	auto RenderGraphBuilder::addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment) noexcept -> NodeHandle
+	auto RenderGraphBuilder::addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment, std::vector<NodeHandle> const& unclear) noexcept -> NodeHandle
 	{
 		MemScope<FramebufferContainer> fbc = MemNew<FramebufferContainer>();
 		fbc->colorAttachCount = color_attachments.size();
 		fbc->depthAttachCount = (depth_attachment == 0) ? 0 : 1;
+		fbc->unclearHandles = unclear;
 		fbc->handles.resize(fbc->colorAttachCount + fbc->depthAttachCount);
 		for (int i = 0; i < fbc->colorAttachCount; i++)
 		{
@@ -696,12 +697,12 @@ namespace SIByL::GFX::RDG
 	}
 
 
-	auto RenderGraphWorkshop::addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> void
+	auto RenderGraphWorkshop::addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> RasterPassScope*
 	{
 		if (renderGraph.rasterPassRegister.find(pass) != renderGraph.rasterPassRegister.end())
 		{
 			SE_CORE_ERROR("RDG :: Render Graph Workshop :: addRasterPassScope() pass name \'{0}\' duplicated !", pass);
-			return;
+			return nullptr;
 		}
 		// create RasterPassScope
 		MemScope<RasterPassScope> rps = MemNew<RasterPassScope>();
@@ -712,6 +713,7 @@ namespace SIByL::GFX::RDG
 		NodeHandle handle = renderGraph.registry.registNode(std::move(rps));
 		renderGraph.rasterPassRegister.emplace(pass, handle);
 		renderGraph.passList.emplace_back(handle);
+		return (RasterPassScope*)(renderGraph.registry.getNode(handle));
 	}
 
 	auto RenderGraphWorkshop::addRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*
