@@ -36,7 +36,7 @@
     <ClCompile Include="Public\Components\Mesh.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\PostProcessing\AcesBloom.ixx">
+    <ClCompile Include="Public\Pipeline\PostProcessing\AcesBloom.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\Components\Transform.ixx">
@@ -58,6 +58,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Public\NoneComponents\Texture.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Public\Pipeline\Compute\HiZAgency.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

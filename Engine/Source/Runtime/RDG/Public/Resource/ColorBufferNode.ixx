@@ -24,6 +24,7 @@ namespace SIByL::GFX::RDG
 		virtual auto rereference(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 
 		virtual auto onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
+		uint32_t mipLevels = 1;
 
 		bool hasDepth = false;
 		bool hasStencil = false;

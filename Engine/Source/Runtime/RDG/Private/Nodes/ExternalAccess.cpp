@@ -19,7 +19,7 @@ namespace SIByL::GFX::RDG
 		for (auto iter : externalAccessMap)
 		{
 			auto resourceNode = rg->getResourceNode(iter.second.resourceHandle);
-			resourceNode->consumeHistory.emplace_back
+			resourceNode->getConsumeHistory().emplace_back
 				(ConsumeHistory{ handle, iter.second.consumeKind });
 		}
 	}

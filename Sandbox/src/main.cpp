@@ -93,6 +93,8 @@ import GFX.PostProcessing.AcesBloom;
 import GFX.Renderer;
 import GFX.RDG.RasterNodes;
 import GFX.RDG.ExternalAccess;
+import GFX.RDG.Agency;
+import GFX.HiZAgency;
 
 import UAT.IUniversalApplication;
 
@@ -278,6 +280,10 @@ public:
 				// Add Materials
 				auto only_mat_scope = workshop.addRasterMaterialScope("Pre-Z Pass", "Opaque", "Only");
 			}
+
+			// Compute HiZ Pass
+			auto hiz_agency = GFX::HiZAgency::createInstance(srgb_depth_attachment, resourceFactory.get());
+			workshop.addAgency(std::move(hiz_agency));
 
 			// Raster Pass "Opaque Pass"
 			auto forward_pass = workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);

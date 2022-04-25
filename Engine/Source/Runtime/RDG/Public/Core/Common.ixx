@@ -174,7 +174,15 @@ namespace SIByL::GFX::RDG
 		}
 
 		std::vector<ConsumeHistory> consumeHistoryOnetime;
+		auto getConsumeHistory() noexcept -> std::vector<ConsumeHistory>&
+		{
+			if (attributes & (uint32_t)(NodeAttrbutesFlagBits::REFERENCE))
+				return *consumeHistoryRef;
+			else
+				return consumeHistory;
+		};
 		std::vector<ConsumeHistory> consumeHistory;
+		std::vector<ConsumeHistory>* consumeHistoryRef = nullptr;
 		std::vector<std::pair<uint32_t, BarrierHandle>> createdBarriers;
 	};
 

@@ -877,6 +877,25 @@ namespace SIByL::RHI
 		return tv;
 	}
 
+	auto IResourceFactory::createTextureView(ITexture* texture, ImageSubresourceRange const& range) noexcept -> MemScope<ITextureView>
+	{
+		MemScope<ITextureView> tv = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<ITextureViewVK> tv_vk = MemNew<ITextureViewVK>(texture, (ILogicalDeviceVK*)logicalDevice, range);
+			tv = MemCast<ITextureView>(tv_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return tv;
+	}
+
 	auto IResourceFactory::createSampler(SamplerDesc const& desc) noexcept -> MemScope<ISampler>
 	{
 		MemScope<ISampler> sampler = nullptr;

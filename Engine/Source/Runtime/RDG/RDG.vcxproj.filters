@@ -96,5 +96,8 @@
     <ClCompile Include="Private\Nodes\ComputeSeries.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Core\Agency.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

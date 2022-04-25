@@ -130,7 +130,7 @@ namespace SIByL::GFX::RDG
 			{
 			case NodeDetailedType::STORAGE_BUFFER:
 			{
-				rg->getResourceNode(resources[i])->consumeHistory.emplace_back
+				rg->getResourceNode(resources[i])->getConsumeHistory().emplace_back
 				(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
 			}
 			break;
@@ -138,13 +138,13 @@ namespace SIByL::GFX::RDG
 				break;
 			case NodeDetailedType::SAMPLER:
 			{
-				rg->getTextureBufferNode(sampled_textures[textureIdx++])->consumeHistory.emplace_back
+				rg->getTextureBufferNode(sampled_textures[textureIdx++])->getConsumeHistory().emplace_back
 				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
 			}
 			break;
 			case NodeDetailedType::COLOR_TEXTURE:
 			{
-				rg->getTextureBufferNode(resources[i])->consumeHistory.emplace_back
+				rg->getTextureBufferNode(resources[i])->getConsumeHistory().emplace_back
 				(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
 			}
 			break;

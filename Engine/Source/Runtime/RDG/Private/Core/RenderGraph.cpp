@@ -531,6 +531,11 @@ namespace SIByL::GFX::RDG
 	// ==============================================================================================
 	// ==============================================================================================
 	// ==============================================================================================
+	auto RenderGraphWorkshop::addAgency(MemScope<Agency>&& agency) noexcept -> void
+	{
+		agency->onRegister(this);
+		renderGraph.agencies.emplace_back(std::move(agency));
+	}
 
 	auto RenderGraphWorkshop::build(RHI::IResourceFactory* factory, uint32_t const& width, uint32_t const& height) noexcept -> void
 	{
@@ -547,6 +552,12 @@ namespace SIByL::GFX::RDG
 		descriptor_pool_desc.typeAndCount.emplace_back(RHI::DescriptorType::STORAGE_IMAGE, 1000);
 		renderGraph.descriptorPool = factory->createDescriptorPool(descriptor_pool_desc);
 
+		// agency before compile
+		for (auto& agency : renderGraph.agencies)
+		{
+			agency->startWorkshopBuild(this);
+			agency->beforeCompile();
+		}
 		// clear barriers
 		renderGraph.barrierPool.barriers.clear();
 		// compile resources
@@ -559,6 +570,9 @@ namespace SIByL::GFX::RDG
 		// devirtualize resources
 		for (auto iter = renderGraph.resources.begin(); iter != renderGraph.resources.end(); iter++)
 			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
+		// agency before devirtualize passes
+		for (auto& agency : renderGraph.agencies)
+			agency->beforeDivirtualizePasses();
 		// devirtualize passes
 		for (auto iter = renderGraph.passList.begin(); iter != renderGraph.passList.end(); iter++)
 			renderGraph.registry.getNode((*iter))->devirtualize((void*)&renderGraph, factory);
@@ -682,14 +696,38 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
+	auto RenderGraphWorkshop::addColorBuffer(RHI::ResourceFormat format, float const& rel_width, float const& rel_height, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<ColorBufferNode> cbn = MemNew<ColorBufferNode>(format, rel_width, rel_height);
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
 	auto RenderGraphWorkshop::addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view, std::string const& name, bool present) noexcept -> NodeHandle
 	{
 		MemScope<ColorBufferNode> cbn = MemNew<ColorBufferNode>();
 		cbn->attributes |= addBit(NodeAttrbutesFlagBits::PLACEHOLDER);
 		cbn->texture.ref = texture;
 		cbn->textureView.ref = view;
-		cbn->format = texture->getDescription().format;
+		if(texture) cbn->format = texture->getDescription().format;
 		if (present) cbn->attributes |= (uint32_t)NodeAttrbutesFlagBits::PRESENT;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
+		renderGraph.resources.emplace_back(handle);
+		renderGraph.tag(handle, name);
+		return handle;
+	}
+
+	auto RenderGraphWorkshop::addColorBufferRef(RHI::ITexture* texture, RHI::ITextureView* view, NodeHandle origin, std::string const& name) noexcept -> NodeHandle
+	{
+		MemScope<ColorBufferNode> cbn = MemNew<ColorBufferNode>();
+		ResourceNode* origin_resource = getNode<ResourceNode>(origin);
+		cbn->attributes |= addBit(NodeAttrbutesFlagBits::PLACEHOLDER) | addBit(NodeAttrbutesFlagBits::REFERENCE);
+		cbn->texture.ref = texture;
+		cbn->textureView.ref = view;
+		cbn->consumeHistoryRef = &(origin_resource->consumeHistory);
+		if (texture) cbn->format = texture->getDescription().format;
 		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
 		renderGraph.resources.emplace_back(handle);
 		renderGraph.tag(handle, name);

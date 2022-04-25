@@ -166,12 +166,12 @@ namespace SIByL::GFX::RDG
 		RenderGraph* rg = (RenderGraph*)graph;
 		for (auto iter = rg->resources.begin(); iter != rg->resources.end(); iter++)
 		{
-			if (rg->getResourceNode((*iter))->consumeHistory.back().pass == scopeBeginHandle)
+			if (rg->getResourceNode((*iter))->getConsumeHistory().back().pass == scopeBeginHandle)
 			{
-				rg->getResourceNode((*iter))->consumeHistory.pop_back();
+				rg->getResourceNode((*iter))->getConsumeHistory().pop_back();
 			}
 			else
-				rg->getResourceNode((*iter))->consumeHistory.emplace_back(handle, ConsumeKind::MULTI_DISPATCH_SCOPE_END);
+				rg->getResourceNode((*iter))->getConsumeHistory().emplace_back(handle, ConsumeKind::MULTI_DISPATCH_SCOPE_END);
 		}
 	}
 }

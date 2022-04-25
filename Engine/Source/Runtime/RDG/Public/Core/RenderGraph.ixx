@@ -23,6 +23,7 @@ import GFX.RDG.MultiDispatchScope;
 import GFX.RDG.RasterNodes;
 import GFX.RDG.ExternalAccess;
 import GFX.RDG.ComputeSeries;
+import GFX.RDG.Agency;
 
 namespace SIByL::GFX::RDG
 {
@@ -129,6 +130,7 @@ namespace SIByL::GFX::RDG
 
 		auto getRasterPassScope(std::string const& pass) noexcept -> RasterPassScope*;
 
+		std::vector<MemScope<Agency>> agencies;
 		std::vector<NodeHandle> passList;
 		std::unordered_map<std::string, NodeHandle> rasterPassRegister;
 		std::unordered_map<std::string, NodeHandle> computePassRegister;
@@ -144,6 +146,10 @@ namespace SIByL::GFX::RDG
 
 		auto build(RHI::IResourceFactory* factory, uint32_t const& width, uint32_t const& height) noexcept -> void;
 
+		// Agency
+		//------------------------------------------
+		auto addAgency(MemScope<Agency>&& agency) noexcept -> void;
+
 		// Resources
 		//------------------------------------------
 		auto addInternalSampler() noexcept -> void;
@@ -157,7 +163,9 @@ namespace SIByL::GFX::RDG
 		auto addIndirectDrawBufferExt(RHI::IStorageBuffer* external, std::string const& name = "Indirect Draw Buffer Ext Anonymous") noexcept -> NodeHandle;
 		auto addSampler(RHI::SamplerDesc const& desc, std::string const& name = "Sampler Anonymous") noexcept -> NodeHandle;
 		auto addSamplerExt(RHI::ISampler* sampler, std::string const& name = "Sampler Ext Anonymous") noexcept -> NodeHandle;
+		auto addColorBuffer(RHI::ResourceFormat format, float const& rel_width, float const& rel_height, std::string const& name = "Color Buffer Anonymous") noexcept -> NodeHandle;
 		auto addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view, std::string const& name = "Color Buffer Ext Anonymous", bool present = false) noexcept -> NodeHandle;
+		auto addColorBufferRef(RHI::ITexture* texture, RHI::ITextureView* view, NodeHandle origin, std::string const& name = "Color Buffer Ref Anonymous") noexcept -> NodeHandle;
 
 		// Passes
 		//------------------------------------------

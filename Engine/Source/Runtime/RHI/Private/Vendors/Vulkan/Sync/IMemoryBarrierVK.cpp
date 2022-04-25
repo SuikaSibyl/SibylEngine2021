@@ -57,7 +57,7 @@ namespace SIByL::RHI
         barrier.subresourceRange.baseMipLevel = desc.subresourceRange.baseMipLevel;
         barrier.subresourceRange.levelCount = desc.subresourceRange.levelCount;
         barrier.subresourceRange.baseArrayLayer = desc.subresourceRange.baseArrayLayer;
-        barrier.subresourceRange.layerCount = desc.subresourceRange.levelCount;
+        barrier.subresourceRange.layerCount = desc.subresourceRange.layerCount;
         barrier.srcAccessMask = getVkAccessFlags(desc.srcAccessMask);
         barrier.dstAccessMask = getVkAccessFlags(desc.dstAccessMask);
     }

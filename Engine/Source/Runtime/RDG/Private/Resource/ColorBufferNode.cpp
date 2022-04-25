@@ -48,7 +48,8 @@ namespace SIByL::GFX::RDG
 				RHI::SampleCount::COUNT_1_BIT, //SampleCount sampleCount;
 				RHI::ImageLayout::UNDEFINED, //ImageLayout layout;
 				(uint32_t)(render_graph->getDatumWidth() * relWidth), //uint32_t width;
-				(uint32_t)(render_graph->getDatumHeight() * relHeight) //uint32_t height;
+				(uint32_t)(render_graph->getDatumHeight() * relHeight), //uint32_t height;
+				mipLevels // uint32_t mip levels
 				});
 			textureView.scope = factory->createTextureView(getTexture(), usages);
 		}

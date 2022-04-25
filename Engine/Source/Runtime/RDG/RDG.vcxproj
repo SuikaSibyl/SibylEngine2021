@@ -163,6 +163,7 @@
     <ClCompile Include="Private\Core\Common.cpp" />
     <ClCompile Include="Private\Nodes\ComputeSeries.cpp" />
     <ClCompile Include="Private\Nodes\ExternalAccess.cpp" />
+    <ClCompile Include="Public\Core\Agency.ixx" />
     <ClCompile Include="Public\PassNodes\ComputeSeries.ixx" />
     <ClCompile Include="Public\PassNodes\ExternalAccess.ixx" />
     <ClCompile Include="Private\Nodes\RasterSerires.cpp" />

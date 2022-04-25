@@ -20,7 +20,7 @@ namespace SIByL::GFX::RDG
 		RenderGraph* rg = (RenderGraph*)graph;
 		for (auto iter = rg->resources.begin(); iter != rg->resources.end(); iter++)
 		{
-			rg->getResourceNode((*iter))->consumeHistory.emplace_back(handle, ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN);
+			rg->getResourceNode((*iter))->getConsumeHistory().emplace_back(handle, ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN);
 		}
 	}
 }
