@@ -104,6 +104,7 @@ namespace SIByL::GFX::RDG
 
 		virtual auto onFrameStart(void* graph) noexcept -> void {} // optional
 		virtual auto onReDatum(void* graph, RHI::IResourceFactory* factory) noexcept -> void {} // optional
+		virtual auto onDestroy() noexcept -> void {} // optional
 
 		// Debug Print
 		virtual auto onPrint() noexcept -> void;
@@ -132,6 +133,17 @@ namespace SIByL::GFX::RDG
 			nodes[handle] = std::move(cast_node);
 			return handle;
 		}
+
+		auto destroyNode(NodeHandle node) noexcept -> void
+		{
+			auto iter = nodes.find(node);
+			if (iter != nodes.end())
+			{
+				iter->second->onDestroy();
+				nodes.erase(iter);
+			}
+		}
+
 		std::unordered_map<NodeHandle, MemScope<Node>> nodes;
 	};
 
@@ -158,7 +170,10 @@ namespace SIByL::GFX::RDG
 	{
 		NodeHandle pass;
 		ConsumeKind kind;
-		RHI::AccessFlags accessFlags = 0;
+		uint32_t subResourcePara_0 = 0;
+		uint32_t subResourcePara_1 = 1;
+		uint32_t subResourcePara_2 = 0;
+		uint32_t subResourcePara_3 = 1;
 	};
 
 	export using BarrierHandle = uint64_t;
@@ -181,6 +196,13 @@ namespace SIByL::GFX::RDG
 			else
 				return consumeHistory;
 		};
+
+		auto getSignified() noexcept -> ResourceNode*
+		{
+			if (signified == handle) return this;
+			else return (ResourceNode*)(registry->getNode(signified));
+		}
+		NodeHandle signified;
 		std::vector<ConsumeHistory> consumeHistory;
 		std::vector<ConsumeHistory>* consumeHistoryRef = nullptr;
 		std::vector<std::pair<uint32_t, BarrierHandle>> createdBarriers;
@@ -201,11 +223,18 @@ namespace SIByL::GFX::RDG
 
 	// Barrier is managed together
 	// There ref (by handle) will be dispatched to each pass
+	struct BarrierGroup
+	{
+		MemScope<RHI::IBarrier> barrier = nullptr;
+		MemScope<RHI::IBarrier> barrierInit = nullptr;
+		uint32_t attribute;
+	};
+
 	export struct BarrierPool
 	{
-		auto registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle;
+		auto registBarrier(MemScope<RHI::IBarrier>&& barrier, MemScope<RHI::IBarrier>&& firstBarrier) noexcept -> NodeHandle;
 		auto getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*;
-		std::unordered_map<BarrierHandle, MemScope<RHI::IBarrier>> barriers;
+		std::unordered_map<BarrierHandle, BarrierGroup> barriers;
 	};
 
 	export struct PassNode :public Node

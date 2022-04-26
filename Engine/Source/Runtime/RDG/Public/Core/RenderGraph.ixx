@@ -97,6 +97,7 @@ namespace SIByL::GFX::RDG
 
 		auto getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*;
 
+		auto getComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*;
 		auto getRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
 
 		auto getDatumWidth() noexcept -> uint32_t { return datumWidth; }
@@ -204,7 +205,6 @@ namespace SIByL::GFX::RDG
 		auto addColorBufferFlightsExtPresent(std::vector<RHI::ITexture*> const& textures, std::vector<RHI::ITextureView*> const& views) noexcept -> NodeHandle;
 		auto addColorBuffer(RHI::ResourceFormat format, float const& rel_width, float const& rel_height, std::string_view name) noexcept -> NodeHandle;
 		auto addIndirectDrawBuffer(std::string_view name) noexcept -> NodeHandle;
-		auto addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle;
 		auto addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment, std::vector<NodeHandle> const& unclear = {}) noexcept -> NodeHandle;
 		auto addFrameBufferFlightsRef(std::vector<std::pair<std::vector<NodeHandle> const&, NodeHandle>> infos) noexcept -> NodeHandle;
 		auto beginMultiDispatchScope(std::string_view name) noexcept -> NodeHandle;

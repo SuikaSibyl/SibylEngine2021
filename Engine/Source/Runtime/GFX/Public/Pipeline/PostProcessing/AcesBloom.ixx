@@ -29,7 +29,7 @@ namespace SIByL::GFX::PostProcessing
 	export struct AcesBloomProxyUnit :public RDG::ProxyUnit
 	{
 		AcesBloomProxyUnit(RHI::IResourceFactory* factory);
-		virtual auto registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void override;
+		virtual auto registerResources(GFX::RDG::RenderGraphWorkshop& workshop) noexcept -> void override;
 		virtual auto registerComputePasses(GFX::RDG::RenderGraphWorkshop& workshop) noexcept -> void override;
 
 		GFX::RDG::NodeHandle iHdrImage;
@@ -59,22 +59,22 @@ namespace SIByL::GFX::PostProcessing
 		:factory(factory)
 	{}
 
-	auto AcesBloomProxyUnit::registerResources(GFX::RDG::RenderGraphBuilder* builder) noexcept -> void
+	auto AcesBloomProxyUnit::registerResources(GFX::RDG::RenderGraphWorkshop& workshop) noexcept -> void
 	{
-		bloomExtract = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f, 1.f, "Bloom Extract Image");
-		ldrImage = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "LDR Image");
-		bloomCombined = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "Combined Image");
+		bloomExtract = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f, 1.f, "Bloom Extract Image");
+		ldrImage = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "LDR Image");
+		bloomCombined = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM, 1.f, 1.f, "Combined Image");
 
-		bloom_00 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f, "Bloom 00 Image");
-		bloom_01 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f, "Bloom 01 Image");
-		bloom_10 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f, "Bloom 10 Image");
-		bloom_11 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f, "Bloom 11 Image");
-		bloom_20 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f, "Bloom 20 Image");
-		bloom_21 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f, "Bloom 21 Image");
-		bloom_30 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16, "Bloom 30 Image");
-		bloom_31 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16, "Bloom 31 Image");
-		bloom_40 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32, "Bloom 40 Image");
-		bloom_41 = builder->addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32, "Bloom 41 Image");
+		bloom_00 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f, "Bloom 00 Image");
+		bloom_01 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.5f, 0.5f, "Bloom 01 Image");
+		bloom_10 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f, "Bloom 10 Image");
+		bloom_11 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.25f, 0.25f, "Bloom 11 Image");
+		bloom_20 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f, "Bloom 20 Image");
+		bloom_21 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 0.125f, 0.125f, "Bloom 21 Image");
+		bloom_30 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16, "Bloom 30 Image");
+		bloom_31 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 16, 1.f / 16, "Bloom 31 Image");
+		bloom_40 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32, "Bloom 40 Image");
+		bloom_41 = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32, 1.f / 32, 1.f / 32, "Bloom 41 Image");
 	}
 
 	struct Size

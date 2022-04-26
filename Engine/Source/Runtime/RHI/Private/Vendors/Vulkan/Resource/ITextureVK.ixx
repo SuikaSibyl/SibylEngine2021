@@ -26,7 +26,7 @@ namespace SIByL
 			virtual ~ITextureVK();
 
 			virtual auto getNativeHandle() noexcept -> uint64_t override;
-			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void override;
+			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout, ImageSubresourceRange range = { 0,0,0,0,0 }) noexcept -> void override;
 			auto getVkImage() noexcept -> VkImage* { return &image; }
 			virtual auto getDescription() noexcept -> TextureDesc const& override { return desc; }
 			

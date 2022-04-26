@@ -4,6 +4,7 @@ module;
 #include <vector>
 #include <string>
 #include <functional>
+#include <algorithm>
 #include <glm/glm.hpp>
 export module GFX.HiZAgency;
 import Core.Buffer;
@@ -15,9 +16,10 @@ import GFX.RDG.Common;
 import GFX.RDG.Agency;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.ColorBufferNode;
+import GFX.RDG.ComputeSeries;
 
 #define GRIDSIZE(x,ThreadSize) ((x+ThreadSize - 1)/ThreadSize)
-
+#define MAX(a,b) ((a)>(b)?(a):(b))
 namespace SIByL::GFX
 {
 	export struct HiZAgency :public RDG::Agency
@@ -39,6 +41,7 @@ namespace SIByL::GFX
 		MemScope<RHI::ITextureView> depthSampleView = nullptr;
 		std::vector<MemScope<RHI::ITextureView>> mipmapTextureViews;
 		std::vector<GFX::RDG::NodeHandle> mipmapColorBufferExt;
+		std::vector<GFX::RDG::ComputeMaterialScope*> minPoolingMaterials;
 	};
 
 	auto HiZAgency::createInstance(GFX::RDG::NodeHandle depthInputHandle, RHI::IResourceFactory* factory) noexcept -> MemScope<RDG::Agency>
@@ -59,25 +62,34 @@ namespace SIByL::GFX
 		auto HiZ_node = workshop->getNode<GFX::RDG::ColorBufferNode>(HiZ_handle);
 		HiZ_node->mipLevels = 0;
 
+		// invalid hiz hierarchy views
+		if (mipmapColorBufferExt.size() == 0)
+		{
+			auto ext_handle = workshop->addColorBufferRef(nullptr, nullptr, HiZ_handle, "HiZ SubResource-" + std::to_string(0));
+			mipmapColorBufferExt.emplace_back(ext_handle);
+			GFX::RDG::TextureBufferNode* texture_buffer_node = workshop->getNode<GFX::RDG::TextureBufferNode>(mipmapColorBufferExt[0]);
+			texture_buffer_node->baseMipLevel = 0;
+			texture_buffer_node->levelCount = 1;
+		}
+
 		// Add Depth Sample View
 		depthSampleHandle = workshop->addColorBufferRef(nullptr, nullptr, depthInputHandle, "Depth Buffer Sample Ref");
 		workshop->getNode<GFX::RDG::ColorBufferNode>(depthSampleHandle)->format = RHI::ResourceFormat::FORMAT_R32_SFLOAT;
 
-		// Add Copu Pass
-				// ACES Pipeline
+		// Add Copy Pipeline
 		GFX::RDG::ComputePipelineScope* copy_pipeline = workshop->addComputePipelineScope("HiZ Pass", "Copy Pipeline");
 		{
 			copy_pipeline->shaderComp = factory->createShaderFromBinaryFile("hiz/copy.spv", { RHI::ShaderStage::COMPUTE,"main" });
 			// Add Materials "Common"
 			{
 				auto copy_mat_scope = workshop->addComputeMaterialScope("HiZ Pass", "Copy Pipeline", "Common");
-				copy_mat_scope->resources = { workshop->getInternalSampler("Default Sampler"), HiZ_handle };
+				copy_mat_scope->resources = { workshop->getInternalSampler("Default Sampler"), mipmapColorBufferExt[0] };
 				copy_mat_scope->sampled_textures = { depthSampleHandle };
 
 				auto copy_dispatch_scope = workshop->addComputeDispatch("HiZ Pass", "Copy Pipeline", "Common", "Only");
 				copy_dispatch_scope->pushConstant = [rdg = &(workshop->renderGraph)](Buffer& buffer) {
 					float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
-					glm::uvec2 size = { screenX,screenY };
+					glm::vec2 size = { screenX,screenY };
 					buffer = std::move(Buffer(sizeof(size), 1));
 					memcpy(buffer.getData(), &size, sizeof(size));
 				};
@@ -88,6 +100,12 @@ namespace SIByL::GFX
 					z = 1;
 				};
 			}
+		}
+
+		// Add Pooling Pipeline
+		GFX::RDG::ComputePipelineScope* pooling_pipeline = workshop->addComputePipelineScope("HiZ Pass", "Pooling Pipeline");
+		{
+			pooling_pipeline->shaderComp = factory->createShaderFromBinaryFile("hiz/pooling.spv", { RHI::ShaderStage::COMPUTE,"main" });
 		}
 	}
 
@@ -103,6 +121,66 @@ namespace SIByL::GFX
 		// get mipmap count
 		mipmapCount = static_cast<uint32_t>(std::floor(std::log2(std::max(workshop->renderGraph.datumWidth, workshop->renderGraph.datumHeight)))) + 1;;
 		mipmapTextureViews.clear();
+
+		// invalid hiz hierarchy views
+		for (int i = 0; i < mipmapCount; i++)
+		{
+			if (mipmapColorBufferExt.size() <= i)
+			{
+				auto ext_handle = workshop->addColorBufferRef(nullptr, nullptr, HiZ_handle, "HiZ SubResource-" + std::to_string(i));
+				mipmapColorBufferExt.emplace_back(ext_handle);
+				GFX::RDG::TextureBufferNode* texture_buffer_node = workshop->getNode<GFX::RDG::TextureBufferNode>(mipmapColorBufferExt[i]);
+				texture_buffer_node->baseMipLevel = i;
+				texture_buffer_node->levelCount = 1;
+			}
+		}
+
+		// invalid pooling pipeline
+		workshop->renderGraph.getComputePipelineScope("HiZ Pass", "Pooling Pipeline")->clearAllMaterials();
+		minPoolingMaterials.clear();
+		float multi = 1;
+		for (int i = 0; i < mipmapCount - 1; i++)
+		{
+			multi /= 2;
+			auto pooling_mat_scope = workshop->addComputeMaterialScope("HiZ Pass", "Pooling Pipeline", "Mipmap" + std::to_string(i));
+			minPoolingMaterials.emplace_back(pooling_mat_scope);
+
+			minPoolingMaterials[i]->resources = { workshop->getInternalSampler("Default Sampler"), mipmapColorBufferExt[i + 1] };
+			minPoolingMaterials[i]->sampled_textures = { mipmapColorBufferExt[i] };
+
+			auto min_pooling_dispatch_scope = workshop->addComputeDispatch("HiZ Pass", "Pooling Pipeline", "Mipmap" + std::to_string(i), "Only");
+			min_pooling_dispatch_scope->pushConstant = [multi = multi, rdg = &(workshop->renderGraph)](Buffer& buffer) {
+				float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
+				glm::vec2 size = { (unsigned int)MAX(uint32_t(multi * screenX), 1),(unsigned int)MAX(uint32_t(multi * screenY), 1) };
+				buffer = std::move(Buffer(sizeof(size), 1));
+				memcpy(buffer.getData(), &size, sizeof(size));
+			};
+			min_pooling_dispatch_scope->customSize = [multi = multi, rdg = &(workshop->renderGraph)](uint32_t& x, uint32_t& y, uint32_t& z) {
+				float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
+				x = GRIDSIZE(MAX(uint32_t(multi * screenX), 1), 32);
+				y = GRIDSIZE(MAX(uint32_t(multi * screenY), 1), 32);
+				z = 1;
+			};
+		}
+			//auto pooling_mat_scope = workshop->addComputeMaterialScope("HiZ Pass", "Pooling Pipeline", "Common");
+			//pooling_mat_scope->resources = { workshop->getInternalSampler("Default Sampler"), HiZ_handle };
+			//pooling_mat_scope->sampled_textures = { depthSampleHandle };
+
+			//auto copy_dispatch_scope = workshop->addComputeDispatch("HiZ Pass", "Pooling Pipeline", "Common", "Only");
+			//copy_dispatch_scope->pushConstant = [rdg = &(workshop->renderGraph)](Buffer& buffer) {
+			//	float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
+			//	glm::vec2 size = { screenX,screenY };
+			//	buffer = std::move(Buffer(sizeof(size), 1));
+			//	memcpy(buffer.getData(), &size, sizeof(size));
+			//};
+			//copy_dispatch_scope->customSize = [rdg = &(workshop->renderGraph)](uint32_t& x, uint32_t& y, uint32_t& z) {
+			//	float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
+			//	x = GRIDSIZE(screenX, 32);
+			//	y = GRIDSIZE(screenY, 32);
+			//	z = 1;
+			//};
+		//}
+
 	}
 	
 	auto HiZAgency::beforeDivirtualizePasses() noexcept -> void
@@ -136,17 +214,9 @@ namespace SIByL::GFX
 				1
 			};
 			mipmapTextureViews.emplace_back(factory->createTextureView(texture, range));
-			if (mipmapColorBufferExt.size() <= i)
-			{
-				auto ext_handle = workshop->addColorBufferExt(texture, mipmapTextureViews[i].get(), "HiZ SubResource-" + std::to_string(i));
-				mipmapColorBufferExt.emplace_back(ext_handle);
-			}
-			else
-			{
-				auto ext_node = workshop->getNode<GFX::RDG::ColorBufferNode>(mipmapColorBufferExt[i]);
-				ext_node->texture.ref = texture;
-				ext_node->textureView.ref = mipmapTextureViews[i].get();
-			}
+			auto ext_node = workshop->getNode<GFX::RDG::ColorBufferNode>(mipmapColorBufferExt[i]);
+			ext_node->texture.ref = texture;
+			ext_node->textureView.ref = mipmapTextureViews[i].get();
 		}
 
 		// create copy pass

@@ -22,6 +22,11 @@ namespace SIByL::GFX::RDG
 		RHI::ResourceFormat format;
 		RHI::ImageUsageFlags usages = 0;
 
+		uint32_t baseMipLevel = 0;
+		uint32_t levelCount = -1;
+		uint32_t baseArrayLayer = 0;
+		uint32_t layerCount = 1;
+
 		TolerantPtr<RHI::ITexture> texture;
 		TolerantPtr<RHI::ITextureView> textureView;
 	};

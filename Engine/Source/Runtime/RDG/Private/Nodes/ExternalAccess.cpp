@@ -18,9 +18,29 @@ namespace SIByL::GFX::RDG
 
 		for (auto iter : externalAccessMap)
 		{
-			auto resourceNode = rg->getResourceNode(iter.second.resourceHandle);
-			resourceNode->getConsumeHistory().emplace_back
-				(ConsumeHistory{ handle, iter.second.consumeKind });
+			auto handle = iter.second.resourceHandle;
+			switch (rg->getResourceNode(handle)->type)
+			{
+			case NodeDetailedType::STORAGE_BUFFER:
+			{
+				rg->getResourceNode(handle)->getConsumeHistory().emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::BUFFER_READ_WRITE });
+			}
+			break;
+			case NodeDetailedType::COLOR_TEXTURE:
+			{
+				TextureBufferNode* texture_node = rg->getTextureBufferNode(handle);
+				texture_node->getConsumeHistory().emplace_back
+				(ConsumeHistory{ this->handle, iter.second.consumeKind,
+					texture_node->baseMipLevel,
+					texture_node->levelCount,
+					texture_node->baseArrayLayer,
+					texture_node->layerCount });
+			}
+			break;
+			default:
+				break;
+			}
 		}
 	}
 

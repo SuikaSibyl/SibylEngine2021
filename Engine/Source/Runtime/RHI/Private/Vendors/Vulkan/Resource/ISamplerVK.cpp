@@ -8,7 +8,23 @@ import RHI.IPhysicalDevice.VK;
 
 namespace SIByL::RHI
 {
+	auto decode(MipmapMode mipmapMode) noexcept -> VkSamplerMipmapMode
+	{
+		switch (mipmapMode)
+		{
+		case SIByL::RHI::MipmapMode::NEAREST:
+			return VK_SAMPLER_MIPMAP_MODE_NEAREST;
+			break;
+		case SIByL::RHI::MipmapMode::LINEAR:
+			return VK_SAMPLER_MIPMAP_MODE_LINEAR;
+			break;
+		default:
+			break;
+		}
+	}
+
 	void createTextureSampler(
+		SamplerDesc const& desc,
 		VkSampler* texture_sampler,
 		ILogicalDeviceVK* logical_device
 	) {
@@ -28,10 +44,20 @@ namespace SIByL::RHI
 		samplerInfo.unnormalizedCoordinates = VK_FALSE;
 		samplerInfo.compareEnable = VK_FALSE;
 		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerInfo.mipmapMode = decode(desc.mipmapMode);
 		samplerInfo.mipLodBias = 0.0f;
-		samplerInfo.minLod = 0.0f;
-		samplerInfo.maxLod = 0.0f;
+		samplerInfo.minLod = (float)desc.minLod;
+		samplerInfo.maxLod = (float)desc.maxLod;
+		
+		// optional extension
+		VkSamplerReductionModeCreateInfoEXT createInfoReduction = {};
+		createInfoReduction.sType = VK_STRUCTURE_TYPE_SAMPLER_REDUCTION_MODE_CREATE_INFO_EXT;
+		if (desc.extension == Extension::MIN_POOLING)
+		{
+			//add a extension struct to enable Min mode
+			createInfoReduction.reductionMode = VK_SAMPLER_REDUCTION_MODE_MIN;
+			samplerInfo.pNext = &createInfoReduction;
+		}
 
 		if (vkCreateSampler(logical_device->getDeviceHandle(), &samplerInfo, nullptr, texture_sampler) != VK_SUCCESS) {
 			SE_CORE_ERROR("VULKAN :: failed to create texture sampler!");
@@ -41,7 +67,7 @@ namespace SIByL::RHI
 	ISamplerVK::ISamplerVK(SamplerDesc const& desc, ILogicalDeviceVK* logical_device)
 		: logicalDevice(logical_device)
 	{
-		createTextureSampler(&textureSampler, logicalDevice);
+		createTextureSampler(desc, &textureSampler, logicalDevice);
 	}
 
 	ISamplerVK::~ISamplerVK()

@@ -27,9 +27,6 @@
     <ClCompile Include="Public\Resource\ColorBufferNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Public\Resource\DepthBufferNode.ixx">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Public\Resource\IndirectDrawBufferNode.ixx">
       <Filter>源文件</Filter>
     </ClCompile>

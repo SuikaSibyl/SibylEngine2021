@@ -120,7 +120,7 @@ namespace SIByL::GFX::RDG
 		{
 			ResourceNode* resource = rg->getResourceNode(resources[j]);
 			if (resource->type == NodeDetailedType::COLOR_TEXTURE)
-				rg->getColorBufferNode(resources[j])->usages |= (uint32_t)RHI::ImageUsageFlagBits::STORAGE_BIT;
+				((ColorBufferNode*)(rg->getColorBufferNode(resources[j])->getSignified()))->usages |= (uint32_t)RHI::ImageUsageFlagBits::STORAGE_BIT;
 		}
 		// Add History
 		unsigned textureIdx = 0;
@@ -137,15 +137,26 @@ namespace SIByL::GFX::RDG
 			case NodeDetailedType::UNIFORM_BUFFER:
 				break;
 			case NodeDetailedType::SAMPLER:
-			{
-				rg->getTextureBufferNode(sampled_textures[textureIdx++])->getConsumeHistory().emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+			{				
+				TextureBufferNode* texture_node = rg->getTextureBufferNode(sampled_textures[textureIdx++]);
+				texture_node->getConsumeHistory().emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE,
+					texture_node->baseMipLevel,
+					texture_node->levelCount,
+					texture_node->baseArrayLayer,
+					texture_node->layerCount });
 			}
 			break;
 			case NodeDetailedType::COLOR_TEXTURE:
 			{
-				rg->getTextureBufferNode(resources[i])->getConsumeHistory().emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
+				TextureBufferNode* texture_node = rg->getTextureBufferNode(resources[i]);
+
+				texture_node->getConsumeHistory().emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE,
+					texture_node->baseMipLevel,
+					texture_node->levelCount,
+					texture_node->baseArrayLayer,
+					texture_node->layerCount });
 			}
 			break;
 			default:
@@ -174,6 +185,16 @@ namespace SIByL::GFX::RDG
 			ComputeDispatch* dispatch = (ComputeDispatch*)render_graph->registry.getNode(handle);
 			dispatch->onCommandRecord(commandbuffer, flight);
 		}
+	}
+
+	auto ComputeMaterialScope::onDestroy() noexcept -> void
+	{
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		for (auto& handle : dispatches)
+		{
+			render_graph->registry.destroyNode(handle);
+		}
+		dispatches.clear();
 	}
 
 	// ===========================================================
@@ -230,6 +251,17 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
+	auto ComputePipelineScope::clearAllMaterials() noexcept -> void
+	{
+		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		for (auto& material_scope : materialScopes)
+		{
+			render_graph->registry.destroyNode(material_scope);
+		}
+		materialScopes.clear();
+		materialScopesRegister.clear();
+	}
+
 	auto ComputePipelineScope::fillComputeMaterialScopeDesc(ComputeMaterialScope* compute_material, void* graph) noexcept -> void
 	{
 		compute_material->totalResourceNum = totalResourceNum;
@@ -269,7 +301,6 @@ namespace SIByL::GFX::RDG
 	{
 		// push all barriers
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
-		for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
 
 		for (auto handle : pipelineScopes)
 		{
@@ -332,10 +363,13 @@ namespace SIByL::GFX::RDG
 
 			for (int i = 0; i < dispatch_times; i++)
 			{
-				//for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
 				for (auto handle : pipelineScopes)
 				{
 					ComputePipelineScope* pipeline_scope = (ComputePipelineScope*)render_graph->registry.getNode(handle);
+
+					if (handle == pipelineScopes[0] && i == 0)
+						for (auto barrier : pipeline_scope->barriers)
+							commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
 					pipeline_scope->onCommandRecord(commandbuffer, flight);
 				}
 			}

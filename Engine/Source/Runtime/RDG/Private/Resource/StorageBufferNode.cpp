@@ -118,7 +118,9 @@ namespace SIByL::GFX::RDG
 						{}
 						});
 
-					BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(barrier));
+					MemScope<RHI::IBarrier> barrierInit = nullptr;
+
+					BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(barrier), std::move(barrierInit));
 					rg->getPassNode(consumeHistory[i].pass)->barriers.emplace_back(barrier_handle);
 				}
 

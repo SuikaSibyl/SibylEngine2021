@@ -64,16 +64,26 @@ namespace SIByL::GFX::RDG
 		}
 	}
 
-	auto BarrierPool::registBarrier(MemScope<RHI::IBarrier>&& barrier) noexcept -> NodeHandle
+	auto BarrierPool::registBarrier(MemScope<RHI::IBarrier>&& barrier, MemScope<RHI::IBarrier>&& firstBarrier) noexcept -> NodeHandle
 	{
 		uint64_t uid = ECS::UniqueID::RequestUniqueID();
-		barriers[uid] = std::move(barrier);
+		uint32_t attribute = firstBarrier.get() == nullptr ? 0 : 2;
+		while (barriers.find(uid) != barriers.end())
+		{
+			uid = ECS::UniqueID::RequestUniqueID();
+		}
+		barriers[uid] = std::move(BarrierGroup{ std::move(barrier), std::move(firstBarrier), attribute });
 		return uid;
 	}
 
 	auto BarrierPool::getBarrier(NodeHandle handle) noexcept -> RHI::IBarrier*
 	{
-		return barriers[handle].get();
+		if (barriers[handle].attribute == 2)
+		{
+			barriers[handle].attribute = 1;
+			return barriers[handle].barrierInit.get();
+		}
+		return barriers[handle].barrier.get();
 	}
 
 	auto FramebufferContainer::getWidth() noexcept -> uint32_t 

@@ -169,7 +169,7 @@ namespace SIByL::RHI
 		return (format == ResourceFormat::FORMAT_D32_SFLOAT_S8_UINT || format == ResourceFormat::FORMAT_D24_UNORM_S8_UINT);
 	}
 
-	auto ITextureVK::transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void
+	auto ITextureVK::transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout, ImageSubresourceRange range) noexcept -> void
 	{
 		// get stage mask
 		AccessFlags srcAccessMask = 0;
@@ -194,7 +194,7 @@ namespace SIByL::RHI
 		}
 		else if (old_layout == ImageLayout::UNDEFINED && new_layout == ImageLayout::SHADER_READ_ONLY_OPTIMAL) {
 			srcAccessMask = 0;
-			dstAccessMask = (uint32_t)AccessFlagBits::SHADER_READ_BIT;
+			dstAccessMask = (uint32_t)AccessFlagBits::SHADER_READ_BIT | (uint32_t)AccessFlagBits::SHADER_WRITE_BIT;
 
 			sourceStage = (uint32_t)PipelineStageFlagBits::TOP_OF_PIPE_BIT;
 			destinationStage = (uint32_t)PipelineStageFlagBits::ALL_COMMANDS_BIT;
@@ -251,15 +251,19 @@ namespace SIByL::RHI
 		MemScope<ICommandBuffer> commandbuffer = global->getResourceFactory()->createCommandBuffer(transientPool);
 		commandbuffer->beginRecording((uint32_t)CommandBufferUsageFlagBits::ONE_TIME_SUBMIT_BIT);
 
-		MemScope<IImageMemoryBarrier> image_memory_barrier = global->getResourceFactory()->createImageMemoryBarrier({
-			this, //ITexture* image;
-			ImageSubresourceRange{
+		if (range == ImageSubresourceRange{ 0,0,0,0,0 })
+			range = { 
 				aspectMask,
 				0,
 				desc.mipLevels,
 				0,
-				1
-			},//ImageSubresourceRange subresourceRange;
+				1};
+		if (range.aspectMask == 0)
+			range.aspectMask = aspectMask;
+
+		MemScope<IImageMemoryBarrier> image_memory_barrier = global->getResourceFactory()->createImageMemoryBarrier({
+			this, //ITexture* image;
+			range,//ImageSubresourceRange subresourceRange;
 			srcAccessMask, //AccessFlags srcAccessMask;
 			dstAccessMask, //AccessFlags dstAccessMask;
 			old_layout, // old Layout

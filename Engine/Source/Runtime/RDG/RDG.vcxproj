@@ -182,7 +182,6 @@
     <ClCompile Include="Public\Pass\RasterPassNode.ixx" />
     <ClCompile Include="Public\Core\RenderGraph.ixx" />
     <ClCompile Include="Public\Resource\ColorBufferNode.ixx" />
-    <ClCompile Include="Public\Resource\DepthBufferNode.ixx" />
     <ClCompile Include="Public\Resource\IndirectDrawBufferNode.ixx" />
     <ClCompile Include="Public\Resource\SamplerNode.ixx" />
     <ClCompile Include="Public\Resource\StorageBufferNode.ixx" />

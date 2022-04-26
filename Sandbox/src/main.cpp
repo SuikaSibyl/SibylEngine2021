@@ -43,6 +43,7 @@ import Core.Color;
 import Core.Input;
 import Core.Cache;
 import Core.Profiler;
+import Core.String;
 
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -208,7 +209,7 @@ public:
 			// Create RDG register proxy
 			acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
-			sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
+			//sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
 
 			// New Pipeline Building
 			GFX::RDG::RenderGraphWorkshop workshop(rdg);
@@ -218,12 +219,12 @@ public:
 			GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 			// sub-pipeline building helper components
 			portal.registerResources(&workshop);
-			sortTest.registerResources(&rdg_builder);
-			acesbloom->registerResources(&rdg_builder);
+			//sortTest.registerResources(&rdg_builder);
+			acesbloom->registerResources(workshop);
 			// raster pass sono 1
-			srgb_color_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
+			srgb_color_attachment = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT, 1.f, 1.f, "SRGB Color Attach");
 			//GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addDepthBuffer(1.f, 1.f);
-			GFX::RDG::NodeHandle srgb_depth_attachment = rdg_builder.addColorBuffer(RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, 1.f, 1.f, "SRGB Depth Attach");
+			GFX::RDG::NodeHandle srgb_depth_attachment = workshop.addColorBuffer(RHI::ResourceFormat::FORMAT_D24_UNORM_S8_UINT, 1.f, 1.f, "SRGB Depth Attach");
 			GFX::RDG::NodeHandle prez_framebuffer = rdg_builder.addFrameBufferRef({  }, srgb_depth_attachment);
 			GFX::RDG::NodeHandle srgb_framebuffer = rdg_builder.addFrameBufferRef({ srgb_color_attachment }, srgb_depth_attachment, { srgb_depth_attachment });
 
@@ -358,7 +359,7 @@ public:
 
 		{
 			PROFILE_SCOPE("create Misc");
-
+			
 			// comand stuffs
 			commandPool = resourceFactory->createCommandPool({ RHI::QueueType::GRAPHICS, (uint32_t)RHI::CommandPoolAttributeFlagBits::RESET });
 			commandbuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -573,10 +574,26 @@ public:
 		bool needReize = editorLayer->mainViewport.getNeedResize();
 		if(needReize)
 		{
+			SE_CORE_DEBUG("Resize");
 			logicalDevice->waitIdle();
 			GFX::RDG::RenderGraphWorkshop workshop(rdg);
 			workshop.build(resourceFactory.get(), editorLayer->mainViewport.getWidth(), editorLayer->mainViewport.getHeight());
 			editorLayer->imImageManager.invalidAll();
+
+			//for (auto resource_handle : rdg.resources)
+			//{
+			//	auto resource_node = rdg.getResourceNode(resource_handle);
+			//	if (resource_node->type == GFX::RDG::NodeDetailedType::COLOR_TEXTURE)
+			//	{
+			//		auto texture_node = (GFX::RDG::ColorBufferNode*)resource_node;
+			//		if (texture_node->getTexture() != nullptr)
+			//			SE_CORE_INFO("Texture Introspection {0}, {1}", texture_node->tag, resource_node->handle);
+			//	}
+			//	else
+			//	{
+			//		SE_CORE_INFO("None Texture Introspection {0}, {1}", resource_node->tag, resource_node->handle);
+			//	}
+			//}
 		}
 	}
 

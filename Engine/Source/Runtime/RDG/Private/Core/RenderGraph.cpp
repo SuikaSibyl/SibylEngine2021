@@ -16,7 +16,6 @@ import GFX.RDG.ComputePassNode;
 import GFX.RDG.RasterPassNode;
 import GFX.RDG.UniformBufferNode;
 import GFX.RDG.IndirectDrawBufferNode;
-import GFX.RDG.DepthBufferNode;
 import GFX.RDG.ColorBufferNode;
 import GFX.RDG.SamplerNode;
 import GFX.RDG.RasterPassNode;
@@ -190,6 +189,24 @@ namespace SIByL::GFX::RDG
 		return ((UniformBufferNode*)registry.getNode(flight_handle))->uniformBuffer.get();
 	}
 
+	auto RenderGraph::getComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*
+	{
+		if (computePassRegister.find(pass) == computePassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getComputePipelineScope() pass name \'{0}\' not found !", pass);
+			return nullptr;
+		}
+		auto pass_node_handle = computePassRegister.find(pass)->second;
+		ComputePassScope* pass_node = (ComputePassScope*)registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getComputePipelineScope() pipeline name \'{0}\' not found !", pipeline);
+			return nullptr;
+		}
+		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
+		return (ComputePipelineScope*)registry.getNode(pipeline_node_handle);
+	}
+
 	auto RenderGraph::getRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*
 	{
 		if (rasterPassRegister.find(pass) == rasterPassRegister.end())
@@ -359,14 +376,6 @@ namespace SIByL::GFX::RDG
 		attached.tag(handle, name);
 		return handle;
 	}
-
-	auto RenderGraphBuilder::addDepthBuffer(float const& rel_width, float const& rel_height) noexcept -> NodeHandle
-	{
-		MemScope<DepthBufferNode> dbn = MemNew<DepthBufferNode>(rel_width, rel_height);
-		NodeHandle handle = attached.registry.registNode(std::move(dbn));
-		attached.resources.emplace_back(handle);
-		return handle;
-	}
 	
 	auto RenderGraphBuilder::addSamplerExt(RHI::ISampler* sampler) noexcept -> NodeHandle
 	{
@@ -470,6 +479,8 @@ namespace SIByL::GFX::RDG
 			attached.registry.getNode((*iter))->devirtualize((void*)&attached, factory);
 
 		// clear barriers
+		attached.barrierPool.barriers.clear();
+		attached.barrierPool.barriers.clear();
 		attached.barrierPool.barriers.clear();
 
 		// compile resources
@@ -589,6 +600,7 @@ namespace SIByL::GFX::RDG
 	{
 		NodeHandle default_sampler = addSampler({}, "Default Sampler");
 		renderGraph.samplerRegister.emplace("Default Sampler", default_sampler);
+
 	}
 
 	auto RenderGraphWorkshop::getInternalSampler(std::string const& name) noexcept -> NodeHandle
@@ -700,6 +712,7 @@ namespace SIByL::GFX::RDG
 	{
 		MemScope<ColorBufferNode> cbn = MemNew<ColorBufferNode>(format, rel_width, rel_height);
 		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
+		getNode<ColorBufferNode>(handle)->signified = handle;
 		renderGraph.resources.emplace_back(handle);
 		renderGraph.tag(handle, name);
 		return handle;
@@ -714,6 +727,7 @@ namespace SIByL::GFX::RDG
 		if(texture) cbn->format = texture->getDescription().format;
 		if (present) cbn->attributes |= (uint32_t)NodeAttrbutesFlagBits::PRESENT;
 		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
+		getNode<ColorBufferNode>(handle)->signified = handle;
 		renderGraph.resources.emplace_back(handle);
 		renderGraph.tag(handle, name);
 		return handle;
@@ -727,6 +741,7 @@ namespace SIByL::GFX::RDG
 		cbn->texture.ref = texture;
 		cbn->textureView.ref = view;
 		cbn->consumeHistoryRef = &(origin_resource->consumeHistory);
+		cbn->signified = origin;
 		if (texture) cbn->format = texture->getDescription().format;
 		NodeHandle handle = renderGraph.registry.registNode(std::move(cbn));
 		renderGraph.resources.emplace_back(handle);

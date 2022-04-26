@@ -64,6 +64,7 @@ namespace SIByL::GFX::RDG
 		virtual auto devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
+		virtual auto onDestroy() noexcept -> void override; // optional
 
 		std::vector<NodeHandle> resources;
 		std::vector<NodeHandle> storage_textures;
@@ -87,6 +88,7 @@ namespace SIByL::GFX::RDG
 		virtual auto onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void override;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 
+		auto clearAllMaterials() noexcept -> void;
 		auto fillComputeMaterialScopeDesc(ComputeMaterialScope* raster_material, void* graph) noexcept -> void;
 
 		// Desc :: Shaders

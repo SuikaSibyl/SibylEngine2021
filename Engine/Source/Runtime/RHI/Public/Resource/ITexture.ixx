@@ -64,6 +64,17 @@ namespace SIByL
 			uint32_t levelCount;
 			uint32_t baseArrayLayer;
 			uint32_t layerCount;
+
+			bool operator==(ImageSubresourceRange const& other)
+			{
+				if (aspectMask == other.aspectMask &&
+					baseMipLevel == other.baseMipLevel &&
+					levelCount == other.levelCount &&
+					baseArrayLayer == other.baseArrayLayer &&
+					layerCount == other.layerCount
+					) return true;
+				else return false;
+			}
 		};
 
 		export struct BufferImageCopyDesc
@@ -93,7 +104,7 @@ namespace SIByL
 			virtual ~ITexture() = default;
 
 			virtual auto getNativeHandle() noexcept -> uint64_t = 0;
-			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout) noexcept -> void = 0;
+			virtual auto transitionImageLayout(ImageLayout old_layout, ImageLayout new_layout, ImageSubresourceRange range = { 0,0,0,0,0 }) noexcept -> void = 0;
 			virtual auto getDescription() noexcept -> TextureDesc const& = 0;
 		};
 	}

@@ -144,14 +144,25 @@ namespace SIByL::GFX::RDG
 				break;
 			case NodeDetailedType::SAMPLER:
 			{
-				rg->getTextureBufferNode(sampled_textures[textureIdx++])->getConsumeHistory().emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE });
+				TextureBufferNode* texture_node = rg->getTextureBufferNode(sampled_textures[textureIdx++]);
+				texture_node->getConsumeHistory().emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_SAMPLE,
+					texture_node->baseMipLevel,
+					texture_node->levelCount,
+					texture_node->baseArrayLayer,
+					texture_node->layerCount });
 			}
 			break;
 			case NodeDetailedType::COLOR_TEXTURE:
 			{
-				rg->getTextureBufferNode(resources[i])->getConsumeHistory().emplace_back
-				(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE });
+				TextureBufferNode* texture_node = rg->getTextureBufferNode(resources[i]);
+
+				texture_node->getConsumeHistory().emplace_back
+				(ConsumeHistory{ handle, ConsumeKind::IMAGE_STORAGE_READ_WRITE,
+					texture_node->baseMipLevel,
+					texture_node->levelCount,
+					texture_node->baseArrayLayer,
+					texture_node->layerCount });
 			}
 			break;
 			default:
@@ -379,8 +390,13 @@ namespace SIByL::GFX::RDG
 		FramebufferContainer* framebuffer_container = render_graph->getFramebufferContainer(framebuffer);
 		for (int i = 0; i < framebuffer_container->handles.size(); i++)
 		{
-			render_graph->getResourceNode(framebuffer_container->handles[i])->getConsumeHistory().emplace_back
-			(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET });
+			auto attachment_texture = render_graph->getColorBufferNode(framebuffer_container->handles[i]);
+			attachment_texture->getConsumeHistory().emplace_back
+			(ConsumeHistory{ handle, ConsumeKind::RENDER_TARGET,
+					attachment_texture->baseMipLevel,
+					attachment_texture->levelCount,
+					attachment_texture->baseArrayLayer,
+					attachment_texture->layerCount });
 		}
 		// make all pipeline_scopes to compile
 		for (auto handle : pipelineScopes)
