@@ -19,6 +19,7 @@ import GFX.Camera;
 import GFX.Transform;
 import GFX.Serializer;
 import GFX.Renderer;
+import GFX.BoundingBox;
 import RHI.ILogicalDevice;
 import Asset.AssetLayer;
 import Asset.Mesh;
@@ -57,6 +58,16 @@ namespace SIByL::GFX
 			out << YAML::Key << "translation" << YAML::Value << translation;
 			out << YAML::Key << "eulerAngles" << YAML::Value << tansform.getEulerAngles();
 			out << YAML::Key << "scale" << YAML::Value << tansform.getScale();
+			out << YAML::EndMap;
+		}
+
+		if (entity.hasComponent<GFX::BoundingBox>())
+		{
+			out << YAML::Key << "BoundingBox";
+			BoundingBox& boundingbox = entity.getComponent<GFX::BoundingBox>();
+			out << YAML::Value << YAML::BeginMap;
+			out << YAML::Key << "min" << YAML::Value << boundingbox.min;
+			out << YAML::Key << "max" << YAML::Value << boundingbox.max;
 			out << YAML::EndMap;
 		}
 
@@ -160,6 +171,18 @@ namespace SIByL::GFX
 			tc.setTranslation(translation);
 			tc.setEulerAngles(eulerAngles);
 			tc.setScale(scale);
+		}
+
+		// BoundingBox Component
+		// -----------------------------------------------
+		auto boundingBox = components["BoundingBox"];
+		if (boundingBox)
+		{
+			glm::vec4 min = boundingBox["min"].as<glm::vec4>();
+			glm::vec4 max = boundingBox["max"].as<glm::vec4>();
+			auto& bc = entity.addComponent<GFX::BoundingBox>();
+			bc.min = min;
+			bc.max = max;
 		}
 
 		// Camera Component

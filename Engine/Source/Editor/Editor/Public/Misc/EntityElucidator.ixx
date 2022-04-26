@@ -33,6 +33,7 @@ import GFX.Camera;
 import GFX.Renderer;
 import GFX.SceneTree;
 import GFX.Scene;
+import GFX.BoundingBox;
 import Editor.CommonProperties;
 
 import GFX.RDG.RenderGraph;
@@ -155,6 +156,12 @@ namespace SIByL::Editor
 				drawVec3Control("Scaling", scaling, 1);
 				bool scale_modified = (component.getScale() != scaling);
 				if (scale_modified) component.setScale(scaling);
+			});
+		// Draw BoundingBox Component
+		drawComponent<GFX::BoundingBox>(entity, "BoundingBox", [](auto& component)
+			{
+				drawVec3Control("Min", *(glm::vec3*)(&(component.min.x)));
+				drawVec3Control("Max", *(glm::vec3*)(&(component.max.x)));
 			});
 		// Draw Camera Component
 		drawComponent<GFX::Camera>(entity, "Camera", [](auto& component)
@@ -393,6 +400,12 @@ namespace SIByL::Editor
 				{
 					if (!entity.hasComponent<GFX::Transform>())
 						entity.addComponent<GFX::Transform>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("BoundingBox"))
+				{
+					if (!entity.hasComponent<GFX::BoundingBox>())
+						entity.addComponent<GFX::BoundingBox>();
 					ImGui::CloseCurrentPopup();
 				}
 				if (ImGui::MenuItem("Camera"))

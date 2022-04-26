@@ -63,5 +63,8 @@
     <ClCompile Include="Public\Pipeline\Compute\HiZAgency.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Components\BoundingBox.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

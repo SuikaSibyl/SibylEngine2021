@@ -337,6 +337,8 @@ public:
 			acesbloom->registerComputePasses(workshop);
 			// Compute Pass "Portal Particle System Update"
 			portal.registerUpdatePasses(&workshop);
+			//portal.
+
 			// External Access Pass "ImGui Read Pass"
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
 			auto imGuiReadPass = workshop.getNode<GFX::RDG::ExternalAccessPass>(imGuiReadPassHandle);

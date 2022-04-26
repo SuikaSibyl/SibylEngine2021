@@ -15,9 +15,12 @@ SceneNodes:
     components:
       TagComponent: particle
       Transform:
-        translation: [187.09111, 9.14573193, -126.988159]
+        translation: [187.09111, 10.1020603, -126.988159]
         eulerAngles: [1.57079566, -0, 0]
-        scale: [0.99999845, 0.999905109, 0.999905109]
+        scale: [0.99999845, 0.999884844, 0.999884844]
+      BoundingBox:
+        min: [5, 1, 5, 0]
+        max: [-5, -6, -5, 0]
       MeshComponent:
         guid: 2267991365489773690
         vert: 7

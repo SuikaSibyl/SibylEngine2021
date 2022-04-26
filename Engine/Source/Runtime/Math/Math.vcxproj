@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Private\LinearAlgebra.cpp" />
+    <ClCompile Include="Public\Geometry.ixx" />
     <ClCompile Include="Public\LinearAlgebra.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

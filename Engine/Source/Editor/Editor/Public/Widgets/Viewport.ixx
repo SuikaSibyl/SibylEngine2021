@@ -1,5 +1,6 @@
 module;
 #include <cstdint>
+#include <vector>
 #include <imgui.h>
 #include <imguizmo/ImGuizmo.h>
 #include <glm/glm.hpp>
@@ -18,11 +19,13 @@ import ECS.UID;
 import ECS.TagComponent;
 import GFX.Transform;
 import GFX.SceneTree;
+import GFX.BoundingBox;
 import GFX.Scene;
 import Editor.Widget;
 import Editor.ImImage;
 import Editor.CameraController;
 import Math.LinearAlgebra;
+import Math.Geometry;
 import Editor.RDGImImageManager;
 
 namespace SIByL::Editor
@@ -100,6 +103,8 @@ namespace SIByL::Editor
 		else if (needResize)
 			needResize--;
 
+		ImGui::BeginChild("Test");
+		ImVec2 p = ImGui::GetCursorScreenPos();
 		if (bindedImage)
 		{
 			ImGui::Image(
@@ -107,8 +112,41 @@ namespace SIByL::Editor
 				{ (float)getWidth(),(float)getHeight() },
 				{ 0,0 }, { 1, 1 });
 		}
-
 		handleTransformGizmo();
+		ImGui::EndChild();
+
+		ImGui::BeginChild("Test");
+		if (selectedEntity)
+		{
+			// draw bounding box
+			if (selectedEntity.hasComponent<GFX::BoundingBox>())
+			{
+				glm::mat4 cameraView = getCameraView();
+				glm::mat4 cameraProj = getCameraProjection();
+				auto& tc = selectedEntity.getComponent<GFX::Transform>();
+				auto& bc = selectedEntity.getComponent<GFX::BoundingBox>();
+				glm::mat4 transform = tc.getAccumulativeTransform();
+				glm::vec3 offset = { transform[3][0],transform[3][1] ,transform[3][2] };
+				std::vector<glm::vec3> points;
+				for (int i = 0; i < 8; i++)
+				{
+					glm::vec3 position = bc.getNode(i);
+					glm::vec4 projected = cameraProj * cameraView * glm::vec4(position + offset, 1);
+					points.emplace_back((projected.x / abs(projected.w) + 1) * 0.5, (1 - projected.y / abs(projected.w)) * 0.5, projected.z / 5000.0f);
+				}
+				std::vector<int> bb_indices = GFX::getBBoxLinePairs();
+				for (int i = 0; i < bb_indices.size(); i += 2)
+				{
+					glm::vec3 pos_0 = points[bb_indices[i]];
+					glm::vec3 pos_1 = points[bb_indices[i + 1]];
+					Math::clampLineUniformly(pos_0, pos_1);
+					ImVec2 im_pos_0 = { p.x + pos_0.x * getWidth(),p.y + pos_0.y * getHeight() };
+					ImVec2 im_pos_1 = { p.x + pos_1.x * getWidth(),p.y + pos_1.y * getHeight() };
+					ImGui::GetWindowDrawList()->AddLine(im_pos_0, im_pos_1, IM_COL32(255, 0, 0, 100), 3.0f);
+				}
+			}
+		}
+		ImGui::EndChild();
 
 		//unsigned int textureID = m_FrameBuffer->GetColorAttachment();
 		//ImGui::DrawImage(
@@ -117,6 +155,8 @@ namespace SIByL::Editor
 		//	viewportPanelSize.y });
 		
 		ImGui::End();
+
+
 		ImGui::PopStyleVar();
 	}
 
@@ -167,7 +207,6 @@ namespace SIByL::Editor
 			// Entity transform
 			auto& tc = selectedEntity.getComponent<GFX::Transform>();
 			glm::mat4x4 transform = tc.getAccumulativeTransform();
-
 			// Snapping 
 			bool snap = input->isKeyPressed(SIByL_KEY_LEFT_CONTROL);
 			float snapValue = 0.5f;

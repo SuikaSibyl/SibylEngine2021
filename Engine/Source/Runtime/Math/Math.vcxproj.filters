@@ -21,5 +21,8 @@
     <ClCompile Include="Private\LinearAlgebra.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Public\Geometry.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

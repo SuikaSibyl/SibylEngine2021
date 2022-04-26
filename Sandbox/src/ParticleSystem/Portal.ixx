@@ -156,7 +156,7 @@ namespace SIByL::Demo
 
 	auto PortalSystem::registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
 	{
-		auto indefinite_scope = workshop->addComputePassIndefiniteScope("Portal Particle System");
+		auto indefinite_scope = workshop->addComputePassIndefiniteScope("Particle System");
 		indefinite_scope->customDispatchCount = [&timer = timer]()
 			{
 				static float deltaTime = 0;
@@ -167,15 +167,15 @@ namespace SIByL::Demo
 			};
 
 		// Create Emit Pass
-		GFX::RDG::ComputePipelineScope* portal_emit_pipeline = workshop->addComputePipelineScope("Portal Particle System", "Emit");
+		GFX::RDG::ComputePipelineScope* portal_emit_pipeline = workshop->addComputePipelineScope("Particle System", "Emit-Portal");
 		{
 			portal_emit_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_emit.spv", { RHI::ShaderStage::COMPUTE,"main" });
 			// Add Materials "Common"
 			{
-				auto particle_emit_mat_scope = workshop->addComputeMaterialScope("Portal Particle System", "Emit", "Common");
+				auto particle_emit_mat_scope = workshop->addComputeMaterialScope("Particle System", "Emit-Portal", "Common");
 				particle_emit_mat_scope->resources = { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle };
 				particle_emit_mat_scope->sampled_textures = { bakedCurveHandle };
-				auto particle_emit_dispatch_scope = workshop->addComputeDispatch("Portal Particle System", "Emit", "Common", "Only");
+				auto particle_emit_dispatch_scope = workshop->addComputeDispatch("Particle System", "Emit-Portal", "Common", "Only");
 				emitDispatch = particle_emit_dispatch_scope;
 				particle_emit_dispatch_scope->pushConstant = [&timer = timer](Buffer& buffer) {
 					EmitConstant emitConstant{ glm::mat4(), 400000u / 50,(float)timer->getTotalTime()};
@@ -191,15 +191,15 @@ namespace SIByL::Demo
 		}
 
 		// Create Update Pass
-		GFX::RDG::ComputePipelineScope* portal_update_pipeline = workshop->addComputePipelineScope("Portal Particle System", "Update");
+		GFX::RDG::ComputePipelineScope* portal_update_pipeline = workshop->addComputePipelineScope("Particle System", "Update-Portal");
 		{
 			portal_update_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
 			// Add Materials "Common"
 			{
-				auto particle_update_mat_scope = workshop->addComputeMaterialScope("Portal Particle System", "Update", "Common");
+				auto particle_update_mat_scope = workshop->addComputeMaterialScope("Particle System", "Update-Portal", "Common");
 				particle_update_mat_scope->resources = { particleBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, indirectDrawBuffer };
 				particle_update_mat_scope->sampled_textures = { bakedCurveHandle };
-				auto particle_update_dispatch_scope = workshop->addComputeDispatch("Portal Particle System", "Update", "Common", "Only");
+				auto particle_update_dispatch_scope = workshop->addComputeDispatch("Particle System", "Update-Portal", "Common", "Only");
 				particle_update_dispatch_scope->customSize = [](uint32_t& x, uint32_t& y, uint32_t& z) {
 					x = 200;
 					y = 1;

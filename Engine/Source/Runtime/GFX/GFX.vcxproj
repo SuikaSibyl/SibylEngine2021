@@ -154,6 +154,7 @@
     <ClCompile Include="Private\GFXLayer\GFXLayer.cpp" />
     <ClCompile Include="Private\Scene\Scene.cpp" />
     <ClCompile Include="Private\Scene\SceneTree.cpp" />
+    <ClCompile Include="Public\Components\BoundingBox.ixx" />
     <ClCompile Include="Public\Components\Camera.ixx" />
     <ClCompile Include="Public\Components\Mesh.ixx" />
     <ClCompile Include="Public\Components\ParticleSystem.ixx" />
