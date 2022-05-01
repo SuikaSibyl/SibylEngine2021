@@ -288,4 +288,23 @@ namespace SIByL::RHI
 			firstTask
 		);
 	}
+
+	auto ICommandBufferVK::cmdBeginDebugUtilsLabel(char const* name, float const* color) noexcept -> void
+	{
+		VkDebugUtilsLabelEXT debugUtilLabel = {};
+		debugUtilLabel.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		debugUtilLabel.pNext = nullptr;
+		debugUtilLabel.pLabelName = name;
+		debugUtilLabel.color[0] = color[0];
+		debugUtilLabel.color[1] = color[1];
+		debugUtilLabel.color[2] = color[2];
+		debugUtilLabel.color[3] = color[3];
+
+		logicalDevice->getPhysicalDeviceVk()->getGraphicContextVK()->vkCmdBeginDebugUtilsLabelEXT(commandBuffer, &debugUtilLabel);
+	}
+
+	auto ICommandBufferVK::cmdEndDebugUtilsLabel() noexcept -> void
+	{
+		logicalDevice->getPhysicalDeviceVk()->getGraphicContextVK()->vkCmdEndDebugUtilsLabelEXT(commandBuffer);
+	}
 }

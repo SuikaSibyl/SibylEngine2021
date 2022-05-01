@@ -19,15 +19,15 @@ SceneNodes:
         eulerAngles: [1.57079566, -0, 0]
         scale: [0.99999845, 0.999884844, 0.999884844]
       BoundingBox:
-        min: [5, 1, 5, 0]
-        max: [-5, -6, -5, 0]
+        min: [-5, -6, -5, 0]
+        max: [5, 1, 5, 0]
       MeshComponent:
         guid: 2267991365489773690
         vert: 7
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
-            PipelineName: Particle Portal
+          - PassName: Forward Pass
+            PipelineName: Particle Portal Mesh
             MaterialName: Portal
   - uid: 11454354189262129274
     parent: 0
@@ -116,7 +116,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_3
           - PassName: Pre-Z Pass
@@ -135,7 +135,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_6
           - PassName: Pre-Z Pass
@@ -215,7 +215,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_9
           - PassName: Pre-Z Pass
@@ -244,7 +244,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_5
           - PassName: Pre-Z Pass
@@ -273,7 +273,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_1
           - PassName: Pre-Z Pass
@@ -356,7 +356,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_11
           - PassName: Pre-Z Pass
@@ -415,7 +415,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_2
           - PassName: Pre-Z Pass
@@ -477,7 +477,7 @@ SceneNodes:
           - PassName: Pre-Z Pass
             PipelineName: Opaque
             MaterialName: Only
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_4
   - uid: 2104032186923863162
@@ -523,7 +523,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_7
           - PassName: Pre-Z Pass
@@ -592,7 +592,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_10
           - PassName: Pre-Z Pass
@@ -611,7 +611,7 @@ SceneNodes:
         vert: 3435973836
       Renderer:
         SubRenderer:
-          - PassName: Opaque Pass
+          - PassName: Forward Pass
             PipelineName: Phongs
             MaterialName: dust2_8
           - PassName: Pre-Z Pass

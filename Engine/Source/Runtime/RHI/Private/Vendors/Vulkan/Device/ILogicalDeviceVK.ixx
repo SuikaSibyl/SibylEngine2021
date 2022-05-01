@@ -3,6 +3,7 @@ module;
 #include <vector>
 #include <optional>
 export module RHI.ILogicalDevice.VK;
+import RHI.IBarrier;
 import RHI.ILogicalDevice;
 import RHI.IPhysicalDevice.VK;
 
@@ -32,6 +33,8 @@ namespace SIByL
 				VkBuffer* vertexBuffer,
 				VkDeviceMemory* vertexBufferMemory) noexcept -> void;
 
+			virtual auto getRasterStageMask() noexcept -> PipelineStageFlags override { return rasterStageMask; }
+
 		private:
 			IPhysicalDeviceVK* physicalDevice;
 			VkDevice device;
@@ -40,6 +43,10 @@ namespace SIByL
 			VkQueue computeQueue;
 
 		private:
+			RHI::PipelineStageFlags rasterStageMask = 
+				(uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT | 
+				(uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+
 			auto createLogicalDevice(IPhysicalDeviceVK* physicalDevice) noexcept -> void;
 		};
 	}

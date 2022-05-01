@@ -1,17 +1,10 @@
  #version 450
 
-struct Particle
-{
-    vec4 pos;
-    vec4 vel;
-    vec4 color;
-    vec4 ext;
-};
+layout(set = 0, binding = 0, std430) buffer ParticlesPosLifetime
+{ vec4 particle_pos_lifetime[]; };
 
-layout(set = 0, binding = 0, std430) buffer Particles
-{
-    Particle particle[];
-} particles;
+layout(set = 0, binding = 1, std430) buffer ParticlesVelocityMass
+{ vec4 particle_vel_mass[]; };
 
 struct Counter
 {
@@ -21,18 +14,18 @@ struct Counter
     uint drawCount;
     uint maxCount;
 };
-layout(set = 0, binding = 1, std430) buffer Counters
+layout(set = 0, binding = 2, std430) buffer Counters
 {
     Counter counter[];
 } counter;
 
 
-layout(set = 0, binding = 2, std430) buffer LiveIndexBuffer
+layout(set = 0, binding = 3, std430) buffer LiveIndexBuffer
 {
     uint[] indices;
 } livePool;
 
-layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
+layout(set = 0, binding = 4, std430) buffer DeadIndexBuffer
 {
     uint[] indices;
 } deadPool;
@@ -46,7 +39,7 @@ struct DrawIndexedIndirect
     uint firstInstance;
 };
 
-layout(set = 0, binding = 4, std430) buffer IndirectDrawBuffer
+layout(set = 0, binding = 5, std430) buffer IndirectDrawBuffer
 {
     DrawIndexedIndirect[] content;
 } IndirectBuffer;
@@ -68,44 +61,47 @@ void main()
     memoryBarrier();
     barrier();
 
-    Particle particle = particles.particle[idx];
+    vec4 pos_lifetime = particle_pos_lifetime[idx];
+    vec4 vel_mass = particle_vel_mass[idx];
     float ground_height = 0;
 
     // update velocity
     // - linear drag
-    float mass = particle.vel.w;
-    vec3 a = - 2 * normalize(particle.vel.xyz) * (length(particle.vel.xyz));;
+    float mass = vel_mass.w;
+    vec3 a = - 2 * normalize(vel_mass.xyz) * (length(vel_mass.xyz));;
     // - gravity
-    if(particle.pos.y - ground_height > 0.02)
+    if(pos_lifetime.y - ground_height > 0.02)
         a += vec3(0, -9.81, 0);
-    particle.vel.xyz += 0.02 * a / mass;
+    vel_mass.xyz += 0.02 * a / mass;
 
     // update position
-    particle.pos.xyz = particle.pos.xyz + particle.vel.xyz * 0.02;
+    pos_lifetime.xyz = pos_lifetime.xyz + vel_mass.xyz * 0.02;
 
     // collision handling
-    if(particle.pos.y < ground_height)
+    if(pos_lifetime.y < ground_height)
     {
-        vec3 compensate = particle.vel.xyz * ((ground_height - particle.pos.y) / particle.vel.y);
-        particle.pos.xyz += compensate;
-        particle.pos.y = ground_height;
-        particle.vel.xyz += - 2 * vec3(0,1,0) * dot(particle.vel.xyz, vec3(0,1,0));
-        particle.vel.xyz *= 0.5;
+        vec3 compensate = vel_mass.xyz * ((ground_height - pos_lifetime.y) / vel_mass.y);
+        pos_lifetime.xyz += compensate;
+        pos_lifetime.y = ground_height;
+        vel_mass.xyz += - 2 * vec3(0,1,0) * dot(vel_mass.xyz, vec3(0,1,0));
+        vel_mass.xyz *= 0.5;
         // todo: roughness to randomize return velocity
     }
 
-    float lifetime = particle.pos.w;
-    lifetime -= 1;
-    if(lifetime <= 0)
+    uint lifetick_pack = floatBitsToUint(pos_lifetime.w);
+    uint lifetick = lifetick_pack & 0xFFFF;
+    lifetick -= 1;
+    if(lifetick == 0)
     {
         uint deadCount = atomicAdd(counter.counter[0].deadCount, 1);
         deadPool.indices[deadCount] = idx;
         uint aliveCount = atomicAdd(counter.counter[0].aliveCount, -1);
         livePool.indices[idx] = livePool.indices[aliveCount-1];
     }
-    particle.pos.w = lifetime;
-    particles.particle[idx] = particle;
-    
+    pos_lifetime.w = uintBitsToFloat(lifetick_pack - 1);
+    particle_pos_lifetime[idx] = pos_lifetime;
+    particle_vel_mass[idx] = vel_mass;
+
     memoryBarrier();
     barrier();
 

@@ -167,6 +167,9 @@ namespace SIByL::GFX::RDG
 
 	auto ComputeMaterialScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_compute_pass[] = { 0.00392, 0.317647, 0.588235, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_compute_pass);
+
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto barrier : barriers)
 		{
@@ -185,6 +188,8 @@ namespace SIByL::GFX::RDG
 			ComputeDispatch* dispatch = (ComputeDispatch*)render_graph->registry.getNode(handle);
 			dispatch->onCommandRecord(commandbuffer, flight);
 		}
+
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 
 	auto ComputeMaterialScope::onDestroy() noexcept -> void
@@ -242,6 +247,9 @@ namespace SIByL::GFX::RDG
 
 	auto ComputePipelineScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_compute_pass[] = { 0.0941, 0.2196, 0.5215686, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_compute_pass);
+
 		commandbuffer->cmdBindComputePipeline(pipeline.get());
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto handle : materialScopes)
@@ -249,6 +257,8 @@ namespace SIByL::GFX::RDG
 			ComputeMaterialScope* material_scope = (ComputeMaterialScope*)render_graph->registry.getNode(handle);
 			material_scope->onCommandRecord(commandbuffer, flight);
 		}
+
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 
 	auto ComputePipelineScope::clearAllMaterials() noexcept -> void
@@ -299,6 +309,9 @@ namespace SIByL::GFX::RDG
 
 	auto ComputePassScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_compute_pass[] = { 0.1607843, 0.0862745, 0.4352941, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_compute_pass);
+
 		// push all barriers
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 
@@ -307,6 +320,8 @@ namespace SIByL::GFX::RDG
 			ComputePipelineScope* pipeline_scope = (ComputePipelineScope*)render_graph->registry.getNode(handle);
 			pipeline_scope->onCommandRecord(commandbuffer, flight);
 		}
+
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 
 	// ===========================================================
@@ -348,6 +363,9 @@ namespace SIByL::GFX::RDG
 
 	auto ComputePassIndefiniteScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_compute_pass[] = { 0.1607843, 0.0862745, 0.4352941, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_compute_pass);
+
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		uint32_t dispatch_times = customDispatchCount();
 		// If no dispatch, call the EndPass Barrier
@@ -374,6 +392,8 @@ namespace SIByL::GFX::RDG
 				}
 			}
 		}
+
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 
 }

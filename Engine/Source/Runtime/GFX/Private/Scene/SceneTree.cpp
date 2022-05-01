@@ -27,6 +27,17 @@ namespace SIByL::GFX
 		root = new_root;
 	}
 
+	auto SceneTree::getNodeEntity(std::string const& name) noexcept -> ECS::Entity
+	{
+		for (auto node : nodes)
+		{
+			std::string& tag = node.second.entity.getComponent<ECS::TagComponent>().Tag;
+			if (tag == name)
+				return (node.second.entity);
+		}
+		return {};
+	}
+
 	auto SceneTree::addNode(std::string const& name, SceneNodeHandle const& parent) noexcept -> SceneNodeHandle
 	{
 		uint64_t uid = ECS::UniqueID::RequestUniqueID();

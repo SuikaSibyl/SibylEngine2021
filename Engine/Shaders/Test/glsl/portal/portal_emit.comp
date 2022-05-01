@@ -6,18 +6,14 @@ layout(push_constant) uniform constants {
     float time;
 } PushConstants;
 
-struct Particle
-{
-    vec4 pos;
-    vec4 vel;
-    vec4 color;
-    vec4 ext;
-};
+layout(set = 0, binding = 0, std430) buffer ParticlesPosLifetime
+{ vec4 particle_pos_lifetime[]; };
 
-layout(set = 0, binding = 0, std430) buffer Particles
-{
-    Particle particle[];
-} particles;
+layout(set = 0, binding = 1, std430) buffer ParticlesVelocityMass
+{ vec4 particle_vel_mass[]; };
+
+layout(set = 0, binding = 2, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
 
 struct Counter
 {
@@ -27,30 +23,32 @@ struct Counter
     uint drawCount;
     uint maxCount;
 };
-layout(set = 0, binding = 1, std430) buffer Counters
+layout(set = 0, binding = 3, std430) buffer Counters
 {
     Counter counter[];
 } counter;
 
 
-layout(set = 0, binding = 2, std430) buffer LiveIndexBuffer
+layout(set = 0, binding = 4, std430) buffer LiveIndexBuffer
 {
     uint[] indices;
 } livePool;
 
-layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
+layout(set = 0, binding = 5, std430) buffer DeadIndexBuffer
 {
     uint[] indices;
 } deadPool;
 
-layout(set = 0, binding = 4, std430) buffer EmitterBuffer
+layout(set = 0, binding = 6, std430) buffer EmitterBuffer
 {
     vec4[] pos;
 } emitterSamples;
 
-layout(binding = 5) uniform sampler2D texSampler;
+layout(binding = 7) uniform sampler2D texSampler;
 
+//----------------------------------------------------------------------------------------
 // RANDOM 
+//----------------------------------------------------------------------------------------
 //note: uniformly distributed, normalized rand, [0;1[
 float nrand( float n )
 {
@@ -70,7 +68,6 @@ vec3 hash31(float p)
    p3 += dot(p3, p3.yzx+33.33);
    return fract((p3.xxy+p3.yzz)*p3.zyx); 
 }
-//----------------------------------------------------------------------------------------
 ///  3 out, 2 in...
 vec3 hash32(vec2 p)
 {
@@ -79,6 +76,9 @@ vec3 hash32(vec2 p)
     return fract((p3.xxy+p3.yzz)*p3.zyx);
 }
 
+//----------------------------------------------------------------------------------------
+// Utility 
+//----------------------------------------------------------------------------------------
 float lerp(float x, float y, float s)
 {
     return x + s * (y-x);
@@ -113,6 +113,16 @@ float remapWithClamp(float i, float old_range_min, float old_range_max, float ne
     return new_range_min + uniformed * (new_range_max - new_range_min);
 }
 
+//----------------------------------------------------------------------------------------
+// Main 
+//----------------------------------------------------------------------------------------
+struct Particle
+{
+    vec4 pos_lifetime;
+    vec4 vel_mass;
+    vec4 color;
+};
+
 layout (local_size_x =512) in;
 void main()
 {
@@ -143,13 +153,13 @@ void main()
     particle_to_center = (pos_rotation_matrix * vec4(particle_to_center, 1.0)).xyz;
 
     vec3 pos_offset = vec3(PushConstants.offset[3].rgb);
-    new_particle.pos.xyz = particle_to_center.xyz + pos_offset;
+    new_particle.pos_lifetime.xyz = particle_to_center.xyz + pos_offset;
 
     // # Height Mask
     // We generate a (0..1) mask based particle elevation.
     // It is then used to categorize particles and 
     // to cancel turbulence noise for particles close to the ground.
-    float height_mask = (clamp(new_particle.pos.y, 0.2, 0.8) - 0.2) / 0.6;
+    float height_mask = (clamp(new_particle.pos_lifetime.y, 0.2, 0.8) - 0.2) / 0.6;
     // # Categorizing particles
     // We are categorizing particles in two groups: core sparks and travelling sparks.
     // Based on a 0.05 probability. This will affect the lifetime.
@@ -162,8 +172,9 @@ void main()
     float rand_for_lifetime = randPerThread(0.5);
     // Set lifetime
     float lifetime = (rand_for_lifetime < lerp(height_mask, 0.15, 0.01)) ? remaped_heightmask : smaller_one;
-    new_particle.pos.w = lifetime / 0.02;
-    new_particle.ext.x = new_particle.pos.w;
+    uint lifetick_count = uint(lifetime / 0.02);
+    lifetick_count |= lifetick_count << 16;
+    new_particle.pos_lifetime.w = uintBitsToFloat(lifetick_count);
 
     // Pulse rotation mask
     float total_time = PushConstants.time * 0.001;
@@ -189,24 +200,25 @@ void main()
     tangent += particle_to_center * vec3(0,0,32);
     // extra component
     tangent *= curve_velocity(rotation_mask) * (0.8 + 1.2 * randPerThread(0.8));
-    new_particle.vel.xyz = (tangent);
+    new_particle.vel_mass.xyz = (tangent);
     // Set Mass Random Uniform [0.6, 1.2]
-    new_particle.vel.w = 0.6 + 0.6 * randPerThread(0.9);
+    new_particle.vel_mass.w = 0.6 + 0.6 * randPerThread(0.9);
 
     // Set Color
     new_particle.color = vec4(brightness,brightness,brightness,1);
 
     mat3 rotation = getRotation(PushConstants.offset);
-    new_particle.pos.xyz = rotation * particle_to_center.xyz + pos_offset;
-    new_particle.vel.xyz = rotation * new_particle.vel.xyz;
-    // new_particle.vel.xyz *= inverse_scale;
+    new_particle.pos_lifetime.xyz = rotation * particle_to_center.xyz + pos_offset;
+    new_particle.vel_mass.xyz = rotation * new_particle.vel_mass.xyz;
 
     // ========================================================================
     // Custom Part Over
     // ========================================================================
     // write new particle
     uint newParticleIdx = deadPool.indices[deadCount-1];
-    particles.particle[newParticleIdx] = new_particle;
+    particle_pos_lifetime[newParticleIdx] = new_particle.pos_lifetime;
+    particle_vel_mass[newParticleIdx] = new_particle.vel_mass;
+    particle_color[newParticleIdx] = new_particle.color;
     // add the new particle idx to live pool
     uint aliveCount = atomicAdd(counter.counter[0].aliveCount, 1);
     livePool.indices[aliveCount] = newParticleIdx;

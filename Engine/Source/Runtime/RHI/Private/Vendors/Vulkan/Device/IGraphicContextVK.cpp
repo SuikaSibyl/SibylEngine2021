@@ -223,6 +223,7 @@ namespace SIByL
 
 			// add extensions that validation layer needs
 			if (enableValidationLayers) {
+				this->extensions |= (uint32_t)GraphicContextExtensionFlagBits::DEBUG_UTILS;
 				extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 			}
 			// finialize collection
@@ -301,6 +302,11 @@ namespace SIByL
 			if (hasBit(this->extensions, GraphicContextExtensionFlagBits::MESH_SHADER))
 			{
 				vkCmdDrawMeshTasksNV = (PFN_vkCmdDrawMeshTasksNV)vkGetInstanceProcAddrStub(instance, "vkCmdDrawMeshTasksNV");
+			}
+			if (hasBit(this->extensions, GraphicContextExtensionFlagBits::DEBUG_UTILS))
+			{
+				vkCmdBeginDebugUtilsLabelEXT = (PFN_vkCmdBeginDebugUtilsLabelEXT)vkGetInstanceProcAddrStub(instance, "vkCmdBeginDebugUtilsLabelEXT");
+				vkCmdEndDebugUtilsLabelEXT = (PFN_vkCmdEndDebugUtilsLabelEXT)vkGetInstanceProcAddrStub(instance, "vkCmdEndDebugUtilsLabelEXT");
 			}
 		}
 	}

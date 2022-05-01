@@ -4,19 +4,6 @@ layout(push_constant) uniform constants {
     uint particleCount;
 } PushConstants;
 
-struct Particle
-{
-    vec4 pos;
-    vec4 vel;
-    vec4 color;
-    vec4 ext;
-};
-
-layout(set = 0, binding = 0, std430) buffer Particles
-{
-    Particle particle[];
-} particles;
-
 struct Counter
 {
     uint aliveCount;
@@ -25,17 +12,12 @@ struct Counter
     uint drawCount;
     uint maxCount;
 };
-layout(set = 0, binding = 1, std430) buffer Counters
+layout(set = 0, binding = 0, std430) buffer Counters
 {
     Counter counter[];
 } counter;
 
-layout(set = 0, binding = 2, std430) buffer LiveIndexBuffer
-{
-    uint[] indices;
-} livePool;
-
-layout(set = 0, binding = 3, std430) buffer DeadIndexBuffer
+layout(set = 0, binding = 1, std430) buffer DeadIndexBuffer
 {
     uint[] indices;
 } deadPool;
@@ -49,7 +31,7 @@ struct DrawIndexedIndirect
     uint firstInstance;
 };
 
-layout(set = 0, binding = 4, std430) buffer IndirectDrawBuffer
+layout(set = 0, binding = 2, std430) buffer IndirectDrawBuffer
 {
     DrawIndexedIndirect[] content;
 } IndirectBuffer;

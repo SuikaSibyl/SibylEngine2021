@@ -64,6 +64,9 @@ namespace SIByL
 			virtual auto cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void override;
 			virtual auto cmdDrawMeshTasks(uint32_t taskCount, uint32_t firstTask) noexcept -> void override;
 
+			virtual auto cmdBeginDebugUtilsLabel(char const* name, float const* color) noexcept -> void override;
+			virtual auto cmdEndDebugUtilsLabel() noexcept -> void override;
+
 		private:
 			auto createVkCommandBuffer() noexcept -> void;
 			ILogicalDeviceVK* logicalDevice;

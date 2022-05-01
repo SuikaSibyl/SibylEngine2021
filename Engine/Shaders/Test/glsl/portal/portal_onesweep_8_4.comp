@@ -1,0 +1,395 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+#extension GL_KHR_shader_subgroup_shuffle: require
+#extension GL_KHR_shader_subgroup_shuffle_relative: require
+
+#define INPUT_SIZE 100000
+#define ELEMENT_PER_THREAD 8
+#define BITS_PER_DIGIT 8
+#define THREADS_PER_BLOCK 256
+#define BINS_PER_THREAD 1
+
+#ifdef USE_ATOMIC_SUBDIVISION
+#define WARP_PRIVATE_ATOMIC_SUBDIVISION 1 // CURRENTLY NOT SUPPORTED
+#endif
+
+#define NUM_SUBGROUPS (THREADS_PER_BLOCK/32)
+#define POSSIBLE_DIGITS (1<<BITS_PER_DIGIT)
+#define DIGIT_MASK ((1<<BITS_PER_DIGIT)-1)
+#define ELEMENT_PER_WARP (ELEMENT_PER_THREAD*gl_SubgroupSize)
+
+const uint PREPARED = 0x80000000;
+const uint PPREPARED = 0xC0000000;
+const uint LOWPASS = 0x3FFFFFFF;
+
+layout (local_size_x = THREADS_PER_BLOCK) in;
+
+layout(push_constant) uniform constants {
+    uint passIdx;
+} PushConstants;
+
+// SIZE = INPUT_SIZE
+layout(set = 0, binding = 0, std430) buffer restrict readonly InputValues
+{
+    uint values[];
+};
+// SIZE = INPUT_SIZE * 2 (Double Buffered)
+layout(set = 0, binding = 1, std430) buffer restrict DoubleBufferedIndices
+{
+    uint indices[];
+};
+// OffsetFromDigitStartsAggregate/OffsetFromDigitStartsPrefix are global using decoupled look-back
+// It is a 2-D buffer
+// Here is an example for 4-way 16-bits parallel radix sorting
+//           x-axis = tiles:
+// y-axis =         0   1   2   3   4  ...  t
+// possible     0  [0] [1] [2] [3] [4] ... [t]
+// values       1  [.] [.] [.] [.] [.] ... [.]
+// (bins)       2  [.] [.] [.] [.] [.] ... [.]
+//              3  [.] [.] [.] [.] [.] ... [.]
+layout(set = 0, binding = 2, std430) buffer volatile restrict OffsetFromDigitStartsAggregate
+{
+    uint aggregate[];
+};
+layout(set = 0, binding = 3, std430) buffer volatile restrict OffsetFromDigitStartsPrefix
+{
+    uint prefix[];
+};
+uint AccessOffsetAs2DArray(uint digit_value, uint workgroup)
+{
+    return digit_value + workgroup * POSSIBLE_DIGITS;
+}
+
+layout(set = 0, binding = 4, std430) buffer restrict readonly GlobalDigitHistogram
+{
+    uint globalHistogram[];
+};
+
+struct Counter
+{
+    uint aliveCount;
+    uint deadCount;
+    uint emitCount;
+    uint drawCount;
+    uint maxCount;
+};
+layout(set = 0, binding = 5, std430) buffer Counters
+{
+    Counter counter[];
+};
+
+
+shared uint sharedGlobalHistogram[POSSIBLE_DIGITS];
+void LoadElements(in uint in_offset, out bool[ELEMENT_PER_THREAD] elements_valid, out uint[ELEMENT_PER_THREAD] thread_indices, out uint[ELEMENT_PER_THREAD] elements)
+{
+    if(gl_LocalInvocationID.x < POSSIBLE_DIGITS)
+        sharedGlobalHistogram[gl_LocalInvocationID.x] = globalHistogram[PushConstants.passIdx*POSSIBLE_DIGITS + gl_LocalInvocationID.x];
+
+    // When Load Data, we use Match-based ranking
+    // Each warp will fetch gl_SubgroupSize*ELEMENT_PER_THREAD consecutive elements
+    uint warp_fetch_offset = (gl_WorkGroupID.x * gl_NumSubgroups + gl_SubgroupID) * ELEMENT_PER_WARP;
+    uint invocation_fetch_idx = warp_fetch_offset + gl_SubgroupInvocationID + in_offset;
+    uint right_shift = BITS_PER_DIGIT * PushConstants.passIdx;
+
+    // Load all ELEMENT_PER_THREAD for this thread
+    for(uint item = 0; item < ELEMENT_PER_THREAD; item++)
+    {
+        elements_valid[item] = invocation_fetch_idx < counter[0].aliveCount + in_offset;
+        thread_indices[item] = elements_valid[item] ? indices[invocation_fetch_idx] : 0;
+        uint element = elements_valid[item] ? values[thread_indices[item]] : 0;
+        elements[item] = (element>>right_shift) & DIGIT_MASK;
+        invocation_fetch_idx += gl_SubgroupSize;
+    }
+}
+
+// Warp-Private Histogram
+shared uint WarpHistogram[NUM_SUBGROUPS][POSSIBLE_DIGITS];
+#ifdef USE_ATOMIC_SUBDIVISION
+// shared uint WarpHistogramSubdivision[NUM_SUBGROUPS][POSSIBLE_DIGITS][WARP_PRIVATE_ATOMIC_SUBDIVISION];
+#endif
+// Compute Warp-Private Histograms
+// it prepares [digit counts for tile] first,
+// to unlock other blocks as early as possible
+void WarpPrivateHistograms(in bool[ELEMENT_PER_THREAD] elements_valid, in uint[ELEMENT_PER_THREAD] elements)
+{
+#ifndef USE_ATOMIC_SUBDIVISION
+    // intialize WarpHistograms
+    for (int i = 0; i < POSSIBLE_DIGITS; i++)
+        WarpHistogram[gl_SubgroupID][i] = 0;
+    subgroupMemoryBarrierBuffer();
+    // Use atomicAdd to quickly count digit nums
+    for(uint item = 0; item < ELEMENT_PER_THREAD; item++)
+    // For each subgroup, fill WarpHistogram[warp][bin] with local digit count
+        if(elements_valid[item]) atomicAdd(WarpHistogram[gl_SubgroupID][elements[item]], 1);
+#else
+    // intialize WarpHistograms
+    for (int i = 0; i < POSSIBLE_DIGITS; i++)
+        for (int j = 0; j < WARP_PRIVATE_ATOMIC_SUBDIVISION; j++)
+            WarpHistogramSubdivision[gl_SubgroupID][i][j] = 0;
+    subgroupMemoryBarrierBuffer();
+    uint subdiv = gl_SubgroupInvocationID % WARP_PRIVATE_ATOMIC_SUBDIVISION;
+    // Use atomicAdd to quickly count digit nums
+    for(uint item = 0; item < ELEMENT_PER_THREAD; item++)
+    // For each subgroup, fill WarpHistogram[warp][bin] with local digit count
+        if(elements_valid[item]) atomicAdd(WarpHistogram[gl_SubgroupID][elements[item]][subdiv], 1);
+    // TODO:
+    // If a subdivision is used we still need to merge them
+    // Do reduction to compute the total count
+    // if(WARP_PRIVATE_ATOMIC_SUBDIVISION > 1) {}
+#endif
+}
+
+// shared offset info to reduce useless read (as offset arrays are volatile)
+shared uint sharedOffsetInfo[POSSIBLE_DIGITS];
+// Compute Sum of Warp-Private Histogram
+// preparing the Data for Decoupled Look-Back
+// we need to count totally POSSIBLE_DIGITS bins
+// therefore we should dispatch the jobs for different threads, 
+// let each thread do BINS_PER_THREAD bins counting.
+void WarpHistogramsUpSweep()
+{
+    // Make Sure (BINS_PER_THREAD * THREADS_PER_BLOCK > POSSIBLE_DIGITS)
+    for(uint i = 0; i < BINS_PER_THREAD; i++)
+    {
+        uint bin = gl_LocalInvocationID.x * BINS_PER_THREAD + i;
+        if(bin < POSSIBLE_DIGITS)
+        {
+            uint bin_count = 0;
+            for(uint warp = 0; warp < gl_NumSubgroups; warp++)
+            {
+                // In the up-sweep WarpHistogram[warp][bin] will be exclusive prefix sum
+                uint warp_count = WarpHistogram[warp][bin];
+                WarpHistogram[warp][bin] = bin_count;
+                bin_count += warp_count;
+            }
+            sharedOffsetInfo[bin] = bin_count;
+            aggregate[AccessOffsetAs2DArray(bin, gl_WorkGroupID.x)] = bin_count | PREPARED;
+        }
+    }
+}
+
+// Shared Bin Scan Info
+shared uint sharedBinScan[POSSIBLE_DIGITS];
+shared uint sharedAllElements;
+shared uint warp_exclusive[8];
+void BlockBinScan()
+{
+    uint bin = gl_LocalInvocationID.x;
+    uint element = sharedOffsetInfo[bin];
+    uint prefix_sum = element;
+    uint shuffled_element = element;
+    // Warp Prefix Sum
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<0)); if(gl_SubgroupInvocationID>=(1<<0)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<1)); if(gl_SubgroupInvocationID>=(1<<1)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<2)); if(gl_SubgroupInvocationID>=(1<<2)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<3)); if(gl_SubgroupInvocationID>=(1<<3)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<4)); if(gl_SubgroupInvocationID>=(1<<4)) prefix_sum+=shuffled_element;
+    if(gl_SubgroupInvocationID==31) warp_exclusive[gl_SubgroupID] = prefix_sum;
+    barrier();
+    // Inter-Warp Prefix Sum
+    if(gl_SubgroupID==0 && gl_SubgroupInvocationID<8)
+    {
+        uint warp_element = warp_exclusive[gl_SubgroupInvocationID];
+        uint incusive_scan = warp_element;
+        shuffled_element = subgroupShuffleUp(incusive_scan, (1<<0)); if(gl_SubgroupInvocationID>=(1<<0)) incusive_scan+=shuffled_element;
+        shuffled_element = subgroupShuffleUp(incusive_scan, (1<<1)); if(gl_SubgroupInvocationID>=(1<<1)) incusive_scan+=shuffled_element;
+        shuffled_element = subgroupShuffleUp(incusive_scan, (1<<2)); if(gl_SubgroupInvocationID>=(1<<2)) incusive_scan+=shuffled_element;
+        warp_exclusive[gl_SubgroupInvocationID] = incusive_scan - warp_element;
+    }
+    barrier();
+    // Warp Down Sweep
+    uint exclusive_prefix_sum = prefix_sum - element + warp_exclusive[gl_SubgroupID];
+    sharedBinScan[bin] = exclusive_prefix_sum;
+    if(bin == POSSIBLE_DIGITS-1) sharedAllElements = exclusive_prefix_sum + element;
+}
+
+// Do actually the Decoupled Look-Back
+// need previous blocks finish [digit counts for tile]
+// output the exclusive prefix sum for the block x digits
+void DecoupledLookBack()
+{
+    // Make Sure (BINS_PER_THREAD * THREADS_PER_BLOCK > POSSIBLE_DIGITS)
+    for(uint i = 0; i < BINS_PER_THREAD; i++)
+    {
+        uint bin = gl_LocalInvocationID.x * BINS_PER_THREAD + i;
+        if(bin < POSSIBLE_DIGITS)
+        {
+            uint access_id = AccessOffsetAs2DArray(bin, gl_WorkGroupID.x);
+            uint exclusive_prefix = 0;
+            // Do decoupled Look-back
+            for(int precursor = int(gl_WorkGroupID.x)-1; precursor >= 0; precursor--)
+            {
+                uint precursor_access_id = AccessOffsetAs2DArray(bin, precursor);
+                uint precursor_prefix = prefix[precursor_access_id];
+                if((precursor_prefix & PREPARED) != 0)
+                {
+                    exclusive_prefix += (precursor_prefix & LOWPASS);
+                    break;
+                }
+                else
+                {
+                    // stall until aggregate is prepared
+                    uint precursor_aggregate = aggregate[precursor_access_id];
+                    while((precursor_aggregate & PREPARED)==0){ precursor_aggregate = aggregate[precursor_access_id]; }
+                    exclusive_prefix += precursor_aggregate & LOWPASS;
+                }
+            }
+            // sharedOffsetInfo is used. 
+            // but memory barrier is not need because it is written by this thread
+            prefix[access_id] = (exclusive_prefix + sharedOffsetInfo[bin]) | PREPARED;
+            sharedOffsetInfo[bin] = exclusive_prefix;
+        }
+    }
+}
+
+void WarpHistogramsDownSweep()
+{
+    // Make Sure (BINS_PER_THREAD * THREADS_PER_BLOCK > POSSIBLE_DIGITS)
+    for(uint i = 0; i < BINS_PER_THREAD; i++)
+    {
+        uint bin = gl_LocalInvocationID.x * BINS_PER_THREAD + i;
+        if(bin < POSSIBLE_DIGITS)
+        {
+            uint digit_prefix_sum = sharedOffsetInfo[bin];
+            for(uint warp = 0; warp < gl_NumSubgroups; warp++)
+            {
+                // In the up-sweep WarpHistogram[warp][bin] will be exclusive prefix sum
+                // In the down-sweep WarpHistogram[warp][bin] will be globally exclusive prefix sum
+                WarpHistogram[warp][bin] += digit_prefix_sum;
+            }
+        }
+    }
+}
+
+shared uint sharedMatchMask[NUM_SUBGROUPS][POSSIBLE_DIGITS];
+shared uint sharedOffsetOutput[ELEMENT_PER_THREAD * THREADS_PER_BLOCK];
+shared uint sharedIndicesOutput[ELEMENT_PER_THREAD * THREADS_PER_BLOCK];
+
+// shared uint sharedOutputBlock[ELEMENT_PER_THREAD*THREADS_PER_BLOCK];
+void WarpWisePrefixSum(in bool[ELEMENT_PER_THREAD] elements_valid, in uint[ELEMENT_PER_THREAD] elements, in uint[ELEMENT_PER_THREAD] tindices, in uint out_offset)
+{
+    // When Load Data, we use Match-based ranking
+    // Each warp will fetch gl_SubgroupSize*ELEMENT_PER_THREAD consecutive elements
+    uint lane_pos = 1 << gl_SubgroupInvocationID;
+    uint lane_mask_lt = (1 << gl_SubgroupInvocationID) - 1;
+
+    uint warp_fetch_offset = (gl_WorkGroupID.x * gl_NumSubgroups + gl_SubgroupID) * ELEMENT_PER_WARP;
+    uint invocation_fetch_idx = warp_fetch_offset + gl_SubgroupInvocationID + out_offset;
+
+    for(uint item = 0; item < ELEMENT_PER_THREAD; item++)
+    {
+        // Clear Shared Memory
+        for(uint i = 0; i<POSSIBLE_DIGITS/gl_SubgroupSize;i++)
+        {
+            uint clearIdx = gl_SubgroupInvocationID + gl_SubgroupSize * i;
+            if(clearIdx < POSSIBLE_DIGITS)
+                sharedMatchMask[gl_SubgroupID][clearIdx] = 0;
+        }
+        subgroupMemoryBarrierBuffer();
+
+        if(elements_valid[item]==false) continue;
+        uint digit = elements[item];
+        atomicOr(sharedMatchMask[gl_SubgroupID][digit], lane_pos);
+        subgroupMemoryBarrierShared();
+
+        uint peer_mask = sharedMatchMask[gl_SubgroupID][digit];
+        uvec4 bit_count = uvec4((peer_mask & lane_mask_lt),0,0,0);
+        // peer_digit_prefix is now [item digit start - element digit]
+        uint peer_digit_prefix = subgroupBallotBitCount(bit_count);
+
+        uint leader = subgroupBallotFindMSB(uvec4(peer_mask,0,0,0));
+        uint item_offset = 0;
+        if(gl_SubgroupInvocationID == leader)
+        {
+            item_offset = atomicAdd(WarpHistogram[gl_SubgroupID][digit], (peer_digit_prefix+1));
+        }
+        // item offset is now [warp digit start - item digit starts]
+        item_offset = subgroupShuffle(item_offset, leader);
+        uint offset = item_offset + peer_digit_prefix + sharedGlobalHistogram[digit]; // TODO ADD GLOBAL HISTOGRAMS
+        subgroupMemoryBarrierShared();
+        // output
+        uint shared_offset_pos = sharedBinScan[digit] + item_offset + peer_digit_prefix - sharedOffsetInfo[digit];
+        sharedOffsetOutput[shared_offset_pos] = offset;
+        sharedIndicesOutput[shared_offset_pos] = tindices[item];
+        
+        invocation_fetch_idx+=gl_SubgroupSize;
+    }
+}
+
+void OutputFromShared(in bool[ELEMENT_PER_THREAD] elements_valid, in uint[ELEMENT_PER_THREAD] tindices, in uint out_offset)
+{
+    // if(PushConstants.passIdx == 1) return;
+    uint shared_idx = gl_SubgroupInvocationID + ELEMENT_PER_WARP*gl_SubgroupID;
+    for(uint item = 0; item < ELEMENT_PER_THREAD; item++)
+    {
+        if(shared_idx<sharedAllElements)
+            indices[out_offset + sharedOffsetOutput[shared_idx]] = sharedIndicesOutput[shared_idx];
+        shared_idx += gl_SubgroupSize;
+    }
+}
+
+void cleanup()
+{
+    // clean up previous value
+    // memoryBarrierBuffer();
+    if(gl_WorkGroupID.x > 0)
+    {
+        for(uint i = 0; i < BINS_PER_THREAD; i++)
+        {
+            uint bin = gl_LocalInvocationID.x * BINS_PER_THREAD + i;
+            if(bin < POSSIBLE_DIGITS)
+            {
+                uint access_id = AccessOffsetAs2DArray(bin, gl_WorkGroupID.x);
+                uint prev_access_id = AccessOffsetAs2DArray(bin, gl_WorkGroupID.x - 1);
+                aggregate[prev_access_id] = 0;
+                prefix[prev_access_id] = 0;
+                if(gl_WorkGroupID.x == (gl_NumWorkGroups.x-1))
+                {
+                    aggregate[access_id] = 0;
+                    prefix[access_id] = 0;
+                }
+            }
+        }
+    }
+}
+
+void OneSweep()
+{
+    // Attributes
+    bool elements_valid[ELEMENT_PER_THREAD];
+    uint thread_indices[ELEMENT_PER_THREAD];
+    uint thread_elments[ELEMENT_PER_THREAD];
+    uint in_offset = PushConstants.passIdx%2;
+    uint out_offset = 1 - in_offset;
+    in_offset *= INPUT_SIZE;
+    out_offset *= INPUT_SIZE;
+    // Load ELEMENT_PER_THREAD elements first
+    LoadElements(in_offset, elements_valid, thread_indices, thread_elments);
+    // Compute Warp-Private Histograms
+    WarpPrivateHistograms(elements_valid, thread_elments);
+    barrier();
+    // Then do up-sweep counting all the digits
+    WarpHistogramsUpSweep();
+    memoryBarrier();
+    // Then do 
+    barrier();
+    BlockBinScan();
+    barrier();
+    // Do actually the Decoupled Look-Back
+    DecoupledLookBack();
+    // Then do down-sweep for warps in blocks
+    WarpHistogramsDownSweep();
+    barrier();
+    memoryBarrier();
+    // Warp Wise Prefix Sum to complete all process 
+    WarpWisePrefixSum(elements_valid,thread_elments, thread_indices, out_offset);
+    barrier();
+    OutputFromShared(elements_valid, thread_indices, out_offset);
+    cleanup();
+}
+
+void main()
+{
+    OneSweep();
+}

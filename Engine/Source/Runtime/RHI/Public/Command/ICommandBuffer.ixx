@@ -113,6 +113,8 @@ namespace SIByL
 			virtual auto cmdPushConstants(IPipelineLayout* pipeline_layout, ShaderStage stage, size_t size, void* data) noexcept -> void = 0;
 			virtual auto cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void = 0;
 			virtual auto cmdDrawMeshTasks(uint32_t taskCount, uint32_t firstTask) noexcept -> void = 0;
+			virtual auto cmdBeginDebugUtilsLabel(char const* name, float const* color) noexcept -> void = 0;
+			virtual auto cmdEndDebugUtilsLabel() noexcept -> void = 0;
 		};
 
 		export struct BlitInfo

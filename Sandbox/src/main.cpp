@@ -96,6 +96,7 @@ import GFX.RDG.RasterNodes;
 import GFX.RDG.ExternalAccess;
 import GFX.RDG.Agency;
 import GFX.HiZAgency;
+import GFX.BoundingBox;
 
 import UAT.IUniversalApplication;
 
@@ -155,15 +156,11 @@ public:
 
 		{
 			PROFILE_SCOPE("create RHI layer")
-				// create device
-#ifdef MACRO_USE_MESH
-				graphicContext = (RHI::IFactory::createGraphicContext({
-					RHI::API::VULKAN,
-					(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
-#else
-				graphicContext = (RHI::IFactory::createGraphicContext({
-					RHI::API::VULKAN }));
-#endif
+			
+			// create device
+			graphicContext = (RHI::IFactory::createGraphicContext({
+				RHI::API::VULKAN,
+				(uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER }));
 
 			graphicContext->attachWindow(window_layer->getWindow());
 			physicalDevice = (RHI::IFactory::createPhysicalDevice({ graphicContext.get() }));
@@ -209,6 +206,7 @@ public:
 			// Create RDG register proxy
 			acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
+			portal.entity = scene.tree.getNodeEntity("particle");
 			//sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
 
 			// New Pipeline Building
@@ -286,9 +284,12 @@ public:
 			auto hiz_agency = GFX::HiZAgency::createInstance(srgb_depth_attachment, resourceFactory.get());
 			workshop.addAgency(std::move(hiz_agency));
 
-			// Raster Pass "Opaque Pass"
-			auto forward_pass = workshop.addRasterPassScope("Opaque Pass", srgb_framebuffer);
-			GFX::RDG::RasterPipelineScope* opaque_phongs_pipeline = workshop.addRasterPipelineScope("Opaque Pass", "Phongs");
+			// Create Cluster Pass
+			workshop.addComputePassScope("Particle Bounding Boxes");
+
+			// Raster Pass "Forward Pass"
+			auto forward_pass = workshop.addRasterPassScope("Forward Pass", srgb_framebuffer);
+			GFX::RDG::RasterPipelineScope* opaque_phongs_pipeline = workshop.addRasterPipelineScope("Forward Pass", "Phongs");
 			{
 				opaque_phongs_pipeline->shaderVert = resourceFactory->createShaderFromBinaryFile("pbr/phong_vert.spv", { RHI::ShaderStage::VERTEX,"main" });
 				opaque_phongs_pipeline->shaderFrag = resourceFactory->createShaderFromBinaryFile("pbr/phong_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
@@ -318,7 +319,7 @@ public:
 				};
 				for (int i = 1; i <= 11; i++)
 				{
-					auto dust2_mat_scope = workshop.addRasterMaterialScope("Opaque Pass", "Phongs", "dust2_" + std::to_string(i));
+					auto dust2_mat_scope = workshop.addRasterMaterialScope("Forward Pass", "Phongs", "dust2_" + std::to_string(i));
 					Asset::Texture* texture = assetLayer->texture(texture_guids[i - 1]);
 					auto dust2_01_texture_handle = workshop.addColorBufferExt(texture->texture.get(), texture->view.get(), "dust2-" + std::to_string(texture_guids[i]));
 					dust2_mat_scope->resources = { default_sampler };
@@ -328,6 +329,7 @@ public:
 			// Raster Pass "Transparency Pass"
 			//workshop.addRasterPassScope("Transparency Pass", srgb_framebuffer);
 			portal.registerRenderPasses(&workshop);
+			portal.registerBoundingBoxesPasses(&workshop);
 
 			// Compute Pass "Post Processing"
 			workshop.addComputePassScope("PostProcessing Pass");
@@ -499,14 +501,15 @@ public:
 			// use transform as Per View Uniform
 			auto prez_pass = rdg.getRasterPassScope("Pre-Z Pass");
 			prez_pass->updatePerViewUniformBuffer(per_view_ubo, currentFrame);
-			auto opaque_pass = rdg.getRasterPassScope("Opaque Pass");
+			auto opaque_pass = rdg.getRasterPassScope("Forward Pass");
 			opaque_pass->updatePerViewUniformBuffer(per_view_ubo, currentFrame);
 		}
 		// update draw calls
 		{
 			rdg.onFrameStart();
-			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Phongs", "dust2_1");
-			auto portal_mat_scope = rdg.getRasterMaterialScope("Opaque Pass", "Particle Portal", "Portal");
+			auto dust2_01_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Phongs", "dust2_1");
+			auto portal_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal", "Portal");
+			auto portal_mat_mesh_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal Mesh", "Portal");
 
 			std::function<void(ECS::TagComponent&, GFX::Transform&, GFX::Mesh&, GFX::Renderer&)> per_particle_system_behavior = [&](ECS::TagComponent& tag, GFX::Transform& transform, GFX::Mesh& mesh, GFX::Renderer& renderer) {
 				for (auto& subrenderer : renderer.subRenderers)
@@ -520,14 +523,16 @@ public:
 					drawcall->indexBuffer = mesh.indexBuffer;
 					drawcall->uniform.model = transform.getAccumulativeTransform();
 
-					if (portal_mat_scope == mat_scope)
+					if (portal_mat_mesh_scope == mat_scope)
 					{
 						portal.emitDispatch->pushConstant = [&timer = timer, &transform = transform](Buffer& buffer) {
 							Demo::EmitConstant emitConstant = { transform.getAccumulativeTransform(), 400000u / 50,(float)timer.getTotalTime() };
 							buffer = std::move(Buffer(sizeof(emitConstant), 1));
 							memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
 						};
-						drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
+						drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
+						drawcall->taskCount = 100000u / 16;
+						//drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
 					}
 				}
 			};

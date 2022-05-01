@@ -46,7 +46,7 @@ namespace SIByL::GFX::RDG
 
 	auto RasterDrawCall::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
-		if (indexBuffer && vertexBuffer)
+		if (kind == DrawCallKind::Indexed && indexBuffer && vertexBuffer)
 		{
 			commandbuffer->cmdBindVertexBuffer(vertexBuffer);
 			commandbuffer->cmdBindIndexBuffer(indexBuffer);
@@ -56,6 +56,10 @@ namespace SIByL::GFX::RDG
 				commandbuffer->cmdDrawIndexedIndirect(indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
 			else
 				commandbuffer->cmdDrawIndexed(indexBuffer->getIndicesCount(), 1, 0, 0, 0);
+		}
+		else if (kind == DrawCallKind::MeshTasks)
+		{
+			commandbuffer->cmdDrawMeshTasks(taskCount, 0);
 		}
 	}
 
@@ -72,6 +76,7 @@ namespace SIByL::GFX::RDG
 
 	auto RasterMaterialScope::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		if (!isActive) return;
 		// build descriptor sets
 		RenderGraph* rg = (RenderGraph*)graph;
 		renderGraph = graph;
@@ -127,6 +132,7 @@ namespace SIByL::GFX::RDG
 	auto RasterMaterialScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		barriers.clear();
+		if (!isActive) return;
 		RenderGraph* rg = (RenderGraph*)graph;
 		// Add History
 		unsigned textureIdx = 0;
@@ -173,7 +179,11 @@ namespace SIByL::GFX::RDG
 
 	auto RasterMaterialScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_raster_pass[] = { 0.90196, 0.470588, 0.090196, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_raster_pass);
+
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
+		if (!isActive) return;
 		//for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
 		RHI::IDescriptorSet* set = descriptorSets[flight].get();
 		commandbuffer->cmdBindDescriptorSets(
@@ -187,10 +197,12 @@ namespace SIByL::GFX::RDG
 			RasterDrawCall* drawcall = (RasterDrawCall*)render_graph->registry.getNode(handle);
 			drawcall->onCommandRecord(commandbuffer, flight);
 		}
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 
 	auto RasterMaterialScope::onFrameStart(void* graph) noexcept -> void
 	{
+		if (!isActive) return;
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto handle : drawCalls)
 		{
@@ -227,6 +239,7 @@ namespace SIByL::GFX::RDG
 
 	auto RasterPipelineScope::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
+		if (!isActive) return;
 		RenderGraph* rg = (RenderGraph*)graph;
 		// vertex buffer layout
 		vertexLayout = factory->createVertexLayout(vertexBufferLayout);
@@ -312,6 +325,7 @@ namespace SIByL::GFX::RDG
 	auto RasterPipelineScope::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		barriers.clear();
+		if (!isActive) return;
 		this->renderGraph = graph;
 		RenderGraph* render_graph = (RenderGraph*)graph;
 		for (auto handle : materialScopes)
@@ -323,6 +337,14 @@ namespace SIByL::GFX::RDG
 
 	auto RasterPipelineScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_raster_pass[] = { 0.88235, 0.33333, 0.0902, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_raster_pass);
+
+		if (!isActive)
+		{
+			commandbuffer->cmdEndDebugUtilsLabel();
+			return;
+		}
 		commandbuffer->cmdBindPipeline(pipeline.get());
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto handle : materialScopes)
@@ -330,10 +352,12 @@ namespace SIByL::GFX::RDG
 			RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);
 			material_scope->onCommandRecord(commandbuffer, flight);
 		}
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 
 	auto RasterPipelineScope::onFrameStart(void* graph) noexcept -> void
 	{
+		if (!isActive) return;
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto handle : materialScopes)
 		{
@@ -408,6 +432,8 @@ namespace SIByL::GFX::RDG
 
 	auto RasterPassScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		float color_raster_pass[] = { 0.8549, 0.14118, 0.1098, 1 };
+		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_raster_pass);
 		// push all barriers
 		RenderGraph* render_graph = (RenderGraph*)renderGraph;
 		for (auto barrier : barriers) commandbuffer->cmdPipelineBarrier(render_graph->barrierPool.getBarrier(barrier));
@@ -434,6 +460,7 @@ namespace SIByL::GFX::RDG
 		}
 
 		commandbuffer->cmdEndRenderPass();
+		commandbuffer->cmdEndDebugUtilsLabel();
 	}
 	
 	auto RasterPassScope::onFrameStart(void* graph) noexcept -> void
@@ -444,6 +471,11 @@ namespace SIByL::GFX::RDG
 			RasterPipelineScope* pipeline_scope = (RasterPipelineScope*)render_graph->registry.getNode(handle);
 			pipeline_scope->onFrameStart(graph);
 		}
+	}
+
+	auto RasterPassScope::getPerViewUniformBufferFlightHandle() noexcept -> NodeHandle
+	{
+		return perViewUniformBufferFlight;
 	}
 
 	auto RasterPassScope::fillRasterPipelineScopeDesc(RasterPipelineScope* raster_pipeline, void* graph) noexcept -> void

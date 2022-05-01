@@ -5,6 +5,17 @@ layout(push_constant) uniform constants {
     vec4 bbmax;
 } PushConstants;
 
+// SIZE = INPUT_SIZE
+layout(set = 0, binding = 0, std430) buffer restrict InputValues
+{
+    uint values[];
+};
+// SIZE = INPUT_SIZE * 2 (Double Buffered)
+layout(set = 0, binding = 1, std430) buffer restrict DoubleBufferedIndices
+{
+    uint indices[];
+};
+
 struct Counter
 {
     uint aliveCount;
@@ -13,37 +24,18 @@ struct Counter
     uint drawCount;
     uint maxCount;
 };
-layout(set = 0, binding = 1, std430) buffer Counters
+layout(set = 0, binding = 2, std430) buffer Counters
 {
     Counter counter[];
 } counter;
 
-struct Particle
-{
-    vec4 pos;
-    vec4 vel;
-    vec4 color;
-    vec4 ext;
-};
-layout(set = 0, binding = 2, std430) buffer Particles
-{
-    Particle particle[];
-} particles;
+layout(set = 0, binding = 3, std430) buffer ParticlesPosLifetime
+{ vec4 particle_pos_lifetime[]; };
 
-layout(set = 0, binding = 3, std430) buffer LiveIndexBuffer
+layout(set = 0, binding = 4, std430) buffer LiveIndexBuffer
 {
     uint[] indices;
 } livePool;
-
-struct MortonIndex
-{
-    uint morton;
-    uint index;
-};
-layout(set = 0, binding = 4, std430) buffer MortonIndexBuffer
-{
-    MortonIndex content[];
-} mortonIndices;
 
 uint expandBits(uint v)
 {
@@ -56,24 +48,25 @@ uint expandBits(uint v)
 
 uint morton(vec3 position)
 {
-    vec3 unipos = (position - PushConstants.bbmin) / (PushConstants.bbmax - PushConstants.bbmin);
+    vec3 unipos = (position - PushConstants.bbmin.rgb) / (PushConstants.bbmax.rgb - PushConstants.bbmin.rgb);
+    unipos = clamp(unipos, vec3(0,0,0), vec3(1,1,1));
     uvec3 uiunipos = uvec3(unipos * 1023u);
     uint morton_code = 0;
-    morton_code += expandBits(uiunipos.x);
-    morton_code += expandBits(uiunipos.y);
-    morton_code += expandBits(uiunipos.z);
+    morton_code += expandBits(uiunipos.x) << 2;
+    morton_code += expandBits(uiunipos.y) << 1;
+    morton_code += expandBits(uiunipos.z) << 0;
     return morton_code;
 }
 
-layout (local_size_x = 128) in;
+layout (local_size_x = 512) in;
 void main()
 {
     uint idx = gl_GlobalInvocationID.x;
     if(idx >= counter.counter[0].aliveCount) return;
 
     uint index = livePool.indices[idx];
-    vec3 position = particles.particle[index].pos.rgb;
+    vec3 position = particle_pos_lifetime[index].rgb;
     
-    mortonIndices.content[idx].morton = morton(position);
-    mortonIndices.content[idx].index = index;
+    values[index] = morton(position);
+    indices[idx] = index;
 }

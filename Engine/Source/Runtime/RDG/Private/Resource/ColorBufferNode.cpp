@@ -13,6 +13,7 @@ import RHI.ITextureView;
 import RHI.IFactory;
 import RHI.IBarrier;
 import RHI.IMemoryBarrier;
+import RHI.ILogicalDevice;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.TextureBufferNode;
 
@@ -36,6 +37,7 @@ namespace SIByL::GFX::RDG
 	auto ColorBufferNode::devirtualize(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		// Create Actual Texture Resource
+		rasterStages = factory->getLogicalDevice()->getRasterStageMask();
 		if (!hasBit(attributes, NodeAttrbutesFlagBits::PLACEHOLDER))
 		{
 			RenderGraph* render_graph = (RenderGraph*)graph;
@@ -305,8 +307,7 @@ namespace SIByL::GFX::RDG
 					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+						dstStageMask = rasterStages;
 					else if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 
@@ -322,13 +323,12 @@ namespace SIByL::GFX::RDG
 					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-									 | (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-									 //| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+						srcStageMask = rasterStages;
 					else if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
 
-					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+					auto pass = rg->getPassNode(consumeHistory[valid_neighbors[right]].pass);
+					if (pass->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
 
@@ -347,8 +347,7 @@ namespace SIByL::GFX::RDG
 					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> IMAGE_SAMPLE, RENDER_TARGET is not consumed by a raster pass!");
 
 					dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
-									| (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-									| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+									| rasterStages;
 
 					oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
 					newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
@@ -360,8 +359,7 @@ namespace SIByL::GFX::RDG
 				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
 				{
 					srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
-						| (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+						| rasterStages;
 
 					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
 						dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :

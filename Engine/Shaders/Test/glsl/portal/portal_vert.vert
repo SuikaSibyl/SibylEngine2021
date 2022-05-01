@@ -10,21 +10,20 @@ layout(binding = 0) uniform PerViewUniformBuffer {
     vec4 cameraPos;
 } view_ubo;
 
-struct Particle
-{
-    vec4 pos;
-    vec4 vel;
-    vec4 color;
-    vec4 ext;
-};
-layout(set = 0, binding = 2, std430) buffer Particles
-{
-    Particle particle[];
-} particles;
 
-layout(binding = 3) uniform sampler2D texSampler;
 
-layout(set = 0, binding = 4, std430) buffer LiveIndexBuffer
+layout(set = 0, binding = 2, std430) buffer ParticlesPosLifetime
+{ vec4 particle_pos_lifetime[]; };
+
+layout(set = 0, binding = 3, std430) buffer ParticlesVelocityMass
+{ vec4 particle_vel_mass[]; };
+
+layout(set = 0, binding = 4, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
+
+layout(binding = 5) uniform sampler2D texSampler;
+
+layout(set = 0, binding = 6, std430) buffer LiveIndexBuffer
 {
     uint[] indices;
 } livePool;
@@ -75,19 +74,23 @@ vec3 getScale(mat4 matrix)
 }
 
 void main() {
-    Particle particle = particles.particle[livePool.indices[gl_InstanceIndex.x]];
-    vec3 instance_pos = particle.pos.xyz;
+    uint particle_idx = livePool.indices[gl_InstanceIndex.x];
+    vec4 pos_lifetime = particle_pos_lifetime[particle_idx];
+    vec4 vel_mass = particle_vel_mass[particle_idx];
+    vec4 pcolor = particle_color[particle_idx];
 
-    mat4 billboardMat = billboardAlongVelocity(particle.vel.xyz, view_ubo.cameraPos.xyz - particle.pos.xyz);
+    mat4 billboardMat = billboardAlongVelocity(vel_mass.xyz, view_ubo.cameraPos.xyz - pos_lifetime.xyz);
 
-    float clamped_speed = clamp(length(particle.vel.xyz), 0, 4) / 4;
+    float clamped_speed = clamp(length(vel_mass.xyz), 0, 4) / 4;
     vec4 modelPosition = billboardMat * vec4(inPosition * vec3(0.2,0.2,0.2) * getScale(PushConstants.model) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
 
-    gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + instance_pos, 1.0));
+    gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
 
-    float lifeAlpha = 1 - particle.pos.w / particle.ext.x;
+    uint lifetick_pack = floatBitsToUint(pos_lifetime.w);
+    float lifeAlpha = 1 - (1.f * (lifetick_pack & 0xFFFF)) / (lifetick_pack & 0xFFFF0000);
+
     vec4 colorOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.75));
     float intensityOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.25)).b;
-    v_out.fragColor = particle.color.rgb *pow(2,intensityOverLife) * colorOverLife.rgb * colorOverLife.a;
+    v_out.fragColor = pcolor.rgb *pow(2,intensityOverLife) * colorOverLife.rgb * colorOverLife.a;
     v_out.fragTexCoord = inTexCoord;
 }

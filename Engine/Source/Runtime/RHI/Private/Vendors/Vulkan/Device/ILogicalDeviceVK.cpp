@@ -5,6 +5,7 @@ module;
 module RHI.ILogicalDevice.VK;
 import Core.Log;
 import Core.BitFlag;
+import RHI.IBarrier;
 import RHI.IPhysicalDevice.VK;
 
 namespace SIByL::RHI
@@ -122,6 +123,8 @@ namespace SIByL::RHI
 			mesh_shader_feature.taskShader = VK_TRUE;
 			mesh_shader_feature.meshShader = VK_TRUE;
 			createInfo.pNext = &mesh_shader_feature;
+
+			//rasterStageMask |= (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
 		}
 
 		if (vkCreateDevice(physicalDevice->getPhysicalDevice(), &createInfo, nullptr, &device) != VK_SUCCESS) {

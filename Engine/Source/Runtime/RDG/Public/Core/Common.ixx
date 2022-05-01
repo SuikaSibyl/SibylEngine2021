@@ -129,6 +129,8 @@ namespace SIByL::GFX::RDG
 			MemScope<Node> cast_node = MemCast<Node>(resource);
 			cast_node->registry = this;
 			NodeHandle handle = ECS::UniqueID::RequestUniqueID();
+			while (nodes.find(handle) != nodes.end())
+				handle = ECS::UniqueID::RequestUniqueID();
 			cast_node->handle = handle;
 			nodes[handle] = std::move(cast_node);
 			return handle;
@@ -239,6 +241,7 @@ namespace SIByL::GFX::RDG
 
 	export struct PassNode :public Node
 	{
+		bool isActive = true;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void {}
 		std::vector<BarrierHandle> barriers;
 	};

@@ -6,6 +6,7 @@ import Core.Log;
 import Core.MemoryManager;
 import Core.BitFlag;
 import RHI.IFactory;
+import RHI.ILogicalDevice;
 import RHI.IStorageBuffer;
 import GFX.RDG.Common;
 import GFX.RDG.RenderGraph;
@@ -20,6 +21,7 @@ namespace SIByL::GFX::RDG
 		{
 			storageBuffer = factory->createStorageBuffer(size);
 		}
+		rasterStages = factory->getLogicalDevice()->getRasterStageMask();
 	}
 
 	auto StorageBufferNode::onBuild(void* graph, RHI::IResourceFactory* factory) noexcept -> void
@@ -90,17 +92,13 @@ namespace SIByL::GFX::RDG
 					if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else if (rg->getPassNode(consumeHistory[left].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-					//| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+						srcStageMask = rasterStages;
 					else SE_CORE_ERROR("RDG :: STORAGE BUFFER unknown access switch!");
 
 					if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
 						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
 					else if (rg->getPassNode(consumeHistory[right].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::VERTEX_SHADER_BIT
-						| (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-					//| (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+						dstStageMask = rasterStages;
 					else SE_CORE_ERROR("RDG :: STORAGE BUFFER unknown access switch!");
 
 					MemScope<RHI::IBufferMemoryBarrier> buffer_memory_barrier = factory->createBufferMemoryBarrier({

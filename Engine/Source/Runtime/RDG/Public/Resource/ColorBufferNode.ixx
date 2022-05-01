@@ -8,6 +8,7 @@ import Core.MemoryManager;
 import RHI.IEnum;
 import RHI.ITexture;
 import RHI.ITextureView;
+import RHI.IBarrier;
 import RHI.IFactory;
 import GFX.RDG.TextureBufferNode;
 
@@ -28,5 +29,6 @@ namespace SIByL::GFX::RDG
 
 		bool hasDepth = false;
 		bool hasStencil = false;
+		RHI::PipelineStageFlags rasterStages;
 	};
 }

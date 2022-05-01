@@ -1,0 +1,25 @@
+#version 450
+#extension GL_NV_mesh_shader: require
+
+// Size of the payloads. The AS payload should preferably stay below 108 bytes, but if that is not possible, then keep it at least under 236 bytes.
+// Number of invocations of the amplification shader.
+// Number of mesh shaders emitted by the respective amplification shader (amplification rate).
+  bool  doRender    = cullCluster(meshlets[GlobalInvocation]);
+  uvec4 vote        = subgroupBallot(doRender);
+  uint  numMeshlets = subgroupBallotBitCount(vote);
+
+  if (LocalInvocation == 0) {
+    gl_TaskCountNV = numMeshlets;
+  }
+
+  uint idxOffset = subgroupBallotExclusiveBitCount(vote);
+  if (render)
+  {
+    OUT.meshletIDs[idxOffset] = GlobalInvocation;
+
+    // in GLSL it is possible to use uint8_t to store just the relative
+    // invocation to the Task Shader WorkGroup and therefore save more output space.
+
+    // OUT.meshletBaseID = WorkGroupID; // write once per workgroup
+    // OUT.meshletSubIDs[idxOffset] = uint8_t(LocaLInvocation);
+  }

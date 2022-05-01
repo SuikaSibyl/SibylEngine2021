@@ -1,0 +1,54 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+#extension GL_KHR_shader_subgroup_shuffle: require
+#extension GL_KHR_shader_subgroup_shuffle_relative: require
+
+layout(binding = 0) uniform PerViewUniformBuffer {
+    mat4 view;
+    mat4 proj;
+    vec4 cameraPos;
+} view_ubo;
+
+layout(set = 0, binding = 1, std430) buffer ParticlesPosLifetime
+{ vec4 particle_pos_lifetime[]; };
+
+layout(set = 0, binding = 2, std430) buffer ParticlesVelocityMass
+{ vec4 particle_vel_mass[]; };
+
+layout(set = 0, binding = 3, std430) buffer restrict DoubleBufferedIndices
+{ uint indices[]; };
+
+struct CullingInfo
+{
+    vec4 aabb_xy_wh;
+    vec4 min_depth;
+};
+layout(set = 0, binding = 4, std430) buffer restrict CullingInfos
+{ CullingInfo cullingInfos[]; };
+
+struct Counter
+{
+    uint aliveCount;
+    uint deadCount;
+    uint emitCount;
+    uint drawCount;
+    uint maxCount;
+};
+layout(set = 0, binding = 5, std430) buffer Counters
+{ Counter counter[]; };
+
+layout (local_size_x =512) in;
+
+void main()
+{    
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= counter[0].aliveCount) return;
+
+    uint particle_idx = indices[idx];
+    vec4 particle_pos = particle_pos_lifetime[particle_idx];
+
+    CullingInfo info;
+    info.aabb_xy_wh = particle_pos;
+    cullingInfos[idx] = info;
+}

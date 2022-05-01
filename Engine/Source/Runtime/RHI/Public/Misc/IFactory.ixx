@@ -118,6 +118,7 @@ namespace SIByL
 
 			auto deviceIdle() noexcept -> void;
 
+			auto getLogicalDevice() noexcept -> ILogicalDevice* { return logicalDevice; }
 		private:
 			API api;
 			IGraphicContext* graphicContext;

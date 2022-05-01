@@ -2,6 +2,7 @@ module;
 
 export module RHI.ILogicalDevice;
 import Core.SObject;
+import RHI.IBarrier;
 import RHI.IPhysicalDevice;
 
 namespace SIByL
@@ -22,6 +23,8 @@ namespace SIByL
 			virtual ~ILogicalDevice() = default;
 			virtual auto getPhysicalDevice() noexcept -> IPhysicalDevice* = 0;
 			virtual auto waitIdle() noexcept -> void = 0;
+
+			virtual auto getRasterStageMask() noexcept -> PipelineStageFlags = 0;
 		};
 	}
 }

@@ -30,6 +30,7 @@ namespace SIByL::GFX
 		auto appointRoot(SceneNodeHandle const& new_root) noexcept -> void;
 		auto getRootHandle() noexcept -> SceneNodeHandle { return root; }
 		auto getNodeEntity(SceneNodeHandle const& handle) noexcept -> ECS::Entity& { return nodes[handle].entity; }
+		auto getNodeEntity(std::string const& name) noexcept -> ECS::Entity;
 
 		auto updateTransforms() noexcept -> void;
 

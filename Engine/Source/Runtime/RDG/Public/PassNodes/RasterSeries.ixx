@@ -53,6 +53,13 @@ namespace SIByL::GFX::RDG
 	struct RasterPipelineScope;
 	struct RasterMaterialScope;
 
+	export enum struct DrawCallKind
+	{
+		Indexed,
+		IndexedIndirect,
+		MeshTasks,
+	};
+
 	export struct RasterDrawCall :public PassNode
 	{
 		RasterDrawCall(RHI::IPipelineLayout** pipeline_layout);
@@ -62,7 +69,9 @@ namespace SIByL::GFX::RDG
 		RHI::IVertexBuffer* vertexBuffer = nullptr;
 		RHI::IIndexBuffer* indexBuffer = nullptr;
 		RHI::IStorageBuffer* indirectDrawBuffer = nullptr;
+		uint32_t taskCount = 0;
 
+		DrawCallKind kind = DrawCallKind::Indexed;
 		PerObjectUniformBuffer uniform;
 
 	private:
@@ -162,6 +171,7 @@ namespace SIByL::GFX::RDG
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void override;
 		virtual auto onFrameStart(void* graph) noexcept -> void override;
 
+		auto getPerViewUniformBufferFlightHandle() noexcept -> NodeHandle;
 
 		auto fillRasterPipelineScopeDesc(RasterPipelineScope* raster_pipeline, void* graph) noexcept -> void;
 		auto updatePerViewUniformBuffer(PerViewUniformBuffer const& buffer, uint32_t const& current_frame) noexcept -> void;

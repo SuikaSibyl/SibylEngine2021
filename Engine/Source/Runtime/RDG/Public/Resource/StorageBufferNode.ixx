@@ -3,6 +3,7 @@ module;
 export module GFX.RDG.StorageBufferNode;
 import Core.MemoryManager;
 import RHI.IFactory;
+import RHI.IBarrier;
 import RHI.IStorageBuffer;
 import GFX.RDG.Common;
 
@@ -19,6 +20,7 @@ namespace SIByL::GFX::RDG
 		virtual auto getStorageBuffer() noexcept -> RHI::IStorageBuffer*;
 
 		size_t size;
+		RHI::PipelineStageFlags rasterStages;
 		RHI::IStorageBuffer* externalStorageBuffer = nullptr;
 		MemScope<RHI::IStorageBuffer> storageBuffer = nullptr;
 	};

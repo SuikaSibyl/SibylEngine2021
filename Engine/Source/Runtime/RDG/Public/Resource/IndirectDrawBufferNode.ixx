@@ -18,6 +18,7 @@ namespace SIByL::GFX::RDG
 				size = sizeof(unsigned int) * 5;
 				storageBuffer = factory->createIndirectDrawBuffer();
 			}
+			rasterStages = factory->getLogicalDevice()->getRasterStageMask();
 		}
 	};
 }
