@@ -22,6 +22,7 @@ namespace SIByL
 			virtual auto isDebugLayerEnabled() noexcept -> bool;
 			// IPhysicalDeviceDX12
 			virtual auto getGraphicContext() noexcept -> IGraphicContext* override;
+			virtual auto getTimestampPeriod() noexcept -> float { return 0; };
 
 			auto getGraphicContextDX12() noexcept -> IGraphicContextDX12*;
 			auto getAdapter() noexcept -> IDXGIAdapter4*;

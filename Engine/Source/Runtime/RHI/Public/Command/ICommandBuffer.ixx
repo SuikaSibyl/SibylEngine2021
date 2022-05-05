@@ -16,6 +16,7 @@ import RHI.IDescriptorSet;
 import RHI.IBarrier;
 import RHI.ITexture;
 import RHI.IStorageBuffer;
+import RHI.IQueryPool;
 
 namespace SIByL
 {
@@ -115,6 +116,8 @@ namespace SIByL
 			virtual auto cmdDrawMeshTasks(uint32_t taskCount, uint32_t firstTask) noexcept -> void = 0;
 			virtual auto cmdBeginDebugUtilsLabel(char const* name, float const* color) noexcept -> void = 0;
 			virtual auto cmdEndDebugUtilsLabel() noexcept -> void = 0;
+			virtual auto cmdResetQueryPool(IQueryPool* pool, uint32_t const& first, uint32_t const& count) noexcept -> void = 0;
+			virtual auto cmdWriteTimestamp(PipelineStageFlagBits stage, IQueryPool* pool, uint32_t const& i) noexcept -> void = 0;
 		};
 
 		export struct BlitInfo

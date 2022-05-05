@@ -1,0 +1,46 @@
+#version 450
+
+layout(push_constant) uniform constants {
+    vec2 imageSize;
+} PushConstants;
+
+layout ( binding = 0, r32ui ) uniform coherent  uimage2D colorAttachment;
+layout ( binding = 1 ) uniform sampler2D depthBuffer;
+
+struct CullingInfo
+{
+    vec4 aabb_xy_wh;
+    vec4 min_max_depth;
+};
+layout(set = 0, binding = 2, std430) buffer restrict CullingInfos
+{ CullingInfo cullingInfos[]; };
+
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+layout(set = 0, binding = 3, std430) buffer DrawIndexedIndirects
+{
+    DrawIndexedIndirect content[];
+} drawIndirect;
+
+void main()
+{
+    uint partilets_count = (drawIndirect.content[0].instanceCount + 15)/16;
+    uint partilets_idx = gl_GlobalInvocationID.x;
+    CullingInfo culling_info = cullingInfos[partilets_idx];
+    
+    float pixel_size = min(culling_info.min_max_depth.z, culling_info.min_max_depth.w);
+    if(pixel_size > 0.0f && pixel_size < 1.0f)
+    {
+        ivec2 pos = ivec2(PushConstants.imageSize * (culling_info.aabb_xy_wh.xy + culling_info.aabb_xy_wh.zw)  * 0.5);
+        imageAtomicAdd(colorAttachment, pos, 1); 
+    }
+    // vec4 depth = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize);
+    // imageStore(outputImage, ivec2(pos), depth);
+    // imageAtomicAdd(colorAttachment, ) 
+}

@@ -27,5 +27,11 @@
     <ClCompile Include="src\ParticleSystem\SortTest.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\ParticleSystem\Grass.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utils\DepthBaker.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

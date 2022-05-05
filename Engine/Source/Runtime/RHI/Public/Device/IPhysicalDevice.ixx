@@ -20,6 +20,7 @@ namespace SIByL
 
 			virtual auto isDebugLayerEnabled() noexcept -> bool { return true; }
 			virtual auto getGraphicContext() noexcept -> IGraphicContext* = 0;
+			virtual auto getTimestampPeriod() noexcept -> float = 0;
 		};
 	}
 }

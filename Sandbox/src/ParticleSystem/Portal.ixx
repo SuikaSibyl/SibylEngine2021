@@ -69,6 +69,9 @@ namespace SIByL::Demo
 		GFX::RDG::NodeHandle forwardPerViewUniformBufferFlight;
 		GFX::RDG::NodeHandle cullingInfo;
 
+		GFX::RDG::NodeHandle rasterColorAttachment;
+		GFX::RDG::NodeHandle rasterDepthAttachment;
+
 		// Resource ----------------------------------------
 		MemScope<RHI::IStorageBuffer> torusBuffer;
 		MemScope<RHI::IShader> shaderPortalInit;
@@ -82,6 +85,8 @@ namespace SIByL::Demo
 		MemScope<RHI::ITextureView> bakedCurvesView;
 
 		GFX::RDG::ComputeDispatch* emitDispatch = nullptr;
+		GFX::RDG::ComputeDispatch* softrasterDispatch = nullptr;
+		GFX::RDG::ComputeDispatch* cullInfoDispatch = nullptr;
 
 		RHI::IResourceFactory* factory;
 		GFX::RDG::RenderGraph portal_rdg;
@@ -358,10 +363,10 @@ namespace SIByL::Demo
 			portal_culling_info_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_culling_info_generation.spv", { RHI::ShaderStage::COMPUTE,"main" });
 			// Add Materials "CullingInfo"
 			{
-
 				auto particle_culling_info_mat_scope = workshop->addComputeMaterialScope("Particle Bounding Boxes", "CullingInfo-Portal", "Common");
 				particle_culling_info_mat_scope->resources = { forwardPerViewUniformBufferFlight, particlePosLifetickBuffer, particleVelocityMassBuffer, doubleBufferedIndicesHandle, cullingInfo, counterBuffer };
 				auto particle_culling_info_dispatch_scope = workshop->addComputeDispatch("Particle Bounding Boxes", "CullingInfo-Portal", "Common", "Only");
+				cullInfoDispatch = particle_culling_info_dispatch_scope;
 				particle_culling_info_dispatch_scope->customSize = [maxParticleCount = maxParticleCount](uint32_t& x, uint32_t& y, uint32_t& z) {
 					x = GRIDSIZE(maxParticleCount, (512));
 					y = 1;
@@ -409,5 +414,55 @@ namespace SIByL::Demo
 			portal_mat_scope->sampled_textures = { spriteHandle, bakedCurveHandle };
 		}
 		trancparency_portal_mesh_pipeline->isActive = true;
+
+		GFX::RDG::RasterPipelineScope* trancparency_portal_mesh_culling_pipeline = workshop->addRasterPipelineScope("Forward Pass", "Particle Portal Mesh Culling");
+		{
+			trancparency_portal_mesh_culling_pipeline->shaderTask = factory->createShaderFromBinaryFile("portal/portal_mesh_culling_frustrum_task.spv", { RHI::ShaderStage::TASK,"main" });
+			trancparency_portal_mesh_culling_pipeline->shaderMesh = factory->createShaderFromBinaryFile("portal/portal_mesh_culling_frustrum_mesh.spv", { RHI::ShaderStage::MESH,"main" });
+			trancparency_portal_mesh_culling_pipeline->shaderFrag = factory->createShaderFromBinaryFile("portal/portal_mesh_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+			trancparency_portal_mesh_culling_pipeline->cullMode = RHI::CullMode::NONE;
+
+			trancparency_portal_mesh_culling_pipeline->colorBlendingDesc = RHI::AdditionBlending;
+			trancparency_portal_mesh_culling_pipeline->depthStencilDesc = RHI::TestLessButNoWrite;
+
+			// Add Materials
+			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Particle Portal Mesh Culling", "Portal");
+			portal_mat_scope->resources = { samplerHandle, particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, samplerHandle, doubleBufferedIndicesHandle, indirectDrawBuffer, cullingInfo };
+			portal_mat_scope->sampled_textures = { spriteHandle, bakedCurveHandle };
+		}
+		trancparency_portal_mesh_culling_pipeline->isActive = false;
+
+		GFX::RDG::RasterPipelineScope* culling_aabb_vis_pipeline = workshop->addRasterPipelineScope("Forward Pass", "Vis AABB Portal");
+		{
+			culling_aabb_vis_pipeline->shaderMesh = factory->createShaderFromBinaryFile("portal/portal_aabb_vis.spv", { RHI::ShaderStage::MESH,"main" });
+			culling_aabb_vis_pipeline->shaderFrag = factory->createShaderFromBinaryFile("portal/portal_aabb_vis_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
+			culling_aabb_vis_pipeline->cullMode = RHI::CullMode::NONE;
+			culling_aabb_vis_pipeline->colorBlendingDesc = RHI::NoBlending;
+			culling_aabb_vis_pipeline->depthStencilDesc = RHI::NoTestAndNoWrite;
+
+			// Add Materials
+			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Vis AABB Portal", "Portal");
+			portal_mat_scope->resources = { cullingInfo, indirectDrawBuffer };
+		}
+		culling_aabb_vis_pipeline->isActive = true;
+
+		workshop->addComputePassScope("Particle Software Raster");
+		GFX::RDG::ComputePipelineScope* portal_softraster_pipeline = workshop->addComputePipelineScope("Particle Software Raster", "SoftwareRaster-Portal");
+		{
+			portal_softraster_pipeline->shaderComp = factory->createShaderFromBinaryFile("portal/portal_softraster_comp.spv", { RHI::ShaderStage::COMPUTE,"main" });
+			// Add Materials "CullingInfo"
+			{
+				auto particle_softraster_info_mat_scope = workshop->addComputeMaterialScope("Particle Software Raster", "SoftwareRaster-Portal", "Common");
+				particle_softraster_info_mat_scope->resources = { rasterColorAttachment, samplerHandle, cullingInfo, indirectDrawBuffer };
+				particle_softraster_info_mat_scope->sampled_textures = { rasterDepthAttachment };
+				auto particle_culling_info_dispatch_scope = workshop->addComputeDispatch("Particle Software Raster", "SoftwareRaster-Portal", "Common", "Only");
+				softrasterDispatch = particle_culling_info_dispatch_scope;
+				particle_culling_info_dispatch_scope->customSize = [maxParticleCount = maxParticleCount](uint32_t& x, uint32_t& y, uint32_t& z) {
+					x = GRIDSIZE(maxParticleCount, (16));
+					y = 1;
+					z = 1;
+				};
+			}
+		}
 	}
 }

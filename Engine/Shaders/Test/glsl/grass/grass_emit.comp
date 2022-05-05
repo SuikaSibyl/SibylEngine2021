@@ -1,0 +1,69 @@
+ #version 450
+#define PARTICLE_COUNT 65536
+#define LOG_PARTICLE_COUNT 256
+layout (local_size_x = 512) in;
+
+layout(set = 0, binding = 0, std430) buffer ParticlesPos
+{ vec4 particle_pos[]; };
+
+layout(binding = 1) uniform sampler2D depthSampler;
+
+float hash11(float p)
+{
+    p = fract(p * .1031);
+    p *= p + 33.33;
+    p *= p + p;
+    return fract(p);
+}
+
+vec2 hash21(float p)
+{
+	vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
+	p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+
+vec2 hash22(vec2 p)
+{
+	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx+33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+float DecodeFloatRGBA( vec4 rgba )
+{
+	vec4 kDecodeDot = vec4(1.0, 1/255.0, 1/65025.0, 1/16581375.0);
+	return dot( rgba, kDecodeDot );
+}
+//note: uniformly distributed, normalized rand, [0;1[
+float nrand( vec2 n )
+{
+	return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+}
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= PARTICLE_COUNT) return;
+    
+    // 0, 1
+    float width = (idx / 256)*1.f/255; 
+    float height = (idx % 256)*1.f/255; 
+
+    vec2 uv = vec2(width, height);
+    
+    vec4 depth_package = vec4(0,0,0,1);
+    float seed = float(gl_GlobalInvocationID.x);
+    int i=0;
+    while(depth_package == vec4(0,0,0,1))
+    {
+        i++;
+        if(i>15) break;
+        uv = hash21(seed);
+        depth_package = texture(depthSampler, uv);
+        seed = nrand(uv);
+    }
+    depth_package.rgb = pow(depth_package.rgb, vec3(1.f/2.2));
+    float depth = DecodeFloatRGBA(depth_package);
+    depth = -10 + depth*40 + 2.5;
+
+    particle_pos[idx] = vec4((uv.x-0.5) * 320, depth, (uv.y-0.5) * 320, gl_GlobalInvocationID.x & 3);
+}

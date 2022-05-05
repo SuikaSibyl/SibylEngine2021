@@ -16,6 +16,7 @@ import RHI.IRenderPass;
 import RHI.IFramebuffer;
 import RHI.ICommandBuffer;
 import RHI.IBarrier;
+import RHI.IQueryPool;
 import ECS.UID;
 
 namespace SIByL::GFX::RDG
@@ -244,6 +245,15 @@ namespace SIByL::GFX::RDG
 		bool isActive = true;
 		virtual auto onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void {}
 		std::vector<BarrierHandle> barriers;
+
+		RHI::IQueryPool* queryPool = nullptr;
+		RHI::PipelineStageFlagBits stageBitsQueryBeforeCmdRecord;
+		RHI::PipelineStageFlagBits stageBitsQueryAfterCmdRecord;
+		uint32_t idxQueryBeforeCmdRecord = -1;
+		uint32_t idxQueryAfterCmdRecord = -1;
+
+		auto queryBeforeCmdRecord(RHI::ICommandBuffer* commandbuffer) noexcept -> void;
+		auto queryAfterCmdRecord(RHI::ICommandBuffer* commandbuffer) noexcept -> void;
 	};
 
 	// - Container

@@ -1,21 +1,84 @@
 #version 450
 #extension GL_NV_mesh_shader: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+#extension GL_KHR_shader_subgroup_shuffle: require
+#extension GL_KHR_shader_subgroup_shuffle_relative: require
+
+#define GROUP_SIZE 32
+
+layout(push_constant) uniform PushConstantObject {
+    vec2 screen_size;
+} PushConstants;
+
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+layout(set = 0, binding = 7, std430) buffer DrawIndexedIndirects
+{
+    DrawIndexedIndirect content[];
+} drawIndirect;
+
+struct CullingInfo
+{
+    vec4 aabb_xy_wh;
+    vec4 min_max_depth;
+};
+layout(set = 0, binding = 8, std430) buffer restrict CullingInfos
+{ CullingInfo cullingInfos[]; };
 
 // Size of the payloads. The AS payload should preferably stay below 108 bytes, but if that is not possible, then keep it at least under 236 bytes.
 // Number of invocations of the amplification shader.
 // Number of mesh shaders emitted by the respective amplification shader (amplification rate).
-  bool  doRender    = cullCluster(meshlets[GlobalInvocation]);
+
+bool cullCluster(in CullingInfo cullingInfo)
+{
+  // xmin ymin xmax ymax
+  if(cullingInfo.aabb_xy_wh.x==99999)
+    return true;
+  if(cullingInfo.aabb_xy_wh.x >= 1 || cullingInfo.aabb_xy_wh.y >= 1 || cullingInfo.aabb_xy_wh.x <= 0 || cullingInfo.aabb_xy_wh.y <= 0)
+    return false;
+
+  float width = (cullingInfo.aabb_xy_wh.z - cullingInfo.aabb_xy_wh.x) * PushConstants.screen_size.x;
+  float height = (cullingInfo.aabb_xy_wh.w - cullingInfo.aabb_xy_wh.y) * PushConstants.screen_size.y;
+  if(max(width, height)<1.0f)
+    return false;
+
+  return true;
+}
+
+taskNV out Task {
+  uint      baseID;
+  uint8_t   subIDs[GROUP_SIZE];
+} OUT;
+
+layout(local_size_x=32) in;
+void main()
+{
+  uint valid_meshlets_count = (drawIndirect.content[0].instanceCount + 15) / 16;
+  if(gl_GlobalInvocationID.x >= valid_meshlets_count) return;
+
+  CullingInfo cullingInfo = cullingInfos[gl_GlobalInvocationID.x];
+
+  bool  doRender    = cullCluster(cullingInfo);
   uvec4 vote        = subgroupBallot(doRender);
   uint  numMeshlets = subgroupBallotBitCount(vote);
 
-  if (LocalInvocation == 0) {
+  if (gl_LocalInvocationID.x == 0) {
     gl_TaskCountNV = numMeshlets;
+    OUT.baseID = gl_WorkGroupID.x * GROUP_SIZE;
   }
 
   uint idxOffset = subgroupBallotExclusiveBitCount(vote);
-  if (render)
+  if (doRender)
   {
-    OUT.meshletIDs[idxOffset] = GlobalInvocation;
+    OUT.subIDs[idxOffset] = uint8_t(gl_LocalInvocationID.x);
 
     // in GLSL it is possible to use uint8_t to store just the relative
     // invocation to the Task Shader WorkGroup and therefore save more output space.
@@ -23,3 +86,4 @@
     // OUT.meshletBaseID = WorkGroupID; // write once per workgroup
     // OUT.meshletSubIDs[idxOffset] = uint8_t(LocaLInvocation);
   }
+}

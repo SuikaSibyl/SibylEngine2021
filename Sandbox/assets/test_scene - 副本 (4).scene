@@ -1,0 +1,657 @@
+SceneName: Scene
+SceneNodes:
+  - uid: 10936717007360642170
+    parent: 4994217299045272698
+    components:
+      TagComponent: part5
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 11902176177478192250
+        vert: 3435973836
+  - uid: 7726776372952321146
+    parent: 2638201337233017978
+    children:
+      - 13987905754904153210
+    components:
+      TagComponent: part1_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 11143601063986580602
+    parent: 4930603952427617402
+    children:
+      - 10404729250121108602
+    components:
+      TagComponent: part1_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 2267855375430191226
+    parent: 11454354189262129274
+    components:
+      TagComponent: particle
+      Transform:
+        translation: [-96.7427368, 14.9233809, -0.546259761]
+        eulerAngles: [1.57079566, -0, 0]
+        scale: [0.99999845, 0.999738038, 0.999738038]
+      BoundingBox:
+        min: [-5, -6, -5, 0]
+        max: [5, 1, 5, 0]
+      MeshComponent:
+        guid: 2267991365489773690
+        vert: 7
+      Renderer:
+        SubRenderer:
+          - PassName: Forward Pass
+            PipelineName: Particle Portal Mesh
+            MaterialName: Portal
+  - uid: 11454354189262129274
+    parent: 0
+    children:
+      - 2267855375430191226
+      - 4930603952427617402
+      - 1833534738330095738
+    components:
+      TagComponent: Scene
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 17573334008244489338
+    parent: 13325313659727268986
+    components:
+      TagComponent: part9
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 3587405365445414010
+        vert: 3435973836
+  - uid: 5237411678923279482
+    parent: 2638201337233017978
+    children:
+      - 13325313659727268986
+    components:
+      TagComponent: part9_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 13987905754904153210
+    parent: 7726776372952321146
+    children:
+      - 4819702813484665978
+    components:
+      TagComponent: part1_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 13563441438768090234
+    parent: 18185260556357061754
+    components:
+      TagComponent: part6
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 7640926453799177338
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 6921757888303451258
+    parent: 3282567914411379834
+    components:
+      TagComponent: part3
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 13285907111731383418
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 4819702813484665978
+    parent: 13987905754904153210
+    components:
+      TagComponent: part1
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 7504974091304324218
+        vert: 3435973836
+  - uid: 11934264273566813306
+    parent: 4930603952427617402
+    children:
+      - 7164670793204747386
+    components:
+      TagComponent: part11_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 4453222393807391866
+    parent: 2638201337233017978
+    children:
+      - 4994217299045272698
+    components:
+      TagComponent: part5_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 7454308595496406138
+    parent: 12331144041985231994
+    components:
+      TagComponent: part3
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 10836511915651648634
+        vert: 3435973836
+  - uid: 11471237988134177914
+    parent: 2638201337233017978
+    children:
+      - 12331144041985231994
+    components:
+      TagComponent: part3_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 12331144041985231994
+    parent: 11471237988134177914
+    children:
+      - 7454308595496406138
+    components:
+      TagComponent: part3_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 12204198776232332410
+    parent: 9592392467334155386
+    components:
+      TagComponent: part9
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 8825654630774328442
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 10327323682782071930
+    parent: 2638201337233017978
+    children:
+      - 6782990776041491578
+    components:
+      TagComponent: part7_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 5084570715312999546
+    parent: 142996024180722810
+    components:
+      TagComponent: part5
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 15040059166592191610
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 4994217299045272698
+    parent: 4453222393807391866
+    children:
+      - 10936717007360642170
+    components:
+      TagComponent: part5_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 2231540351373790330
+    parent: 10404729250121108602
+    components:
+      TagComponent: part1
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 10092573500948991098
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 6782990776041491578
+    parent: 10327323682782071930
+    children:
+      - 4421978671392509050
+    components:
+      TagComponent: part7_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 4421978671392509050
+    parent: 6782990776041491578
+    components:
+      TagComponent: part7
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 8606385675173121146
+        vert: 3435973836
+  - uid: 13325313659727268986
+    parent: 5237411678923279482
+    children:
+      - 17573334008244489338
+    components:
+      TagComponent: part9_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 7759708893971074170
+    parent: 18282087948345527418
+    children:
+      - 10133668847548746874
+    components:
+      TagComponent: part2_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 4930603952427617402
+    parent: 11454354189262129274
+    children:
+      - 11934264273566813306
+      - 11143601063986580602
+      - 18282087948345527418
+      - 17375738523337215098
+      - 13706149251960392826
+      - 281200237745654906
+      - 7662881501982608506
+      - 68405155352398970
+      - 15138856883417631866
+      - 2104032186923863162
+      - 11482778410922921082
+    components:
+      TagComponent: dust2
+      Transform:
+        translation: [15.8900003, 7.51499987, -79.2160034]
+        eulerAngles: [1.57079685, 0, 1.50995703e-07]
+        scale: [0.0599999987, 0.0599963889, -0.0599999987]
+      MeshComponent:
+        guid: 0
+        vert: 0
+  - uid: 7164670793204747386
+    parent: 11934264273566813306
+    children:
+      - 7651059552960760954
+    components:
+      TagComponent: part11_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 7651059552960760954
+    parent: 7164670793204747386
+    components:
+      TagComponent: part11
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 12170703254003764346
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 10404729250121108602
+    parent: 11143601063986580602
+    children:
+      - 2231540351373790330
+    components:
+      TagComponent: part1_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 9592392467334155386
+    parent: 2104032186923863162
+    children:
+      - 12204198776232332410
+    components:
+      TagComponent: part9_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 17375738523337215098
+    parent: 4930603952427617402
+    children:
+      - 3282567914411379834
+    components:
+      TagComponent: part3_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 18282087948345527418
+    parent: 4930603952427617402
+    children:
+      - 7759708893971074170
+    components:
+      TagComponent: part2_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 281200237745654906
+    parent: 4930603952427617402
+    children:
+      - 142996024180722810
+    components:
+      TagComponent: part5_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 10133668847548746874
+    parent: 7759708893971074170
+    components:
+      TagComponent: part2
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 8856898353189211258
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Forward Pass
+            PipelineName: Phongs
+            MaterialName: dust2_2
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+  - uid: 3282567914411379834
+    parent: 17375738523337215098
+    children:
+      - 6921757888303451258
+    components:
+      TagComponent: part3_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 13706149251960392826
+    parent: 4930603952427617402
+    children:
+      - 13612136609739033722
+    components:
+      TagComponent: part4_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 13612136609739033722
+    parent: 13706149251960392826
+    children:
+      - 6279431991449734266
+    components:
+      TagComponent: part4_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 2104032186923863162
+    parent: 4930603952427617402
+    children:
+      - 9592392467334155386
+    components:
+      TagComponent: part9_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 6279431991449734266
+    parent: 13612136609739033722
+    components:
+      TagComponent: part4
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 2432232009768488058
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Forward Pass
+            PipelineName: Phongs
+            MaterialName: dust2_4
+  - uid: 142996024180722810
+    parent: 281200237745654906
+    children:
+      - 5084570715312999546
+    components:
+      TagComponent: part5_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 10225711164933131386
+    parent: 16712302003230198906
+    components:
+      TagComponent: part7
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 15337578216975355002
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 7662881501982608506
+    parent: 4930603952427617402
+    children:
+      - 18185260556357061754
+    components:
+      TagComponent: part6_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 18185260556357061754
+    parent: 7662881501982608506
+    children:
+      - 13563441438768090234
+    components:
+      TagComponent: part6_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 4662076775270304890
+    parent: 15138856883417631866
+    children:
+      - 7073754375727205498
+    components:
+      TagComponent: part8_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 68405155352398970
+    parent: 4930603952427617402
+    children:
+      - 16712302003230198906
+    components:
+      TagComponent: part7_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 16712302003230198906
+    parent: 68405155352398970
+    children:
+      - 10225711164933131386
+    components:
+      TagComponent: part7_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 18235363102211558522
+    parent: 2200015153982196858
+    components:
+      TagComponent: part10
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 3894213038803635322
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 15138856883417631866
+    parent: 4930603952427617402
+    children:
+      - 4662076775270304890
+    components:
+      TagComponent: part8_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 7073754375727205498
+    parent: 4662076775270304890
+    components:
+      TagComponent: part8
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 10876762786064878714
+        vert: 3435973836
+      Renderer:
+        SubRenderer:
+          - PassName: Depth Baker Pass
+            PipelineName: Depth Baker
+            MaterialName: Only
+          - PassName: Pre-Z Pass
+            PipelineName: Opaque
+            MaterialName: Only
+  - uid: 11482778410922921082
+    parent: 4930603952427617402
+    children:
+      - 2200015153982196858
+    components:
+      TagComponent: part10_$AssimpFbx$_PreRotation
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 2200015153982196858
+    parent: 11482778410922921082
+    children:
+      - 18235363102211558522
+    components:
+      TagComponent: part10_$AssimpFbx$_Scaling
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+  - uid: 1833534738330095738
+    parent: 11454354189262129274
+    components:
+      TagComponent: grass
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 2267991365489773690
+        vert: 7
+      Renderer:
+        SubRenderer:
+          - PassName: Forward Pass
+            PipelineName: Particle Grass
+            MaterialName: Grass
+SceneEnd: TRUE

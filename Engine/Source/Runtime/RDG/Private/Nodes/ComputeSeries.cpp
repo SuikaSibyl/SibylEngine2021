@@ -44,6 +44,8 @@ namespace SIByL::GFX::RDG
 {
 	auto ComputeDispatch::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		queryBeforeCmdRecord(commandbuffer);
+
 		if (pushConstant)
 		{
 			Buffer buffer;
@@ -54,6 +56,7 @@ namespace SIByL::GFX::RDG
 		uint32_t x, y, z;
 		customSize(x, y, z);
 		commandbuffer->cmdDispatch(x, y, z);
+		queryAfterCmdRecord(commandbuffer);
 	}
 
 	// ===========================================================

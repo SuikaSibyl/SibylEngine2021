@@ -170,6 +170,8 @@
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandPoolVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandQueueVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Command\ICommandQueueVK.ixx" />
+    <ClCompile Include="Private\Vendors\Vulkan\Query\IQueryPoolVK.cpp" />
+    <ClCompile Include="Private\Vendors\Vulkan\Query\IQueryPoolVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISamplerVK.cpp" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\ISamplerVK.ixx" />
     <ClCompile Include="Private\Vendors\Vulkan\Resource\IStorageBufferVK.cpp" />
@@ -230,6 +232,7 @@
     <ClCompile Include="Public\Command\ICommandBuffer.ixx" />
     <ClCompile Include="Public\Command\ICommandList.ixx" />
     <ClCompile Include="Public\Command\ICommandPool.ixx" />
+    <ClCompile Include="Public\Query\IQueryPool.ixx" />
     <ClCompile Include="Public\Resource\IStorageBuffer.ixx" />
     <ClCompile Include="Public\Shader\IShaderReflection.ixx" />
     <ClCompile Include="Public\Sync\IEvent.ixx" />

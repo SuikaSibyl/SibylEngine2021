@@ -11,6 +11,12 @@ import ECS.UID;
 
 namespace SIByL::GFX
 {
+	export enum struct ProjectKind
+	{
+		PERSPECTIVE,
+		ORTHOGONAL,
+	};
+
 	export struct Camera
 	{
 	public:
@@ -27,11 +33,16 @@ namespace SIByL::GFX
 		auto setNear(float input) noexcept -> void {  near = input; }
 		auto setFar(float input) noexcept -> void { far = input; }
 
+		ProjectKind kind = ProjectKind::PERSPECTIVE;
+
 	private:
 		float fovy = glm::radians(45.0f);
 		float aspect = 1;
 		float near = 0.1f;
 		float far = 100.0f;
+
+		float left_right = 0;
+		float bottom_top = 0;
 
 	private:
 		glm::mat4x4 view;
@@ -45,7 +56,14 @@ namespace SIByL::GFX
 
 	auto Camera::invalidProjectionMat() noexcept -> glm::mat4x4
 	{
-		glm::perspective(fovy, aspect, near, far);
+		if (kind == ProjectKind::PERSPECTIVE)
+		{
+			projection = glm::perspective(fovy, aspect, near, far);
+		}
+		else if (kind == ProjectKind::ORTHOGONAL)
+		{
+			projection = glm::ortho(-left_right, left_right, -bottom_top, bottom_top, near, far);
+		}
 		return projection;
 	}
 }

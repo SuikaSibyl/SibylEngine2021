@@ -21,6 +21,7 @@ namespace SIByL
 			virtual auto initialize() -> bool;
 			virtual auto isDebugLayerEnabled() noexcept -> bool;
 			virtual auto getGraphicContext() noexcept -> IGraphicContext* override;
+			virtual auto getTimestampPeriod() noexcept -> float override;
 
 		public:
 			struct QueueFamilyIndices {
@@ -64,6 +65,9 @@ namespace SIByL
 			auto checkDeviceExtensionSupport(VkPhysicalDevice device, std::string& device_diagnosis) -> bool;
 			auto querySwapChainSupport(VkPhysicalDevice device) -> SwapChainSupportDetails;
 			auto findSupportedFormat(std::vector<VkFormat> const& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) noexcept -> VkFormat;
+
+		private:
+			float timestampPeriod = 0.0f;
 		};
 	}
 }

@@ -4,6 +4,7 @@ module;
 #include <glm/glm.hpp>
 #include <unordered_map>
 export module GFX.RDG.RasterNodes;
+import Core.Buffer;
 import Core.MemoryManager;
 import RHI.GraphicContext;
 import RHI.IPhysicalDevice;
@@ -35,6 +36,7 @@ import RHI.ISampler;
 import RHI.IStorageBuffer;
 import RHI.IBarrier;
 import RHI.ICommandBuffer;
+import RHI.IQueryPool;
 import GFX.RDG.Common;
 
 namespace SIByL::GFX::RDG
@@ -70,9 +72,13 @@ namespace SIByL::GFX::RDG
 		RHI::IIndexBuffer* indexBuffer = nullptr;
 		RHI::IStorageBuffer* indirectDrawBuffer = nullptr;
 		uint32_t taskCount = 0;
+		uint32_t instanceCount = 1;
 
 		DrawCallKind kind = DrawCallKind::Indexed;
 		PerObjectUniformBuffer uniform;
+
+		using PushConstantFn = std::function<void(Buffer&)>;
+		PushConstantFn pushConstant = nullptr;
 
 	private:
 		friend struct RasterMaterialScope;

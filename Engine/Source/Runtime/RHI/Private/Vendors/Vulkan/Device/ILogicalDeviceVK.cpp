@@ -116,22 +116,58 @@ namespace SIByL::RHI
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(physicalDevice->getDeviceExtensions().size());
 		createInfo.ppEnabledExtensionNames = physicalDevice->getDeviceExtensions().data();
 
+		void const** pNextChainHead = &(createInfo.pNext);
+		void** pNextChainTail = nullptr;
+		VkPhysicalDeviceHostQueryResetFeatures resetFeatures;
+		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::QUERY))
+		{
+			resetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+			resetFeatures.hostQueryReset = VK_TRUE;
+			resetFeatures.pNext = nullptr;
+
+			if (pNextChainTail == nullptr)
+				*pNextChainHead = &resetFeatures;
+			else
+				*pNextChainTail = &resetFeatures;
+			pNextChainTail = &(resetFeatures.pNext);
+		}
 		VkPhysicalDeviceMeshShaderFeaturesNV mesh_shader_feature{};
 		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::MESH_SHADER))
 		{
 			mesh_shader_feature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV;
+			mesh_shader_feature.pNext = nullptr;
 			mesh_shader_feature.taskShader = VK_TRUE;
 			mesh_shader_feature.meshShader = VK_TRUE;
-			createInfo.pNext = &mesh_shader_feature;
 
-			//rasterStageMask |= (uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+			rasterStageMask |=
+				(uint32_t)RHI::PipelineStageFlagBits::TASK_SHADER_BIT_NV |
+				(uint32_t)RHI::PipelineStageFlagBits::MESH_SHADER_BIT_NV;
+
+			if (pNextChainTail == nullptr)
+				*pNextChainHead = &mesh_shader_feature;
+			else
+				*pNextChainTail = &mesh_shader_feature;
+			pNextChainTail = &(mesh_shader_feature.pNext);
+		}
+		VkPhysicalDeviceShaderFloat16Int8Features shader_float16_int8{};
+		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::SHADER_INT8))
+		{
+			shader_float16_int8.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
+			shader_float16_int8.pNext = nullptr;
+			shader_float16_int8.shaderInt8 = VK_TRUE;
+
+			if (pNextChainTail == nullptr)
+				*pNextChainHead = &shader_float16_int8;
+			else
+				*pNextChainTail = &shader_float16_int8;
+			pNextChainTail = &(shader_float16_int8.pNext);
 		}
 
 		if (vkCreateDevice(physicalDevice->getPhysicalDevice(), &createInfo, nullptr, &device) != VK_SUCCESS) {
 			SE_CORE_ERROR("VULKAN :: failed to create logical device!");
 		}
 
-		// get queue handle
+		// get queue handlevul		
 		vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 		vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 		vkGetDeviceQueue(device, indices.computeFamily.value(), 0, &computeQueue);

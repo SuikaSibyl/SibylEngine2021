@@ -72,6 +72,7 @@ namespace SIByL
 			FORMAT_B8G8R8A8_RGB,
 			FORMAT_B8G8R8A8_SRGB,
 			FORMAT_R8G8B8A8_SRGB,
+			FORMAT_R32_UINT,
 			FORMAT_R32_SFLOAT,
 			FORMAT_D32_SFLOAT, 
 			FORMAT_D32_SFLOAT_S8_UINT, 
@@ -96,6 +97,7 @@ namespace SIByL
 			GEOMETRY,
 			TESSELLATION,
 			COMPUTE,
+			TASK,
 			MESH,
 		};
 
@@ -262,7 +264,7 @@ namespace SIByL
 			INTERSECTION_BIT = 0x00000400,
 			CALLABLE_BIT = 0x00000800,
 			TASK_BIT = 0x00001000,
-			MESH_BIT = 0x00002080,
+			MESH_BIT = 0x00002000,
 			SUBPASS_SHADING_BIT = 0x00004000,
 		};
 		export using ShaderStageFlags = uint32_t;
@@ -275,6 +277,7 @@ namespace SIByL
 			case ShaderStage::GEOMETRY:	return ShaderStageFlagBits::GEOMETRY_BIT; break;
 			case ShaderStage::COMPUTE:	return ShaderStageFlagBits::COMPUTE_BIT; break;
 			case ShaderStage::MESH:		return ShaderStageFlagBits::MESH_BIT; break;
+			case ShaderStage::TASK:		return ShaderStageFlagBits::TASK_BIT; break;
 			}
 			return ShaderStageFlagBits::NONE_BIT;
 		}
@@ -334,6 +337,37 @@ namespace SIByL
 			ATTACHMENT_OPTIMAL,
 		};
 
+		export enum class PipelineStageFlagBits :uint32_t
+		{
+			TOP_OF_PIPE_BIT = 0x00000001,
+			DRAW_INDIRECT_BIT = 0x00000002,
+			VERTEX_INPUT_BIT = 0x00000004,
+			VERTEX_SHADER_BIT = 0x00000008,
+			TESSELLATION_CONTROL_SHADER_BIT = 0x00000010,
+			TESSELLATION_EVALUATION_SHADER_BIT = 0x00000020,
+			GEOMETRY_SHADER_BIT = 0x00000040,
+			FRAGMENT_SHADER_BIT = 0x00000080,
+			EARLY_FRAGMENT_TESTS_BIT = 0x00000100,
+			LATE_FRAGMENT_TESTS_BIT = 0x00000200,
+			COLOR_ATTACHMENT_OUTPUT_BIT = 0x00000400,
+			COMPUTE_SHADER_BIT = 0x00000800,
+			TRANSFER_BIT = 0x00001000,
+			BOTTOM_OF_PIPE_BIT = 0x00002000,
+			HOST_BIT = 0x00004000,
+			ALL_GRAPHICS_BIT = 0x00008000,
+			ALL_COMMANDS_BIT = 0x00010000,
+			TRANSFORM_FEEDBACK_BIT_EXT = 0x01000000,
+			CONDITIONAL_RENDERING_BIT_EXT = 0x00040000,
+			ACCELERATION_STRUCTURE_BUILD_BIT_KHR = 0x02000000,
+			RAY_TRACING_SHADER_BIT_KHR = 0x00200000,
+			TASK_SHADER_BIT_NV = 0x00080000,
+			MESH_SHADER_BIT_NV = 0x00100000,
+			FRAGMENT_DENSITY_PROCESS_BIT = 0x00800000,
+			FRAGMENT_SHADING_RATE_ATTACHMENT_BIT = 0x00400000,
+			COMMAND_PREPROCESS_BIT = 0x00020000,
+		};
+		export using PipelineStageFlags = uint32_t;
+
 		export inline auto to_string(ImageLayout imageLayout) noexcept -> std::string
 		{
 			switch (imageLayout)
@@ -365,4 +399,5 @@ namespace SIByL
 
 		export inline auto flagBitSwitch(uint32_t const& input, uint32_t const& flag, uint32_t const& vendor_flag, uint32_t& target) noexcept -> void;
 	}
+
 }

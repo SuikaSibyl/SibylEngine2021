@@ -171,6 +171,22 @@ namespace SIByL::GFX::RDG
 		framebuffer = factory->createFramebuffer(framebuffer_desc);
 	}
 
+	auto PassNode::queryBeforeCmdRecord(RHI::ICommandBuffer* commandbuffer) noexcept -> void
+	{
+		if (idxQueryBeforeCmdRecord != -1)
+		{
+			commandbuffer->cmdWriteTimestamp(stageBitsQueryBeforeCmdRecord, queryPool, idxQueryBeforeCmdRecord);
+		}
+	}
+
+	auto PassNode::queryAfterCmdRecord(RHI::ICommandBuffer* commandbuffer) noexcept -> void
+	{
+		if (idxQueryAfterCmdRecord != -1)
+		{
+			commandbuffer->cmdWriteTimestamp(stageBitsQueryAfterCmdRecord, queryPool, idxQueryAfterCmdRecord);
+		}
+	}
+
 	auto PassScopeEnd::onCompile(void* graph, RHI::IResourceFactory* factory) noexcept -> void
 	{
 		RenderGraph* rg = (RenderGraph*)graph;

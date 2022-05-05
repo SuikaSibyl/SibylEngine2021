@@ -41,6 +41,9 @@ namespace SIByL::RHI
 	{
 		switch (stage)
 		{
+		case SIByL::RHI::ShaderStage::TASK:
+			return VK_SHADER_STAGE_TASK_BIT_NV;
+			break;
 		case SIByL::RHI::ShaderStage::MESH:
 			return VK_SHADER_STAGE_MESH_BIT_NV;
 			break;
@@ -276,6 +279,8 @@ namespace SIByL::RHI
 			break;
 		case ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32:
 			return VK_FORMAT_B10G11R11_UFLOAT_PACK32;
+		case ResourceFormat::FORMAT_R32_UINT:
+			return VK_FORMAT_R32_UINT;
 		case ResourceFormat::FORMAT_R32_SFLOAT:
 			return VK_FORMAT_R32_SFLOAT;
 			break;

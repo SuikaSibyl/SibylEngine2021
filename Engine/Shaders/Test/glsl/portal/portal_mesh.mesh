@@ -2,7 +2,7 @@
 #extension GL_NV_mesh_shader: require
 
 #define LOCAL_SIZE 16
-layout(local_size_x = LOCAL_SIZE, local_size_y = 1, local_size_z = 1) in;
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 layout(triangles, max_vertices = LOCAL_SIZE * 4, max_primitives = LOCAL_SIZE * 2) out;
 
 layout(push_constant) uniform PushConstantObject {
@@ -137,46 +137,55 @@ vec3 getWorkgroupGridColor()
 
 void main()
 {    
-    uint idx = gl_GlobalInvocationID.x;
-    uint thread_id = gl_LocalInvocationID.x;
-
+    uint idx = gl_GlobalInvocationID.x / 2;
     if(idx >= drawIndirect.content[0].instanceCount) return;
 
-    // Each thread handle a particle
+    // Every 2 neighbor thread handle a particle
     uint particle_idx = livePool.indices[idx];
     vec4 pos_lifetime = particle_pos_lifetime[particle_idx];
     vec4 vel_mass = particle_vel_mass[particle_idx];
     vec4 pcolor = particle_color[particle_idx];
 
-    // vertex write
-    mat4 billboardMat = billboardAlongVelocity(vel_mass.xyz, view_ubo.cameraPos.xyz - pos_lifetime.xyz);
-  
-    float clamped_speed = clamp(length(vel_mass.xyz), 0, 4) / 4;
+    // Get id for each offset
+    uint quad_id = gl_LocalInvocationID.x / 2;
+    uint triangle_id = gl_LocalInvocationID.x & 0x1;
 
+    // get billboard mat
+    mat4 billboardMat = billboardAlongVelocity(vel_mass.xyz, view_ubo.cameraPos.xyz - pos_lifetime.xyz);
+    // get speed
+    float clamped_speed = clamp(length(vel_mass.xyz), 0, 4) / 4;
+    vec3 scale_quad = vec3(0.2,0.2,0.2) * getScale(PushConstants.model) * vec3(0.1, speed_y_curve(clamped_speed), 1);
+    
     uint lifetick_pack = floatBitsToUint(pos_lifetime.w);
     float lifeAlpha = 1 - (1.f * (lifetick_pack & 0xFFFF)) / (lifetick_pack & 0xFFFF0000);
     vec4 colorOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.75));
     float intensityOverLife = texture(texSampler, vec2((0.5 * (lifeAlpha) * 127)/128, 0.25)).b;
 
     vec3 color = pcolor.rgb *pow(2,intensityOverLife) * colorOverLife.rgb * colorOverLife.a;
-    color = getWorkgroupGridColor();
-    per_primitive_out[thread_id*2 + 0].color = color;
-    per_primitive_out[thread_id*2 + 1].color = color;
+    // color = getWorkgroupGridColor();
+    per_primitive_out[quad_id*2 + triangle_id].color = color;
 
-    for(uint i = 0; i < 4; i++)
+    uint t2xtriangle_id = 2*triangle_id;
+    uint t4xquad_id = 4*quad_id;
+    uint t3xtriangle_id = t2xtriangle_id+triangle_id;
+    uint t6xquad = 6*quad_id;
+    uint t4xquad_id_t2xtriangle_id = t4xquad_id + t2xtriangle_id;
+    uint t6xquad_t3xtriangle_id = t6xquad + t3xtriangle_id;
+    
+    for(uint i = 0; i < 2; i++)
     {
-        vec4 modelPosition = billboardMat * vec4(vertices[i] * vec3(0.2,0.2,0.2) * getScale(PushConstants.model) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
-        gl_MeshVerticesNV[i + 4*thread_id].gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
+        vec4 modelPosition = billboardMat * vec4(vertices[i + t2xtriangle_id] * scale_quad, 1.0);
+        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
 
-        v_out[i + 4*thread_id].fragTexCoord = uvs[i];
+        v_out[i + t4xquad_id_t2xtriangle_id].fragTexCoord = uvs[i + t2xtriangle_id];
     }
 
-    for(uint i = 0; i < 6; i++)
+    for(uint i = 0; i < 3; i++)
     {
-        gl_PrimitiveIndicesNV[i + 6*thread_id] = 4*thread_id + quad_indices[i];
+        gl_PrimitiveIndicesNV[i + t6xquad_t3xtriangle_id] = t4xquad_id + quad_indices[i + t3xtriangle_id];
     }
     
-    if (thread_id == 0) {
+    if (gl_LocalInvocationID.x == 0) {
         gl_PrimitiveCountNV = LOCAL_SIZE * 2;
         if((gl_WorkGroupID.x + 1) * LOCAL_SIZE > drawIndirect.content[0].instanceCount)
         {

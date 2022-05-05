@@ -56,6 +56,7 @@ namespace SIByL
 			case SIByL::RHI::ResourceFormat::FORMAT_R8G8B8A8_UNORM:
 			case SIByL::RHI::ResourceFormat::FORMAT_R32G32B32A32_SFLOAT:
 			case SIByL::RHI::ResourceFormat::FORMAT_B10G11R11_UFLOAT_PACK32:
+			case SIByL::RHI::ResourceFormat::FORMAT_R32_UINT:
 			case SIByL::RHI::ResourceFormat::FORMAT_R32_SFLOAT:
 				accessMask = (uint32_t)ImageAspectFlagBits::COLOR_BIT;
 				break;

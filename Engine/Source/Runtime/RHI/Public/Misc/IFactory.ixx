@@ -34,6 +34,7 @@ import RHI.ITexture;
 import RHI.ITextureView;
 import RHI.ISampler;
 import RHI.IStorageBuffer;
+import RHI.IQueryPool;
 
 namespace SIByL
 {
@@ -112,6 +113,7 @@ namespace SIByL
 			auto createTextureView(ITexture* texture, ImageUsageFlags extra_usages = 0) noexcept -> MemScope<ITextureView>;
 			auto createTextureView(ITexture* texture, ImageSubresourceRange const& range) noexcept -> MemScope<ITextureView>;
 			auto createSampler(SamplerDesc const&) noexcept -> MemScope<ISampler>;
+			auto createQueryPool(QueryPoolDesc const&) noexcept -> MemScope<IQueryPool>;
 
 			auto createTransientCommandBuffer() noexcept -> MemScope<ICommandBuffer>;
 			auto createShaderFromBinaryFile(std::filesystem::path path, ShaderDesc const& desc) noexcept -> MemScope<IShader>;

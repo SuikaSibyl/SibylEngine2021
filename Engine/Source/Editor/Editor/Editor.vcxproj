@@ -160,6 +160,7 @@
     <ClCompile Include="Public\Widgets\Inspector.ixx" />
     <ClCompile Include="Public\Widgets\RenderPipeline.ixx" />
     <ClCompile Include="Public\Widgets\Scene.ixx" />
+    <ClCompile Include="Public\Widgets\Statistics.ixx" />
     <ClCompile Include="Public\Widgets\Viewport.ixx" />
     <ClCompile Include="Public\Framework\Widget.ixx" />
   </ItemGroup>

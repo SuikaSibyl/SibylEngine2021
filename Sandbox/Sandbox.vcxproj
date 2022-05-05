@@ -171,8 +171,10 @@ xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang-llvm.dll $(Solut
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\main.ixx" />
+    <ClCompile Include="src\ParticleSystem\Grass.ixx" />
     <ClCompile Include="src\ParticleSystem\Portal.ixx" />
     <ClCompile Include="src\ParticleSystem\SortTest.ixx" />
+    <ClCompile Include="src\Utils\DepthBaker.ixx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Source\Editor\EditorCore\EditorCore.vcxproj">

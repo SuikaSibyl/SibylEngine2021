@@ -45,6 +45,7 @@ import RHI.ITexture;
 import RHI.ITextureView;
 import RHI.ISampler;
 import RHI.IStorageBuffer;
+import RHI.IQueryPool;
 
 import RHI.GraphicContext.VK;
 import RHI.IPhysicalDevice.VK;
@@ -72,6 +73,7 @@ import RHI.ITexture.VK;
 import RHI.ITextureView.VK;
 import RHI.ISampler.VK;
 import RHI.IStorageBuffer.VK;
+import RHI.IQueryPool.VK;
 
 namespace SIByL::RHI
 {
@@ -913,6 +915,25 @@ namespace SIByL::RHI
 			break;
 		}
 		return sampler;
+	}
+
+	auto IResourceFactory::createQueryPool(QueryPoolDesc const& desc) noexcept -> MemScope<IQueryPool>
+	{
+		MemScope<IQueryPool> queryPool = nullptr;
+		switch (api)
+		{
+		case SIByL::RHI::API::DX12:
+			break;
+		case SIByL::RHI::API::VULKAN:
+		{
+			MemScope<IQueryPoolVK> queryPool_vk = MemNew<IQueryPoolVK>(desc, (ILogicalDeviceVK*)logicalDevice);
+			queryPool = MemCast<IQueryPool>(queryPool_vk);
+		}
+		break;
+		default:
+			break;
+		}
+		return queryPool;
 	}
 
 	auto IResourceFactory::createTransientCommandBuffer() noexcept -> MemScope<ICommandBuffer>

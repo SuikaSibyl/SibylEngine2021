@@ -197,6 +197,13 @@ namespace SIByL
 			RHI::CompareOp::LESS_OR_EQUAL
 		};
 
+		export inline DepthStencilDesc NoTestAndNoWrite
+		{
+			false,
+			false,
+			RHI::CompareOp::ALWAYS
+		};
+
 		export class IDepthStencil
 		{
 		public:

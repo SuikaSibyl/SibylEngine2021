@@ -46,6 +46,7 @@ namespace SIByL::GFX::RDG
 
 	auto RasterDrawCall::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		queryBeforeCmdRecord(commandbuffer);
 		if (kind == DrawCallKind::Indexed && indexBuffer && vertexBuffer)
 		{
 			commandbuffer->cmdBindVertexBuffer(vertexBuffer);
@@ -55,12 +56,19 @@ namespace SIByL::GFX::RDG
 			if (indirectDrawBuffer)
 				commandbuffer->cmdDrawIndexedIndirect(indirectDrawBuffer, 0, 1, sizeof(unsigned int) * 5);
 			else
-				commandbuffer->cmdDrawIndexed(indexBuffer->getIndicesCount(), 1, 0, 0, 0);
+				commandbuffer->cmdDrawIndexed(indexBuffer->getIndicesCount(), instanceCount, 0, 0, 0);
 		}
 		else if (kind == DrawCallKind::MeshTasks)
 		{
+			if (pushConstant)
+			{
+				Buffer buffer;
+				pushConstant(buffer);
+				commandbuffer->cmdPushConstants(*pipelineLayout, RHI::ShaderStage::MESH, buffer.getSize(), buffer.getData());
+			}
 			commandbuffer->cmdDrawMeshTasks(taskCount, 0);
 		}
+		queryAfterCmdRecord(commandbuffer);
 	}
 
 	auto RasterDrawCall::clearDrawCallInfo() noexcept -> void
@@ -288,8 +296,10 @@ namespace SIByL::GFX::RDG
 		pipelineLayout = factory->createPipelineLayout(pipelineLayout_desc);
 		// shaders
 		std::vector<RHI::IShader*> shader_groups;
-		if (shaderVert.get() == nullptr && shaderFrag.get() != nullptr && shaderMesh.get() != nullptr)
+		if (shaderVert.get() == nullptr && shaderFrag.get() != nullptr && shaderMesh.get() != nullptr && shaderTask.get() == nullptr)
 			shader_groups = { shaderMesh.get(), shaderFrag.get() };
+		else if (shaderVert.get() == nullptr && shaderFrag.get() != nullptr && shaderMesh.get() != nullptr && shaderTask.get() != nullptr)
+			shader_groups = { shaderTask.get(), shaderMesh.get(), shaderFrag.get() };
 		else if (shaderVert.get() != nullptr && shaderFrag.get() != nullptr && shaderMesh.get() == nullptr)
 			shader_groups = { shaderVert.get(), shaderFrag.get() };
 		else
@@ -441,6 +451,7 @@ namespace SIByL::GFX::RDG
 		for (auto handle : pipelineScopes)
 		{
 			RasterPipelineScope* pipeline_scope = (RasterPipelineScope*)render_graph->registry.getNode(handle);
+			if (pipeline_scope->isActive == false) continue;
 			for (auto handle : pipeline_scope->materialScopes)
 			{
 				RasterMaterialScope* material_scope = (RasterMaterialScope*)render_graph->registry.getNode(handle);

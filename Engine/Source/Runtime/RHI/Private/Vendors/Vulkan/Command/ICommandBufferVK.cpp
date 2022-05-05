@@ -37,6 +37,8 @@ import RHI.IMemoryBarrier.VK;
 import RHI.ITexture;
 import RHI.ITexture.VK;
 import RHI.IStorageBuffer.VK;
+import RHI.IQueryPool;
+import RHI.IQueryPool.VK;
 
 namespace SIByL::RHI
 {
@@ -306,5 +308,15 @@ namespace SIByL::RHI
 	auto ICommandBufferVK::cmdEndDebugUtilsLabel() noexcept -> void
 	{
 		logicalDevice->getPhysicalDeviceVk()->getGraphicContextVK()->vkCmdEndDebugUtilsLabelEXT(commandBuffer);
+	}
+	
+	auto ICommandBufferVK::cmdResetQueryPool(IQueryPool* pool, uint32_t const& first, uint32_t const& count) noexcept -> void
+	{
+		vkCmdResetQueryPool(commandBuffer, *((IQueryPoolVK*)pool)->getQueryPool(), first, count);
+	}
+
+	auto ICommandBufferVK::cmdWriteTimestamp(PipelineStageFlagBits stage, IQueryPool* pool, uint32_t const& i) noexcept -> void
+	{
+		vkCmdWriteTimestamp(commandBuffer, (VkPipelineStageFlagBits)stage, *((IQueryPoolVK*)pool)->getQueryPool(), i);
 	}
 }

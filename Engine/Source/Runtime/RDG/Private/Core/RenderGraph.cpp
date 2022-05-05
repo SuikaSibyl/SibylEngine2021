@@ -207,6 +207,24 @@ namespace SIByL::GFX::RDG
 		return (ComputePipelineScope*)registry.getNode(pipeline_node_handle);
 	}
 
+	auto RenderGraph::getRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*
+	{
+		if (rasterPassRegister.find(pass) == rasterPassRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getRasterPipelineScope() pass name \'{0}\' not found !", pass);
+			return nullptr;
+		}
+		auto pass_node_handle = rasterPassRegister.find(pass)->second;
+		RasterPassScope* pass_node = (RasterPassScope*)registry.getNode(pass_node_handle);
+		if (pass_node->pipelineScopesRegister.find(pipeline) == pass_node->pipelineScopesRegister.end())
+		{
+			SE_CORE_ERROR("RDG :: Render Graph :: getRasterPipelineScope() pipeline name \'{0}\' not found !", pipeline);
+			return nullptr;
+		}
+		auto pipeline_node_handle = pass_node->pipelineScopesRegister.find(pipeline)->second;
+		return (RasterPipelineScope*)registry.getNode(pipeline_node_handle);
+	}
+
 	auto RenderGraph::getRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*
 	{
 		if (rasterPassRegister.find(pass) == rasterPassRegister.end())
@@ -749,6 +767,22 @@ namespace SIByL::GFX::RDG
 		return handle;
 	}
 
+	auto RenderGraphWorkshop::addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment) noexcept -> NodeHandle
+	{
+		MemScope<FramebufferContainer> fbc = MemNew<FramebufferContainer>();
+		fbc->colorAttachCount = color_attachments.size();
+		fbc->depthAttachCount = (depth_attachment == 0) ? 0 : 1;
+		fbc->handles.resize(fbc->colorAttachCount + fbc->depthAttachCount);
+		for (int i = 0; i < fbc->colorAttachCount; i++)
+		{
+			fbc->handles[i] = color_attachments[i];
+			renderGraph.getColorBufferNode(color_attachments[i])->usages |= (uint32_t)RHI::ImageUsageFlagBits::COLOR_ATTACHMENT_BIT;
+		}
+		if (depth_attachment) fbc->handles[fbc->colorAttachCount] = depth_attachment;
+		NodeHandle handle = renderGraph.registry.registNode(std::move(fbc));
+		renderGraph.resources.emplace_back(handle);
+		return handle;
+	}
 
 	auto RenderGraphWorkshop::addRasterPassScope(std::string const& pass, NodeHandle const& framebuffer) noexcept -> RasterPassScope*
 	{

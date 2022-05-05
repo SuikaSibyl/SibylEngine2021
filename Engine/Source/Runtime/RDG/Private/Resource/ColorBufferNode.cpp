@@ -50,8 +50,8 @@ namespace SIByL::GFX::RDG
 				RHI::BufferShareMode::EXCLUSIVE, //BufferShareMode shareMode;
 				RHI::SampleCount::COUNT_1_BIT, //SampleCount sampleCount;
 				RHI::ImageLayout::UNDEFINED, //ImageLayout layout;
-				(uint32_t)(render_graph->getDatumWidth() * relWidth), //uint32_t width;
-				(uint32_t)(render_graph->getDatumHeight() * relHeight), //uint32_t height;
+				relWidth > 0 ? (uint32_t)(render_graph->getDatumWidth() * relWidth) : (uint32_t)(-relWidth), //uint32_t width;
+				relHeight > 0 ? (uint32_t)(render_graph->getDatumHeight() * relHeight) : (uint32_t)(-relHeight), //uint32_t height;
 				mipLevels // uint32_t mip levels
 				});
 			textureView.scope = factory->createTextureView(getTexture(), usages);
@@ -461,6 +461,13 @@ namespace SIByL::GFX::RDG
 				createdBarriers.emplace_back(i, barrier_handle);
 				rg->getPassNode(consumeHistory[i].pass)->barriers.emplace_back(barrier_handle);
 				i_minus = i;
+			}
+		}
+		else if (consumeHistory.size() == 1)
+		{
+			if (!hasBit(attributes, NodeAttrbutesFlagBits::PLACEHOLDER))
+			{
+				getTexture()->transitionImageLayout(RHI::ImageLayout::UNDEFINED, RHI::ImageLayout::GENERAL, { 0,0,1,0,1 });
 			}
 		}
 

@@ -25,6 +25,8 @@ import RHI.IDescriptorSet;
 import RHI.IBarrier;
 import RHI.ITexture;
 import RHI.IStorageBuffer.VK;
+import RHI.IQueryPool;
+import RHI.IQueryPool.VK;
 
 namespace SIByL
 {
@@ -63,6 +65,8 @@ namespace SIByL
 			virtual auto cmdDrawIndexedIndirect(IStorageBuffer* storageBuffer, uint32_t const& indiret_offset, uint32_t const& draw_count, uint32_t const& draw_stride) noexcept -> void override;
 			virtual auto cmdBlitImage(ITexture* src, ImageLayout srcLayout, ITexture* dst, ImageLayout dstLayout, std::vector<BlitInfo> const& blit_info) noexcept -> void override;
 			virtual auto cmdDrawMeshTasks(uint32_t taskCount, uint32_t firstTask) noexcept -> void override;
+			virtual auto cmdResetQueryPool(IQueryPool* pool, uint32_t const& first, uint32_t const& count) noexcept -> void override;
+			virtual auto cmdWriteTimestamp(PipelineStageFlagBits stage, IQueryPool* pool, uint32_t const& i) noexcept -> void override;
 
 			virtual auto cmdBeginDebugUtilsLabel(char const* name, float const* color) noexcept -> void override;
 			virtual auto cmdEndDebugUtilsLabel() noexcept -> void override;

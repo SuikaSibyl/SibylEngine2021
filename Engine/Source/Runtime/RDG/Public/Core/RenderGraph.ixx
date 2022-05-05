@@ -98,6 +98,7 @@ namespace SIByL::GFX::RDG
 		auto getUniformBufferFlight(NodeHandle handle, uint32_t const& flight) noexcept -> RHI::IUniformBuffer*;
 
 		auto getComputePipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> ComputePipelineScope*;
+		auto getRasterPipelineScope(std::string const& pass, std::string const& pipeline) noexcept -> RasterPipelineScope*;
 		auto getRasterMaterialScope(std::string const& pass, std::string const& pipeline, std::string const& mat) noexcept -> RasterMaterialScope*;
 
 		auto getDatumWidth() noexcept -> uint32_t { return datumWidth; }
@@ -167,6 +168,8 @@ namespace SIByL::GFX::RDG
 		auto addColorBuffer(RHI::ResourceFormat format, float const& rel_width, float const& rel_height, std::string const& name = "Color Buffer Anonymous") noexcept -> NodeHandle;
 		auto addColorBufferExt(RHI::ITexture* texture, RHI::ITextureView* view, std::string const& name = "Color Buffer Ext Anonymous", bool present = false) noexcept -> NodeHandle;
 		auto addColorBufferRef(RHI::ITexture* texture, RHI::ITextureView* view, NodeHandle origin, std::string const& name = "Color Buffer Ref Anonymous") noexcept -> NodeHandle;
+		
+		auto addFrameBufferRef(std::vector<NodeHandle> const& color_attachments, NodeHandle depth_attachment) noexcept -> NodeHandle;
 
 		// Passes
 		//------------------------------------------

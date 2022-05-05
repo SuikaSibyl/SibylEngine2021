@@ -3,6 +3,13 @@
 #extension GL_KHR_shader_subgroup_ballot: require
 #extension GL_KHR_shader_subgroup_shuffle: require
 #extension GL_KHR_shader_subgroup_shuffle_relative: require
+#extension GL_KHR_shader_subgroup_clustered: require
+
+#define CAMERA_NEAR 0.1
+
+layout(push_constant) uniform PushConstantObject {
+    vec2 screen_size;
+} PushConstants;
 
 layout(binding = 0) uniform PerViewUniformBuffer {
     mat4 view;
@@ -22,7 +29,7 @@ layout(set = 0, binding = 3, std430) buffer restrict DoubleBufferedIndices
 struct CullingInfo
 {
     vec4 aabb_xy_wh;
-    vec4 min_depth;
+    vec4 min_max_depth;
 };
 layout(set = 0, binding = 4, std430) buffer restrict CullingInfos
 { CullingInfo cullingInfos[]; };
@@ -38,7 +45,36 @@ struct Counter
 layout(set = 0, binding = 5, std430) buffer Counters
 { Counter counter[]; };
 
-layout (local_size_x =512) in;
+#define THREADS_PER_BLOCK 512
+#define WARPS_PER_BLOCK (THREADS_PER_BLOCK / 32)
+
+layout (local_size_x = THREADS_PER_BLOCK) in;
+
+const float bounding_sphere_radius = 0.5 * 0.2 * 0.76966;
+
+bool projectSphere(vec3 center, float radius, float znear, float p00, float p11, out vec4 aabb)
+{
+    // culled by near plane
+    if(center.z <= znear - radius)
+    {
+        aabb = vec4(99999, 99999, -99999, -99999);
+        return false;
+    }
+
+    vec2 c_xz = center.xz;
+    vec2 vx = vec2(sqrt(dot(c_xz,c_xz)-radius*radius), radius);
+    vec2 minx = mat2(vx.x, vx.y, -vx.y, vx.x) * c_xz;
+    vec2 maxx = mat2(vx.x, -vx.y, vx.y, vx.x) * c_xz;
+
+    vec2 c_yz = center.yz;
+    vec2 vy = vec2(sqrt(dot(c_yz,c_yz)-radius*radius), radius);
+    vec2 miny = mat2(vy.x, vy.y, -vy.y, vy.x) * c_yz;
+    vec2 maxy = mat2(vy.x, -vy.y, vy.y, vy.x) * c_yz;
+
+    aabb = vec4(minx.x/minx.y*p00, miny.x/miny.y*p11, maxx.x/maxx.y*p00, maxy.x/maxy.y*p11);
+    aabb = aabb * vec4(0.5f,  -0.5f, 0.5f, -0.5f) + vec4(0.5f); // clip space -> uv space
+    return true;
+}
 
 void main()
 {    
@@ -48,7 +84,36 @@ void main()
     uint particle_idx = indices[idx];
     vec4 particle_pos = particle_pos_lifetime[particle_idx];
 
-    CullingInfo info;
-    info.aabb_xy_wh = particle_pos;
-    cullingInfos[idx] = info;
+    // transform center to view space
+    vec4 view_space_pos = view_ubo.view * vec4(particle_pos.rgb, 1.0);
+    vec4 screen_space_single_sphere_aabb;
+    projectSphere(view_space_pos.xyz, bounding_sphere_radius, CAMERA_NEAR,
+        view_ubo.proj[0][0], view_ubo.proj[1][1], screen_space_single_sphere_aabb);
+
+    vec2 bounding_min = screen_space_single_sphere_aabb.xy;
+    vec2 bounding_max = screen_space_single_sphere_aabb.zw;
+    vec2 bounding_min_cluster = subgroupClusteredMin(bounding_min, 16);
+    vec2 bounding_max_cluster = subgroupClusteredMax(bounding_max, 16);
+
+    // get nearest z, assuming there is part after Near Plane
+    // float nearest_z = max(CAMERA_NEAR, abs(screen_space_pos.z) - bounding_sphere_radius);
+
+    // vec2 screen_space_radius = vec2(bounding_sphere_radius / nearest_z);
+    
+    // // get center x,y in screen space
+    // screen_space_pos = view_ubo.proj * screen_space_pos;
+    // screen_space_pos.xy /= abs(screen_space_pos.w);
+
+    // // get 
+    // vec2 bounding_min = screen_space_pos.xy - screen_space_radius;
+    // vec2 bounding_max = screen_space_pos.xy + screen_space_radius;
+
+    if(gl_SubgroupInvocationID == 0 || gl_SubgroupInvocationID == 16)
+    {
+        uint meshlets_idx = gl_WorkGroupID.x*2*WARPS_PER_BLOCK + gl_SubgroupID*2 + gl_SubgroupInvocationID/16;
+        CullingInfo info;
+        info.aabb_xy_wh = vec4(bounding_min_cluster, bounding_max_cluster);
+        info.min_max_depth = vec4(0,0, (bounding_max_cluster.xy-bounding_min_cluster.xy)*PushConstants.screen_size);
+        cullingInfos[meshlets_idx] = info;
+    }
 }

@@ -24,6 +24,7 @@ import Asset.AssetLayer;
 import Editor.ImGuiLayer;
 import Editor.RDGImImageManager;
 import GFX.RDG.RenderGraph;
+import Editor.Statistics;
 
 namespace SIByL::Editor
 {
@@ -33,7 +34,8 @@ namespace SIByL::Editor
 			imImageManager(renderGraph, imgui_layer),
 			mainViewport(window_layer, timer),
 			sceneGui(window_layer, asset_layer, &mainViewport, renderGraph),
-			contentBrowserGui(window_layer, asset_layer, imgui_layer) {}
+			contentBrowserGui(window_layer, asset_layer, imgui_layer),
+			statisticsGui(timer) {}
 
 		auto onDrawGui() noexcept -> void;
 		virtual auto onUpdate() -> void override;
@@ -48,6 +50,7 @@ namespace SIByL::Editor
 		Introspection introspectionGui;
 		RenderPipeline pipelineGui;
 		ContentBrowser contentBrowserGui;
+		Statistics statisticsGui;
 	};
 
 	auto EditorLayer::onDrawGui() noexcept -> void
@@ -59,6 +62,7 @@ namespace SIByL::Editor
 		inspectorGui.onDrawGui();
 
 		mainViewport.onDrawGui();
+		statisticsGui.onDrawGui();
 	}
 	
 	auto EditorLayer::onUpdate() -> void

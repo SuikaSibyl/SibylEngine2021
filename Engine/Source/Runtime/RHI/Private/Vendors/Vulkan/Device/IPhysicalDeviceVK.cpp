@@ -175,6 +175,10 @@ namespace SIByL::RHI
 					physicalDevice = device;
 					max_rate = rate;
 					choosen_device = i;
+
+					VkPhysicalDeviceProperties deviceProperties;
+					vkGetPhysicalDeviceProperties(device, &deviceProperties);
+					timestampPeriod = deviceProperties.limits.timestampPeriod;
 				}
 			}
 			else
@@ -221,6 +225,8 @@ namespace SIByL::RHI
 			// check graphic support
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 				indices.graphicsFamily = i;
+				if (queueFamily.timestampValidBits <= 0)
+					SE_CORE_ERROR("RHI :: VULKAN :: Graphics Family not support timestamp ValidBits");
 			}
 			// check queue support
 			if (queueFamily.queueFlags & VK_QUEUE_COMPUTE_BIT) {
@@ -298,5 +304,10 @@ namespace SIByL::RHI
 		physicalDeviceProperties.pNext = &subgroupProperties;
 
 		vkGetPhysicalDeviceProperties2(physicalDevice, &physicalDeviceProperties);
+	}
+
+	auto IPhysicalDeviceVK::getTimestampPeriod() noexcept -> float
+	{
+		return timestampPeriod;
 	}
 }

@@ -19,7 +19,9 @@ namespace SIByL
 		export enum struct GraphicContextExtensionFlagBits
 		{
 			DEBUG_UTILS = 0x00000001,
-			MESH_SHADER = 0x00000002,
+			QUERY	    = 0x00000002,
+			MESH_SHADER = 0x00000004,
+			SHADER_INT8 = 0x00000008,
 		};
 		export using GraphicContextExtensionFlags = uint32_t;
 
