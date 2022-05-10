@@ -85,6 +85,7 @@ void main() {
     vec4 modelPosition = billboardMat * vec4(inPosition * vec3(0.2,0.2,0.2) * getScale(PushConstants.model) * vec3(0.1, speed_y_curve(clamped_speed), 1),1.0);
 
     gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
+    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
     uint lifetick_pack = floatBitsToUint(pos_lifetime.w);
     float lifeAlpha = 1 - (1.f * (lifetick_pack & 0xFFFF)) / (lifetick_pack & 0xFFFF0000);

@@ -178,289 +178,298 @@ namespace SIByL::GFX::RDG
 		{
 			if (consumeHistory[0].kind >= ConsumeKind::SCOPE && consumeHistory.size() == 3) return;
 
-			unsigned int i_minus = history_size - 1;
-
-			for (int i = 0; i < history_size; i++)
-			{			
-				int valid_idx = i;
+			for (auto& range : resourceDivision.cut_ranges)
+			{
+				int valid_idx;
 				std::vector<int> valid_neighbors = subResourceFilter(
 					consumeHistory, valid_idx,
-					consumeHistory[i].subResourcePara_0,
-					consumeHistory[i].subResourcePara_1,
-					consumeHistory[i].subResourcePara_2,
-					consumeHistory[i].subResourcePara_3
+					range.start,
+					range.end - range.start, 
+					0,
+					1
 				);
 
-				int right = valid_idx;
-				int left = valid_idx - 1 < 0 ? valid_idx - 1 + valid_neighbors.size() : valid_idx - 1;
+				unsigned int history_size = valid_neighbors.size();
+				unsigned int i_minus = history_size - 1;
 
-				// - A - BEGIN - B -
-				//   |     | 
-				// we create a A-B barrier in BEGIN
-				if (consumeHistory[valid_neighbors[right]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN)
+
+				for (int i = 0; i < history_size; i++)
 				{
-					right = right + 1;
-				}
-				// - BEGIN - A - B - C - END -
-				//     |     |
-				// we create a C-A barrier in A
-				if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN)
-				{
-					while (consumeHistory[valid_neighbors[left + 1]].kind != ConsumeKind::MULTI_DISPATCH_SCOPE_END)
+					int right = i;
+					int left = i - 1 < 0 ? i - 1 + valid_neighbors.size() : i - 1;
+
+					// - A - BEGIN - B -
+					//   |     | 
+					// we create a A-B barrier in BEGIN
+					if (consumeHistory[valid_neighbors[right]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN)
 					{
-						left++;
+						right = right + 1;
 					}
-				}
-				// - A - BEGIN - B - C - END - D
-				//                        |    |
-				// we create a C-D barrier in D
-				if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_END)
-				{
-					left--;
-				}
-				// - A - BEGIN - B - C - END - D
-				//                   |    |   
-				// we create a A-D barrier in End ( used only when 0 dispatch happens)
-				if (consumeHistory[valid_neighbors[right]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_END)
-				{
-					while (consumeHistory[valid_neighbors[left + 1]].kind != ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN)
+					// - BEGIN - A - B - C - END -
+					//     |     |
+					// we create a C-A barrier in A
+					if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN)
+					{
+						while (consumeHistory[valid_neighbors[left + 1]].kind != ConsumeKind::MULTI_DISPATCH_SCOPE_END)
+						{
+							left++;
+						}
+					}
+					// - A - BEGIN - B - C - END - D
+					//                        |    |
+					// we create a C-D barrier in D
+					if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_END)
 					{
 						left--;
 					}
-					right = right + 1;
-				}
-
-				if (left < 0) left += valid_neighbors.size();
-				if (right >= valid_neighbors.size()) right -= valid_neighbors.size();
-
-				while (consumeHistory[valid_neighbors[left]].kind >= ConsumeKind::SCOPE) left--;
-				while (consumeHistory[valid_neighbors[right]].kind >= ConsumeKind::SCOPE) right++;
-
-				RHI::PipelineStageFlags srcStageMask = 0;
-				RHI::PipelineStageFlags dstStageMask = 0;
-				RHI::ImageLayout oldLayout = RHI::ImageLayout::UNDEFINED;
-				RHI::ImageLayout newLayout = RHI::ImageLayout::UNDEFINED;
-				RHI::AccessFlags srcAccessFlags = 0;
-				RHI::AccessFlags dstAccessFlags = 0;
-
-				// STORE_READ_WRITE -> RENDER_TARGET
-				if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
-				{
-					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> RENDER_TARGET, STORAGE_READ_WRITE is not consumed by a compute pass!");
-
-					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
-						dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
-						(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
-					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> RENDER_TARGET, RENDER_TARGET is not consumed by a raster pass!");
-
-					oldLayout = RHI::ImageLayout::GENERAL;
-					newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
-
-					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT;
-					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : 
-						(uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
-				}
-				// RENDER_TARGET -> STORE_READ_WRITE
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::RENDER_TARGET && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
-				{
-					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
-						srcStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
-						(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
-					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> STORAGE_READ_WRITE, RENDER_TARGET is not consumed by a raster pass!");
-
-					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
-
-					oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
-					newLayout = RHI::ImageLayout::GENERAL;
-
-					srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
-				}
-				// STORE_READ_WRITE -> STORE_READ_WRITE
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
-				{
-					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> STORAGE_READ_WRITE, RENDER_TARGET is not consumed by a compute pass!");
-
-					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
-
-					oldLayout = RHI::ImageLayout::GENERAL;
-					newLayout = RHI::ImageLayout::GENERAL;
-
-					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
-					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
-				}
-				// STORE_READ_WRITE -> IMAGE_SAMPLE
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_SAMPLE)
-				{
-					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> IMAGE_SAMPLE, STORAGE_READ_WRITE is not consumed by a compute pass!");
-
-					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						dstStageMask = rasterStages;
-					else if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-
-					oldLayout = RHI::ImageLayout::GENERAL;
-					newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
-
-					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
-					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
-				}
-				// IMAGE_SAMPLE -> STORE_READ_WRITE
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
-				{
-					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
-						srcStageMask = rasterStages;
-					else if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
-						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
-
-					auto pass = rg->getPassNode(consumeHistory[valid_neighbors[right]].pass);
-					if (pass->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
-						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
-					else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
-
-					oldLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
-					newLayout = RHI::ImageLayout::GENERAL;
-
-					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
-					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
-				}
-				// RENDER_TARGET -> IMAGE_SAMPLE
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::RENDER_TARGET && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_SAMPLE)
-				{
-					if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
-						srcStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
-						(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
-					else SE_CORE_ERROR("RDG :: RENDER_TARGET -> IMAGE_SAMPLE, RENDER_TARGET is not consumed by a raster pass!");
-
-					dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
-									| rasterStages;
-
-					oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
-					newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
-
-					srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-					dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
-				}
-				// IMAGE_SAMPLE -> RENDER_TARGET
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
-				{
-					srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
-						| rasterStages;
-
-					if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
-						dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
-						(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
-					else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> RENDER_TARGET, RENDER_TARGET is not consumed by a raster pass!");
-
-					oldLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
-					newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
-
-					srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
-					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : 
-						(uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
-				}
-				// RENDER_TARGET -> RENDER_TARGET
-				else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::RENDER_TARGET && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
-				{
-					srcStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
-						(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
-
-					dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT : 
-						(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
-
-					oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
-					newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
-
-					srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-					dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
-				}
-				else
-				{
-					if (consumeHistory[valid_neighbors[right]].kind != consumeHistory[valid_neighbors[left]].kind)
+					// - A - BEGIN - B - C - END - D
+					//                   |    |   
+					// we create a A-D barrier in End ( used only when 0 dispatch happens)
+					if (consumeHistory[valid_neighbors[right]].kind == ConsumeKind::MULTI_DISPATCH_SCOPE_END)
 					{
-						SE_CORE_ERROR("RDG :: unknown access switch");
+						while (consumeHistory[valid_neighbors[left + 1]].kind != ConsumeKind::MULTI_DISPATCH_SCOPE_BEGIN)
+						{
+							left--;
+						}
+						right = right + 1;
 					}
-					i_minus = i;
-					continue;
-				}
 
-				MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = factory->createImageMemoryBarrier({
-					getTexture(), //ITexture* image;
-					RHI::ImageSubresourceRange{
-						(!hasDepth) ?
-						(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT :
-						(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::DEPTH_BIT
-						| (RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::STENCIL_BIT,
-						consumeHistory[valid_neighbors[right]].subResourcePara_0,
-						consumeHistory[valid_neighbors[right]].subResourcePara_1 == (uint32_t)(-1) ? getTexture()->getDescription().mipLevels : consumeHistory[valid_neighbors[right]].subResourcePara_1,
-						0,
-						1
-					},//ImageSubresourceRange subresourceRange;
-					srcAccessFlags, //AccessFlags srcAccessMask;
-					dstAccessFlags, //AccessFlags dstAccessMask;
-					oldLayout, // old Layout
-					newLayout // new Layout
-				});
+					if (left < 0) left += valid_neighbors.size();
+					if (right >= valid_neighbors.size()) right -= valid_neighbors.size();
 
-				MemScope<RHI::IBarrier> attach_read_barrier = factory->createBarrier({
-					srcStageMask,//srcStageMask
-					dstStageMask,//dstStageMask
-					0,
-					{},
-					{},
-					{image_memory_barrier.get()}
-				});
+					while (consumeHistory[valid_neighbors[left]].kind >= ConsumeKind::SCOPE) left--;
+					while (consumeHistory[valid_neighbors[right]].kind >= ConsumeKind::SCOPE) right++;
 
-				MemScope<RHI::IBarrier> barrierInit = nullptr;
-				MemScope<RHI::IImageMemoryBarrier> init_image_memory_barrier = nullptr;
-				if (valid_idx == 0)
-				{
-					init_image_memory_barrier = std::move(factory->createImageMemoryBarrier({
+					RHI::PipelineStageFlags srcStageMask = 0;
+					RHI::PipelineStageFlags dstStageMask = 0;
+					RHI::ImageLayout oldLayout = RHI::ImageLayout::UNDEFINED;
+					RHI::ImageLayout newLayout = RHI::ImageLayout::UNDEFINED;
+					RHI::AccessFlags srcAccessFlags = 0;
+					RHI::AccessFlags dstAccessFlags = 0;
+
+					// STORE_READ_WRITE -> RENDER_TARGET
+					if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
+					{
+						if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> RENDER_TARGET, STORAGE_READ_WRITE is not consumed by a compute pass!");
+
+						if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
+							dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
+							(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
+						else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> RENDER_TARGET, RENDER_TARGET is not consumed by a raster pass!");
+
+						oldLayout = RHI::ImageLayout::GENERAL;
+						newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
+
+						srcAccessFlags = (uint32_t)RHI::AccessFlagBits::MEMORY_READ_BIT;
+						dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT :
+							(uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+					}
+					// RENDER_TARGET -> STORE_READ_WRITE
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::RENDER_TARGET && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
+					{
+						if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
+							srcStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
+							(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
+						else SE_CORE_ERROR("RDG :: RENDER_TARGET -> STORAGE_READ_WRITE, RENDER_TARGET is not consumed by a raster pass!");
+
+						if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else SE_CORE_ERROR("RDG :: RENDER_TARGET -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
+
+						oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
+						newLayout = RHI::ImageLayout::GENERAL;
+
+						srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+						dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+					}
+					// STORE_READ_WRITE -> STORE_READ_WRITE
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
+					{
+						if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> STORAGE_READ_WRITE, RENDER_TARGET is not consumed by a compute pass!");
+
+						if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
+
+						oldLayout = RHI::ImageLayout::GENERAL;
+						newLayout = RHI::ImageLayout::GENERAL;
+
+						srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+						dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT | (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+					}
+					// STORE_READ_WRITE -> IMAGE_SAMPLE
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_SAMPLE)
+					{
+						if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else SE_CORE_ERROR("RDG :: STORAGE_READ_WRITE -> IMAGE_SAMPLE, STORAGE_READ_WRITE is not consumed by a compute pass!");
+
+						if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
+							dstStageMask = rasterStages;
+						else if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
+							dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+
+						oldLayout = RHI::ImageLayout::GENERAL;
+						newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
+
+						srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+						dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
+					}
+					// IMAGE_SAMPLE -> STORE_READ_WRITE
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_STORAGE_READ_WRITE)
+					{
+						if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_MATERIAL_SCOPE)
+							srcStageMask = rasterStages;
+						else if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::EXTERNAL_ACCESS_PASS)
+							srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::FRAGMENT_SHADER_BIT;
+
+						auto pass = rg->getPassNode(consumeHistory[valid_neighbors[right]].pass);
+						if (pass->type == NodeDetailedType::COMPUTE_MATERIAL_SCOPE)
+							dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT;
+						else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> STORAGE_READ_WRITE, STORAGE_READ_WRITE is not consumed by a compute pass!");
+
+						oldLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
+						newLayout = RHI::ImageLayout::GENERAL;
+
+						srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
+						dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_WRITE_BIT;
+					}
+					// RENDER_TARGET -> IMAGE_SAMPLE
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::RENDER_TARGET && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::IMAGE_SAMPLE)
+					{
+						if (rg->getPassNode(consumeHistory[valid_neighbors[left]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
+							srcStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
+							(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
+						else SE_CORE_ERROR("RDG :: RENDER_TARGET -> IMAGE_SAMPLE, RENDER_TARGET is not consumed by a raster pass!");
+
+						dstStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
+							| rasterStages;
+
+						oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
+						newLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
+
+						srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+						dstAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
+					}
+					// IMAGE_SAMPLE -> RENDER_TARGET
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::IMAGE_SAMPLE && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
+					{
+						srcStageMask = (uint32_t)RHI::PipelineStageFlagBits::COMPUTE_SHADER_BIT
+							| rasterStages;
+
+						if (rg->getPassNode(consumeHistory[valid_neighbors[right]].pass)->type == NodeDetailedType::RASTER_PASS_SCOPE)
+							dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
+							(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
+						else SE_CORE_ERROR("RDG :: IMAGE_SAMPLE -> RENDER_TARGET, RENDER_TARGET is not consumed by a raster pass!");
+
+						oldLayout = RHI::ImageLayout::SHADER_READ_ONLY_OPTIMAL;
+						newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
+
+						srcAccessFlags = (uint32_t)RHI::AccessFlagBits::SHADER_READ_BIT;
+						dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT :
+							(uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+					}
+					// RENDER_TARGET -> RENDER_TARGET
+					else if (consumeHistory[valid_neighbors[left]].kind == ConsumeKind::RENDER_TARGET && consumeHistory[valid_neighbors[right]].kind == ConsumeKind::RENDER_TARGET)
+					{
+						srcStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
+							(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
+
+						dstStageMask = (!hasDepth) ? (uint32_t)RHI::PipelineStageFlagBits::COLOR_ATTACHMENT_OUTPUT_BIT :
+							(uint32_t)RHI::PipelineStageFlagBits::EARLY_FRAGMENT_TESTS_BIT | (uint32_t)RHI::PipelineStageFlagBits::LATE_FRAGMENT_TESTS_BIT;
+
+						oldLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
+						newLayout = (!hasDepth) ? RHI::ImageLayout::COLOR_ATTACHMENT_OPTIMAL : RHI::ImageLayout::DEPTH_STENCIL_ATTACHMENT_OPTIMA;
+
+						srcAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+						dstAccessFlags = (!hasDepth) ? (uint32_t)RHI::AccessFlagBits::COLOR_ATTACHMENT_WRITE_BIT : (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_WRITE_BIT | (uint32_t)RHI::AccessFlagBits::DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+					}
+					else
+					{
+						if (consumeHistory[valid_neighbors[right]].kind != consumeHistory[valid_neighbors[left]].kind)
+						{
+							SE_CORE_ERROR("RDG :: unknown access switch");
+						}
+						i_minus = i;
+						continue;
+					}
+
+					MemScope<RHI::IImageMemoryBarrier> image_memory_barrier = factory->createImageMemoryBarrier({
 						getTexture(), //ITexture* image;
 						RHI::ImageSubresourceRange{
 							(!hasDepth) ?
 							(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT :
 							(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::DEPTH_BIT
 							| (RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::STENCIL_BIT,
-							consumeHistory[valid_neighbors[right]].subResourcePara_0,
-							consumeHistory[valid_neighbors[right]].subResourcePara_1 == (uint32_t)(-1) ? getTexture()->getDescription().mipLevels : consumeHistory[valid_neighbors[right]].subResourcePara_1,
+							range.start,
+							range.end - range.start,
 							0,
 							1
 						},//ImageSubresourceRange subresourceRange;
-						0, //AccessFlags srcAccessMask;
+						srcAccessFlags, //AccessFlags srcAccessMask;
 						dstAccessFlags, //AccessFlags dstAccessMask;
-						RHI::ImageLayout::UNDEFINED, // old Layout
+						oldLayout, // old Layout
 						newLayout // new Layout
-						}));
+						});
 
-					barrierInit = std::move(factory->createBarrier({
-						(uint32_t)RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT,//srcStageMask
+					MemScope<RHI::IBarrier> attach_read_barrier = factory->createBarrier({
+						srcStageMask,//srcStageMask
 						dstStageMask,//dstStageMask
 						0,
 						{},
 						{},
-						{init_image_memory_barrier.get()}
-						}));
-				}
+						{image_memory_barrier.get()}
+						});
 
-				BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(attach_read_barrier), std::move(barrierInit));
-				createdBarriers.emplace_back(i, barrier_handle);
-				rg->getPassNode(consumeHistory[i].pass)->barriers.emplace_back(barrier_handle);
-				i_minus = i;
+					MemScope<RHI::IBarrier> barrierInit = nullptr;
+					MemScope<RHI::IImageMemoryBarrier> init_image_memory_barrier = nullptr;
+					if (i == 0)
+					{
+						init_image_memory_barrier = std::move(factory->createImageMemoryBarrier({
+							getTexture(), //ITexture* image;
+							RHI::ImageSubresourceRange{
+								(!hasDepth) ?
+								(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::COLOR_BIT :
+								(RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::DEPTH_BIT
+								| (RHI::ImageAspectFlags)RHI::ImageAspectFlagBits::STENCIL_BIT,
+								range.start,
+								range.end - range.start,
+								//consumeHistory[valid_neighbors[right]].subResourcePara_0,
+								//consumeHistory[valid_neighbors[right]].subResourcePara_1 == (uint32_t)(-1) ? getTexture()->getDescription().mipLevels : consumeHistory[valid_neighbors[right]].subResourcePara_1,
+								0,
+								1
+							},//ImageSubresourceRange subresourceRange;
+							0, //AccessFlags srcAccessMask;
+							dstAccessFlags, //AccessFlags dstAccessMask;
+							RHI::ImageLayout::UNDEFINED, // old Layout
+							newLayout // new Layout
+							}));
+
+						barrierInit = std::move(factory->createBarrier({
+							(uint32_t)RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT,//srcStageMask
+							dstStageMask,//dstStageMask
+							0,
+							{},
+							{},
+							{init_image_memory_barrier.get()}
+							}));
+					}
+
+					BarrierHandle barrier_handle = rg->barrierPool.registBarrier(std::move(attach_read_barrier), std::move(barrierInit));
+					createdBarriers.emplace_back(createdBarriers.size(), barrier_handle);
+
+					auto* passnode = rg->getPassNode(consumeHistory[valid_neighbors[i]].pass);
+					passnode->barriers.emplace_back(barrier_handle);
+					i_minus = i;
+				}
 			}
 		}
 		else if (consumeHistory.size() == 1)

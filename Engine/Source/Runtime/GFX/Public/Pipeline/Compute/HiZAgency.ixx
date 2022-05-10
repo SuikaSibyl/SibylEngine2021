@@ -139,19 +139,22 @@ namespace SIByL::GFX
 		workshop->renderGraph.getComputePipelineScope("HiZ Pass", "Pooling Pipeline")->clearAllMaterials();
 		minPoolingMaterials.clear();
 		float multi = 1;
+		float last_multi = 1;
 		for (int i = 0; i < mipmapCount - 1; i++)
 		{
 			multi /= 2;
 			auto pooling_mat_scope = workshop->addComputeMaterialScope("HiZ Pass", "Pooling Pipeline", "Mipmap" + std::to_string(i));
 			minPoolingMaterials.emplace_back(pooling_mat_scope);
 
-			minPoolingMaterials[i]->resources = { workshop->getInternalSampler("Default Sampler"), mipmapColorBufferExt[i + 1] };
+			minPoolingMaterials[i]->resources = { workshop->getInternalSampler("MinPooling Sampler"), mipmapColorBufferExt[i + 1] };
 			minPoolingMaterials[i]->sampled_textures = { mipmapColorBufferExt[i] };
 
 			auto min_pooling_dispatch_scope = workshop->addComputeDispatch("HiZ Pass", "Pooling Pipeline", "Mipmap" + std::to_string(i), "Only");
-			min_pooling_dispatch_scope->pushConstant = [multi = multi, rdg = &(workshop->renderGraph)](Buffer& buffer) {
+			min_pooling_dispatch_scope->pushConstant = [multi = multi, last_multi = last_multi, rdg = &(workshop->renderGraph)](Buffer& buffer) {
 				float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
-				glm::vec2 size = { (unsigned int)MAX(uint32_t(multi * screenX), 1),(unsigned int)MAX(uint32_t(multi * screenY), 1) };
+				glm::vec4 size = {
+					(unsigned int)MAX(uint32_t(multi * screenX), 1),(unsigned int)MAX(uint32_t(multi * screenY), 1),
+					(unsigned int)MAX(uint32_t(last_multi * screenX), 1),(unsigned int)MAX(uint32_t(last_multi * screenY), 1) };
 				buffer = std::move(Buffer(sizeof(size), 1));
 				memcpy(buffer.getData(), &size, sizeof(size));
 			};
@@ -161,26 +164,8 @@ namespace SIByL::GFX
 				y = GRIDSIZE(MAX(uint32_t(multi * screenY), 1), 32);
 				z = 1;
 			};
+			last_multi = multi;
 		}
-			//auto pooling_mat_scope = workshop->addComputeMaterialScope("HiZ Pass", "Pooling Pipeline", "Common");
-			//pooling_mat_scope->resources = { workshop->getInternalSampler("Default Sampler"), HiZ_handle };
-			//pooling_mat_scope->sampled_textures = { depthSampleHandle };
-
-			//auto copy_dispatch_scope = workshop->addComputeDispatch("HiZ Pass", "Pooling Pipeline", "Common", "Only");
-			//copy_dispatch_scope->pushConstant = [rdg = &(workshop->renderGraph)](Buffer& buffer) {
-			//	float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
-			//	glm::vec2 size = { screenX,screenY };
-			//	buffer = std::move(Buffer(sizeof(size), 1));
-			//	memcpy(buffer.getData(), &size, sizeof(size));
-			//};
-			//copy_dispatch_scope->customSize = [rdg = &(workshop->renderGraph)](uint32_t& x, uint32_t& y, uint32_t& z) {
-			//	float screenX = rdg->datumWidth, screenY = rdg->datumHeight;
-			//	x = GRIDSIZE(screenX, 32);
-			//	y = GRIDSIZE(screenY, 32);
-			//	z = 1;
-			//};
-		//}
-
 	}
 	
 	auto HiZAgency::beforeDivirtualizePasses() noexcept -> void

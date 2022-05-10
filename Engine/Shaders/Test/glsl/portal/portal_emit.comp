@@ -46,6 +46,17 @@ layout(set = 0, binding = 6, std430) buffer EmitterBuffer
 
 layout(binding = 7) uniform sampler2D texSampler;
 
+
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+layout(set = 0, binding = 8, std430) buffer IndirectDrawBuffer
+{ DrawIndexedIndirect[] content; } IndirectBuffer;
 //----------------------------------------------------------------------------------------
 // RANDOM 
 //----------------------------------------------------------------------------------------
@@ -221,5 +232,6 @@ void main()
     particle_color[newParticleIdx] = new_particle.color;
     // add the new particle idx to live pool
     uint aliveCount = atomicAdd(counter.counter[0].aliveCount, 1);
+    atomicAdd(IndirectBuffer.content[0].instanceCount, 1);
     livePool.indices[aliveCount] = newParticleIdx;
 }

@@ -96,18 +96,10 @@ void main()
         uint deadCount = atomicAdd(counter.counter[0].deadCount, 1);
         deadPool.indices[deadCount] = idx;
         uint aliveCount = atomicAdd(counter.counter[0].aliveCount, -1);
+        atomicAdd(IndirectBuffer.content[0].instanceCount, -1);
         livePool.indices[idx] = livePool.indices[aliveCount-1];
     }
     pos_lifetime.w = uintBitsToFloat(lifetick_pack - 1);
     particle_pos_lifetime[idx] = pos_lifetime;
     particle_vel_mass[idx] = vel_mass;
-
-    memoryBarrier();
-    barrier();
-
-    if(idx==0)
-    {
-        uint aliveCount = atomicAdd(counter.counter[0].aliveCount, 0);
-        IndirectBuffer.content[0].instanceCount = aliveCount;
-    }
 }

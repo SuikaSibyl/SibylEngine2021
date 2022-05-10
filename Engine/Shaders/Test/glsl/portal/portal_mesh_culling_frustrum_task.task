@@ -33,6 +33,8 @@ struct CullingInfo
 layout(set = 0, binding = 8, std430) buffer restrict CullingInfos
 { CullingInfo cullingInfos[]; };
 
+layout ( binding = 9 ) uniform sampler2D depthImage;
+
 // Size of the payloads. The AS payload should preferably stay below 108 bytes, but if that is not possible, then keep it at least under 236 bytes.
 // Number of invocations of the amplification shader.
 // Number of mesh shaders emitted by the respective amplification shader (amplification rate).
@@ -42,13 +44,47 @@ bool cullCluster(in CullingInfo cullingInfo)
   // xmin ymin xmax ymax
   if(cullingInfo.aabb_xy_wh.x==99999)
     return true;
-  if(cullingInfo.aabb_xy_wh.x >= 1 || cullingInfo.aabb_xy_wh.y >= 1 || cullingInfo.aabb_xy_wh.x <= 0 || cullingInfo.aabb_xy_wh.y <= 0)
+  if(cullingInfo.aabb_xy_wh.x >= 1 || cullingInfo.aabb_xy_wh.y >= 1 || cullingInfo.aabb_xy_wh.z <= 0 || cullingInfo.aabb_xy_wh.w <= 0 || cullingInfo.min_max_depth.y < 0.1)
     return false;
 
   float width = (cullingInfo.aabb_xy_wh.z - cullingInfo.aabb_xy_wh.x) * PushConstants.screen_size.x;
   float height = (cullingInfo.aabb_xy_wh.w - cullingInfo.aabb_xy_wh.y) * PushConstants.screen_size.y;
   if(max(width, height)<1.0f)
     return false;
+
+  uint partilets_idx = gl_GlobalInvocationID.x;
+  if(cullingInfo.min_max_depth.x > 0.1)
+  {
+    float depth_proj = cullingInfo.min_max_depth.x;
+    // depth_proj = 1.00004005 - 0.200004011 / depth_proj; // [-1,1]
+    // depth_proj = (depth_proj + 1) /2;
+    vec2 uv = vec2(
+        (cullingInfos[partilets_idx].aabb_xy_wh.x + cullingInfos[partilets_idx].aabb_xy_wh.z) / 2, 
+        (cullingInfos[partilets_idx].aabb_xy_wh.y + cullingInfos[partilets_idx].aabb_xy_wh.w) / 2);
+    
+    float width = (cullingInfos[partilets_idx].aabb_xy_wh.z - cullingInfos[partilets_idx].aabb_xy_wh.x) * PushConstants.screen_size.x;
+    float height = (cullingInfos[partilets_idx].aabb_xy_wh.w - cullingInfos[partilets_idx].aabb_xy_wh.y) * PushConstants.screen_size.y;
+
+    if(width>PushConstants.screen_size.x || height > PushConstants.screen_size.y)
+    {
+
+    }
+    else
+    {
+        float level = ceil(log2(max(ceil(width), ceil(height))));
+        float depth = 1 - textureLod(depthImage, uv, level).x;
+        float depth_in_linear = 0.200004011 / (1.00004005 - depth);
+
+        if(depth_proj > depth_in_linear) return false;
+
+        //if(thread_in_partilets==0)
+        //{
+        //    cullingInfos[partilets_idx].min_max_depth.z = depth_proj;
+        //    cullingInfos[partilets_idx].min_max_depth.w = depth_in_linear;
+        //}
+    }
+
+  }
 
   return true;
 }

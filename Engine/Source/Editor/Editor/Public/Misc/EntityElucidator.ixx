@@ -34,6 +34,7 @@ import GFX.Renderer;
 import GFX.SceneTree;
 import GFX.Scene;
 import GFX.BoundingBox;
+import GFX.ParticleSystem;
 import Editor.CommonProperties;
 
 import GFX.RDG.RenderGraph;
@@ -333,34 +334,6 @@ namespace SIByL::Editor
 								ImGui::EndMenu();
 							}
 						}
-						//for (int i = 0; i < IM_ARRAYSIZE(names); i++)
-						//	ImGui::MenuItem(names[i], "", &toggles[i]);
-
-						//ImGui::Separator();
-						//ImGui::Text("Tooltip here");
-						//if (ImGui::IsItemHovered())
-						//	ImGui::SetTooltip("I am a tooltip over a popup");
-
-						//if (ImGui::Button("Stacked Popup"))
-						//	ImGui::OpenPopup("another popup");
-						//if (ImGui::BeginPopup("another popup"))
-						//{
-						//	for (int i = 0; i < IM_ARRAYSIZE(names); i++)
-						//		ImGui::MenuItem(names[i], "", &toggles[i]);
-						//	if (ImGui::BeginMenu("Sub-menu"))
-						//	{
-						//		ImGui::MenuItem("Click me");
-						//		if (ImGui::Button("Stacked Popup"))
-						//			ImGui::OpenPopup("another popup");
-						//		if (ImGui::BeginPopup("another popup"))
-						//		{
-						//			ImGui::Text("I am the last one here.");
-						//			ImGui::EndPopup();
-						//		}
-						//		ImGui::EndMenu();
-						//	}
-						//	ImGui::EndPopup();
-						//}
 						ImGui::EndPopup();
 					}
 
@@ -382,7 +355,18 @@ namespace SIByL::Editor
 				if (ImGui::Button("Add Pass", buttonSize))
 					component.subRenderers.emplace_back("NONE", "NONE", "NONE");
 			});
-
+		// Draw Particle System Component
+		drawComponent<GFX::ParticleSystem>(entity, "Particle System", [](auto& component)
+			{
+				// switch show cluster
+				bool needShowCluster = component.showCluster;
+				ImGui::Checkbox("Visualize Cluster AABB Bounding", &needShowCluster);
+				if (needShowCluster != component.showCluster)
+				{
+					component.showCluster = needShowCluster;
+					component.needRebuildPipeline = true;
+				}
+			});
 		// Add Components
 		{
 			ImGui::Separator();
@@ -424,6 +408,12 @@ namespace SIByL::Editor
 				{
 					if (!entity.hasComponent<GFX::Renderer>())
 						entity.addComponent<GFX::Renderer>();
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Particle System"))
+				{
+					if (!entity.hasComponent<GFX::ParticleSystem>())
+						entity.addComponent<GFX::ParticleSystem>();
 					ImGui::CloseCurrentPopup();
 				}
 				ImGui::EndPopup();

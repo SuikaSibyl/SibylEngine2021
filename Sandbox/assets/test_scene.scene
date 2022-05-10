@@ -13,7 +13,7 @@ SceneNodes:
   - uid: 2267855375430191226
     parent: 11454354189262129274
     components:
-      TagComponent: particle
+      TagComponent: portal
       Transform:
         translation: [-96.7427368, 14.9233809, -0.546259761]
         eulerAngles: [1.57079566, -0, 0]
@@ -29,12 +29,15 @@ SceneNodes:
           - PassName: Forward Pass
             PipelineName: Particle Portal Mesh
             MaterialName: Portal
+      ParticleSystem:
+        showClusterAABB: false
   - uid: 11454354189262129274
     parent: 0
     children:
       - 2267855375430191226
       - 4930603952427617402
       - 1833534738330095738
+      - 4181950869093355642
     components:
       TagComponent: Scene
       Transform:
@@ -291,6 +294,22 @@ SceneNodes:
       MeshComponent:
         guid: 8606385675173121146
         vert: 3435973836
+  - uid: 4181950869093355642
+    parent: 11454354189262129274
+    components:
+      TagComponent: firework
+      Transform:
+        translation: [0, 0, 0]
+        eulerAngles: [0, 0, 0]
+        scale: [1, 1, 1]
+      MeshComponent:
+        guid: 2267991365489773690
+        vert: 7
+      Renderer:
+        SubRenderer:
+          - PassName: Forward Pass
+            PipelineName: Particle Firework
+            MaterialName: Firework
   - uid: 13325313659727268986
     parent: 5237411678923279482
     children:

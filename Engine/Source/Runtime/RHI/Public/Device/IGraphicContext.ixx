@@ -22,6 +22,8 @@ namespace SIByL
 			QUERY	    = 0x00000002,
 			MESH_SHADER = 0x00000004,
 			SHADER_INT8 = 0x00000008,
+			FRAGMENT_BARYCENTRIC = 0x00000010,
+			SAMPLER_FILTER_MIN_MAX = 0x00000020,
 		};
 		export using GraphicContextExtensionFlags = uint32_t;
 

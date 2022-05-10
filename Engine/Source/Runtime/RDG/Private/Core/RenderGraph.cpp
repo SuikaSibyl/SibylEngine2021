@@ -619,6 +619,10 @@ namespace SIByL::GFX::RDG
 		NodeHandle default_sampler = addSampler({}, "Default Sampler");
 		renderGraph.samplerRegister.emplace("Default Sampler", default_sampler);
 
+		RHI::SamplerDesc min_pooling_desc = {};
+		min_pooling_desc.extension = RHI::Extension::MIN_POOLING;
+		NodeHandle min_pooling_sampler = addSampler(min_pooling_desc, "MinPooling Sampler");
+		renderGraph.samplerRegister.emplace("MinPooling Sampler", min_pooling_sampler);
 	}
 
 	auto RenderGraphWorkshop::getInternalSampler(std::string const& name) noexcept -> NodeHandle

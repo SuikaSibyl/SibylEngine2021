@@ -171,6 +171,7 @@ xcopy /y/r $(SolutionDir)Engine\Binaries\ThirdParty\slang\slang-llvm.dll $(Solut
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\main.ixx" />
+    <ClCompile Include="src\ParticleSystem\Firework.ixx" />
     <ClCompile Include="src\ParticleSystem\Grass.ixx" />
     <ClCompile Include="src\ParticleSystem\Portal.ixx" />
     <ClCompile Include="src\ParticleSystem\SortTest.ixx" />

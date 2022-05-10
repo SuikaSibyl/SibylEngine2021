@@ -76,44 +76,100 @@ bool projectSphere(vec3 center, float radius, float znear, float p00, float p11,
     return true;
 }
 
+mat4 billboardAlongVelocity(vec3 velocity, vec3 cameraPos)
+{
+    vec3 up = - normalize(velocity);
+    vec3 right = normalize(cross(up, -normalize(cameraPos)));
+    vec3 look = normalize(cross(right, up));
+    return mat4(
+        right.x,right.y,right.z,0,
+        up.x,up.y,up.z,0,
+        look.x,look.y,look.z,0,
+        0,0,0,1);
+}
+vec3 getScale(mat4 matrix)
+{
+    return vec3(1,1,1);
+}
+float speed_y_curve(float i)
+{
+    if(i > 1) return 0.769;
+    return 0.769 * i;
+}
+
+// Constant Billboard Data 
+const vec3 vertices[4] = {
+    vec3(-0.5f, -0.5f, +0.0f),
+    vec3(+0.5f, -0.5f, +0.0f),
+    vec3(+0.5f, +0.5f, +0.0f),
+    vec3(-0.5f, +0.5f, +0.0f),
+};
+
+void getBoundingInfoDumb(out vec2 bounding_min, out vec2 bounding_max, out vec2 z)
+{
+    uint idx = gl_GlobalInvocationID.x;
+    uint particle_idx = indices[idx];
+    vec4 vel_mass = particle_vel_mass[particle_idx];
+    vec4 pos_lifetime = particle_pos_lifetime[particle_idx];
+    mat4 billboardMat = billboardAlongVelocity(vel_mass.xyz, view_ubo.cameraPos.xyz - pos_lifetime.xyz);
+    float clamped_speed = clamp(length(vel_mass.xyz), 0, 4) / 4;
+    vec3 scale_quad = vec3(0.2,0.2,0.2) * vec3(0.1, speed_y_curve(clamped_speed), 1);
+
+    vec4 modelPosition[4];
+    vec4 projPosition[4];
+
+    for(int i=0;i<4;i++)
+    {
+        modelPosition[i] = billboardMat * vec4(vertices[i] * scale_quad, 1.0);
+        projPosition[i] = view_ubo.proj * view_ubo.view * (vec4(modelPosition[i].xyz + pos_lifetime.xyz, 1.0));
+        projPosition[i].xy /= abs(projPosition[i].w);
+        projPosition[i].z = projPosition[i].w;
+    }
+
+    bounding_min = min(min(projPosition[0].xy,projPosition[1].xy),min(projPosition[2].xy,projPosition[3].xy));
+    bounding_max = max(max(projPosition[0].xy,projPosition[1].xy),max(projPosition[2].xy,projPosition[3].xy));
+    float min_z = min(min(projPosition[0].z,projPosition[1].z),min(projPosition[2].z,projPosition[3].z));
+    float max_z = max(max(projPosition[0].z,projPosition[1].z),max(projPosition[2].z,projPosition[3].z));
+
+    bounding_min = bounding_min*vec2(0.5) + vec2(0.5);
+    bounding_max = bounding_max*vec2(0.5) + vec2(0.5);
+    z = vec2(min_z, max_z);
+}
+
 void main()
 {    
     uint idx = gl_GlobalInvocationID.x;
     if(idx >= counter[0].aliveCount) return;
 
-    uint particle_idx = indices[idx];
-    vec4 particle_pos = particle_pos_lifetime[particle_idx];
+    // uint particle_idx = indices[idx];
+    // vec4 particle_pos = particle_pos_lifetime[particle_idx];
 
-    // transform center to view space
-    vec4 view_space_pos = view_ubo.view * vec4(particle_pos.rgb, 1.0);
-    vec4 screen_space_single_sphere_aabb;
-    projectSphere(view_space_pos.xyz, bounding_sphere_radius, CAMERA_NEAR,
-        view_ubo.proj[0][0], view_ubo.proj[1][1], screen_space_single_sphere_aabb);
+    // // transform center to view space
+    // vec4 view_space_pos = view_ubo.view * vec4(particle_pos.rgb, 1.0);
+    // vec4 screen_space_single_sphere_aabb;
+    // projectSphere(view_space_pos.xyz, bounding_sphere_radius, CAMERA_NEAR,
+    //     view_ubo.proj[0][0], view_ubo.proj[1][1], screen_space_single_sphere_aabb);
 
-    vec2 bounding_min = screen_space_single_sphere_aabb.xy;
-    vec2 bounding_max = screen_space_single_sphere_aabb.zw;
+    // vec2 bounding_min = screen_space_single_sphere_aabb.xy;
+    // vec2 bounding_max = screen_space_single_sphere_aabb.zw;
+
+    vec2 bounding_min;
+    vec2 bounding_max;
+    vec2 bounding_z;
+    getBoundingInfoDumb(bounding_min, bounding_max, bounding_z);
+    bounding_z = vec2(bounding_z.x, -bounding_z.y);
+
     vec2 bounding_min_cluster = subgroupClusteredMin(bounding_min, 16);
     vec2 bounding_max_cluster = subgroupClusteredMax(bounding_max, 16);
-
-    // get nearest z, assuming there is part after Near Plane
-    // float nearest_z = max(CAMERA_NEAR, abs(screen_space_pos.z) - bounding_sphere_radius);
-
-    // vec2 screen_space_radius = vec2(bounding_sphere_radius / nearest_z);
-    
-    // // get center x,y in screen space
-    // screen_space_pos = view_ubo.proj * screen_space_pos;
-    // screen_space_pos.xy /= abs(screen_space_pos.w);
-
-    // // get 
-    // vec2 bounding_min = screen_space_pos.xy - screen_space_radius;
-    // vec2 bounding_max = screen_space_pos.xy + screen_space_radius;
+    vec2 bounding_z_cluster = subgroupClusteredMin(bounding_z, 16);
+    bounding_z_cluster = vec2(bounding_z_cluster.x, -bounding_z_cluster.y);
 
     if(gl_SubgroupInvocationID == 0 || gl_SubgroupInvocationID == 16)
     {
         uint meshlets_idx = gl_WorkGroupID.x*2*WARPS_PER_BLOCK + gl_SubgroupID*2 + gl_SubgroupInvocationID/16;
         CullingInfo info;
         info.aabb_xy_wh = vec4(bounding_min_cluster, bounding_max_cluster);
-        info.min_max_depth = vec4(0,0, (bounding_max_cluster.xy-bounding_min_cluster.xy)*PushConstants.screen_size);
+        info.min_max_depth = vec4(bounding_z_cluster, (bounding_max_cluster.xy-bounding_min_cluster.xy)*PushConstants.screen_size);
         cullingInfos[meshlets_idx] = info;
     }
 }

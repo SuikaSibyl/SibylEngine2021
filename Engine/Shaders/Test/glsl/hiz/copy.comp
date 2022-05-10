@@ -15,7 +15,7 @@ void main()
     if(pos.x>=PushConstants.imageSize.x || pos.y>=PushConstants.imageSize.y) return;
 
 	// Sampler is set up to do min reduction, so this computes the minimum depth of a 2x2 texel quad
-	vec4 depth = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize);
+	vec4 depth = vec4(1) - texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize);
 
 	imageStore(outputImage, ivec2(pos), depth);
 }

@@ -1,0 +1,162 @@
+ #version 450
+
+layout(push_constant) uniform constants {
+    uint emitCount;
+} PushConstants;
+
+layout(set = 0, binding = 0, std430) buffer ParticlesPosLifetime
+{ vec4 particle_pos_lifetime[]; };
+
+layout(set = 0, binding = 1, std430) buffer ParticlesVelocityMass
+{ vec4 particle_vel_mass[]; };
+
+layout(set = 0, binding = 2, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
+
+struct Counter
+{
+    uint aliveCount;
+    uint deadCount;
+    uint emitCount;
+    uint drawCount;
+    uint maxCount;
+};
+layout(set = 0, binding = 3, std430) buffer Counters
+{
+    Counter counter[];
+} counter;
+
+
+layout(set = 0, binding = 4, std430) buffer LiveIndexBuffer
+{
+    uint[] indices;
+} livePool;
+
+layout(set = 0, binding = 5, std430) buffer DeadIndexBuffer
+{
+    uint[] indices;
+} deadPool;
+
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+layout(set = 0, binding = 6, std430) buffer IndirectDrawBuffer
+{ DrawIndexedIndirect[] content; } IndirectBuffer;
+
+//----------------------------------------------------------------------------------------
+// RANDOM 
+//----------------------------------------------------------------------------------------
+//note: uniformly distributed, normalized rand, [0;1[
+float nrand( float n )
+{
+	return fract(sin(91.2228 * n)* 43758.5453);
+}
+float nrand( vec2 n )
+{
+	return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
+}
+
+float hash(float n) { return fract(sin(n) * 1e4); }
+float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
+//  3 out, 1 in...
+vec3 hash31(float p)
+{
+   vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
+   p3 += dot(p3, p3.yzx+33.33);
+   return fract((p3.xxy+p3.yzz)*p3.zyx); 
+}
+///  3 out, 2 in...
+vec3 hash32(vec2 p)
+{
+	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yxz+33.33);
+    return fract((p3.xxy+p3.yzz)*p3.zyx);
+}
+
+vec2 hash21(float p)
+{
+	vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
+	p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+//----------------------------------------------------------------------------------------
+// Utility 
+//----------------------------------------------------------------------------------------
+float lerp(float x, float y, float s)
+{
+    return x + s * (y-x);
+}
+
+float curve_velocity(float time)
+{   
+    if(time < 0.669) return time * 0.687593423;
+    else if(time < 0.822) return 0.46 + (time - 0.669) * 7.79738562;
+    else return 1.653;
+}
+
+// float randPerThread(float seed)
+// {
+//     // return nrand(gl_GlobalInvocationID.x + seed * fract(PushConstants.time));
+// }
+
+mat3 getRotation(mat4 mat)
+{
+    mat3 no_translation = mat3(mat);
+    vec3 scale = vec3(length(mat[0].rgb),length(mat[1].rgb),length(mat[2].rgb));
+    no_translation[0] /= scale.x;
+    no_translation[1] /= scale.y;
+    no_translation[2] /= scale.z;
+    return no_translation;
+}
+
+float remapWithClamp(float i, float old_range_min, float old_range_max, float new_range_min, float new_range_max)
+{
+    float clamped = clamp(i, old_range_min, old_range_max);
+    float uniformed = (clamped - old_range_min) / (old_range_max - old_range_min);
+    return new_range_min + uniformed * (new_range_max - new_range_min);
+}
+
+//----------------------------------------------------------------------------------------
+// Main 
+//----------------------------------------------------------------------------------------
+struct Particle
+{
+    vec4 pos_lifetime;
+    vec4 vel_mass;
+    vec4 color;
+};
+
+layout (local_size_x =32) in;
+void main()
+{
+    if(gl_GlobalInvocationID.x >= PushConstants.emitCount) return;
+
+    // Move a dead particle to alive
+    uint deadCount = atomicAdd(counter.counter[0].deadCount, -1);
+    if(deadCount == 0 || deadCount > counter.counter[0].maxCount) return; // If no space is available
+    
+    Particle new_particle;
+    // ========================================================================
+    // Time for init a new particle
+    // ========================================================================
+    // init the particle on a Torus
+    new_particle.pos_lifetime.xyz = vec3(hash21(gl_GlobalInvocationID.x), 0.0);
+
+    // ========================================================================
+    // Custom Part Over
+    // ========================================================================
+    // write new particle
+    uint newParticleIdx = deadPool.indices[deadCount-1];
+    particle_pos_lifetime[newParticleIdx] = new_particle.pos_lifetime;
+    particle_vel_mass[newParticleIdx] = new_particle.vel_mass;
+    particle_color[newParticleIdx] = new_particle.color;
+    // add the new particle idx to live pool
+    uint aliveCount = atomicAdd(counter.counter[0].aliveCount, 1);
+    atomicAdd(IndirectBuffer.content[0].instanceCount, 1);
+    livePool.indices[aliveCount] = newParticleIdx;
+}

@@ -13,6 +13,12 @@ layout(binding = 0) uniform PerViewUniformBuffer {
 layout(set = 0, binding = 1, std430) buffer ParticlesPos
 { vec4 particle_pos[]; };
 
+layout(set = 0, binding = 2, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
+
+layout(set = 0, binding = 3, std430) buffer ParticlesDirection
+{ vec4 particle_direction[]; };
+
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inColor;
 layout(location = 2) in vec2 inTexCoord;
@@ -54,13 +60,17 @@ mat4 billboardAlongVelocity(vec3 velocity, vec3 cameraPos)
 
 void main() {
     vec4 pos = particle_pos[gl_InstanceIndex.x];
-    mat4 billboardMat = billboardAlongVelocity(vec3(0,1,0), view_ubo.cameraPos.xyz - pos.xyz);
+    vec4 color = particle_color[gl_InstanceIndex.x];
+    vec4 direction = particle_direction[gl_InstanceIndex.x];
+    mat4 billboardMat = billboardAlongVelocity(direction.xyz, view_ubo.cameraPos.xyz - pos.xyz);
     
-    vec4 modelPosition = billboardMat * vec4(inPosition * vec3(5,5,5) * getScale(PushConstants.model),1.0);
-    modelPosition.rgb += PushConstants.model[3].rgb;
+    vec4 modelPosition = billboardMat * vec4((inPosition+vec3(0,0,0.5)) * vec3(5,5,5) * pos.w,1.0);
+    modelPosition.rgb += PushConstants.model[3].rgb;// - vec3(0,0.5,0) * vec3(5,5,5) * pos.w;
     gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos.xyz, 1.0));
+    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 
     vec2 uv = inTexCoord;
-    uv.x = (pos.w + uv.x) * 0.25;
+    uv.x = (color.w + uv.x) * 0.25;
     v_out.fragTexCoord = uv;
+    v_out.fragColor = color.rgb;
 }

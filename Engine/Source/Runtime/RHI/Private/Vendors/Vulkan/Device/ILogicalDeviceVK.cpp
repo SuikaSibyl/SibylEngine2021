@@ -119,18 +119,18 @@ namespace SIByL::RHI
 		void const** pNextChainHead = &(createInfo.pNext);
 		void** pNextChainTail = nullptr;
 		VkPhysicalDeviceHostQueryResetFeatures resetFeatures;
-		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::QUERY))
-		{
-			resetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
-			resetFeatures.hostQueryReset = VK_TRUE;
-			resetFeatures.pNext = nullptr;
+		//if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::QUERY))
+		//{
+		//	resetFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_HOST_QUERY_RESET_FEATURES;
+		//	resetFeatures.hostQueryReset = VK_TRUE;
+		//	resetFeatures.pNext = nullptr;
 
-			if (pNextChainTail == nullptr)
-				*pNextChainHead = &resetFeatures;
-			else
-				*pNextChainTail = &resetFeatures;
-			pNextChainTail = &(resetFeatures.pNext);
-		}
+		//	if (pNextChainTail == nullptr)
+		//		*pNextChainHead = &resetFeatures;
+		//	else
+		//		*pNextChainTail = &resetFeatures;
+		//	pNextChainTail = &(resetFeatures.pNext);
+		//}
 		VkPhysicalDeviceMeshShaderFeaturesNV mesh_shader_feature{};
 		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::MESH_SHADER))
 		{
@@ -149,18 +149,46 @@ namespace SIByL::RHI
 				*pNextChainTail = &mesh_shader_feature;
 			pNextChainTail = &(mesh_shader_feature.pNext);
 		}
-		VkPhysicalDeviceShaderFloat16Int8Features shader_float16_int8{};
-		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::SHADER_INT8))
+		//VkPhysicalDeviceShaderFloat16Int8Features shader_float16_int8{};
+		//if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::SHADER_INT8))
+		//{
+		//	shader_float16_int8.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
+		//	shader_float16_int8.pNext = nullptr;
+		//	shader_float16_int8.shaderInt8 = VK_TRUE;
+
+		//	if (pNextChainTail == nullptr)
+		//		*pNextChainHead = &shader_float16_int8;
+		//	else
+		//		*pNextChainTail = &shader_float16_int8;
+		//	pNextChainTail = &(shader_float16_int8.pNext);
+		//}
+		VkPhysicalDeviceFragmentShaderBarycentricFeaturesNV  shader_fragment_barycentric{};
+		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::FRAGMENT_BARYCENTRIC))
 		{
-			shader_float16_int8.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SHADER_FLOAT16_INT8_FEATURES;
-			shader_float16_int8.pNext = nullptr;
-			shader_float16_int8.shaderInt8 = VK_TRUE;
+			shader_fragment_barycentric.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_SHADER_BARYCENTRIC_FEATURES_NV;
+			shader_fragment_barycentric.pNext = nullptr;
+			shader_fragment_barycentric.fragmentShaderBarycentric = VK_TRUE;
 
 			if (pNextChainTail == nullptr)
-				*pNextChainHead = &shader_float16_int8;
+				*pNextChainHead = &shader_fragment_barycentric;
 			else
-				*pNextChainTail = &shader_float16_int8;
-			pNextChainTail = &(shader_float16_int8.pNext);
+				*pNextChainTail = &shader_fragment_barycentric;
+			pNextChainTail = &(shader_fragment_barycentric.pNext);
+		}
+		VkPhysicalDeviceVulkan12Features sampler_filter_min_max_properties{};
+		if (hasBit(physicalDevice->getGraphicContextVK()->getExtensions(), GraphicContextExtensionFlagBits::SAMPLER_FILTER_MIN_MAX))
+		{
+			sampler_filter_min_max_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+			sampler_filter_min_max_properties.pNext = nullptr;
+			sampler_filter_min_max_properties.samplerFilterMinmax = VK_TRUE;
+			sampler_filter_min_max_properties.shaderInt8 = VK_TRUE;
+			sampler_filter_min_max_properties.hostQueryReset = VK_TRUE;
+
+			if (pNextChainTail == nullptr)
+				*pNextChainHead = &sampler_filter_min_max_properties;
+			else
+				*pNextChainTail = &sampler_filter_min_max_properties;
+			pNextChainTail = &(sampler_filter_min_max_properties.pNext);
 		}
 
 		if (vkCreateDevice(physicalDevice->getPhysicalDevice(), &createInfo, nullptr, &device) != VK_SUCCESS) {

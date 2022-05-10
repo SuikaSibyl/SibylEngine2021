@@ -17,6 +17,7 @@ namespace SIByL::GFX
 {
 	export struct ParticleSystem
 	{
-		
+		bool showCluster = false;
+		bool needRebuildPipeline = false;
 	};
 }

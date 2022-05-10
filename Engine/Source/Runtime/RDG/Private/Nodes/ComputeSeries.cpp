@@ -250,6 +250,8 @@ namespace SIByL::GFX::RDG
 
 	auto ComputePipelineScope::onCommandRecord(RHI::ICommandBuffer* commandbuffer, uint32_t flight) noexcept -> void
 	{
+		queryBeforeCmdRecord(commandbuffer);
+
 		float color_compute_pass[] = { 0.0941, 0.2196, 0.5215686, 1 };
 		commandbuffer->cmdBeginDebugUtilsLabel(tag.c_str(), color_compute_pass);
 
@@ -262,6 +264,7 @@ namespace SIByL::GFX::RDG
 		}
 
 		commandbuffer->cmdEndDebugUtilsLabel();
+		queryAfterCmdRecord(commandbuffer);
 	}
 
 	auto ComputePipelineScope::clearAllMaterials() noexcept -> void

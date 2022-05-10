@@ -33,5 +33,8 @@
     <ClCompile Include="src\Utils\DepthBaker.ixx">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\ParticleSystem\Firework.ixx">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

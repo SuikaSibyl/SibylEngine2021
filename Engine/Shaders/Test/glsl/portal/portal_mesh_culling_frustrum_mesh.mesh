@@ -12,10 +12,6 @@ taskNV in Task {
 layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 layout(triangles, max_vertices = LOCAL_SIZE * 4, max_primitives = LOCAL_SIZE * 2) out;
 
-layout(push_constant) uniform PushConstantObject {
-    mat4 model;
-} PushConstants;
-
 layout(binding = 0) uniform PerViewUniformBuffer {
     mat4 view;
     mat4 proj;
@@ -162,7 +158,7 @@ void main()
     mat4 billboardMat = billboardAlongVelocity(vel_mass.xyz, view_ubo.cameraPos.xyz - pos_lifetime.xyz);
     // get speed
     float clamped_speed = clamp(length(vel_mass.xyz), 0, 4) / 4;
-    vec3 scale_quad = vec3(0.2,0.2,0.2) * getScale(PushConstants.model) * vec3(0.1, speed_y_curve(clamped_speed), 1);
+    vec3 scale_quad = vec3(0.2,0.2,0.2) * vec3(0.1, speed_y_curve(clamped_speed), 1);
     
     uint lifetick_pack = floatBitsToUint(pos_lifetime.w);
     float lifeAlpha = 1 - (1.f * (lifetick_pack & 0xFFFF)) / (lifetick_pack & 0xFFFF0000);
@@ -183,7 +179,10 @@ void main()
     for(uint i = 0; i < 2; i++)
     {
         vec4 modelPosition = billboardMat * vec4(vertices[i + t2xtriangle_id] * scale_quad, 1.0);
-        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
+
+        vec4 Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
+        Position.z = (Position.z + Position.w) / 2.0;
+        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = Position;
 
         v_out[i + t4xquad_id_t2xtriangle_id].fragTexCoord = uvs[i + t2xtriangle_id];
     }
@@ -195,9 +194,13 @@ void main()
     
     if (gl_LocalInvocationID.x == 0) {
         gl_PrimitiveCountNV = LOCAL_SIZE * 2;
-        if((gl_WorkGroupID.x + 1) * LOCAL_SIZE > drawIndirect.content[0].instanceCount)
+        if((meshletID + 2) * LOCAL_SIZE > drawIndirect.content[0].instanceCount)
         {
-            gl_PrimitiveCountNV = max(drawIndirect.content[0].instanceCount - gl_WorkGroupID.x * LOCAL_SIZE, 0);
+            gl_PrimitiveCountNV = 0;
+        }
+        else if((meshletID + 1) * LOCAL_SIZE > drawIndirect.content[0].instanceCount)
+        {
+            gl_PrimitiveCountNV = max(drawIndirect.content[0].instanceCount - meshletID * LOCAL_SIZE, 0);
         }
     }
 }

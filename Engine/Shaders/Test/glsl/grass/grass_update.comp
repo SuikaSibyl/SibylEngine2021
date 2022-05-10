@@ -1,0 +1,47 @@
+ #version 450
+#define PARTICLE_COUNT 65536
+#define LOG_PARTICLE_COUNT 256
+layout (local_size_x = 512) in;
+
+layout(push_constant) uniform constants {
+    float time;
+} PushConstants;
+
+layout(set = 0, binding = 0, std430) buffer ParticlesPos
+{ vec4 particle_pos[]; };
+
+layout(set = 0, binding = 1, std430) buffer ParticlesDirection
+{ vec4 particle_direction[]; };
+
+layout(set = 0, binding = 2, std430) buffer ParticlesVelocity
+{ vec4 particle_velocity[]; };
+
+layout(binding = 3) uniform sampler2D windNoiseSampler;
+
+const vec2 WIND_SCROLL_SPEED = vec2(3,0);
+const vec2 WIND_WORLD_TILING = vec2(10);
+const vec3 WIND_PUSH_INTENSITY = vec3(0.2, 0.1, 0.2);
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= PARTICLE_COUNT) return;
+
+    vec4 velocity = particle_velocity[idx];
+    // alpha increases every frame until it reaches 1
+    float alpha = 1; // here we do not push from camera
+    // lerp(velocity.rgb, vec3(0), alpha);
+
+    // add windd noise (not attenuated)
+    vec4 position = particle_pos[idx];
+    vec2 pos_uv = position.xz / 320 + vec2(0.5, 0.5);
+    vec2 offset = PushConstants.time * WIND_SCROLL_SPEED;
+    vec2 wind_uv = (pos_uv+offset)/WIND_WORLD_TILING;
+    vec3 wind_effect = (texture(windNoiseSampler, offset).xyz - vec3(0.5)) * WIND_PUSH_INTENSITY * alpha;
+
+    // update target position
+    vec4 target_position = particle_direction[idx];
+    target_position.xyz += vec3(0,0.15,0);
+    target_position.xyz += wind_effect; // add target position from map
+    particle_direction[idx] = normalize(target_position);
+}

@@ -7,6 +7,7 @@ layout(triangles, max_vertices = 64, max_primitives = 64) out;
 
 layout(push_constant) uniform PushConstantObject {
     vec2 inv_screen_size;
+    vec2 screen_size;
 } PushConstants;
 
 struct CullingInfo
@@ -30,6 +31,8 @@ layout(set = 0, binding = 1, std430) buffer DrawIndexedIndirects
     DrawIndexedIndirect content[];
 } drawIndirect;
 
+layout ( binding = 2 ) uniform sampler2D depthImage;
+
 const uvec2 point_finder[] = {
     uvec2(0,1),
     uvec2(2,1),
@@ -44,28 +47,35 @@ const vec2 extension[] = {
     vec2(-1,+1),
 };
 
+layout (location = 0) perprimitiveNV out PerPrimitiveData
+{
+  vec3 color;
+} per_primitive_out[];   // [max_vertices]
+
 void main()
 {
     uint local_partilets_idx = gl_LocalInvocationID.x / 4;
     uint partilets_idx = gl_WorkGroupID.x * 8 + local_partilets_idx;
     uint thread_in_partilets = gl_LocalInvocationID.x & 3;
 
+    vec3 color = vec3(0,1,0);
+
     uint partilets_count = (drawIndirect.content[0].instanceCount + 15)/16;
-    if(partilets_idx >= partilets_count)
+    if(partilets_idx > partilets_count)
     {
-        gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 0].gl_Position = vec4(0, 0, 0.1,1);
-        gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 1].gl_Position = vec4(0, 0, 0.1,1);
+        gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 0].gl_Position = vec4(0, 0, -0.1,1);
+        gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 1].gl_Position = vec4(0, 0, -0.1,1);
     }
     else
     {
         CullingInfo cullingInfo = cullingInfos[partilets_idx];
-        cullingInfo.aabb_xy_wh = (cullingInfo.aabb_xy_wh-vec4(0.5))* vec4(2,-2,2,-2);
+        cullingInfo.aabb_xy_wh = (cullingInfo.aabb_xy_wh-vec4(0.5))* vec4(2);
         uvec2 point_finded = point_finder[thread_in_partilets];
 
-        if(point_finded.x == 99999 || point_finded.x == -99999)
+        if(point_finded.x == 99999 || point_finded.x == -99999 || cullingInfo.min_max_depth.y < 0)
         {
-            gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 0].gl_Position = vec4(0, 0, 0.1,1);
-            gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 1].gl_Position = vec4(0, 0, 0.1,1);
+            gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 0].gl_Position = vec4(0, 0, -0.1,1);
+            gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 1].gl_Position = vec4(0, 0, -0.1,1);
         }
         else
         {
@@ -74,14 +84,50 @@ void main()
 
             gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 0].gl_Position = vec4(point_to_handle, 0.1,1);
             gl_MeshVerticesNV[local_partilets_idx*8 + thread_in_partilets*2 + 1].gl_Position = vec4(extend_point, 0.1,1);
+            
+            if(cullingInfo.min_max_depth.x > 0.1)
+            {
+                float depth_proj = cullingInfo.min_max_depth.x;
+                depth_proj = 1.00004005 - 0.200004011 / depth_proj; // Z : [-1,1]
+                depth_proj = (depth_proj + 1) /2;
+                vec2 uv = vec2(
+                    (cullingInfos[partilets_idx].aabb_xy_wh.x + cullingInfos[partilets_idx].aabb_xy_wh.z) / 2, 
+                    (cullingInfos[partilets_idx].aabb_xy_wh.y + cullingInfos[partilets_idx].aabb_xy_wh.w) / 2);
+                
+                float width = (cullingInfos[partilets_idx].aabb_xy_wh.z - cullingInfos[partilets_idx].aabb_xy_wh.x) * PushConstants.screen_size.x;
+                float height = (cullingInfos[partilets_idx].aabb_xy_wh.w - cullingInfos[partilets_idx].aabb_xy_wh.y) * PushConstants.screen_size.y;
+
+                if(width>PushConstants.screen_size.x || height > PushConstants.screen_size.y)
+                {
+
+                }
+                else
+                {
+                    float level = ceil(log2(max(ceil(width), ceil(height))));
+                    float depth = 1 - textureLod(depthImage, uv, level).x;
+                    //float depth_in_linear = 0.200004011 / (1.00004005 - (2*depth-1));
+
+                    if(depth_proj > depth) color = vec3(1,0,0);
+
+                    if(thread_in_partilets==0)
+                    {
+                        cullingInfos[partilets_idx].min_max_depth.z = depth_proj;
+                        cullingInfos[partilets_idx].min_max_depth.w = depth;
+                    }
+                }
+            }
         }
     }
-    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 0] = local_partilets_idx*8 + (0+thread_in_partilets*2)&7;
-    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 1] = local_partilets_idx*8 + (2+thread_in_partilets*2)&7;
-    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 2] = local_partilets_idx*8 + (3+thread_in_partilets*2)&7;
-    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 3] = local_partilets_idx*8 + (0+thread_in_partilets*2)&7;
-    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 4] = local_partilets_idx*8 + (3+thread_in_partilets*2)&7;
-    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 5] = local_partilets_idx*8 + (1+thread_in_partilets*2)&7;
+    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 0] = local_partilets_idx*8 + ((0+thread_in_partilets*2)&7);
+    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 1] = local_partilets_idx*8 + ((2+thread_in_partilets*2)&7);
+    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 2] = local_partilets_idx*8 + ((3+thread_in_partilets*2)&7);
+    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 3] = local_partilets_idx*8 + ((0+thread_in_partilets*2)&7);
+    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 4] = local_partilets_idx*8 + ((3+thread_in_partilets*2)&7);
+    gl_PrimitiveIndicesNV[local_partilets_idx*24 + thread_in_partilets*6 + 5] = local_partilets_idx*8 + ((1+thread_in_partilets*2)&7);
+
+    color *= vec3(0.1);
+    per_primitive_out[local_partilets_idx*8 + thread_in_partilets*2 + 0].color = color;
+    per_primitive_out[local_partilets_idx*8 + thread_in_partilets*2 + 1].color = color;
 
     if (gl_LocalInvocationID.x == 0) {
             gl_PrimitiveCountNV = 64;

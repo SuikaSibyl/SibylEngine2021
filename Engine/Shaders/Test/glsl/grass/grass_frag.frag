@@ -9,10 +9,10 @@ layout (location = 0) in PerVertexData
 
 layout(location = 0) out vec4 outColor;
 
-layout(binding = 2) uniform sampler2D albedoSampler;
+layout(binding = 4) uniform sampler2D albedoSampler;
 
 void main() {
   vec4 albedo = texture(albedoSampler, v_out.fragTexCoord);
   if(albedo.a < 0.5) discard;
-  outColor = albedo;
+  outColor = albedo * vec4(v_out.fragColor, 1.0);
 }

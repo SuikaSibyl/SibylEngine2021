@@ -1,0 +1,60 @@
+#version 450
+#define FIREWORK_COUNT_MAX 32
+#define THREADS_PER_BLOCK 32
+
+struct Counter
+{
+    uint aliveCount;
+    uint deadCount;
+    uint emitCount;
+    uint drawCount;
+    uint maxCount;
+};
+layout(set = 0, binding = 0, std430) buffer Counters
+{
+    Counter counter[];
+} counter;
+
+layout(set = 0, binding = 1, std430) buffer DeadIndexBuffer
+{
+    uint[] indices;
+} deadPool;
+
+struct DrawIndexedIndirect
+{
+    uint indexCount;
+    uint instanceCount;
+    uint firstIndex;
+    int  vertexOffset;
+    uint firstInstance;
+};
+
+layout(set = 0, binding = 2, std430) buffer IndirectDrawBuffer
+{
+    DrawIndexedIndirect[] content;
+} IndirectBuffer;
+
+layout (local_size_x = THREADS_PER_BLOCK) in;
+
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= FIREWORK_COUNT_MAX) return;
+    
+    deadPool.indices[idx] = FIREWORK_COUNT_MAX - idx - 1;
+
+    if(idx == 0)
+    {
+        counter.counter[0].deadCount = FIREWORK_COUNT_MAX;
+        counter.counter[0].aliveCount = 0;
+        counter.counter[0].maxCount = FIREWORK_COUNT_MAX;
+        
+        DrawIndexedIndirect indirectBuffer;
+        indirectBuffer.indexCount = 6;
+        indirectBuffer.instanceCount = 0;
+        indirectBuffer.firstIndex = 0;
+        indirectBuffer.vertexOffset = 0;
+        indirectBuffer.firstInstance = 0;
+        IndirectBuffer.content[0] = indirectBuffer;
+    }
+}

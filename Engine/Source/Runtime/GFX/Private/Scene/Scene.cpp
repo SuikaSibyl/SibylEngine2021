@@ -20,6 +20,7 @@ import GFX.Transform;
 import GFX.Serializer;
 import GFX.Renderer;
 import GFX.BoundingBox;
+import GFX.ParticleSystem;
 import RHI.ILogicalDevice;
 import Asset.AssetLayer;
 import Asset.Mesh;
@@ -110,6 +111,17 @@ namespace SIByL::GFX
 				out << YAML::EndMap;
 			}
 			out << YAML::EndSeq;
+
+			out << YAML::EndMap;
+		}
+
+		if (entity.hasComponent<GFX::ParticleSystem>())
+		{
+			out << YAML::Key << "ParticleSystem";
+			auto& ps = entity.getComponent<GFX::ParticleSystem>();
+			out << YAML::Value << YAML::BeginMap;
+
+			out << YAML::Key << "showClusterAABB" << YAML::Value << ps.showCluster;
 
 			out << YAML::EndMap;
 		}
@@ -218,6 +230,8 @@ namespace SIByL::GFX
 			if (mc.meshDesc.vertexInfo != asset_mesh->desc.vertexInfo) SE_CORE_ERROR("GFX :: Scene Deserialize :: Mesh Component Deserialize failed :: Scene Vertex Desc != Cache Vertex Desc");
 		}
 
+		// Renderer Component
+		// -----------------------------------------------
 		auto rendererComponent = components["Renderer"];
 		if (rendererComponent)
 		{
@@ -231,6 +245,15 @@ namespace SIByL::GFX
 					std::string materialName = sub["MaterialName"].as<std::string>();
 					rc.subRenderers.emplace_back(passName, pipelineName, materialName);
 				}
+		}
+
+		// ParticleSystem Component
+		// -----------------------------------------------
+		auto psComponent = components["ParticleSystem"];
+		if (psComponent)
+		{
+			auto& ps = entity.addComponent<GFX::ParticleSystem>();
+			ps.showCluster = psComponent["showClusterAABB"].as<bool>();
 		}
 	}
 

@@ -60,6 +60,7 @@ namespace SIByL::GFX::RDG
 		Indexed,
 		IndexedIndirect,
 		MeshTasks,
+		Tasks,
 	};
 
 	export struct RasterDrawCall :public PassNode

@@ -175,7 +175,10 @@ void main()
     for(uint i = 0; i < 2; i++)
     {
         vec4 modelPosition = billboardMat * vec4(vertices[i + t2xtriangle_id] * scale_quad, 1.0);
-        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
+        vec4 Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos_lifetime.xyz, 1.0));
+        Position.z = (Position.z + Position.w) / 2.0;
+
+        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = Position;
 
         v_out[i + t4xquad_id_t2xtriangle_id].fragTexCoord = uvs[i + t2xtriangle_id];
     }

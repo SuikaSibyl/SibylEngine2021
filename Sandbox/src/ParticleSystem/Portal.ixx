@@ -29,6 +29,8 @@ import GFX.RDG.ComputePassNode;
 import GFX.RDG.ComputeSeries;
 import GFX.Transform;
 import GFX.BoundingBox;
+import GFX.ParticleSystem;
+import GFX.RDG.RenderGraph;
 
 import ParticleSystem.ParticleSystem;
 #define GRIDSIZE(x,ThreadSize) ((x+ThreadSize - 1)/ThreadSize)
@@ -46,8 +48,12 @@ namespace SIByL::Demo
 		auto registerBoundingBoxesPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void;
 		virtual auto registerRenderPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
 
+		auto freshRenderPipeline(GFX::RDG::RenderGraph* rendergraph) noexcept -> bool;
+
 		ECS::Entity entity = {};
 		Timer* timer;
+
+		GFX::RDG::NodeHandle hiz;
 
 		// Resource Nodes Handles --------------------------
 		GFX::RDG::NodeHandle particlePosLifetickBuffer;
@@ -231,7 +237,7 @@ namespace SIByL::Demo
 			// Add Materials "Common"
 			{
 				auto particle_emit_mat_scope = workshop->addComputeMaterialScope("Particle System", "Emit-Portal", "Common");
-				particle_emit_mat_scope->resources = { particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle };
+				particle_emit_mat_scope->resources = { particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, counterBuffer, liveIndexBuffer, deadIndexBuffer, emitterVolumeHandle, samplerHandle, indirectDrawBuffer };
 				particle_emit_mat_scope->sampled_textures = { bakedCurveHandle };
 				auto particle_emit_dispatch_scope = workshop->addComputeDispatch("Particle System", "Emit-Portal", "Common", "Only");
 				emitDispatch = particle_emit_dispatch_scope;
@@ -427,8 +433,8 @@ namespace SIByL::Demo
 
 			// Add Materials
 			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Particle Portal Mesh Culling", "Portal");
-			portal_mat_scope->resources = { samplerHandle, particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, samplerHandle, doubleBufferedIndicesHandle, indirectDrawBuffer, cullingInfo };
-			portal_mat_scope->sampled_textures = { spriteHandle, bakedCurveHandle };
+			portal_mat_scope->resources = { samplerHandle, particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, samplerHandle, doubleBufferedIndicesHandle, indirectDrawBuffer, cullingInfo, workshop->getInternalSampler("MinPooling Sampler") };
+			portal_mat_scope->sampled_textures = { spriteHandle, bakedCurveHandle, hiz };
 		}
 		trancparency_portal_mesh_culling_pipeline->isActive = false;
 
@@ -437,12 +443,13 @@ namespace SIByL::Demo
 			culling_aabb_vis_pipeline->shaderMesh = factory->createShaderFromBinaryFile("portal/portal_aabb_vis.spv", { RHI::ShaderStage::MESH,"main" });
 			culling_aabb_vis_pipeline->shaderFrag = factory->createShaderFromBinaryFile("portal/portal_aabb_vis_frag.spv", { RHI::ShaderStage::FRAGMENT,"main" });
 			culling_aabb_vis_pipeline->cullMode = RHI::CullMode::NONE;
-			culling_aabb_vis_pipeline->colorBlendingDesc = RHI::NoBlending;
+			culling_aabb_vis_pipeline->colorBlendingDesc = RHI::AdditionBlending;
 			culling_aabb_vis_pipeline->depthStencilDesc = RHI::NoTestAndNoWrite;
 
 			// Add Materials
 			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Vis AABB Portal", "Portal");
-			portal_mat_scope->resources = { cullingInfo, indirectDrawBuffer };
+			portal_mat_scope->resources = { cullingInfo, indirectDrawBuffer, workshop->getInternalSampler("MinPooling Sampler") };
+			portal_mat_scope->sampled_textures = { hiz };
 		}
 		culling_aabb_vis_pipeline->isActive = true;
 
@@ -465,4 +472,18 @@ namespace SIByL::Demo
 			}
 		}
 	}
+
+	auto PortalSystem::freshRenderPipeline(GFX::RDG::RenderGraph* rendergraph) noexcept -> bool
+	{
+		GFX::ParticleSystem& ps = entity.getComponent<GFX::ParticleSystem>();
+		if (ps.needRebuildPipeline)
+		{
+			rendergraph->getRasterPipelineScope("Forward Pass", "Vis AABB Portal")->isActive = ps.showCluster;
+			ps.needRebuildPipeline = false;
+			return true;
+		}
+		else
+			return false;
+	}
+
 }

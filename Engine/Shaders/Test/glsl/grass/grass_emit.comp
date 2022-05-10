@@ -6,7 +6,17 @@ layout (local_size_x = 512) in;
 layout(set = 0, binding = 0, std430) buffer ParticlesPos
 { vec4 particle_pos[]; };
 
-layout(binding = 1) uniform sampler2D depthSampler;
+layout(set = 0, binding = 1, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
+
+layout(set = 0, binding = 2, std430) buffer ParticlesDirection
+{ vec4 particle_direction[]; };
+
+layout(set = 0, binding = 3, std430) buffer ParticlesVelocity
+{ vec4 particle_velocity[]; };
+
+layout(binding = 4) uniform sampler2D depthSampler;
+layout(binding = 5) uniform sampler2D shadowSampler;
 
 float hash11(float p)
 {
@@ -29,16 +39,47 @@ vec2 hash22(vec2 p)
     p3 += dot(p3, p3.yzx+33.33);
     return fract((p3.xx+p3.yz)*p3.zy);
 }
+
+vec3 hash31(float p)
+{
+   vec3 p3 = fract(vec3(p) * vec3(.1031, .1030, .0973));
+   p3 += dot(p3, p3.yzx+33.33);
+   return fract((p3.xxy+p3.yzz)*p3.zyx); 
+}
+
 float DecodeFloatRGBA( vec4 rgba )
 {
 	vec4 kDecodeDot = vec4(1.0, 1/255.0, 1/65025.0, 1/16581375.0);
 	return dot( rgba, kDecodeDot );
 }
+
+vec3 lerp(vec3 a, vec3 b, vec3 alpha)
+{
+    return a + (b-a)*alpha;
+}
+
 //note: uniformly distributed, normalized rand, [0;1[
 float nrand( vec2 n )
 {
 	return fract(sin(dot(n.xy, vec2(12.9898, 78.233)))* 43758.5453);
 }
+
+float rand_size(float r)
+{
+    if(r<0.854) return 0.685 + r*0.2096;
+    else return -1.03704 + r*2.35204;
+}
+
+vec3 rand_up_centered_direction(float seed)
+{
+    float seed_theta = nrand(hash21(seed));
+    float theta = seed_theta * 6.283185307;
+    float seed_phi = nrand(hash21(seed_theta));
+    float phi = (seed_phi - 0.5) * 3.14159265359 * 0.5;
+    float sinphi = sin(phi);
+    return vec3(sinphi * cos(theta) ,cos(phi), sinphi * sin(theta));
+}
+
 void main()
 {
     uint idx = gl_GlobalInvocationID.x;
@@ -52,6 +93,7 @@ void main()
     
     vec4 depth_package = vec4(0,0,0,1);
     float seed = float(gl_GlobalInvocationID.x);
+    vec3 color_rand = lerp(vec3(0.6792453), vec3(0.8584906, 0.6685152, 0.376602), hash31(seed));
     int i=0;
     while(depth_package == vec4(0,0,0,1))
     {
@@ -63,7 +105,13 @@ void main()
     }
     depth_package.rgb = pow(depth_package.rgb, vec3(1.f/2.2));
     float depth = DecodeFloatRGBA(depth_package);
-    depth = -10 + depth*40 + 2.5;
+    seed = nrand(uv);
+    float size = rand_size(seed);
+    depth = 30 - depth*40 + size*2.5 - 0.1;
+    if(depth >=15) depth += 0.5;
 
-    particle_pos[idx] = vec4((uv.x-0.5) * 320, depth, (uv.y-0.5) * 320, gl_GlobalInvocationID.x & 3);
+    particle_direction[idx] = vec4(rand_up_centered_direction(seed), 1.0);
+    particle_velocity[idx] = vec4(0,0,0, 1.0);
+    particle_pos[idx] = vec4((uv.x-0.5) * 320, depth, (uv.y-0.5) * 320, size);
+    particle_color[idx] = vec4(texture(shadowSampler, uv).rgb * color_rand, gl_GlobalInvocationID.x & 3);
 }

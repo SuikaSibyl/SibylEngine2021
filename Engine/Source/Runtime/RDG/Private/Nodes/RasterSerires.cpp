@@ -68,6 +68,17 @@ namespace SIByL::GFX::RDG
 			}
 			commandbuffer->cmdDrawMeshTasks(taskCount, 0);
 		}
+		else if (kind == DrawCallKind::Tasks)
+		{
+			if (pushConstant)
+			{
+				Buffer buffer;
+				pushConstant(buffer);
+				commandbuffer->cmdPushConstants(*pipelineLayout, RHI::ShaderStage::TASK, buffer.getSize(), buffer.getData());
+			}
+			commandbuffer->cmdDrawMeshTasks(taskCount, 0);
+		}
+
 		queryAfterCmdRecord(commandbuffer);
 	}
 

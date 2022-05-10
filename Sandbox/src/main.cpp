@@ -113,6 +113,7 @@ import Editor.RDGImImageManager;
 import Demo.Portal;
 import Demo.SortTest;
 import Demo.Grass;
+import Demo.Firework;
 import Utils.DepthBaker;
 
 using namespace SIByL;
@@ -166,6 +167,8 @@ public:
 				(uint32_t)RHI::GraphicContextExtensionFlagBits::QUERY
 				| (uint32_t)RHI::GraphicContextExtensionFlagBits::MESH_SHADER
 				| (uint32_t)RHI::GraphicContextExtensionFlagBits::SHADER_INT8
+				| (uint32_t)RHI::GraphicContextExtensionFlagBits::FRAGMENT_BARYCENTRIC
+				| (uint32_t)RHI::GraphicContextExtensionFlagBits::SAMPLER_FILTER_MIN_MAX
 				}));
 
 			graphicContext->attachWindow(window_layer->getWindow());
@@ -212,10 +215,12 @@ public:
 			// Create RDG register proxy
 			acesbloom = MemNew<GFX::PostProcessing::AcesBloomProxyUnit>(resourceFactory.get());
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
+			portal.entity = scene.tree.getNodeEntity("portal");
 			grass = std::move(Demo::GrassSystem(resourceFactory.get(), &timer));
-			//depthBaker = Utils::DepthBaker(resourceFactory.get());
-			portal.entity = scene.tree.getNodeEntity("particle");
+			firework = std::move(Demo::FireworkSystem(resourceFactory.get(), &timer));
+
 			//sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
+			//depthBaker = Utils::DepthBaker(resourceFactory.get());
 
 			// New Pipeline Building
 			GFX::RDG::RenderGraphWorkshop workshop(rdg);
@@ -225,6 +230,7 @@ public:
 			GFX::RDG::RenderGraphBuilder rdg_builder(rdg);
 			// sub-pipeline building helper components
 			portal.registerResources(&workshop);
+			firework.registerResources(&workshop);
 			//depthBaker.registerResources(&workshop);
 			grass.registerResources(&workshop);
 			//sortTest.registerResources(&rdg_builder);
@@ -262,6 +268,7 @@ public:
 			auto hiz_agency = GFX::HiZAgency::createInstance(srgb_depth_attachment, resourceFactory.get());
 			workshop.addAgency(std::move(hiz_agency));
 			portal.rasterDepthAttachment = ((GFX::HiZAgency*)(rdg.agencies[0].get()))->depthSampleHandle;
+			portal.hiz = ((GFX::HiZAgency*)(rdg.agencies[0].get()))->HiZ_handle;
 			
 			// Create Cluster Pass
 			workshop.addComputePassScope("Particle Bounding Boxes");
@@ -309,6 +316,8 @@ public:
 			grass.registerRenderPasses(&workshop);
 			portal.registerBoundingBoxesPasses(&workshop);
 			portal.registerRenderPasses(&workshop);
+			firework.registerBoundingBoxesPasses(&workshop);
+			firework.registerRenderPasses(&workshop);
 
 			// Compute Pass "Post Processing"
 			workshop.addComputePassScope("PostProcessing Pass");
@@ -318,6 +327,8 @@ public:
 			acesbloom->registerComputePasses(workshop);
 			// Compute Pass "Portal Particle System Update"
 			portal.registerUpdatePasses(&workshop);
+			grass.registerUpdatePasses(&workshop);
+			firework.registerUpdatePasses(&workshop);
 
 			// External Access Pass "ImGui Read Pass"
 			auto imGuiReadPassHandle = workshop.addExternalAccessPass("ImGui Read Pass");
@@ -350,7 +361,7 @@ public:
 			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 			{
 				commandbuffers[i] = resourceFactory->createCommandBuffer(commandPool.get());
-				queryPools[i] = resourceFactory->createQueryPool({ RHI::QueryType::TIMESTAMP, 4 });
+				queryPools[i] = resourceFactory->createQueryPool({ RHI::QueryType::TIMESTAMP, 6 });
 				inFlightFence[i] = resourceFactory->createFence();
 			}
 
@@ -417,7 +428,7 @@ public:
 			//GFX::RDG::PerViewUniformBuffer per_view_ubo_baker;
 			//per_view_ubo_baker.cameraPos = glm::vec4(0,0,0,0);
 			//per_view_ubo_baker.view = glm::lookAtLH(glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-			//per_view_ubo_baker.proj = glm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, -20.0f, 20.0f);
+			//per_view_ubo_baker.proj = glm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, 20.0f, -20.0f);
 			//per_view_ubo_baker.proj[1][1] *= -1;
 
 			//glm::vec4 test_01_01 = per_view_ubo_baker.view * glm::vec4(0, 29, 0, 1);
@@ -430,12 +441,14 @@ public:
 		}
 		// 
 		{
-			uint64_t timestamp_pairs[4];
-			bool isReady = queryPools[currentFrame]->fetchResult(0, 4, timestamp_pairs);
+			uint64_t timestamp_pairs[6];
+			bool isReady = queryPools[currentFrame]->fetchResult(0, 6, timestamp_pairs);
 			float time_on_drawmesh = 0.000001 * (timestamp_pairs[1] - timestamp_pairs[0]) * physicalDevice->getTimestampPeriod();
 			float time_on_softraster = 0.000001 * (timestamp_pairs[3] - timestamp_pairs[2]) * physicalDevice->getTimestampPeriod();
+			float time_on_onesweepX4 = 0.000001 * (timestamp_pairs[5] - timestamp_pairs[4]) * physicalDevice->getTimestampPeriod();
 			editorLayer->statisticsGui.portalDrawcallTime = time_on_drawmesh;
 			editorLayer->statisticsGui.portalSoftDrawTime = time_on_softraster;
+			editorLayer->statisticsGui.portalOneSweep4Time = time_on_onesweepX4;
 		}
 		// update draw calls
 		{
@@ -444,6 +457,7 @@ public:
 			auto portal_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal", "Portal");
 			auto portal_mat_mesh_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal Mesh", "Portal");
 			auto grass_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Grass", "Grass");
+			auto firework_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Firework", "Firework");
 			auto portal_mat_mesh_culling_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal Mesh Culling", "Portal");
 
 			{
@@ -453,11 +467,35 @@ public:
 				drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
 				drawcall->taskCount = GRIDSIZE(100000u, (16 * 8));
 				drawcall->pushConstant = [&viewport= editorLayer->mainViewport](Buffer& buffer) {
-					glm::vec2 screen_size{ 1.f/viewport.getWidth(), 1.f/viewport.getHeight() };
+					glm::vec4 screen_size{ 1.f/viewport.getWidth(), 1.f/viewport.getHeight(), viewport.getWidth(), viewport.getHeight() };
 					buffer = std::move(Buffer(sizeof(screen_size), 1));
 					memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
 				};
 
+			}
+			{
+				auto vis_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Vis AABB Firework", "Firework");
+				auto drawcall_handle = vis_mat_scope->addRasterDrawCall("Vis", &rdg);
+				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
+				drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
+				drawcall->taskCount = GRIDSIZE(32, (16 * 8));
+				drawcall->pushConstant = [&viewport = editorLayer->mainViewport](Buffer& buffer) {
+					glm::vec2 screen_size{ 1.f / viewport.getWidth(), 1.f / viewport.getHeight() };
+					buffer = std::move(Buffer(sizeof(screen_size), 1));
+					memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
+				};
+			}
+			// portal
+			{
+				auto integrate_pipeline = rdg.getComputePipelineScope("Particle System Cluster", "Histogram_Integrate-Portal");
+				integrate_pipeline->queryPool = queryPools[currentFrame].get();
+				integrate_pipeline->stageBitsQueryBeforeCmdRecord = RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT;
+				integrate_pipeline->idxQueryBeforeCmdRecord = 4;
+
+				auto onesweep_pipeline = rdg.getComputePipelineScope("Particle System Cluster", "Histogram_Onesweep-Portal");
+				onesweep_pipeline->queryPool = queryPools[currentFrame].get();
+				onesweep_pipeline->stageBitsQueryAfterCmdRecord = RHI::PipelineStageFlagBits::BOTTOM_OF_PIPE_BIT;
+				onesweep_pipeline->idxQueryAfterCmdRecord = 5;
 			}
 			// soft raster
 			{
@@ -511,6 +549,10 @@ public:
 					{
 						drawcall->instanceCount = 65536;
 					}
+					if (mat_scope == firework_mat_scope)
+					{
+						drawcall->instanceCount = 32;
+					}
 					if (mat_scope == portal_mat_scope)
 					{
 						drawcall->queryPool = queryPools[currentFrame].get();
@@ -539,12 +581,7 @@ public:
 							buffer = std::move(Buffer(sizeof(emitConstant), 1));
 							memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
 						};
-						portal.emitDispatch->pushConstant = [&timer = timer, &transform = transform](Buffer& buffer) {
-							Demo::EmitConstant emitConstant = { transform.getAccumulativeTransform(), 400000u / 50,(float)timer.getTotalTime() };
-							buffer = std::move(Buffer(sizeof(emitConstant), 1));
-							memcpy(buffer.getData(), &emitConstant, sizeof(emitConstant));
-						};
-						drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
+						drawcall->kind = GFX::RDG::DrawCallKind::Tasks;
 						drawcall->taskCount = 100000u / (16 * 32);
 						drawcall->pushConstant = [&viewport = editorLayer->mainViewport](Buffer& buffer) {
 							glm::vec2 screen_size{ viewport.getWidth(), viewport.getHeight() };
@@ -561,7 +598,7 @@ public:
 			// record a command buffer which draws the scene onto that image
 			commandbuffers[currentFrame]->reset();
 			commandbuffers[currentFrame]->beginRecording();
-			commandbuffers[currentFrame]->cmdResetQueryPool(queryPools[currentFrame].get(), 0, 4);
+			commandbuffers[currentFrame]->cmdResetQueryPool(queryPools[currentFrame].get(), 0, 6);
 
 			// render pass
 			//rdg.recordCommands(commandbuffers[currentFrame].get(), currentFrame);
@@ -612,8 +649,10 @@ public:
 				SE_CORE_INFO("Current Raster: Vertex!");
 			}
 		}
+		bool freshRequestFromParticleSystems = false;
+		freshRequestFromParticleSystems |= portal.freshRenderPipeline(&rdg);
 		bool needReize = editorLayer->mainViewport.getNeedResize();
-		if (needReize | needChangeRasterPipeline)
+		if (needReize | needChangeRasterPipeline | freshRequestFromParticleSystems)
 		{
 			SE_CORE_DEBUG("Resize");
 			logicalDevice->waitIdle();
@@ -651,6 +690,7 @@ private:
 	// RDG Proxy
 	Demo::PortalSystem portal;
 	Demo::GrassSystem grass;
+	Demo::FireworkSystem firework;
 	Utils::DepthBaker depthBaker;
 
 	MemScope<GFX::PostProcessing::AcesBloomProxyUnit> acesbloom;

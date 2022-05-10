@@ -43,7 +43,12 @@ namespace SIByL::Demo
 
 		// Resource Nodes Handles --------------------------
 		GFX::RDG::NodeHandle particlePosBuffer;
+		GFX::RDG::NodeHandle particleColorBuffer;
+		GFX::RDG::NodeHandle particleDirectionBuffer;
+		GFX::RDG::NodeHandle particleVelocityBuffer;
+
 		GFX::RDG::NodeHandle spriteHandle;
+		GFX::RDG::NodeHandle windNoiseHandle;
 
 
 		ECS::Entity entity = {};
@@ -62,6 +67,10 @@ namespace SIByL::Demo
 		MemScope<RHI::ITextureView> sceneDepthTextureView;
 		MemScope<RHI::ITexture> grassAlbedoTexture;
 		MemScope<RHI::ITextureView> grassAlbedoTextureView;
+		MemScope<RHI::ITexture> grassShadowTexture;
+		MemScope<RHI::ITextureView> grassShadowTextureView;
+		MemScope<RHI::ITexture> windNoiseTexture;
+		MemScope<RHI::ITextureView> windNoiseTextureView;
 	};
 
 	GrassSystem::GrassSystem(RHI::IResourceFactory* factory, Timer* timer)
@@ -74,6 +83,14 @@ namespace SIByL::Demo
 		Image image_grass("./grass/Grass01.png");
 		grassAlbedoTexture = factory->createTexture(&image_grass);
 		grassAlbedoTextureView = factory->createTextureView(grassAlbedoTexture.get());
+
+		Image image_shadow("./grass/shadowmap.png");
+		grassShadowTexture = factory->createTexture(&image_shadow);
+		grassShadowTextureView = factory->createTextureView(grassShadowTexture.get());
+
+		Image image_windnoise("./grass/Noise.tga");
+		windNoiseTexture = factory->createTexture(&image_windnoise);
+		windNoiseTextureView = factory->createTextureView(windNoiseTexture.get());
 	}
 
 	auto GrassSystem::registerResources(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
@@ -83,7 +100,12 @@ namespace SIByL::Demo
 
 		// Build Up Local Resources
 		auto particle_buffer_pos_handle = local_workshop.addStorageBuffer(sizeof(float) * 4 * particleMaxCount, "Particle Buffer Pos-Lifetick (Grass)");
+		auto particle_buffer_color_handle = local_workshop.addStorageBuffer(sizeof(float) * 4 * particleMaxCount, "Particle Buffer Color (Grass)");
+		auto particle_buffer_direction_handle = local_workshop.addStorageBuffer(sizeof(float) * 4 * particleMaxCount, "Particle Buffer Direction (Grass)");
+		auto particle_buffer_velocity_handle = local_workshop.addStorageBuffer(sizeof(float) * 4 * particleMaxCount, "Particle Buffer Velocity (Grass)");
+		
 		auto baked_scene_depth_handle = local_workshop.addColorBufferExt(sceneDepthTexture.get(), sceneDepthTextureView.get(), "Baked Scene Depth");
+		auto baked_shadowmap_handle = local_workshop.addColorBufferExt(grassShadowTexture.get(), grassShadowTextureView.get(), "Baked Shadowmap");
 		auto internal_sampler_handle = local_workshop.getInternalSampler("Default Sampler");
 
 		// Build Up Local Init Pass
@@ -94,8 +116,8 @@ namespace SIByL::Demo
 			// Add Materials "Common"
 			{
 				auto particle_init_mat_scope = local_workshop.addComputeMaterialScope("Local Init", "Particle Init", "Common");
-				particle_init_mat_scope->resources = { particle_buffer_pos_handle, internal_sampler_handle };
-				particle_init_mat_scope->sampled_textures = { baked_scene_depth_handle };
+				particle_init_mat_scope->resources = { particle_buffer_pos_handle, particle_buffer_color_handle, particle_buffer_direction_handle, particle_buffer_velocity_handle, internal_sampler_handle, internal_sampler_handle };
+				particle_init_mat_scope->sampled_textures = { baked_scene_depth_handle, baked_shadowmap_handle };
 				auto particle_init_dispatch_scope = local_workshop.addComputeDispatch("Local Init", "Particle Init", "Common", "Only");
 				particle_init_dispatch_scope->customSize = [](uint32_t& x, uint32_t& y, uint32_t& z) {
 					x = 65536 / 512;
@@ -116,11 +138,38 @@ namespace SIByL::Demo
 		factory->deviceIdle();
 		// Build Up Main Resources - Buffers
 		particlePosBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(particle_buffer_pos_handle)->getStorageBuffer(), "Particle Pos (Grass) Buffer");
+		particleColorBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(particle_buffer_color_handle)->getStorageBuffer(), "Particle Color (Grass) Buffer");
+		particleDirectionBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(particle_buffer_direction_handle)->getStorageBuffer(), "Particle Direction (Grass) Buffer");
+		particleVelocityBuffer = workshop->addStorageBufferExt(local_workshop.getNode<GFX::RDG::StorageBufferNode>(particle_buffer_velocity_handle)->getStorageBuffer(), "Particle Velocity (Grass) Buffer");
+		
 		spriteHandle = workshop->addColorBufferExt(grassAlbedoTexture.get(), grassAlbedoTextureView.get(), "Grass Albedo");
+		windNoiseHandle = workshop->addColorBufferExt(windNoiseTexture.get(), windNoiseTextureView.get(), "Grass Wind Noise");
 	}
 
 	auto GrassSystem::registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
 	{
+		// Create Update Pass
+		GFX::RDG::ComputePipelineScope* grass_update_pipeline = workshop->addComputePipelineScope("Particle System", "Update-Grass");
+		{
+			grass_update_pipeline->shaderComp = factory->createShaderFromBinaryFile("grass/grass_update.spv", { RHI::ShaderStage::COMPUTE,"main" });
+			// Add Materials "Common"
+			{
+				auto particle_update_mat_scope = workshop->addComputeMaterialScope("Particle System", "Update-Grass", "Common");
+				particle_update_mat_scope->resources = { particlePosBuffer, particleDirectionBuffer, particleVelocityBuffer, workshop->getInternalSampler("Default Sampler") };
+				particle_update_mat_scope->sampled_textures = { windNoiseHandle };
+				auto particle_update_dispatch_scope = workshop->addComputeDispatch("Particle System", "Update-Grass", "Common", "Only");
+				particle_update_dispatch_scope->pushConstant = [timer = timer](Buffer& buffer) {
+					float time = timer->getMsPF() * 0.001;
+					buffer = std::move(Buffer(sizeof(time), 1));
+					memcpy(buffer.getData(), &time, sizeof(time));
+				};
+				particle_update_dispatch_scope->customSize = [](uint32_t& x, uint32_t& y, uint32_t& z) {
+					x = 65536 / 512;
+					y = 1;
+					z = 1;
+				};
+			}
+		}
 	}
 
 	auto GrassSystem::registerBoundingBoxesPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void
@@ -146,7 +195,7 @@ namespace SIByL::Demo
 
 			// Add Materials
 			auto grass_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Particle Grass", "Grass");
-			grass_mat_scope->resources = { particlePosBuffer, workshop->getInternalSampler("Default Sampler") };
+			grass_mat_scope->resources = { particlePosBuffer, particleColorBuffer, particleDirectionBuffer, workshop->getInternalSampler("Default Sampler") };
 			grass_mat_scope->sampled_textures = { spriteHandle };
 		}
 		trancparency_grass_pipeline->isActive = true;

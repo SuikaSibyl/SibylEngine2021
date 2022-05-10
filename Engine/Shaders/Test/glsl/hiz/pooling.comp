@@ -2,6 +2,7 @@
 
 layout(push_constant) uniform constants {
     vec2 imageSize;
+    vec2 inputSize;
 } PushConstants;
 
 layout ( binding = 0 ) uniform sampler2D inputImage;
@@ -14,8 +15,36 @@ void main()
 	uvec2 pos = gl_GlobalInvocationID.xy;
     if(pos.x>=PushConstants.imageSize.x || pos.y>=PushConstants.imageSize.y) return;
 
-	// Sampler is set up to do min reduction, so this computes the minimum depth of a 2x2 texel quad
-	vec4 depth = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize);
+	bool isXOdd = ((uint(PushConstants.inputSize.x) & 1) == 1);
+	bool isYOdd = ((uint(PushConstants.inputSize.y) & 1) == 1);
+
+	vec4 depth = vec4(0);
+	vec2 odd_offset = vec2(0.5)/PushConstants.inputSize;
+
+	if((!isXOdd) && (!isYOdd))
+	{
+		depth = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize);
+	}	
+	else if((isXOdd) && (!isYOdd))
+	{
+		vec4 depth_0 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize + vec2(odd_offset.x, 0));
+		vec4 depth_1 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize - vec2(odd_offset.x, 0));
+		depth = min(depth_0, depth_1);
+	}
+	else if((!isXOdd) && (isYOdd))
+	{
+		vec4 depth_0 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize + vec2(0, odd_offset.y));
+		vec4 depth_1 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize - vec2(0, odd_offset.y));
+		depth = min(depth_0, depth_1);
+	}
+	else if((isXOdd) && (isYOdd))
+	{
+		vec4 depth_0 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize + vec2(+odd_offset.x, +odd_offset.y));
+		vec4 depth_1 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize + vec2(-odd_offset.x, +odd_offset.y));
+		vec4 depth_2 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize + vec2(+odd_offset.x, -odd_offset.y));
+		vec4 depth_3 = texture(inputImage, (vec2(pos) + vec2(0.5)) / PushConstants.imageSize + vec2(-odd_offset.x, -odd_offset.y));
+		depth = min(min(depth_0, depth_1), min(depth_2, depth_3));
+	}
 
 	imageStore(outputImage, ivec2(pos), depth);
 }

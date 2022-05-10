@@ -17,4 +17,5 @@ layout(binding = 0) uniform PerViewUniformBuffer {
 
 void main() {
     gl_Position = view_ubo.proj * view_ubo.view * PushConstants.model * vec4(inPosition, 1.0);
+    gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 }
