@@ -1,0 +1,53 @@
+#version 450
+
+layout(push_constant) uniform constants {
+    vec4 bbmin;
+    vec4 bbmax;
+} PushConstants;
+
+// SIZE = INPUT_SIZE
+layout(set = 0, binding = 0, std430) buffer restrict InputValues
+{
+    uint values[];
+};
+// SIZE = INPUT_SIZE * 2 (Double Buffered)
+layout(set = 0, binding = 1, std430) buffer restrict DoubleBufferedIndices
+{
+    uint indices[];
+};
+
+layout(set = 0, binding = 2, std430) buffer ParticlesPos
+{ vec4 particle_pos[]; };
+
+uint expandBits(uint v)
+{
+    v = (v * 0x00010001u) & 0xFF0000FFu;
+    v = (v * 0x00000101u) & 0x0F00F00Fu;
+    v = (v * 0x00000011u) & 0xC30C30C3u;
+    v = (v * 0x00000005u) & 0x49249249u;
+    return v;
+}
+
+uint morton(vec3 position)
+{
+    vec3 unipos = (position - PushConstants.bbmin.rgb) / (PushConstants.bbmax.rgb - PushConstants.bbmin.rgb);
+    unipos = clamp(unipos, vec3(0,0,0), vec3(1,1,1));
+    uvec3 uiunipos = uvec3(unipos * 1023u);
+    uint morton_code = 0;
+    morton_code += expandBits(uiunipos.x) << 2;
+    morton_code += expandBits(uiunipos.y) << 1;
+    morton_code += expandBits(uiunipos.z) << 0;
+    return morton_code;
+}
+
+layout (local_size_x = 512) in;
+void main()
+{
+    uint idx = gl_GlobalInvocationID.x;
+    if(idx >= 65536) return;
+
+    vec3 position = particle_pos[idx].rgb;
+    
+    values[idx] = morton(position);
+    indices[idx] = idx;
+}

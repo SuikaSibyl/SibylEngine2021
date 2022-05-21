@@ -4,6 +4,7 @@ module;
 #include <imgui.h>
 #include <imguizmo/ImGuizmo.h>
 #include <glm/glm.hpp>
+#include <fstream>
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -59,10 +60,12 @@ namespace SIByL::Editor
 		int gizmozType = 0;
 		auto handleTransformGizmo() noexcept -> void;
 		SimpleCameraController cameraController;
+		WindowLayer* windowLayer;
 	};
 
 	Viewport::Viewport(WindowLayer* window_layer, Timer* timer)
 		:input(window_layer->getWindow()->getInput()),
+		windowLayer(window_layer),
 		cameraController(input, timer)
 	{ 
 		cameraController.bindTransform(&cameraTransform);
@@ -82,7 +85,54 @@ namespace SIByL::Editor
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2({ 0,0 }));
 		ImGui::Begin("Viewport", 0, ImGuiWindowFlags_MenuBar);
+		// Menu
+		{
+			ImGui::PushItemWidth(ImGui::GetFontSize() * -12);
+			if (ImGui::BeginMenuBar())
+			{
+				// Menu - Save
+				if (ImGui::BeginMenu("Save Setting"))
+				{
+					// Menu - File - Load
+					if (ImGui::MenuItem("Save"))
+					{
+						std::string path = windowLayer->getWindow()->saveFile("");
+						std::ofstream file1(path);
+						auto transform = cameraTransform.getTranslation();
+						auto euler = cameraTransform.getEulerAngles();
+						file1 << transform.x << " " << transform.y << " " << transform.z << " ";
+						file1 << euler.x << " " << euler.y << " " << euler.z;
+						file1.close();
+						//std::string path = windowLayer->getWindow()->openFile("");
 
+						//hold_scene = MemNew<GFX::Scene>();
+						//bindScene(hold_scene.get());
+					}
+					ImGui::EndMenu();
+				}
+				// Menu - Load
+				if (ImGui::BeginMenu("Load Setting"))
+				{
+					// Menu - File - Load
+					if (ImGui::MenuItem("Load"))
+					{
+						std::string path = windowLayer->getWindow()->openFile("");
+						std::ifstream file1(path);
+						auto transform = cameraTransform.getTranslation();
+						auto euler = cameraTransform.getEulerAngles();
+						file1 >> transform.x >> transform.y >> transform.z;
+						file1 >> euler.x >> euler.y >> euler.z;
+						file1.close();
+						cameraTransform.setTranslation(transform);
+						cameraTransform.setEulerAngles(euler);
+						cameraController.targetCameraState.setFromTransform(cameraTransform);
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenuBar();
+			}
+			ImGui::PopItemWidth();
+		}
 		//m_ViewportFocused = ImGui::IsWindowFocused();
 		//m_ViewportHoverd = ImGui::IsWindowHovered();
 		//Application::get().GetImGuiLayer()->SetBlockEvents(!m_ViewportFocused && !m_ViewportHoverd);

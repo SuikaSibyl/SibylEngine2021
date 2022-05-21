@@ -665,12 +665,15 @@ SceneNodes:
         translation: [0, 0, 0]
         eulerAngles: [0, 0, 0]
         scale: [1, 1, 1]
+      BoundingBox:
+        min: [-160, 40, -160, 0]
+        max: [160, 0, 160, 0]
       MeshComponent:
         guid: 2267991365489773690
         vert: 7
       Renderer:
         SubRenderer:
           - PassName: Forward Pass
-            PipelineName: Particle Grass
+            PipelineName: Particle Grass Mesh
             MaterialName: Grass
 SceneEnd: TRUE

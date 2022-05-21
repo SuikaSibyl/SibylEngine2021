@@ -1,0 +1,140 @@
+#version 450
+#extension GL_NV_mesh_shader: require
+
+#define LOCAL_SIZE 16
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+layout(triangles, max_vertices = LOCAL_SIZE * 4, max_primitives = LOCAL_SIZE * 2) out;
+
+layout(push_constant) uniform PushConstantObject {
+    mat4 model;
+} PushConstants;
+
+layout(binding = 0) uniform PerViewUniformBuffer {
+    mat4 view;
+    mat4 proj;
+    vec4 cameraPos;
+} view_ubo;
+
+layout(set = 0, binding = 2, std430) buffer ParticlesPos
+{ vec4 particle_pos[]; };
+
+layout(set = 0, binding = 3, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
+
+layout(set = 0, binding = 4, std430) buffer ParticlesDirection
+{ vec4 particle_direction[]; };
+
+layout (location = 0) out PerVertexData
+{
+  vec2 fragTexCoord;
+} v_out[];   // [max_vertices]
+
+layout (location = 1) perprimitiveNV out PerPrimitiveData
+{
+  vec3 color;
+} per_primitive_out[];   // [max_vertices]
+
+// Constant Billboard Data 
+const vec3 vertices[4] = {
+    vec3(-0.5f, -0.5f, +0.0f),
+    vec3(+0.5f, -0.5f, +0.0f),
+    vec3(+0.5f, +0.5f, +0.0f),
+    vec3(-0.5f, +0.5f, +0.0f),
+};
+const vec2 uvs[4] = {
+    vec2(0.0f, 0.0f),
+    vec2(1.0f, 0.0f),
+    vec2(1.0f, 1.0f),
+    vec2(0.0f, 1.0f),
+};
+const uint quad_indices[6] = { 0, 1, 2, 2, 3, 0 };
+
+// Billboard Utilities
+mat4 billboardTowardCameraPlane(vec3 cameraPos)
+{
+    vec3 look = - normalize(cameraPos);
+    vec3 right = normalize(cross(vec3(0,1,0), look));
+    vec3 up = normalize(cross(right, look));
+    return mat4(
+        right.x,right.y,right.z,0,
+        up.x,up.y,up.z,0,
+        look.x,look.y,look.z,0,
+        0,0,0,1);
+}
+
+mat4 billboardAlongVelocity(vec3 velocity, vec3 cameraPos)
+{
+    vec3 up = - normalize(velocity);
+    vec3 right = normalize(cross(up, -normalize(cameraPos)));
+    vec3 look = normalize(cross(right, up));
+    return mat4(
+        right.x,right.y,right.z,0,
+        up.x,up.y,up.z,0,
+        look.x,look.y,look.z,0,
+        0,0,0,1);
+}
+
+float speed_y_curve(float i)
+{
+    if(i > 1) return 0.769;
+    return 0.769 * i;
+}
+
+vec3 getScale(mat4 matrix)
+{
+    return vec3(1,1,1);
+}
+
+void main()
+{    
+    uint idx = gl_GlobalInvocationID.x / 2;
+    if(idx >= 65536) return;
+
+    // Every 2 neighbor thread handle a particle
+    uint particle_idx = idx;
+    vec4 pos = particle_pos[particle_idx];
+    vec4 color = particle_color[particle_idx];
+    vec4 direction = particle_direction[particle_idx];
+
+    // Get id for each offset
+    uint quad_id = gl_LocalInvocationID.x / 2;
+    uint triangle_id = gl_LocalInvocationID.x & 0x1;
+
+    // get billboard mat
+    mat4 billboardMat = billboardAlongVelocity(direction.xyz, view_ubo.cameraPos.xyz - pos.xyz);
+    // get speed    
+    per_primitive_out[quad_id*2 + triangle_id].color = color.rgb;
+
+    uint t2xtriangle_id = 2*triangle_id;
+    uint t4xquad_id = 4*quad_id;
+    uint t3xtriangle_id = t2xtriangle_id+triangle_id;
+    uint t6xquad = 6*quad_id;
+    uint t4xquad_id_t2xtriangle_id = t4xquad_id + t2xtriangle_id;
+    uint t6xquad_t3xtriangle_id = t6xquad + t3xtriangle_id;
+    
+    for(uint i = 0; i < 2; i++)
+    {
+        vec4 modelPosition = billboardMat * vec4((vertices[i + t2xtriangle_id] + vec3(0,-0.5,0)) * vec3(5,5,5) * pos.w, 1.0);
+        vec4 Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos.xyz, 1.0));
+        Position.z = (Position.z + Position.w) / 2.0;
+        
+        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = Position;
+
+        vec2 uv = uvs[i + t2xtriangle_id];
+        uv.x = (color.w + uv.x) * 0.25;
+        v_out[i + t4xquad_id_t2xtriangle_id].fragTexCoord = uv;
+    }
+
+    for(uint i = 0; i < 3; i++)
+    {
+        gl_PrimitiveIndicesNV[i + t6xquad_t3xtriangle_id] = t4xquad_id + quad_indices[i + t3xtriangle_id];
+    }
+    
+    if (gl_LocalInvocationID.x == 0) {
+        gl_PrimitiveCountNV = LOCAL_SIZE * 2;
+        if((gl_WorkGroupID.x + 1) * LOCAL_SIZE > 65536)
+        {
+            gl_PrimitiveCountNV = max(65536 - gl_WorkGroupID.x * LOCAL_SIZE, 0);
+        }
+    }
+}

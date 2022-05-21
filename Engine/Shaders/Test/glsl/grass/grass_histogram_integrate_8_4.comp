@@ -1,0 +1,67 @@
+#version 450
+#extension GL_KHR_shader_subgroup_basic: require
+#extension GL_KHR_shader_subgroup_ballot: require
+#extension GL_KHR_shader_subgroup_shuffle: require
+#extension GL_KHR_shader_subgroup_shuffle_relative: require
+
+#define INPUT_SIZE 65536
+#define ELEMENT_PER_THREAD 8
+#define BITS_PER_DIGIT 8
+#define THREADS_PER_BLOCK 256
+#define BINS_PER_THREAD 1
+
+#define NUM_SUBGROUPS (THREADS_PER_BLOCK/32)
+#define POSSIBLE_DIGITS (1<<BITS_PER_DIGIT)
+#define DIGIT_MASK ((1<<BITS_PER_DIGIT)-1)
+#define ELEMENT_PER_BLOCK (ELEMENT_PER_THREAD*THREADS_PER_BLOCK)
+#define ELEMENT_PER_WARP (ELEMENT_PER_THREAD*gl_SubgroupSize)
+#define LOG_WARP_SIZE 5
+
+layout (local_size_x = THREADS_PER_BLOCK) in;
+
+// Intermediate Histogram
+layout(set = 0, binding = 0, std430) buffer IntermediateHistogram
+{
+    uvec4 histogram[];
+};
+
+layout(set = 0, binding = 1, std430) buffer GlobalDigitHistogram
+{
+    uint globalHistogram[];
+};
+
+shared uvec4 warp_exclusive[8];
+
+void main()
+{
+    // Fetch element
+    uint bin = gl_SubgroupID * gl_SubgroupSize + gl_SubgroupInvocationID;
+    uvec4 element = histogram[bin];
+    uvec4 prefix_sum = element;
+    uvec4 shuffled_element = element;
+    // Warp Prefix Sum
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<0)); if(gl_SubgroupInvocationID>=(1<<0)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<1)); if(gl_SubgroupInvocationID>=(1<<1)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<2)); if(gl_SubgroupInvocationID>=(1<<2)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<3)); if(gl_SubgroupInvocationID>=(1<<3)) prefix_sum+=shuffled_element;
+    shuffled_element = subgroupShuffleUp(prefix_sum, (1<<4)); if(gl_SubgroupInvocationID>=(1<<4)) prefix_sum+=shuffled_element;
+    if(gl_SubgroupInvocationID==31) warp_exclusive[gl_SubgroupID] = prefix_sum;
+    barrier();
+    // Inter-Warp Prefix Sum
+    if(gl_SubgroupID==0 && gl_SubgroupInvocationID<8)
+    {
+        uvec4 warp_element = warp_exclusive[gl_SubgroupInvocationID];
+        uvec4 incusive_scan = warp_element;
+        shuffled_element = subgroupShuffleUp(incusive_scan, (1<<0)); if(gl_SubgroupInvocationID>=(1<<0)) incusive_scan+=shuffled_element;
+        shuffled_element = subgroupShuffleUp(incusive_scan, (1<<1)); if(gl_SubgroupInvocationID>=(1<<1)) incusive_scan+=shuffled_element;
+        shuffled_element = subgroupShuffleUp(incusive_scan, (1<<2)); if(gl_SubgroupInvocationID>=(1<<2)) incusive_scan+=shuffled_element;
+        warp_exclusive[gl_SubgroupInvocationID] = incusive_scan - warp_element;
+    }
+    barrier();
+    // Warp Down Sweep
+    uvec4 exclusive_prefix_sum = prefix_sum - element + warp_exclusive[gl_SubgroupID];
+    globalHistogram[0*POSSIBLE_DIGITS + bin] = exclusive_prefix_sum.r;
+    globalHistogram[1*POSSIBLE_DIGITS + bin] = exclusive_prefix_sum.g;
+    globalHistogram[2*POSSIBLE_DIGITS + bin] = exclusive_prefix_sum.b;
+    globalHistogram[3*POSSIBLE_DIGITS + bin] = exclusive_prefix_sum.a;
+}

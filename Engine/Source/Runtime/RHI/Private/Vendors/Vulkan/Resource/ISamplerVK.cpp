@@ -23,6 +23,19 @@ namespace SIByL::RHI
 		}
 	}
 
+	auto decode(AddressMode addressMode) noexcept ->VkSamplerAddressMode
+	{
+		switch (addressMode)
+		{
+		case AddressMode::REPEAT:
+			return VK_SAMPLER_ADDRESS_MODE_REPEAT;
+			break;
+		case AddressMode::CLAMP_TO_EDGE:
+			return VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+			break;
+		}
+	}
+
 	void createTextureSampler(
 		SamplerDesc const& desc,
 		VkSampler* texture_sampler,
@@ -32,9 +45,9 @@ namespace SIByL::RHI
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 		samplerInfo.magFilter = VK_FILTER_LINEAR;
 		samplerInfo.minFilter = VK_FILTER_LINEAR;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		samplerInfo.addressModeU = decode(desc.clampModeU);
+		samplerInfo.addressModeV = decode(desc.clampModeV);
+		samplerInfo.addressModeW = decode(desc.clampModeW);
 		samplerInfo.anisotropyEnable = VK_TRUE;
 
 		VkPhysicalDeviceProperties properties{};

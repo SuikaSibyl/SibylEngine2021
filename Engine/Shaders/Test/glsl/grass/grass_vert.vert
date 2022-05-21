@@ -64,8 +64,9 @@ void main() {
     vec4 direction = particle_direction[gl_InstanceIndex.x];
     mat4 billboardMat = billboardAlongVelocity(direction.xyz, view_ubo.cameraPos.xyz - pos.xyz);
     
-    vec4 modelPosition = billboardMat * vec4((inPosition+vec3(0,0,0.5)) * vec3(5,5,5) * pos.w,1.0);
+    vec4 modelPosition = billboardMat * vec4((inPosition + vec3(0,-0.5,0)) * vec3(5,5,5) * pos.w,1.0);
     modelPosition.rgb += PushConstants.model[3].rgb;// - vec3(0,0.5,0) * vec3(5,5,5) * pos.w;
+    
     gl_Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos.xyz, 1.0));
     gl_Position.z = (gl_Position.z + gl_Position.w) / 2.0;
 

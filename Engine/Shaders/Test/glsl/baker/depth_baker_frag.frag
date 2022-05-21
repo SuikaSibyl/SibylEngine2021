@@ -5,7 +5,7 @@ layout(location = 0) out vec4 outColor;
 
 vec4 packFloat32AsVec4(float value)
 {
-    // uint value_bits = floatBitsToUint(value);
+    // uint value_bits = float(value);
     float value_uniform = (value + 1) / 2;
     uint value_bits = uint(value_uniform * float(0xFFFFFFFF));
     float r = (1.f * ((value_bits >> 24) & 255)) / 255;

@@ -17,7 +17,8 @@ namespace SIByL
 		};
 
 		export enum struct AddressMode {
-			CLAMP_TO_EDGE
+			REPEAT,
+			CLAMP_TO_EDGE,
 		};
 
 		export enum struct Extension {

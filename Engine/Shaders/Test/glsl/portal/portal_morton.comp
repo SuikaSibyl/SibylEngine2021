@@ -58,6 +58,67 @@ uint morton(vec3 position)
     return morton_code;
 }
 
+#define BIT_SIZE 32
+// rotate x by d bits to the right
+uint rotate_right(in uint x, in uint d)
+{ return (x >> d) | (x << (BIT_SIZE - d)); }
+// rotate x by d bits to the left
+uint rotate_left(in uint x, in uint d)
+{ return (x << d) | (x >> (BIT_SIZE - d)); }
+// return i-th bit of x
+uint bit_component(in uint x, in uint i)
+{ return (x & (1<<i) >> i); }
+// return gray code index of i
+uint gc(in uint i) { return i^(i>>1); }
+// inverse gray code
+uint inverse_gc(in uint g)
+{
+    uint i = g;
+    for(uint j = 1; j<BIT_SIZE; j++)
+        i ^= (g>>j);
+    return i;
+}
+// The direction between subcube i and the next one
+uint g(in uint i)
+{ return uint(log2(gc(i)^gc(i+1))); }
+// The direction of the arrow whithin a subcube
+uint d(in uint i)
+{
+    if(i==0) return 0;
+    else if((i&1)==0) return (g(i-1)) & 31;
+    else return (g(i)) & 31;
+}
+// return the Hilbert index of point p
+uint hilbert(vec3 position)
+{
+    uint M = 2
+    uint h = 0
+    // ve and vd contain the entry point and dimension of the current subcube
+    // we choose here a main traversal direction N-2 (i.e. z for a cube) to match
+    // the illustrations
+    uint ve = 0
+    uint vd = 2
+    for(int i = M-1; i > -1; i--)
+    {
+        // the cell label is constructed in two steps
+        // 1. extract the relevant bits from p
+        l = [bit_component(px, i) for px in p]
+        // 2. construct a integer whose bits are given by l
+        l = sum( [lx*2**j for j, lx in enumerate(l)] )
+        // transform l into the current subcube
+        l = T(ve, vd, l)
+        // obtain the gray code ordering from the label l
+        w = inverse_gc(l)
+        // compose (see [TR] lemma 2.13) the transform of ve and vd
+        // with the data of the subcube
+        ve = ve ^ (rotate_left(e(w), vd+1))
+        vd = (vd + d(w) + 1) % N
+        // move the index to more significant bits and add current value
+        h = (h << N) | w
+    }
+    return h
+}
+
 layout (local_size_x = 512) in;
 void main()
 {

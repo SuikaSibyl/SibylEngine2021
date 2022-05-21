@@ -39,11 +39,21 @@ layout ( binding = 9 ) uniform sampler2D depthImage;
 // Number of invocations of the amplification shader.
 // Number of mesh shaders emitted by the respective amplification shader (amplification rate).
 
-bool cullCluster(in CullingInfo cullingInfo)
+float nrand()
+{
+  float n = gl_GlobalInvocationID.x;
+	return fract(sin(91.2228 * n)* 43758.5453);
+}
+
+bool cullCluster(in CullingInfo cullingInfo, out bool needLoD, out bool doRenderLoDMin, out float throwPosibility)
 {
   // xmin ymin xmax ymax
+  needLoD = false;
+  doRenderLoDMin = false;
   if(cullingInfo.aabb_xy_wh.x==99999)
+  {
     return true;
+  }
   if(cullingInfo.aabb_xy_wh.x >= 1 || cullingInfo.aabb_xy_wh.y >= 1 || cullingInfo.aabb_xy_wh.z <= 0 || cullingInfo.aabb_xy_wh.w <= 0 || cullingInfo.min_max_depth.y < 0.1)
     return false;
 
@@ -56,15 +66,25 @@ bool cullCluster(in CullingInfo cullingInfo)
   if(cullingInfo.min_max_depth.x > 0.1)
   {
     float depth_proj = cullingInfo.min_max_depth.x;
-    // depth_proj = 1.00004005 - 0.200004011 / depth_proj; // [-1,1]
-    // depth_proj = (depth_proj + 1) /2;
+    depth_proj = 1.00004005 - 0.200004011 / depth_proj; // Z : [-1,1]
+    depth_proj = (depth_proj + 1) /2;
     vec2 uv = vec2(
         (cullingInfos[partilets_idx].aabb_xy_wh.x + cullingInfos[partilets_idx].aabb_xy_wh.z) / 2, 
         (cullingInfos[partilets_idx].aabb_xy_wh.y + cullingInfos[partilets_idx].aabb_xy_wh.w) / 2);
-    
+
     float width = (cullingInfos[partilets_idx].aabb_xy_wh.z - cullingInfos[partilets_idx].aabb_xy_wh.x) * PushConstants.screen_size.x;
     float height = (cullingInfos[partilets_idx].aabb_xy_wh.w - cullingInfos[partilets_idx].aabb_xy_wh.y) * PushConstants.screen_size.y;
 
+    if(width > 10 || height > 10)
+    {
+      needLoD = true;
+    }
+    if(width <= 4 && height <= 4)
+    {
+      doRenderLoDMin = true;
+      throwPosibility = clamp(0.3 + ((4 - min(width, height)) / 4), 0, 1);
+      // throwPosibility = 1 - throwPosibility * throwPosibility;
+    }
     if(width>PushConstants.screen_size.x || height > PushConstants.screen_size.y)
     {
 
@@ -73,25 +93,18 @@ bool cullCluster(in CullingInfo cullingInfo)
     {
         float level = ceil(log2(max(ceil(width), ceil(height))));
         float depth = 1 - textureLod(depthImage, uv, level).x;
-        float depth_in_linear = 0.200004011 / (1.00004005 - depth);
+        //float depth_in_linear = 0.200004011 / (1.00004005 - (2*depth-1));
 
-        if(depth_proj > depth_in_linear) return false;
-
-        //if(thread_in_partilets==0)
-        //{
-        //    cullingInfos[partilets_idx].min_max_depth.z = depth_proj;
-        //    cullingInfos[partilets_idx].min_max_depth.w = depth_in_linear;
-        //}
+        if(depth_proj > depth) return false;
     }
 
   }
-
   return true;
 }
 
 taskNV out Task {
   uint      baseID;
-  uint8_t   subIDs[GROUP_SIZE];
+  uint8_t   subIDs[65];
 } OUT;
 
 layout(local_size_x=32) in;
@@ -102,24 +115,72 @@ void main()
 
   CullingInfo cullingInfo = cullingInfos[gl_GlobalInvocationID.x];
 
-  bool  doRender    = cullCluster(cullingInfo);
+  bool  doRenderLoD = false;
+  bool  doRenderLoDMin = false;
+  float throwPosibility = -1;
+  bool  doRender    = cullCluster(cullingInfo, doRenderLoD, doRenderLoDMin, throwPosibility);
+
+  doRenderLoDMin = doRenderLoDMin && doRender;
+  if(doRenderLoDMin)
+  {
+    doRender = false;
+    doRenderLoDMin = (nrand() > throwPosibility) ? true : false;
+  }
+  doRenderLoD = doRenderLoD && doRender;
+  
   uvec4 vote        = subgroupBallot(doRender);
   uint  numMeshlets = subgroupBallotBitCount(vote);
-
-  if (gl_LocalInvocationID.x == 0) {
-    gl_TaskCountNV = numMeshlets;
-    OUT.baseID = gl_WorkGroupID.x * GROUP_SIZE;
-  }
+  OUT.baseID = gl_WorkGroupID.x * GROUP_SIZE;
+  uint taskCount = 0;
 
   uint idxOffset = subgroupBallotExclusiveBitCount(vote);
   if (doRender)
   {
     OUT.subIDs[idxOffset] = uint8_t(gl_LocalInvocationID.x);
+  }
+  taskCount += numMeshlets;
+  
+  if(numMeshlets != 0)
+  {
+    uvec4 voteLoD        = subgroupBallot(doRenderLoD);
+    uint  numMeshletsLoD = subgroupBallotBitCount(voteLoD);
 
-    // in GLSL it is possible to use uint8_t to store just the relative
-    // invocation to the Task Shader WorkGroup and therefore save more output space.
+    uint idxOffsetLoD = subgroupBallotExclusiveBitCount(voteLoD);
+    if (doRender && doRenderLoD)
+    {
+      OUT.subIDs[idxOffset] |= uint8_t(64);
+      OUT.subIDs[taskCount + idxOffsetLoD] = uint8_t(gl_LocalInvocationID.x | 192);
+    }
 
-    // OUT.meshletBaseID = WorkGroupID; // write once per workgroup
-    // OUT.meshletSubIDs[idxOffset] = uint8_t(LocaLInvocation);
+    taskCount += numMeshletsLoD;
+  }
+
+  if(numMeshlets != 32)
+  {
+    // min LoD problem
+    uvec4 voteMin        = subgroupBallot(doRenderLoDMin);
+    uint  numMeshletsMin = subgroupBallotBitCount(voteMin);
+    uint idxOffsetMin = subgroupBallotExclusiveBitCount(voteMin);
+
+    if(numMeshletsMin > 0)
+    {
+      uint minMeshGroupNum = (numMeshletsMin + 15) / 16;
+        
+      if(doRenderLoDMin)
+      {
+        OUT.subIDs[taskCount + 2 + idxOffsetMin] = uint8_t(gl_LocalInvocationID.x | 128);
+      }
+
+      if (gl_LocalInvocationID.x == 0)  
+      {
+        OUT.subIDs[taskCount + 0] = uint8_t(min(numMeshletsMin, 16) | 128);
+        OUT.subIDs[taskCount + 1] = uint8_t(numMeshletsMin | 128);
+      }
+      taskCount+=minMeshGroupNum;
+    }
+  }
+
+  if (gl_LocalInvocationID.x == 0) {
+    gl_TaskCountNV = taskCount;
   }
 }

@@ -23,7 +23,7 @@ import Interpolator.AnimationCurve;
 
 namespace SIByL::Editor
 {
-	struct CameraState
+	export struct CameraState
 	{
 		float yaw = 0;
 		float pitch = 0;

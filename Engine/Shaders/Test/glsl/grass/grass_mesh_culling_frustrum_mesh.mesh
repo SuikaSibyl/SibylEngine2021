@@ -1,0 +1,458 @@
+#version 450
+#extension GL_NV_mesh_shader: require
+#extension GL_EXT_shader_explicit_arithmetic_types: require
+#define GROUP_SIZE 32
+#define MIN_LOD
+taskNV in Task {
+  uint      baseID;
+  uint8_t   subIDs[65];
+} IN;
+
+#define LOCAL_SIZE 16
+layout(local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+layout(triangles, max_vertices = 64, max_primitives = 48) out;
+// 64， 32 // 4 vetices = 2 triangle = 1 quad; 64 vertices = 32 triangles = 16 quads
+// 64,  48 // 8 vetices = 6 triangles = 1 octagon; 64 vertices = 48 triangles = 8 octagon
+
+layout(binding = 0) uniform PerViewUniformBuffer {
+    mat4 view;
+    mat4 proj;
+    vec4 cameraPos;
+} view_ubo;
+
+layout(set = 0, binding = 2, std430) buffer ParticlesPos
+{ vec4 particle_pos[]; };
+
+layout(set = 0, binding = 3, std430) buffer ParticlesColor
+{ vec4 particle_color[]; };
+
+layout(set = 0, binding = 4, std430) buffer ParticlesDirection
+{ vec4 particle_direction[]; };
+
+layout(set = 0, binding = 5, std430) buffer LiveIndexBuffer
+{
+    uint[] indices;
+} livePool;
+
+struct CullingInfo
+{
+    vec4 aabb_xy_wh;
+    vec4 min_max_depth;
+};
+layout(set = 0, binding = 6, std430) buffer restrict CullingInfos
+{ CullingInfo cullingInfos[]; };
+
+layout (location = 0) out PerVertexData
+{
+  vec2 fragTexCoord;
+} v_out[];   // [max_vertices]
+
+layout (location = 1) perprimitiveNV out PerPrimitiveData
+{
+  vec3 color;
+} per_primitive_out[];   // [max_vertices]
+
+// Constant Billboard Data 
+const vec3 vertices[4] = {
+    vec3(-0.5f, -0.5f, +0.0f),
+    vec3(+0.5f, -0.5f, +0.0f),
+    vec3(+0.5f, +0.5f, +0.0f),
+    vec3(-0.5f, +0.5f, +0.0f),
+};
+const vec2 uvs[4] = {
+    vec2(0.0f, 0.0f),
+    vec2(1.0f, 0.0f),
+    vec2(1.0f, 1.0f),
+    vec2(0.0f, 1.0f),
+};
+const uint quad_indices[6] = { 0, 1, 2, 2, 3, 0 };
+
+const vec2 lod_vertices[4*8] = {
+    vec2( 0.500000, -0.500000),
+    vec2( -0.500000, -0.240649),
+    vec2( 0.188332, 0.500000),
+    vec2( -0.202564, 0.056557),
+    vec2( -0.282691, 0.350063),
+    vec2( -0.182732, -0.500000),
+    vec2( 0.500000, -0.191094),
+    vec2( 0.324826, 0.500000),
+
+    vec2(-0.168500, 0.500000),
+    vec2(-0.500000, -0.087526),
+    vec2(-0.055966, 0.500000),
+    vec2(-0.161760, -0.500000 ),
+    vec2(0.061744, -0.500000),
+    vec2(0.180223, 0.31978700),
+    vec2(0.459581, -0.291034),
+    vec2(-0.450734, -0.253901 ),
+
+    vec2(-0.500000, -0.087622),
+    vec2(0.206821, -0.500000),
+    vec2(-0.332508, 0.242496),
+    vec2(0.010631, 0.465609 ),
+    vec2(0.336190, 0.133306),
+    vec2(0.457201, 0.149462),
+    vec2(-0.269261, -0.500000),
+    vec2(-0.500000, -0.416369 ),
+
+    vec2(0.258112, 0.500000),
+    vec2(0.206464, -0.500000),
+    vec2(0.460669, -0.244899),
+    vec2(-0.293408, -0.500000 ),
+    vec2(-0.500000, -0.344876),
+    vec2(-0.035242, 0.500000),
+    vec2(-0.500000, -0.167859),
+    vec2(-0.251114, 0.370626  )
+};
+const vec2 lod_uvs[4*8] = {
+    vec2( 0.250000 - 0.000000, 0.000000),
+    vec2( 0.250000 - 0.250000, 0.259351),
+    vec2( 0.250000 - 0.077917, 1.000000),
+    vec2( 0.250000 - 0.175641, 0.556557),
+    vec2( 0.250000 - 0.195673, 0.850063),
+    vec2( 0.250000 - 0.170683, 0.000000),
+    vec2( 0.250000 - 0.000000, 0.308906),
+    vec2( 0.250000 - 0.043794, 1.000000),
+    
+    // [0.25,0.5] [0.5,0.25]
+    vec2( 0.75 - 0.417125, 1.000000),
+    vec2( 0.75 - 0.500000, 0.412474),
+    vec2( 0.75 - 0.388991, 1.000000 ),
+    vec2( 0.75 - 0.415440, 0.000000),
+    vec2( 0.75 - 0.359564, 0.000000),
+    vec2( 0.75 - 0.329944, 0.819787),
+    vec2( 0.75 - 0.260105, 0.208966),
+    vec2( 0.75 - 0.487683, 0.246099),
+    
+    // [0.50,0.75] [0.75,0.50]
+    vec2( 1.25 - 0.750000, 0.412378),
+    vec2( 1.25 - 0.573295, 0.000000),
+    vec2( 1.25 - 0.708127, 0.742496),
+    vec2( 1.25 - 0.622342, 0.965609),
+    vec2( 1.25 - 0.540953, 0.633306),
+    vec2( 1.25 - 0.510700, 0.649462),
+    vec2( 1.25 - 0.692315, 0.000000),
+    vec2( 1.25 - 0.750000, 0.083631),
+    
+    // [0.75,1.00] [1.00,0.75]
+    vec2( 1.75 - 0.810472, 1.000000),
+    vec2( 1.75 - 0.823384, 0.000000),
+    vec2( 1.75 - 0.759833, 0.255101),
+    vec2( 1.75 - 0.948352, 0.000000),
+    vec2( 1.75 - 1.000000, 0.155124),
+    vec2( 1.75 - 0.883810, 1.000000),
+    vec2( 1.75 - 1.000000, 0.332141),
+    vec2( 1.75 - 0.937778, 0.870626)
+};
+const uint lod_indices[4*18] = { 
+    3,2,4, 1,5,3, 3,7,2, 3,6,7, 3,0,6, 3,5,0,
+    5,0,2, 1,0,5, 1,5,7, 3,5,4, 7,5,3, 4,5,6,
+    4,5,1, 4,1,6, 2,3,4, 0,2,4, 7,0,4, 7,4,6,
+    0,7,5, 0,6,7, 1,0,2, 4,6,0, 3,0,1, 4,0,3
+    };
+
+// Billboard Utilities
+mat4 billboardTowardCameraPlane(vec3 cameraPos)
+{
+    vec3 look = - normalize(cameraPos);
+    vec3 right = normalize(cross(vec3(0,1,0), look));
+    vec3 up = normalize(cross(right, look));
+    return mat4(
+        right.x,right.y,right.z,0,
+        up.x,up.y,up.z,0,
+        look.x,look.y,look.z,0,
+        0,0,0,1);
+}
+
+mat4 billboardAlongVelocity(vec3 velocity, vec3 cameraPos)
+{
+    vec3 up = - normalize(velocity);
+    vec3 right = normalize(cross(up, -normalize(cameraPos)));
+    vec3 look = normalize(cross(right, up));
+    return mat4(
+        right.x,right.y,right.z,0,
+        up.x,up.y,up.z,0,
+        look.x,look.y,look.z,0,
+        0,0,0,1);
+}
+
+float speed_y_curve(float i)
+{
+    if(i > 1) return 0.769;
+    return 0.769 * i;
+}
+
+vec3 getScale(mat4 matrix)
+{
+    return vec3(1,1,1);
+}
+
+vec3 getWorkgroupGridColor()
+{
+    vec3 color = vec3(1,0,0);
+    float i = (1.0f * gl_WorkGroupID.x) / 6250 ;
+    //red: (first quarter)
+    if (i <= 0.25)
+    {
+        color.g = 4 * i;
+    }
+    else if (i <= 0.5)  //2nd quarter
+    {
+        color.r = (2 - 4 * i);
+        color.g = 1;
+    }
+    else if (i <= 0.75)
+    {
+        color.r = 0;
+        color.g = 1;
+        color.b = 4 * i - 2;
+    }
+    else if(i > 0.75)
+    {
+        color.r = 0;
+        color.g = 4 - 4 * i;
+        color.b = 1;
+    }
+    return color;
+}
+
+void BasicCase()
+{
+    uint meshletID = IN.baseID + IN.subIDs[gl_WorkGroupID.x];
+    uint idx = meshletID * 16 + gl_LocalInvocationID.x / 2;
+
+    if(idx >= 65536) return;
+
+    // Every 2 neighbor thread handle a particle
+    uint particle_idx = livePool.indices[idx];
+    vec4 pos = particle_pos[particle_idx];
+    vec4 color = particle_color[particle_idx];
+    vec4 direction = particle_direction[particle_idx];
+
+    // Get id for each offset
+    uint quad_id = gl_LocalInvocationID.x / 2;
+    uint triangle_id = gl_LocalInvocationID.x & 0x1;
+
+    // get billboard mat
+    mat4 billboardMat = billboardAlongVelocity(direction.xyz, view_ubo.cameraPos.xyz - pos.xyz);
+    per_primitive_out[quad_id*2 + triangle_id].color = color.rgb;
+
+    uint t2xtriangle_id = 2*triangle_id;
+    uint t4xquad_id = 4*quad_id;
+    uint t3xtriangle_id = t2xtriangle_id+triangle_id;
+    uint t6xquad = 6*quad_id;
+    uint t4xquad_id_t2xtriangle_id = t4xquad_id + t2xtriangle_id;
+    uint t6xquad_t3xtriangle_id = t6xquad + t3xtriangle_id;
+    
+    for(uint i = 0; i < 2; i++)
+    {
+        vec4 modelPosition = billboardMat * vec4((vertices[i + t2xtriangle_id] + vec3(0,-0.5,0)) * vec3(5,5,5) * pos.w, 1.0);
+
+        vec4 Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos.xyz, 1.0));
+        Position.z = (Position.z + Position.w) / 2.0;
+        gl_MeshVerticesNV[i + t4xquad_id_t2xtriangle_id].gl_Position = Position;
+
+        vec2 uv = uvs[i + t2xtriangle_id];
+        uv.x = (color.w + uv.x) * 0.25;
+
+        v_out[i + t4xquad_id_t2xtriangle_id].fragTexCoord = uv;
+    }
+
+    for(uint i = 0; i < 3; i++)
+    {
+        gl_PrimitiveIndicesNV[i + t6xquad_t3xtriangle_id] = t4xquad_id + quad_indices[i + t3xtriangle_id];
+    }
+    
+    if (gl_LocalInvocationID.x == 0) {
+        gl_PrimitiveCountNV = LOCAL_SIZE * 2;
+        if((meshletID + 2) * LOCAL_SIZE > 65536)
+        {
+            gl_PrimitiveCountNV = 0;
+        }
+        else if((meshletID + 1) * LOCAL_SIZE > 65536)
+        {
+            gl_PrimitiveCountNV = 2 * max(65536 - meshletID * LOCAL_SIZE, 0);
+        }
+    }
+}
+
+void MinLoDCaseTEST()
+{
+    if(gl_LocalInvocationID.x > 0) return;
+
+    uint meshletID = IN.baseID + IN.subIDs[gl_WorkGroupID.x + 2] - 128;
+    CullingInfo cullingInfo = cullingInfos[meshletID];
+
+    float depth_proj = cullingInfo.min_max_depth.x;
+    depth_proj = 1.00004005 - 0.200004011 / depth_proj; // Z : [-1,1]
+    depth_proj = (depth_proj + 1) /2;
+
+    cullingInfo.aabb_xy_wh = cullingInfo.aabb_xy_wh * 2 - vec4(1);
+
+    gl_MeshVerticesNV[0].gl_Position = vec4(cullingInfo.aabb_xy_wh[2],cullingInfo.aabb_xy_wh[1], depth_proj, 1.0);
+    gl_MeshVerticesNV[1].gl_Position = vec4(cullingInfo.aabb_xy_wh[0],cullingInfo.aabb_xy_wh[1], depth_proj, 1.0);
+    gl_MeshVerticesNV[2].gl_Position = vec4(cullingInfo.aabb_xy_wh[0],cullingInfo.aabb_xy_wh[3], depth_proj, 1.0);
+    gl_MeshVerticesNV[3].gl_Position = vec4(cullingInfo.aabb_xy_wh[2],cullingInfo.aabb_xy_wh[3], depth_proj, 1.0);
+
+    v_out[0].fragTexCoord = vec2(1.0f, 0.0f);
+    v_out[1].fragTexCoord = vec2(0.0f, 0.0f);
+    v_out[2].fragTexCoord = vec2(0.0f, 1.0f);
+    v_out[3].fragTexCoord = vec2(1.0f, 1.0f);
+
+    gl_PrimitiveIndicesNV[0] = quad_indices[0];
+    gl_PrimitiveIndicesNV[1] = quad_indices[1];
+    gl_PrimitiveIndicesNV[2] = quad_indices[2];
+    gl_PrimitiveIndicesNV[3] = quad_indices[3];
+    gl_PrimitiveIndicesNV[4] = quad_indices[4];
+    gl_PrimitiveIndicesNV[5] = quad_indices[5];
+
+    per_primitive_out[0].color = vec3(cullingInfo.min_max_depth.zw, -1);
+    per_primitive_out[1].color = vec3(cullingInfo.min_max_depth.zw, -1);
+
+    gl_PrimitiveCountNV = 2;
+}
+
+void MinLoDCase()
+{
+    uint meshCount = IN.subIDs[gl_WorkGroupID.x] - 128;
+    uint quad_id = gl_LocalInvocationID.x >> 1;
+    uint subIDIndex = gl_WorkGroupID.x + quad_id;
+    if(meshCount <= 16)
+    {
+        if(quad_id >= meshCount) return;
+        subIDIndex += 2;
+    }
+    else
+    {
+        if(quad_id >= (meshCount - 16)) return;
+        subIDIndex += 17;
+    }
+    if(subIDIndex >= 65) return;
+    
+    if((IN.subIDs[subIDIndex] & uint8_t(192)) != uint8_t(128))
+        return;
+
+    uint meshletID = IN.baseID + IN.subIDs[subIDIndex] - 128;
+    uint triangle_id = gl_LocalInvocationID.x & 0x1;
+
+    CullingInfo cullingInfo = cullingInfos[meshletID];
+    float depth_proj = cullingInfo.min_max_depth.x;
+    depth_proj = 1.00004005 - 0.200004011 / depth_proj; // Z : [-1,1]
+    depth_proj = (depth_proj + 1) /2;
+
+    cullingInfo.aabb_xy_wh = cullingInfo.aabb_xy_wh * 2 - vec4(1);
+
+    // 2 threads -> 1 quad
+    uint c4xquad_id = 4 * quad_id;
+    if(triangle_id == 0)
+    {
+        gl_MeshVerticesNV[c4xquad_id + 0].gl_Position = vec4(cullingInfo.aabb_xy_wh[2],cullingInfo.aabb_xy_wh[1], depth_proj, 1.0);
+        gl_MeshVerticesNV[c4xquad_id + 1].gl_Position = vec4(cullingInfo.aabb_xy_wh[0],cullingInfo.aabb_xy_wh[1], depth_proj, 1.0);
+        gl_MeshVerticesNV[c4xquad_id + 2].gl_Position = vec4(cullingInfo.aabb_xy_wh[0],cullingInfo.aabb_xy_wh[3], depth_proj, 1.0);
+        gl_MeshVerticesNV[c4xquad_id + 3].gl_Position = vec4(cullingInfo.aabb_xy_wh[2],cullingInfo.aabb_xy_wh[3], depth_proj, 1.0);
+    }
+
+    uint t2xtriangle_id = 2*triangle_id;
+    uint t4xquad_id = 4*quad_id;
+    uint t3xtriangle_id = t2xtriangle_id+triangle_id;
+    uint t6xquad = 6*quad_id;
+    uint t4xquad_id_t2xtriangle_id = t4xquad_id + t2xtriangle_id;
+    uint t6xquad_t3xtriangle_id = t6xquad + t3xtriangle_id;
+
+    for(uint i = 0; i < 2; i++)
+    {    
+        v_out[i + c4xquad_id + triangle_id*2].fragTexCoord = uvs[i + triangle_id*2];
+    }
+
+    per_primitive_out[quad_id*2 + triangle_id].color = vec3(cullingInfo.min_max_depth.zw, -1);
+
+    for(uint i = 0; i < 3; i++)
+    {
+        gl_PrimitiveIndicesNV[i + t6xquad_t3xtriangle_id] = t4xquad_id + quad_indices[i + t3xtriangle_id];
+    }
+
+    if (gl_LocalInvocationID.x == 0) {
+        gl_PrimitiveCountNV = 2 * (meshCount>16?(meshCount-16):meshCount);
+    }
+}
+
+void MaxLoDCase(uint8_t subID, uint8_t offset)
+{
+    uint meshletID = IN.baseID + subID;
+    uint idx = meshletID * 16 + offset + gl_LocalInvocationID.x / 4;
+
+    if(idx >= 65536) return;
+
+    // Every 4 neighbor thread handle a particle
+    uint particle_idx = livePool.indices[idx];
+    vec4 pos = particle_pos[particle_idx];
+    vec4 color = particle_color[particle_idx];
+    vec4 direction = particle_direction[particle_idx];
+
+    // Get id for each offset
+    uint oct_id = gl_LocalInvocationID.x / 4;
+    uint oct_local_id = gl_LocalInvocationID.x & 3;
+
+    // get billboard mat
+    mat4 billboardMat = billboardAlongVelocity(direction.xyz, view_ubo.cameraPos.xyz - pos.xyz);
+
+    per_primitive_out[oct_id*6 + oct_local_id].color = color.rgb;
+    if(oct_local_id < 2) per_primitive_out[oct_id*6 + 4 + oct_local_id].color = color.rgb;
+
+    uint t2xoctlocal_id = 2*oct_local_id;
+    uint t8xoct_id = 8*oct_id;
+    uint t8xoct_id_t2xoctlocal_id = t8xoct_id + t2xoctlocal_id;
+    uint t18xoct = 18*oct_id;
+    
+    uint type = uint(color.w);
+    for(uint i = 0; i < 2; i++)
+    {
+        vec4 modelPosition = billboardMat * vec4((vec3(lod_vertices[type*8 + i + t2xoctlocal_id], 0) + vec3(0,-0.5,0)) * vec3(5,5,5) * pos.w, 1.0);
+        vec4 Position = view_ubo.proj * view_ubo.view * (vec4(modelPosition.xyz + pos.xyz, 1.0));
+        Position.z = (Position.z + Position.w) / 2.0;
+        gl_MeshVerticesNV[i + t8xoct_id_t2xoctlocal_id].gl_Position = Position;
+        
+        v_out[i + t8xoct_id_t2xoctlocal_id].fragTexCoord = lod_uvs[type*8 + i + t2xoctlocal_id];
+    }
+
+    gl_PrimitiveIndicesNV[t18xoct + oct_local_id + 0] = t8xoct_id + lod_indices[type*18 + oct_local_id + 0];
+    gl_PrimitiveIndicesNV[t18xoct + oct_local_id + 4] = t8xoct_id + lod_indices[type*18 + oct_local_id + 4];
+    gl_PrimitiveIndicesNV[t18xoct + oct_local_id + 8] = t8xoct_id + lod_indices[type*18 + oct_local_id + 8];
+    gl_PrimitiveIndicesNV[t18xoct + oct_local_id + 12] = t8xoct_id + lod_indices[type*18 + oct_local_id + 12];
+    if(oct_local_id < 2) gl_PrimitiveIndicesNV[t18xoct + oct_local_id + 16] = t8xoct_id + lod_indices[type*18 + oct_local_id + 16];
+    
+    gl_PrimitiveCountNV = 6 * 8;
+}
+
+void main()
+{   
+    // LoD
+    if((IN.subIDs[gl_WorkGroupID.x] & uint8_t(192)) == uint8_t(64))
+    {
+        // LoD Max 1 group
+        gl_PrimitiveCountNV = 0;
+        MaxLoDCase(IN.subIDs[gl_WorkGroupID.x] - uint8_t(64), uint8_t(0));
+        return;
+    }
+    else if((IN.subIDs[gl_WorkGroupID.x] & uint8_t(192)) == uint8_t(192))
+    {
+        // LoD Max 2 group
+        gl_PrimitiveCountNV = 0;
+        MaxLoDCase(IN.subIDs[gl_WorkGroupID.x] - uint8_t(192), uint8_t(8));
+        return;
+    }
+    else if((IN.subIDs[gl_WorkGroupID.x] & uint8_t(192)) == uint8_t(128))
+    {
+        // LoD Max 2 group
+        gl_PrimitiveCountNV = 0;
+#ifdef MIN_LOD
+        MinLoDCase();
+#endif
+        return;
+    }
+    else
+    {
+        // not a LoD
+        BasicCase();
+    }
+}

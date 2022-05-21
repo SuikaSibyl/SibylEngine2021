@@ -217,6 +217,7 @@ public:
 			portal = std::move(Demo::PortalSystem(resourceFactory.get(), &timer));
 			portal.entity = scene.tree.getNodeEntity("portal");
 			grass = std::move(Demo::GrassSystem(resourceFactory.get(), &timer));
+			grass.entity = scene.tree.getNodeEntity("grass");
 			firework = std::move(Demo::FireworkSystem(resourceFactory.get(), &timer));
 
 			//sortTest = std::move(Demo::SortTest(resourceFactory.get(), 100000u));
@@ -269,6 +270,7 @@ public:
 			workshop.addAgency(std::move(hiz_agency));
 			portal.rasterDepthAttachment = ((GFX::HiZAgency*)(rdg.agencies[0].get()))->depthSampleHandle;
 			portal.hiz = ((GFX::HiZAgency*)(rdg.agencies[0].get()))->HiZ_handle;
+			grass.hiz = ((GFX::HiZAgency*)(rdg.agencies[0].get()))->HiZ_handle;
 			
 			// Create Cluster Pass
 			workshop.addComputePassScope("Particle Bounding Boxes");
@@ -317,6 +319,7 @@ public:
 			portal.registerBoundingBoxesPasses(&workshop);
 			portal.registerRenderPasses(&workshop);
 			firework.registerBoundingBoxesPasses(&workshop);
+			grass.registerBoundingBoxesPasses(&workshop);
 			firework.registerRenderPasses(&workshop);
 
 			// Compute Pass "Post Processing"
@@ -361,7 +364,7 @@ public:
 			for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 			{
 				commandbuffers[i] = resourceFactory->createCommandBuffer(commandPool.get());
-				queryPools[i] = resourceFactory->createQueryPool({ RHI::QueryType::TIMESTAMP, 6 });
+				queryPools[i] = resourceFactory->createQueryPool({ RHI::QueryType::TIMESTAMP, 8 });
 				inFlightFence[i] = resourceFactory->createFence();
 			}
 
@@ -386,6 +389,14 @@ public:
 		if (keycode == 32)
 		{
 			needChangeRasterPipeline = true;
+		}
+		if (keycode == 261)
+		{
+			auto indefinite_scope = rdg.getNode<GFX::RDG::ComputePassIndefiniteScope>(rdg.computePassRegister["Particle System"]);
+			indefinite_scope->customDispatchCount = []()
+			{
+				return 0;
+			};
 		}
 		return false;
 	}
@@ -441,14 +452,16 @@ public:
 		}
 		// 
 		{
-			uint64_t timestamp_pairs[6];
-			bool isReady = queryPools[currentFrame]->fetchResult(0, 6, timestamp_pairs);
+			uint64_t timestamp_pairs[8];
+			bool isReady = queryPools[currentFrame]->fetchResult(0, 8, timestamp_pairs);
 			float time_on_drawmesh = 0.000001 * (timestamp_pairs[1] - timestamp_pairs[0]) * physicalDevice->getTimestampPeriod();
 			float time_on_softraster = 0.000001 * (timestamp_pairs[3] - timestamp_pairs[2]) * physicalDevice->getTimestampPeriod();
 			float time_on_onesweepX4 = 0.000001 * (timestamp_pairs[5] - timestamp_pairs[4]) * physicalDevice->getTimestampPeriod();
+			float time_on_grass = 0.000001 * (timestamp_pairs[7] - timestamp_pairs[6]) * physicalDevice->getTimestampPeriod();
 			editorLayer->statisticsGui.portalDrawcallTime = time_on_drawmesh;
 			editorLayer->statisticsGui.portalSoftDrawTime = time_on_softraster;
 			editorLayer->statisticsGui.portalOneSweep4Time = time_on_onesweepX4;
+			editorLayer->statisticsGui.grassTime = time_on_grass;
 		}
 		// update draw calls
 		{
@@ -457,8 +470,10 @@ public:
 			auto portal_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal", "Portal");
 			auto portal_mat_mesh_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal Mesh", "Portal");
 			auto grass_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Grass", "Grass");
+			auto grass_mesh_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Grass Mesh", "Grass");
 			auto firework_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Firework", "Firework");
 			auto portal_mat_mesh_culling_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Portal Mesh Culling", "Portal");
+			auto grass_mat_mesh_culling_scope = rdg.getRasterMaterialScope("Forward Pass", "Particle Grass Mesh Culling", "Grass");
 
 			{
 				auto vis_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Vis AABB Portal", "Portal");
@@ -471,7 +486,18 @@ public:
 					buffer = std::move(Buffer(sizeof(screen_size), 1));
 					memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
 				};
-
+			}
+			{
+				auto vis_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Vis AABB Grass", "Grass");
+				auto drawcall_handle = vis_mat_scope->addRasterDrawCall("Vis", &rdg);
+				auto drawcall = rdg.getNode<GFX::RDG::RasterDrawCall>(drawcall_handle);
+				drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
+				drawcall->taskCount = GRIDSIZE(65536u, (16 * 8));
+				drawcall->pushConstant = [&viewport = editorLayer->mainViewport](Buffer& buffer) {
+					glm::vec4 screen_size{ 1.f / viewport.getWidth(), 1.f / viewport.getHeight(), viewport.getWidth(), viewport.getHeight() };
+					buffer = std::move(Buffer(sizeof(screen_size), 1));
+					memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
+				};
 			}
 			{
 				auto vis_mat_scope = rdg.getRasterMaterialScope("Forward Pass", "Vis AABB Firework", "Firework");
@@ -487,7 +513,7 @@ public:
 			}
 			// portal
 			{
-				auto integrate_pipeline = rdg.getComputePipelineScope("Particle System Cluster", "Histogram_Integrate-Portal");
+				auto integrate_pipeline = rdg.getComputePipelineScope("Particle System Cluster", "Morton-Portal");
 				integrate_pipeline->queryPool = queryPools[currentFrame].get();
 				integrate_pipeline->stageBitsQueryBeforeCmdRecord = RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT;
 				integrate_pipeline->idxQueryBeforeCmdRecord = 4;
@@ -512,6 +538,11 @@ public:
 				};
 
 				portal.cullInfoDispatch->pushConstant = [&viewport = editorLayer->mainViewport](Buffer& buffer) {
+					glm::vec2 screen_size{ viewport.getWidth(), viewport.getHeight() };
+					buffer = std::move(Buffer(sizeof(screen_size), 1));
+					memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
+				};
+				grass.cullInfoDispatch->pushConstant = [&viewport = editorLayer->mainViewport](Buffer& buffer) {
 					glm::vec2 screen_size{ viewport.getWidth(), viewport.getHeight() };
 					buffer = std::move(Buffer(sizeof(screen_size), 1));
 					memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
@@ -545,10 +576,6 @@ public:
 						drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
 						drawcall->taskCount = 100000u / 16;
 					}
-					if (mat_scope == grass_mat_scope)
-					{
-						drawcall->instanceCount = 65536;
-					}
 					if (mat_scope == firework_mat_scope)
 					{
 						drawcall->instanceCount = 32;
@@ -568,6 +595,28 @@ public:
 						};
 						drawcall->indirectDrawBuffer = rdg.getNode<GFX::RDG::StorageBufferNode>(portal.indirectDrawBuffer)->getStorageBuffer();
 					}
+					if (mat_scope == grass_mat_scope)
+					{
+						drawcall->instanceCount = 65536;
+
+						drawcall->queryPool = queryPools[currentFrame].get();
+						drawcall->stageBitsQueryBeforeCmdRecord = RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT;
+						drawcall->stageBitsQueryAfterCmdRecord = RHI::PipelineStageFlagBits::BOTTOM_OF_PIPE_BIT;
+						drawcall->idxQueryBeforeCmdRecord = 6;
+						drawcall->idxQueryAfterCmdRecord = 7;
+					}
+					if (mat_scope == grass_mesh_mat_scope)
+					{
+						drawcall->queryPool = queryPools[currentFrame].get();
+						drawcall->stageBitsQueryBeforeCmdRecord = RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT;
+						drawcall->stageBitsQueryAfterCmdRecord = RHI::PipelineStageFlagBits::BOTTOM_OF_PIPE_BIT;
+						drawcall->idxQueryBeforeCmdRecord = 6;
+						drawcall->idxQueryAfterCmdRecord = 7;
+
+						drawcall->kind = GFX::RDG::DrawCallKind::MeshTasks;
+						drawcall->taskCount = 65536 / 16;
+					}
+
 					if (mat_scope == portal_mat_mesh_culling_scope)
 					{
 						drawcall->queryPool = queryPools[currentFrame].get();
@@ -589,6 +638,22 @@ public:
 							memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
 						};
 					}
+					if (mat_scope == grass_mat_mesh_culling_scope)
+					{
+						drawcall->queryPool = queryPools[currentFrame].get();
+						drawcall->stageBitsQueryBeforeCmdRecord = RHI::PipelineStageFlagBits::TOP_OF_PIPE_BIT;
+						drawcall->stageBitsQueryAfterCmdRecord = RHI::PipelineStageFlagBits::BOTTOM_OF_PIPE_BIT;
+						drawcall->idxQueryBeforeCmdRecord = 6;
+						drawcall->idxQueryAfterCmdRecord = 7;
+
+						drawcall->kind = GFX::RDG::DrawCallKind::Tasks;
+						drawcall->taskCount = 65536u / (16 * 32);
+						drawcall->pushConstant = [&viewport = editorLayer->mainViewport](Buffer& buffer) {
+							glm::vec2 screen_size{ viewport.getWidth(), viewport.getHeight() };
+							buffer = std::move(Buffer(sizeof(screen_size), 1));
+							memcpy(buffer.getData(), &screen_size, sizeof(screen_size));
+						};
+					}
 				}
 			};
 			scene.tree.context.traverse<ECS::TagComponent, GFX::Transform, GFX::Mesh, GFX::Renderer>(per_particle_system_behavior);
@@ -598,7 +663,7 @@ public:
 			// record a command buffer which draws the scene onto that image
 			commandbuffers[currentFrame]->reset();
 			commandbuffers[currentFrame]->beginRecording();
-			commandbuffers[currentFrame]->cmdResetQueryPool(queryPools[currentFrame].get(), 0, 6);
+			commandbuffers[currentFrame]->cmdResetQueryPool(queryPools[currentFrame].get(), 0, 8);
 
 			// render pass
 			//rdg.recordCommands(commandbuffers[currentFrame].get(), currentFrame);
@@ -647,6 +712,34 @@ public:
 				rdg.getRasterPipelineScope("Forward Pass", "Particle Portal Mesh Culling")->isActive = false;
 				rdg.getRasterPipelineScope("Forward Pass", "Particle Portal")->isActive = true;
 				SE_CORE_INFO("Current Raster: Vertex!");
+			}
+
+			{
+				auto& renderer = grass.entity.getComponent<GFX::Renderer>();
+				if (renderer.subRenderers[0].pipelineName == "Particle Grass" && renderer.subRenderers[0].materialName == "Grass")
+				{
+					renderer.subRenderers[0].pipelineName = "Particle Grass Mesh";
+					renderer.subRenderers[0].materialName = "Grass";
+					rdg.getRasterPipelineScope("Forward Pass", "Particle Grass")->isActive = false;
+					rdg.getRasterPipelineScope("Forward Pass", "Particle Grass Mesh")->isActive = true;
+					SE_CORE_INFO("Current Raster (Grass): Mesh!");
+				}
+				else if (renderer.subRenderers[0].pipelineName == "Particle Grass Mesh" && renderer.subRenderers[0].materialName == "Grass")
+				{
+					renderer.subRenderers[0].pipelineName = "Particle Grass Mesh Culling";
+					renderer.subRenderers[0].materialName = "Grass";
+					rdg.getRasterPipelineScope("Forward Pass", "Particle Grass Mesh")->isActive = false;
+					rdg.getRasterPipelineScope("Forward Pass", "Particle Grass Mesh Culling")->isActive = true;
+					SE_CORE_INFO("Current Raster (Grass): Mesh Culling!");
+				}
+				else if (renderer.subRenderers[0].pipelineName == "Particle Grass Mesh Culling" && renderer.subRenderers[0].materialName == "Grass")
+				{
+					renderer.subRenderers[0].pipelineName = "Particle Grass";
+					renderer.subRenderers[0].materialName = "Grass";
+					rdg.getRasterPipelineScope("Forward Pass", "Particle Grass Mesh Culling")->isActive = false;
+					rdg.getRasterPipelineScope("Forward Pass", "Particle Grass")->isActive = true;
+					SE_CORE_INFO("Current Raster (Grass): Vertex!");
+				}
 			}
 		}
 		bool freshRequestFromParticleSystems = false;

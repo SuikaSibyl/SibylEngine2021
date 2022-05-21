@@ -616,9 +616,19 @@ namespace SIByL::GFX::RDG
 
 	auto RenderGraphWorkshop::addInternalSampler() noexcept -> void
 	{
+		// default
 		NodeHandle default_sampler = addSampler({}, "Default Sampler");
 		renderGraph.samplerRegister.emplace("Default Sampler", default_sampler);
 
+		// repeat
+		RHI::SamplerDesc repeat_desc = {};
+		repeat_desc.clampModeU = RHI::AddressMode::REPEAT;
+		repeat_desc.clampModeV = RHI::AddressMode::REPEAT;
+		repeat_desc.clampModeW = RHI::AddressMode::REPEAT;
+		NodeHandle repeat_sampler = addSampler(repeat_desc, "Repeat Sampler");
+		renderGraph.samplerRegister.emplace("Repeat Sampler", repeat_sampler);
+
+		// min pooling
 		RHI::SamplerDesc min_pooling_desc = {};
 		min_pooling_desc.extension = RHI::Extension::MIN_POOLING;
 		NodeHandle min_pooling_sampler = addSampler(min_pooling_desc, "MinPooling Sampler");

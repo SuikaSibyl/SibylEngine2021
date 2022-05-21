@@ -136,22 +136,47 @@ void getBoundingInfoDumb(out vec2 bounding_min, out vec2 bounding_max, out vec2 
     z = vec2(min_z, max_z);
 }
 
+uint findQuartile(in float x, in float minx, in float maxx)
+{
+    float fraction = (x - minx) / (maxx - minx);
+    return min(uint(fraction * 4), 3);
+}
+
+shared uint votes[WARPS_PER_BLOCK][16];
+shared uvec2 packedtex[WARPS_PER_BLOCK];
+vec2 easyVote(in vec2 bounding_min, in vec2 bounding_max, in vec2 bounding_min_cluster, in vec2 bounding_max_cluster)
+{
+    float width = (bounding_max_cluster.x - bounding_min_cluster.x) * PushConstants.screen_size.x;
+    float height = (bounding_max_cluster.y - bounding_min_cluster.y) * PushConstants.screen_size.y;
+
+    if(gl_SubgroupInvocationID < 16)
+        votes[gl_SubgroupID][gl_SubgroupInvocationID] = 0;
+    
+    uint xmin = findQuartile(bounding_min.x, bounding_min_cluster.x, bounding_max_cluster.x);
+    uint xmax = findQuartile(bounding_max.x, bounding_min_cluster.x, bounding_max_cluster.x);
+    uint ymin = findQuartile(bounding_min.y, bounding_min_cluster.y, bounding_max_cluster.y);
+    uint ymax = findQuartile(bounding_max.y, bounding_min_cluster.y, bounding_max_cluster.y);
+    for(uint i = xmin; i <= xmax; i++)
+        for(uint j = ymin; j <= ymax; j++)
+            atomicAdd(votes[gl_SubgroupID][i*4+j], 1);
+            
+    // pack votes
+    if(gl_SubgroupInvocationID == 0) packedtex[gl_SubgroupID] = uvec2(0);
+    if(gl_SubgroupInvocationID < 8)
+    {
+        atomicAdd(packedtex[gl_SubgroupID].x, (min(votes[gl_SubgroupID][gl_SubgroupInvocationID], 15))<<(28-(gl_SubgroupInvocationID<<2)));
+        atomicAdd(packedtex[gl_SubgroupID].y, (min(votes[gl_SubgroupID][gl_SubgroupInvocationID+8], 15))<<(28-(gl_SubgroupInvocationID<<2)));
+    }
+
+    return vec2(
+        uintBitsToFloat(packedtex[gl_SubgroupID].x),
+        uintBitsToFloat(packedtex[gl_SubgroupID].y));
+}
+
 void main()
 {    
     uint idx = gl_GlobalInvocationID.x;
     if(idx >= counter[0].aliveCount) return;
-
-    // uint particle_idx = indices[idx];
-    // vec4 particle_pos = particle_pos_lifetime[particle_idx];
-
-    // // transform center to view space
-    // vec4 view_space_pos = view_ubo.view * vec4(particle_pos.rgb, 1.0);
-    // vec4 screen_space_single_sphere_aabb;
-    // projectSphere(view_space_pos.xyz, bounding_sphere_radius, CAMERA_NEAR,
-    //     view_ubo.proj[0][0], view_ubo.proj[1][1], screen_space_single_sphere_aabb);
-
-    // vec2 bounding_min = screen_space_single_sphere_aabb.xy;
-    // vec2 bounding_max = screen_space_single_sphere_aabb.zw;
 
     vec2 bounding_min;
     vec2 bounding_max;
@@ -164,12 +189,15 @@ void main()
     vec2 bounding_z_cluster = subgroupClusteredMin(bounding_z, 16);
     bounding_z_cluster = vec2(bounding_z_cluster.x, -bounding_z_cluster.y);
 
+    vec2 tex = easyVote(bounding_min, bounding_max, bounding_min_cluster, bounding_max_cluster);
+
     if(gl_SubgroupInvocationID == 0 || gl_SubgroupInvocationID == 16)
     {
         uint meshlets_idx = gl_WorkGroupID.x*2*WARPS_PER_BLOCK + gl_SubgroupID*2 + gl_SubgroupInvocationID/16;
         CullingInfo info;
         info.aabb_xy_wh = vec4(bounding_min_cluster, bounding_max_cluster);
-        info.min_max_depth = vec4(bounding_z_cluster, (bounding_max_cluster.xy-bounding_min_cluster.xy)*PushConstants.screen_size);
+
+        info.min_max_depth = vec4(bounding_z_cluster, tex);
         cullingInfos[meshlets_idx] = info;
     }
 }

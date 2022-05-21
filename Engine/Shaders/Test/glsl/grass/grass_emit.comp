@@ -107,7 +107,7 @@ void main()
     float depth = DecodeFloatRGBA(depth_package);
     seed = nrand(uv);
     float size = rand_size(seed);
-    depth = 30 - depth*40 + size*2.5 - 0.1;
+    depth = 30 - depth*40 + size*2.5 - 2;
     if(depth >=15) depth += 0.5;
 
     particle_direction[idx] = vec4(rand_up_centered_direction(seed), 1.0);

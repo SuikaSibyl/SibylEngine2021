@@ -20,13 +20,40 @@ layout(binding = 1) uniform sampler2D texSampler;
 
 layout(location = 0) out vec4 outColor;
 
-void main() {
-    // vec2 uv = (gl_BaryCoordNV.x * v_out[0].fragTexCoord +
-    //           gl_BaryCoordNV.y * v_out[1].fragTexCoord +
-    //           gl_BaryCoordNV.z * v_out[2].fragTexCoord);
-    // vec4 texture_color = texture(texSampler, uv);
+uvec2 uv2uuv()
+{
+  vec2 uv = v_out.fragTexCoord * 4; //[0,4]
+  return uvec2(min(uint(uv.x), 3), min(uint(uv.y), 3));
+}
 
-    vec4 texture_color = texture(texSampler, v_out.fragTexCoord);
-    texture_color.rgb *= p_out.fragColor;
-    outColor = texture_color;
+float nrand()
+{
+  float n = v_out.fragTexCoord.x * 10 + v_out.fragTexCoord.y;
+	return fract(sin(91.2228 * n)* 43758.5453);
+}
+
+float unpackSimpTex(in uint x, in uint y)
+{
+  uint index = x * 4 + y;
+  uint halftex = 0;
+  if(index < 8) halftex = floatBitsToUint(p_out.fragColor.x);
+  else { halftex = floatBitsToUint(p_out.fragColor.y); index-= 8; }
+
+  uint texel = (halftex >> (28-(index<<2))) & 0xF;
+  return float(texel)/15;
+}
+
+void main() {
+    if(p_out.fragColor.b == -1)
+    {
+      uvec2 uuv = uv2uuv();
+      float rejUnpackCol = unpackSimpTex(uuv.x, uuv.y);
+      outColor = vec4(0.749, 0.20784, 0.0549, 1) * 0.12 * rejUnpackCol;
+    }
+    else
+    {
+      vec4 texture_color = texture(texSampler, v_out.fragTexCoord);
+      texture_color.rgb *= p_out.fragColor;
+      outColor = texture_color;
+    }
 }
