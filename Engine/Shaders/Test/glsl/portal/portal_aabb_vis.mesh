@@ -109,8 +109,8 @@ void main()
                     float width = (clamped_aabb.z - clamped_aabb.x) * PushConstants.screen_size.x;
                     float height = (clamped_aabb.w - clamped_aabb.y) * PushConstants.screen_size.y;
 
-                    float level = ceil(log2(max(ceil(width), ceil(height)))) + 2;
-                    float depth = 1 - textureLod(depthImage, uv, 9).x;
+                    float level = floor(log2(max(width, height)));
+                    float depth = 1 - textureLod(depthImage, uv, level).x;
                     //float depth_in_linear = 0.200004011 / (1.00004005 - (2*depth-1));
 
                     if(depth_proj > depth) color = vec3(1,0,0);

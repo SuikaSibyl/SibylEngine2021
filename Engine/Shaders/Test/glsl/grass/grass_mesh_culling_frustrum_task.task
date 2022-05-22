@@ -77,12 +77,21 @@ bool cullCluster(in CullingInfo cullingInfo, out bool needLoD, out bool doRender
 
     }
     else
-    {
-        float level = ceil(log2(max(ceil(width), ceil(height))));
+    {                    
+      vec4 clamped_aabb = clamp(cullingInfos[partilets_idx].aabb_xy_wh, vec4(0), vec4(1));
+
+      vec2 uv = vec2(
+          (clamped_aabb.x + clamped_aabb.z) / 2, 
+          (clamped_aabb.y + clamped_aabb.w) / 2);
+
+      float width = (clamped_aabb.z - clamped_aabb.x) * PushConstants.screen_size.x;
+      float height = (clamped_aabb.w - clamped_aabb.y) * PushConstants.screen_size.y;
+
+        float level = floor(log2(max(width, height)));
         float depth = 1 - textureLod(depthImage, uv, level).x;
         //float depth_in_linear = 0.200004011 / (1.00004005 - (2*depth-1));
 
-        // if(depth_proj > depth) return false;
+        if(depth_proj > depth) return false;
     }
 
   }

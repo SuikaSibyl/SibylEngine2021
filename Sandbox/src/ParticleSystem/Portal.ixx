@@ -433,7 +433,7 @@ namespace SIByL::Demo
 
 			// Add Materials
 			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Particle Portal Mesh Culling", "Portal");
-			portal_mat_scope->resources = { samplerHandle, particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, samplerHandle, doubleBufferedIndicesHandle, indirectDrawBuffer, cullingInfo, workshop->getInternalSampler("MinPooling Sampler") };
+			portal_mat_scope->resources = { samplerHandle, particlePosLifetickBuffer, particleVelocityMassBuffer, particleColorBuffer, samplerHandle, doubleBufferedIndicesHandle, indirectDrawBuffer, cullingInfo, workshop->getInternalSampler("HiZ Sampler") };
 			portal_mat_scope->sampled_textures = { spriteHandle, bakedCurveHandle, hiz };
 		}
 		trancparency_portal_mesh_culling_pipeline->isActive = false;
@@ -448,7 +448,7 @@ namespace SIByL::Demo
 
 			// Add Materials
 			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Vis AABB Portal", "Portal");
-			portal_mat_scope->resources = { cullingInfo, indirectDrawBuffer, workshop->getInternalSampler("MinPooling Sampler") };
+			portal_mat_scope->resources = { cullingInfo, indirectDrawBuffer, workshop->getInternalSampler("HiZ Sampler") };
 			portal_mat_scope->sampled_textures = { hiz };
 		}
 		culling_aabb_vis_pipeline->isActive = true;

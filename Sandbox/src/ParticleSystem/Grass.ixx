@@ -348,7 +348,7 @@ namespace SIByL::Demo
 
 			// Add Materials
 			auto grass_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Particle Grass Mesh Culling", "Grass");
-			grass_mat_scope->resources = { workshop->getInternalSampler("Default Sampler"), particlePosBuffer, particleColorBuffer, particleDirectionBuffer, doubleBufferedIndicesHandle, cullingInfo, workshop->getInternalSampler("MinPooling Sampler") };
+			grass_mat_scope->resources = { workshop->getInternalSampler("Default Sampler"), particlePosBuffer, particleColorBuffer, particleDirectionBuffer, doubleBufferedIndicesHandle, cullingInfo, workshop->getInternalSampler("HiZ Sampler") };
 			grass_mat_scope->sampled_textures = { spriteHandle, hiz };
 		}
 		grass_mesh_culling_pipeline->isActive = false;
@@ -363,7 +363,7 @@ namespace SIByL::Demo
 
 			// Add Materials
 			auto portal_mat_scope = workshop->addRasterMaterialScope("Forward Pass", "Vis AABB Grass", "Grass");
-			portal_mat_scope->resources = { cullingInfo, workshop->getInternalSampler("MinPooling Sampler") };
+			portal_mat_scope->resources = { cullingInfo, workshop->getInternalSampler("HiZ Sampler") };
 			portal_mat_scope->sampled_textures = { hiz };
 		}
 		culling_aabb_vis_pipeline->isActive = true;

@@ -11,12 +11,14 @@ import Core.Buffer;
 import Core.MemoryManager;
 import RHI.ITexture;
 import RHI.IFactory;
+import RHI.ISampler;
 import RHI.ITextureView;
 import GFX.RDG.Common;
 import GFX.RDG.Agency;
 import GFX.RDG.RenderGraph;
 import GFX.RDG.ColorBufferNode;
 import GFX.RDG.ComputeSeries;
+import GFX.RDG.SamplerNode;
 
 #define GRIDSIZE(x,ThreadSize) ((x+ThreadSize - 1)/ThreadSize)
 #define MAX(a,b) ((a)>(b)?(a):(b))
@@ -36,8 +38,10 @@ namespace SIByL::GFX
 		GFX::RDG::NodeHandle depthInputHandle;
 		GFX::RDG::NodeHandle depthSampleHandle;
 		GFX::RDG::NodeHandle HiZ_handle;
+		GFX::RDG::NodeHandle HiZSamplerHandle;
 		RHI::IResourceFactory* factory = nullptr;
 		GFX::RDG::RenderGraphWorkshop* workshop = nullptr;
+		MemScope<RHI::ISampler> sampler = nullptr;
 		MemScope<RHI::ITextureView> depthSampleView = nullptr;
 		std::vector<MemScope<RHI::ITextureView>> mipmapTextureViews;
 		std::vector<GFX::RDG::NodeHandle> mipmapColorBufferExt;
@@ -56,6 +60,10 @@ namespace SIByL::GFX
 		workshop = (GFX::RDG::RenderGraphWorkshop*)i_workshop;
 		// Add Pass "HiZ Pass"
 		workshop->addComputePassScope("HiZ Pass");
+
+		// Add HiZ Sampler
+		HiZSamplerHandle = workshop->addSamplerExt(sampler.get(), "HiZ Sampler");
+		workshop->renderGraph.samplerRegister.emplace("HiZ Sampler", HiZSamplerHandle);
 
 		// Add HiZ Depth Buffer
 		HiZ_handle = workshop->addColorBuffer(RHI::ResourceFormat::FORMAT_R32_SFLOAT, 1.f, 1.f, "Z-Hierachy");
@@ -121,6 +129,12 @@ namespace SIByL::GFX
 		// get mipmap count
 		mipmapCount = static_cast<uint32_t>(std::floor(std::log2(std::max(workshop->renderGraph.datumWidth, workshop->renderGraph.datumHeight)))) + 1;;
 		mipmapTextureViews.clear();
+
+		RHI::SamplerDesc min_pooling_desc = {};
+		min_pooling_desc.extension = RHI::Extension::MIN_POOLING;
+		min_pooling_desc.maxLod = mipmapCount - 1;
+		sampler = this->factory->createSampler(min_pooling_desc);
+		workshop->renderGraph.getNode<GFX::RDG::SamplerNode>(HiZSamplerHandle)->extSampler = sampler.get();
 
 		// invalid hiz hierarchy views
 		for (int i = 0; i < mipmapCount; i++)
