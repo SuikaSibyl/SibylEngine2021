@@ -30,7 +30,7 @@ SceneNodes:
             PipelineName: Particle Portal Mesh
             MaterialName: Portal
       ParticleSystem:
-        showClusterAABB: false
+        showClusterAABB: true
   - uid: 11454354189262129274
     parent: 0
     children:
@@ -676,4 +676,6 @@ SceneNodes:
           - PassName: Forward Pass
             PipelineName: Particle Grass Mesh
             MaterialName: Grass
+      ParticleSystem:
+        showClusterAABB: true
 SceneEnd: TRUE

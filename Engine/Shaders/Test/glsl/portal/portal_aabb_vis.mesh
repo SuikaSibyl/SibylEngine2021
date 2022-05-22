@@ -90,9 +90,6 @@ void main()
                 float depth_proj = cullingInfo.min_max_depth.x;
                 depth_proj = 1.00004005 - 0.200004011 / depth_proj; // Z : [-1,1]
                 depth_proj = (depth_proj + 1) /2;
-                vec2 uv = vec2(
-                    (cullingInfos[partilets_idx].aabb_xy_wh.x + cullingInfos[partilets_idx].aabb_xy_wh.z) / 2, 
-                    (cullingInfos[partilets_idx].aabb_xy_wh.y + cullingInfos[partilets_idx].aabb_xy_wh.w) / 2);
                 
                 float width = (cullingInfos[partilets_idx].aabb_xy_wh.z - cullingInfos[partilets_idx].aabb_xy_wh.x) * PushConstants.screen_size.x;
                 float height = (cullingInfos[partilets_idx].aabb_xy_wh.w - cullingInfos[partilets_idx].aabb_xy_wh.y) * PushConstants.screen_size.y;
@@ -103,17 +100,20 @@ void main()
                 }
                 else
                 {
-                    float level = ceil(log2(max(ceil(width), ceil(height))));
-                    float depth = 1 - textureLod(depthImage, uv, level).x;
+                    vec4 clamped_aabb = clamp(cullingInfos[partilets_idx].aabb_xy_wh, vec4(0), vec4(1));
+
+                    vec2 uv = vec2(
+                        (clamped_aabb.x + clamped_aabb.z) / 2, 
+                        (clamped_aabb.y + clamped_aabb.w) / 2);
+
+                    float width = (clamped_aabb.z - clamped_aabb.x) * PushConstants.screen_size.x;
+                    float height = (clamped_aabb.w - clamped_aabb.y) * PushConstants.screen_size.y;
+
+                    float level = ceil(log2(max(ceil(width), ceil(height)))) + 2;
+                    float depth = 1 - textureLod(depthImage, uv, 9).x;
                     //float depth_in_linear = 0.200004011 / (1.00004005 - (2*depth-1));
 
                     if(depth_proj > depth) color = vec3(1,0,0);
-
-                    if(thread_in_partilets==0)
-                    {
-                        cullingInfos[partilets_idx].min_max_depth.z = depth_proj;
-                        cullingInfos[partilets_idx].min_max_depth.w = depth;
-                    }
                 }
             }
         }

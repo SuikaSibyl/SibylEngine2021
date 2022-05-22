@@ -82,7 +82,7 @@ bool cullCluster(in CullingInfo cullingInfo, out bool needLoD, out bool doRender
         float depth = 1 - textureLod(depthImage, uv, level).x;
         //float depth_in_linear = 0.200004011 / (1.00004005 - (2*depth-1));
 
-        if(depth_proj > depth) return false;
+        // if(depth_proj > depth) return false;
     }
 
   }

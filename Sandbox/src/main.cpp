@@ -744,6 +744,7 @@ public:
 		}
 		bool freshRequestFromParticleSystems = false;
 		freshRequestFromParticleSystems |= portal.freshRenderPipeline(&rdg);
+		freshRequestFromParticleSystems |= grass.freshRenderPipeline(&rdg);
 		bool needReize = editorLayer->mainViewport.getNeedResize();
 		if (needReize | needChangeRasterPipeline | freshRequestFromParticleSystems)
 		{

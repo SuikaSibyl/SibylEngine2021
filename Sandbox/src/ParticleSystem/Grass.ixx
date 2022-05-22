@@ -29,6 +29,7 @@ import GFX.RDG.ComputePassNode;
 import GFX.RDG.ComputeSeries;
 import GFX.Transform;
 import GFX.BoundingBox;
+import GFX.ParticleSystem;
 
 import ParticleSystem.ParticleSystem;
 #define GRIDSIZE(x,ThreadSize) ((x+ThreadSize - 1)/ThreadSize)
@@ -68,6 +69,7 @@ namespace SIByL::Demo
 		virtual auto registerUpdatePasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
 		auto registerBoundingBoxesPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void;
 		virtual auto registerRenderPasses(GFX::RDG::RenderGraphWorkshop* workshop) noexcept -> void override;
+		auto freshRenderPipeline(GFX::RDG::RenderGraph* rendergraph) noexcept -> bool;
 
 		MemScope<RHI::ITexture> sceneDepthTexture;
 		MemScope<RHI::ITextureView> sceneDepthTextureView;
@@ -367,4 +369,18 @@ namespace SIByL::Demo
 		culling_aabb_vis_pipeline->isActive = true;
 
 	}
+
+	auto GrassSystem::freshRenderPipeline(GFX::RDG::RenderGraph* rendergraph) noexcept -> bool
+	{
+		GFX::ParticleSystem& ps = entity.getComponent<GFX::ParticleSystem>();
+		if (ps.needRebuildPipeline)
+		{
+			rendergraph->getRasterPipelineScope("Forward Pass", "Vis AABB Grass")->isActive = ps.showCluster;
+			ps.needRebuildPipeline = false;
+			return true;
+		}
+		else
+			return false;
+	}
+
 }
